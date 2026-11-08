@@ -80,6 +80,17 @@ Para depurar el bridge de forma aislada, su actividad (sincronizaciones, notific
 
 ## 🛠️ Compilación a .EXE (Windows)
 
+### Opción recomendada: compilación automática en GitHub
+
+En GitHub, pestaña **Actions** → **Compilar Organizador** → **Run workflow**. Antes, sube a `main` la versión nueva con sus notas (paso 2 de abajo).
+
+- **solo-descarga**: compila y deja el instalador y su `.sha256` como descarga del propio workflow (30 días). No crea ninguna Release y los equipos no se enteran. Sirve para probar.
+- **borrador**: además crea la Release **en borrador** con el instalador, el `.sha256` y las novedades de `release_notes.md`. Los equipos no la ven (consultan `/releases/latest`, que nunca devuelve borradores). Para que se actualicen, en **Releases** abre el borrador y pulsa **Publish release**.
+
+Antes de compilar se comprueba (`compilacion/preparar_release.py`) que `APP_VERSION` y `MyAppVersion` coinciden, que la versión es par, que `release_notes.md` empieza por esa versión y, para el borrador, que no existe ya una Release con esa versión. Si algo falla, no se crea nada.
+
+Para hacerlo a mano en un equipo con Windows, los pasos son estos:
+
 ### 1. Compilar el ejecutable con PyInstaller
 
 ```

@@ -9,6 +9,7 @@ Aplicación de escritorio para Windows 10/11 de la Central de Compras Princess C
 - **Python 3.10–3.13 + ttkbootstrap (Tkinter).** Punto de entrada: `main_agenda.py`. Persistencia local en SQLite (`app/db/sqlite.py`) y en `%APPDATA%\OrganizadorPrincess\`.
 - **Compilación:** `compilar.bat` (copia el proyecto a `C:\build_temp\OrganizadorPrincess` y lanza PyInstaller con `main.spec`). Un módulo nuevo que se importe de forma dinámica va en `hiddenimports` de `main.spec` (ya pasó con `ui.dnd_windows`).
 - **Instalador:** Inno Setup con `OrganizadorPrincess_Setup.iss` → `OrganizadorPrincess_Setup_<versión>.exe`.
+- **Compilación automática:** `.github/workflows/compilar.yml`, solo a mano desde la pestaña Actions (Windows de GitHub, Python 3.12, `compilacion/requisitos.txt`). Destino «solo-descarga» (instalador como descarga del workflow, sin Release) o «borrador» (Release en **borrador**, invisible para `/releases/latest`; se publica a mano con «Publish release»). Las comprobaciones previas están en `compilacion/preparar_release.py`. Nunca publicar una Release directamente desde el workflow ni lanzarlo al subir código.
 
 ## Estructura
 - `main_agenda.py` — ventana principal, agenda, login de Administración y arranque de los servicios.

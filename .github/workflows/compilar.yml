@@ -1,0 +1,124 @@
+# Compila el Organizador Princess en Windows y genera el instalador.
+#
+# La idea y el desarrollo de la aplicación Organizador Princess, incluidas sus pruebas, son de
+# Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.
+#
+# Solo se lanza A MANO (pestaña Actions → «Compilar Organizador» → Run workflow); nunca al subir código.
+#   - destino «solo-descarga»: deja el instalador y su .sha256 como descarga del propio workflow.
+#     No crea ninguna Release; los equipos no se enteran.
+#   - destino «borrador»: además crea una Release en BORRADOR con el instalador y el .sha256.
+#     Los equipos consultan /releases/latest, que nunca devuelve borradores: no se actualiza nadie
+#     hasta que se pulsa «Publish release» en GitHub.
+# Antes de compilar se comprueba (compilacion/preparar_release.py) que APP_VERSION y el .iss coinciden,
+# que la versión es par y, para el borrador, que no existe ya una Release con esa versión.
+name: Compilar Organizador
+
+on:
+  workflow_dispatch:
+    inputs:
+      destino:
+        description: "Qué hacer con el instalador"
+        type: choice
+        options:
+          - solo-descarga
+          - borrador
+        default: solo-descarga
+
+permissions:
+  contents: write
+
+concurrency:
+  group: compilar-organizador
+  cancel-in-progress: false
+
+jobs:
+  compilar:
+    runs-on: windows-2022
+    timeout-minutes: 40
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Comprobar versión
+        id: version
+        shell: pwsh
+        run: |
+          $args_extra = @()
+          if ("${{ inputs.destino }}" -eq "borrador") {
+            gh api --paginate "repos/${{ github.repository }}/releases?per_page=100" --jq '.[].tag_name' | Out-File -Encoding utf8 etiquetas.txt
+            if ($LASTEXITCODE -ne 0) { throw "No se pudo leer la lista de Releases" }
+            $args_extra = @("--releases", "etiquetas.txt")
+          }
+          python compilacion/preparar_release.py @args_extra --notas notas_release.md --github-output "$env:GITHUB_OUTPUT"
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+
+      - name: Instalar dependencias
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r compilacion/requisitos.txt
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          python -c "import requests, socketio, engineio, websocket, cryptography, ttkbootstrap, PIL; print('Dependencias OK')"
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          python -m pip freeze
+
+      - name: Comprobar el código
+        shell: pwsh
+        run: |
+          python -m compileall -q main_agenda.py pedidos_agenda_bridge.py app
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          python test_filtrado_popups.py
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+
+      - name: Compilar con PyInstaller
+        shell: pwsh
+        run: |
+          python -m PyInstaller main.spec --noconfirm --clean
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          if (-not (Test-Path dist\OrganizadorPrincess.exe)) { throw "No se generó dist\OrganizadorPrincess.exe" }
+          "{0:N1} MB" -f ((Get-Item dist\OrganizadorPrincess.exe).Length / 1MB)
+
+      - name: Crear el instalador (Inno Setup)
+        shell: pwsh
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) {
+            choco install innosetup -y --no-progress
+            $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          }
+          & $iscc OrganizadorPrincess_Setup.iss
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          $exe = "dist_installer\${{ steps.version.outputs.instalador }}"
+          if (-not (Test-Path $exe)) { throw "No se generó $exe" }
+          $hash = (Get-FileHash $exe -Algorithm SHA256).Hash.ToLower()
+          "$hash  ${{ steps.version.outputs.instalador }}" | Out-File -Encoding ascii "$exe.sha256"
+          Get-Content "$exe.sha256"
+
+      - name: Guardar el instalador como descarga
+        uses: actions/upload-artifact@v4
+        with:
+          name: OrganizadorPrincess_Setup_${{ steps.version.outputs.version }}
+          path: |
+            dist_installer/${{ steps.version.outputs.instalador }}
+            dist_installer/${{ steps.version.outputs.instalador }}.sha256
+          retention-days: 30
+
+      - name: Crear la Release en BORRADOR (no llega a los equipos)
+        if: inputs.destino == 'borrador'
+        shell: pwsh
+        run: |
+          gh release create "${{ steps.version.outputs.etiqueta }}" `
+            "dist_installer\${{ steps.version.outputs.instalador }}" `
+            "dist_installer\${{ steps.version.outputs.instalador }}.sha256" `
+            --draft `
+            --target "${{ github.sha }}" `
+            --title "Organizador Princess v${{ steps.version.outputs.version }}" `
+            --notes-file notas_release.md
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          "Borrador creado. Revísalo en Releases y pulsa «Publish release» cuando quieras que se actualicen los equipos."

@@ -7,7 +7,6 @@ Uso:
     from negocio.correo import _enriquecer_evento_correo, _generar_texto_correo, _abrir_ventana_correo
 """
 from datetime import datetime
-import urllib.parse
 import ttkbootstrap as ttk
 from tkinter import messagebox, StringVar
 from ui.assets import _apply_icon          # ANTI-REGRESION: usada en _abrir_ventana_correo

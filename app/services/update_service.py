@@ -4,15 +4,15 @@ Comprobación de actualizaciones en GitHub y diálogos de instalación.
 Extraído de main_agenda.py en Fase 2 del sprint de estabilización.
 
 Uso desde main_agenda:
-    from services.update_service import _lanzar_check_update, _dialogo_nueva_version_safe
+    from services.update_service import _lanzar_check_update, _check_version_reset
     _lanzar_check_update(app)
+(La ventana «Nueva versión» tras instalar vive en main_agenda.py, _dialogo_nueva_version.)
 """
 # Nota: este módulo usa tkinter/ttkbootstrap directamente porque toda la UI
 # de actualización está acoplada a los diálogos. Se desacoplará en Fase 3.
 
 import os
 import ttkbootstrap as ttk                              # ANTI-REGRESION: era global de main_agenda
-from tkinter import messagebox, filedialog, StringVar   # ANTI-REGRESION: idem
 from db.sqlite import CONFIG_FILE, VERSION_FILE, AGENDA_FILE  # ANTI-REGRESION: AGENDA_FILE faltaba
 from ui.assets import _apply_icon                       # ANTI-REGRESION: usada en todos los Toplevel
 # Inyectados desde main_agenda al arrancar
@@ -21,19 +21,9 @@ GITHUB_REPO  = ""   # se sobreescribe desde main_agenda
 
 # Constante de color — ANTI-REGRESION: era global de main_agenda
 LIGHT = "#D8E8F0"
-import sys
 import json
 import threading
 from datetime import datetime
-import ssl
-import socket
-import shutil
-import tempfile
-import zipfile
-import urllib.request
-import urllib.error
-import subprocess
-import traceback
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -716,291 +706,6 @@ def _check_version_reset():
         return False, APP_VERSION
 
     return True, version_guardada  # version anterior (puede ser "")
-
-
-    def _dialogo_nueva_version():
-        """Ventana modal de decision de instalacion de nueva version."""
-
-        dlg = ttk.Toplevel(app)   # FIX: padre explícito para evitar fallo silencioso en after()
-        dlg.withdraw()   # ocultar hasta posicionar correctamente
-        dlg.title("Nueva version detectada  " + APP_VERSION)
-        dlg.resizable(False, False)
-        dlg.attributes("-topmost", True)
-        _apply_icon(dlg)
-        dlg.transient(app)
-
-        # ── Cabecera ─────────────────────────────────────────────
-        hdr = ttk.Frame(dlg, bootstyle="warning")
-        hdr.pack(fill="x")
-        _hdr_inner = ttk.Frame(hdr, bootstyle="warning")
-        _hdr_inner.pack(fill="x", padx=16, pady=12)
-        ttk.Label(
-            _hdr_inner,
-            text="🆕  Nueva version  " + APP_VERSION,
-            font=("Segoe UI", 13, "bold"),
-            bootstyle="inverse-warning",
-        ).pack(anchor="w")
-        ver_tag = _version_anterior or "desconocida"
-        ttk.Label(
-            _hdr_inner,
-            text=f"Version anterior: {ver_tag}",
-            font=("Segoe UI", 9),
-            bootstyle="inverse-warning",
-        ).pack(anchor="w", pady=(2, 0))
-
-        ttk.Separator(dlg).pack(fill="x")
-
-        # ── Cuerpo ───────────────────────────────────────────────
-        body = ttk.Frame(dlg)
-        body.pack(fill="x", padx=18, pady=(14, 6))
-
-        ttk.Label(
-            body,
-            text="¿Como deseas instalar la nueva version?",
-            font=("Segoe UI", 10, "bold"),
-        ).pack(anchor="w", pady=(0, 10))
-
-        # Radio: tipo de instalacion
-        var_modo = StringVar(value="actualizar")
-
-        frm_r1 = ttk.Frame(body)
-        frm_r1.pack(fill="x", pady=(0, 4))
-        ttk.Radiobutton(
-            frm_r1,
-            text="  Solo actualizar version  (mantiene configuracion y agenda)",
-            variable=var_modo,
-            value="actualizar",
-            bootstyle="warning",
-        ).pack(anchor="w")
-
-        frm_r2 = ttk.Frame(body)
-        frm_r2.pack(fill="x", pady=(0, 6))
-        ttk.Radiobutton(
-            frm_r2,
-            text="  Instalacion desde cero  (borra configuracion Y agenda)",
-            variable=var_modo,
-            value="desde_cero",
-            bootstyle="danger",
-        ).pack(anchor="w")
-
-        ttk.Separator(body).pack(fill="x", pady=(6, 10))
-
-        # Sub-bloque: opciones de copia de seguridad (solo visible en "desde_cero")
-        # FIX Python 3.14 + ttkbootstrap: LabelFrame no acepta padding= como kwarg.
-        # Se usa un Frame interior con padx/pady para replicar el mismo espaciado.
-        frm_backup = ttk.LabelFrame(body, text=" Copia de seguridad de agenda (vacaciones y festivos incluidos) ")
-        frm_backup.pack(fill="x", pady=(0, 8))
-        _frm_backup_inner = ttk.Frame(frm_backup)
-        _frm_backup_inner.pack(fill="x", padx=10, pady=8)
-
-        var_backup = StringVar(value="si")
-        ttk.Radiobutton(
-            _frm_backup_inner,
-            text="  Si, hacer copia de seguridad antes de borrar",
-            variable=var_backup,
-            value="si",
-            bootstyle="success",
-        ).pack(anchor="w", pady=(0, 4))
-        ttk.Radiobutton(
-            _frm_backup_inner,
-            text="  No, borrar sin copia",
-            variable=var_backup,
-            value="no",
-            bootstyle="danger",
-        ).pack(anchor="w")
-
-        ttk.Label(
-            _frm_backup_inner,
-            text="Carpeta destino de la copia:",
-            font=("Segoe UI", 9),
-        ).pack(anchor="w", pady=(10, 2))
-
-        frm_ruta = ttk.Frame(_frm_backup_inner)
-        frm_ruta.pack(fill="x")
-
-        _appdata_dir = os.path.dirname(CONFIG_FILE)
-        var_ruta_bk = StringVar(value=_appdata_dir)
-
-        ent_ruta = ttk.Entry(frm_ruta, textvariable=var_ruta_bk, width=42)
-        ent_ruta.pack(side="left", fill="x", expand=True)
-
-        def _elegir_carpeta():
-            carpeta = filedialog.askdirectory(
-                title="Elegir carpeta para la copia de seguridad",
-                initialdir=var_ruta_bk.get(),
-                parent=dlg,
-            )
-            if carpeta:
-                var_ruta_bk.set(carpeta)
-
-        ttk.Button(
-            frm_ruta,
-            text="  📁  ",
-            bootstyle="secondary-outline",
-            command=_elegir_carpeta,
-        ).pack(side="left", padx=(6, 0))
-
-        # Habilitar/deshabilitar sub-bloque segun modo
-        def _toggle_backup(*_):
-            estado = "normal" if var_modo.get() == "desde_cero" else "disabled"
-            # Los widgets estan en _frm_backup_inner (nivel 1) y sus hijos (nivel 2)
-            for w in _frm_backup_inner.winfo_children():
-                try:
-                    w.configure(state=estado)
-                except Exception:
-                    pass  # UI — ignorar silenciosamente
-                for ww in w.winfo_children():
-                    try:
-                        ww.configure(state=estado)
-                    except Exception:
-                        pass  # UI — ignorar silenciosamente
-
-        var_modo.trace_add("write", _toggle_backup)
-        _toggle_backup()  # estado inicial
-
-        ttk.Separator(dlg).pack(fill="x")
-
-        # ── Pie con botones ───────────────────────────────────────
-        pie = ttk.Frame(dlg)
-        pie.pack(fill="x", padx=18, pady=(10, 12))
-
-        def _confirmar():
-            modo = var_modo.get()
-            if modo == "actualizar":
-                _aplicar_solo_actualizacion(_version_anterior)
-                dlg.destroy()
-                messagebox.showinfo(
-                    "Version actualizada",
-                    f"Version actualizada a {APP_VERSION}.\n\n"
-                    "Tu configuracion y agenda permanecen intactas.\n"
-                    "Usa 'Importar config' en el panel Admin si necesitas ajustar rutas.",
-                    parent=app,
-                )
-                app.after(300, _mostrar_saludo_diario)
-            else:
-                # Desde cero
-                hacer_backup = var_backup.get() == "si"
-                ruta_bk      = var_ruta_bk.get().strip() or _appdata_dir
-
-                if hacer_backup:
-                    # Verificar que la carpeta existe o es creable
-                    if not os.path.isdir(ruta_bk):
-                        messagebox.showerror(
-                            "Carpeta no valida",
-                            f"La carpeta indicada no existe:\n{ruta_bk}\n\n"
-                            "Selecciona una carpeta valida antes de continuar.",
-                            parent=dlg,
-                        )
-                        return
-
-                    confirmar = messagebox.askyesno(
-                        "Confirmar instalación desde cero",
-                        f"Se realizará una copia de seguridad de la agenda en:\n\n"
-                        f"  {ruta_bk}\n\n"
-                        "A continuación se borrarán la configuración y la agenda.\n\n"
-                        "⚠️  La aplicación se cerrará automáticamente al terminar.\n"
-                        "Deberás volver a abrirla para que los cambios surtan efecto.\n\n"
-                        "¿Deseas continuar?",
-                        parent=dlg,
-                    )
-                else:
-                    confirmar = messagebox.askyesno(
-                        "Confirmar instalación desde cero",
-                        "Se borrarán la configuración Y la agenda SIN copia de seguridad.\n\n"
-                        "⚠️  Esta acción no se puede deshacer.\n\n"
-                        "La aplicación se cerrará automáticamente al terminar.\n"
-                        "Deberás volver a abrirla para que los cambios surtan efecto.\n\n"
-                        "¿Deseas continuar?",
-                        icon="warning",
-                        parent=dlg,
-                    )
-
-                if not confirmar:
-                    return
-
-                _aplicar_instalacion_desde_cero(
-                    _version_anterior,
-                    backup_agenda=hacer_backup,
-                    ruta_backup=ruta_bk if hacer_backup else None,
-                )
-                dlg.destroy()
-
-                msg_ok = f"✅  Instalación desde cero completada ({APP_VERSION}).\n\n"
-                if hacer_backup:
-                    msg_ok += f"📁  Copia de seguridad guardada en:\n     {ruta_bk}\n\n"
-                msg_ok += (
-                    "La configuración y la agenda han sido reiniciadas.\n\n"
-                    "⚠️  La aplicación se cerrará ahora.\n"
-                    "Vuelve a abrirla para que todos los cambios surtan efecto."
-                )
-                messagebox.showinfo("Instalación completada — reinicio necesario", msg_ok, parent=app)
-
-                # Cerrar la aplicación para que los cambios surtan efecto al reabrir
-                detener_bridge()
-                app.destroy()
-
-        def _cancelar():
-            # El usuario no elige; marcamos la version igual para no volver a preguntar
-            _aplicar_solo_actualizacion(_version_anterior)
-            dlg.destroy()
-            app.after(300, _mostrar_saludo_diario)
-
-        ttk.Button(
-            pie, text="  Cancelar  ",
-            bootstyle="secondary",
-            command=_cancelar,
-        ).pack(side="right", padx=(8, 0))
-
-        ttk.Button(
-            pie, text="  Confirmar  ",
-            bootstyle="warning",
-            command=_confirmar,
-        ).pack(side="right")
-
-             # ── Posicionar y mostrar ───────────────────────────
-        # Ancho minimo garantizado; la ventana esta oculta (withdraw)
-        # hasta que Tk calcula el tamano real con update() completo.
-        # Luego se posiciona en el lado izquierdo (~60 px del borde)
-        # centrada verticalmente, sin solaparse con el saludo diario.
-        _MIN_W = 480
-        dlg.minsize(_MIN_W, 1)
-
-        dlg.update_idletasks()
-        dlg.update()   # renderizado completo antes de medir
-
-        _sw = app.winfo_screenwidth()
-        _sh = app.winfo_screenheight()
-
-        _w = max(dlg.winfo_width(), dlg.winfo_reqwidth(), _MIN_W)
-        _h = max(dlg.winfo_height(), dlg.winfo_reqheight())
-
-        # X: ~60 px del borde izquierdo (~2-3 dedos)
-        _x = 60
-        # Y: centrado vertical, minimo 40 px del borde superior
-        _y = max(40, (_sh - _h) // 2)
-
-        dlg.geometry(f"{_w}x{_h}+{_x}+{_y}")
-        dlg.deiconify()   # mostrar ya en posicion correcta
-        dlg.lift()
-        dlg.focus_force()
-        dlg.grab_set()
-
-
-    def _dialogo_nueva_version_safe():
-        """Wrapper con captura de errores para que el after() no muera en silencio."""
-        try:
-            _dialogo_nueva_version()
-        except Exception as _exc:
-            import traceback
-            _log_path = os.path.join(os.path.dirname(CONFIG_FILE), "version_error.log")
-            with open(_log_path, "w", encoding="utf-8") as _f:
-                traceback.print_exc(file=_f)
-            messagebox.showerror(
-                "Error al mostrar dialogo de version",
-                f"Ha ocurrido un error inesperado:\n\n{_exc}\n\n"
-                f"Detalle guardado en:\n{_log_path}",
-                parent=app,
-            )
 
 
 def _parse_version(tag: str):

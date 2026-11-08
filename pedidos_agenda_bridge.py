@@ -308,7 +308,6 @@ def _mostrar_error_bridge(titulo: str, cuerpo: str):
     de cuántas veces falle la conexión o de si hay éxitos intermedios.
     Los fallos adicionales del mismo día solo van al log.
     """
-    global _errores_mostrados_hoy
 
     _blog(f"ERROR: {titulo}\n{cuerpo}\n{'─'*60}")
 
@@ -466,7 +465,6 @@ def _mostrar_error_bridge(titulo: str, cuerpo: str):
 def _resetear_contador_errores():
     """Compatibilidad: ya no resetea nada. El límite es 1 diálogo/día por tipo,
     independientemente de los éxitos de conexión intermedios."""
-    pass
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -1074,7 +1072,7 @@ def _sincronizar_alertas(agenda_data, save_agenda_fn, mostrar_alerta_fn):
     servidor manda aparte total_activas/urgentes_activas/normales_activas
     con el recuento SIN filtrar.
     """
-    global _dia_actual, _resumen_alertas
+    global _dia_actual
 
     endpoint = "/api/bridge/alertas"
 
@@ -1146,7 +1144,6 @@ def _procesar_push(agenda_data, save_agenda_fn, mostrar_alerta_fn):
     aviso concreto se pierde (no hay replay al reiniciar) — compromiso
     aceptado a cambio de simplicidad.
     """
-    global _push_procesados
 
     endpoint   = "/api/bridge/notificaciones"
 
@@ -1255,7 +1252,7 @@ def iniciar_bridge_pedidos(agenda_data, save_agenda_fn, app_root_legacy=None, ap
     mostrar_alerta_fn: referencia directa a negocio.alertas.mostrar_alerta,
               inyectada por main_agenda.py. Ver ANTI-REGRESION más abajo.
     """
-    global _estado_popups, _dia_actual, _push_procesados, _app_root
+    global _dia_actual, _app_root
 
     # Compatibilidad con llamada antigua de 3 argumentos
     _app_root = app_root or app_root_legacy

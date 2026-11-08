@@ -12,9 +12,8 @@ import queue
 import time                                          # ANTI-REGRESION: necesario para time.sleep en monitor_avisos
 import logging
 import os
-from datetime import datetime, date, timedelta
+from datetime import datetime, timedelta
 import ttkbootstrap as ttk
-from tkinter import messagebox
 from utils.fechas import _iso_a_ui
 from utils.sonido import _reproducir_sonido_aviso
 from db.sqlite import load_agenda, save_agenda       # ANTI-REGRESION: importar directamente, no depender de inyección desde main_agenda
@@ -581,7 +580,6 @@ def mostrar_alerta(aviso, clave_silencio: str = None):
 
 def _construir_popup(aviso, clave_silencio: str = None):
     """Construye y muestra un popup. Al cerrarse procesa el siguiente en cola."""
-    global _popup_activo
     _log.info("CONSTRUIR popup '%s'", aviso.get("titulo","?"))
 
     tipo_popup   = aviso.get("_tipo_popup", "aviso")   # "aviso" | "vacaciones" | "festivo"

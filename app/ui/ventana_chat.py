@@ -34,7 +34,7 @@ _HANDLER        = None  # función que procesa un evento del chat mientras la ve
 
 
 def _ventana_chat(ctx):
-    global _VENTANA_ACTUAL, _CANAL_VISIBLE, _HANDLER
+    global _VENTANA_ACTUAL, _HANDLER
     if _VENTANA_ACTUAL is not None and _VENTANA_ACTUAL.winfo_exists():
         _VENTANA_ACTUAL.lift()
         _VENTANA_ACTUAL.focus_force()

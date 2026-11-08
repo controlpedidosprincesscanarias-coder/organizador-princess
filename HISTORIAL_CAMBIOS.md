@@ -51,6 +51,65 @@
 
 ---
 
+## 2026-11-08 17:41 — [Control Pedidos] app.js partido por temas y manuales al día (v12.34.04)
+
+- **Petición**: Víctor aprueba partir `static/js/app.js` (punto 13 de los pendientes).
+- **Cambio**:
+  - `app.js` → `app_nucleo.js` (1–1112), `app_vistas.js`, `app_pedidos.js`, `app_entregas.js`, `app_alertas_proveedores.js`, `app_sap.js`, `app_pedido_simplificado.js` y `app_utilidades.js`.
+  - Cortes en las cabeceras de sección existentes, en el mismo orden de `<script>` en `templates/index.html`.
+- **Comprobaciones**:
+  - con `acorn`: ningún corte parte una sentencia de primer nivel, y ninguna sentencia que se ejecuta al cargar usa una declaración de un archivo posterior;
+  - la concatenación de los 8 archivos, sin la cabecera de autoría añadida, es idéntica byte a byte al `app.js` anterior;
+  - cada archivo compila por separado;
+  - E2E (57 pasos) sin errores de JS;
+  - el recorrido completo del script de capturas de los manuales, sin errores de JS.
+- Comentarios de `servicios/` y `rutas/` que citaban `static/js/app.js`, actualizados al archivo nuevo. `CLAUDE.md` y `README.md` describen el reparto y la regla de orden.
+- **Manuales** regenerados (V 12.34.04), con el Excel de faltantes, la copia al responsable, el seguimiento en bloque (captura nueva) y el recordatorio semanal.
+
+---
+
+## 2026-11-08 17:31 — [Control Pedidos] Mejoras de los pendientes: copia al responsable, Excel de faltantes, recordatorio semanal y seguimiento en bloque (v12.34.02)
+
+- **Petición**: Víctor aprueba los puntos 1, 7, 8, 9, 10, 11 y 12 de la lista de pendientes.
+- **Cambios**:
+  - `servicios/correos_estado.py`: nueva `_cc_comprador_responsable()`. El correo al proveedor lleva en CC al primer comprador del hotel si firma otra persona. Pasa por la redirección del hotel PR como el resto.
+  - `rutas/albaranes_lote.py`:
+    - el cálculo de `/api/pedidos/pendientes-entrega` pasa a `_pendientes_entrega_de_la_peticion()`;
+    - nueva ruta `GET /api/pedidos/pendientes-entrega/excel` (openpyxl, sin precios);
+    - botón «⬇ Faltantes (Excel)» en `templates/index.html` y `exportarFaltantesExcel()` en `app.js`.
+  - `jobs/recordatorios.py` (nuevo): `_job_recordatorio_listados_sap`, lunes 08:20 (Atlantic/Canary), por `_notificar_evento`.
+    - La última carga sale de `sap_pedidos_listado`, `sap_pedidos_lineas` y `sap_albaranes_cab`; sin el hotel PR.
+    - Migración, paso 126 (al final, idempotente): evento `recordatorio_listados_sap` en `eventos_aviso`.
+  - `rutas/proveedores.py`: `GET` y `PUT /api/proveedores/seguimiento` (`@admin_required`; el PUT solo cambia los ids indicados, 422 si un id va en las dos listas). Botón y ventana «☑ Seguimiento en bloque» en Proveedores.
+  - `app.py`: `_marca_arranque()` con los tiempos por fase. `core/migraciones.py`: tiempo de conexión y duración total.
+  - Punto 9: ya implementado desde v12.32.86; se cierra sin código.
+- **Pruebas**:
+  - `test_flujo.py`, secciones 14 a 17 (de 60 a 76 comprobaciones);
+  - `test_hotel_pruebas.py`, copia al responsable (de 19 a 21);
+  - huellas regeneradas (3 rutas, 1 tarea programada y 8 funciones nuevas);
+  - migraciones, techo, rotación EmailJS, referencias y E2E (57): OK;
+  - ventana de seguimiento probada en Chromium.
+- **Manuales**: los del Comprador y del Administrador conviene regenerarlos (botones nuevos). Se hará tras partir `app.js`.
+
+---
+
+## 2026-11-08 17:18 — [Control Pedidos] Retirado código sin uso tras revisar todas las aplicaciones (v12.34.00)
+
+- **Petición**: Víctor, al repasar los pendientes: retirar la auditoría puntual de Restaurante/Bares (ya hecha), las ventanas sin botón y, tras revisar Catálogo, Activo Operacional, Organizador y Chat, las rutas que nadie usa.
+- **Revisión de las otras aplicaciones** (`dali-sap-articulos-app`, `activo-operacional-princess`, `organizador-princess`, `control-pedidos-chat`), por dirección completa y por palabras sueltas: solo usan `/api/externo/dali-sap/*`, `/api/externo/activo-operacional/*`, `/api/bridge/*`, `/api/login` y `/api/solicitar-usuario/directo`.
+- **Retirado**:
+  - `templates/index.html`: tarjeta de la auditoría y modales `modal-actualizar-departamentos` y `modal-importar-albaranes`;
+  - `static/js/importar_pedidos.js`: `loadAuditoriaRestauranteBares`;
+  - `static/js/app.js`: bloques «Actualizar departamentos» e «Importar Albaranes»;
+  - 15 rutas: `/api/admin/auditoria-restaurante-bares-gy-it-mt-ta`, `/api/pedidos/comparar-listado-pdf` (×3), `/api/pedidos/comparar-listado-albaranes` (×4), `/api/pedidos/listado-sap-guardado/<id>`, `/api/pedidos/pendientes-crear-sap/<id>`, `/api/pedidos/crear-desde-sap`, `/api/pedidos/actualizar-departamentos-listado` (×2) y `/api/albaranes/importar-listado` (×2);
+  - borrados `rutas/sap_comparar_pdf.py` y `rutas/sap_crear_pedidos.py`, que se quedaron vacíos.
+- **Arreglo** (commit propio): `servicios/externo.py` importaba `_DALI_BRIDGE_MARGEN_SEGUNDOS` de `rutas/admin_datos.py`. Se mueve la constante a `servicios/externo.py`, que es donde se usa.
+- **Anotado en CLAUDE.md**: funciones de `servicios/` que se quedan sin llamadas, para retirarlas en una entrega propia.
+- `PENDIENTES.md`: fuera la entrada de la auditoría de Restaurante/Bares.
+- **Pruebas**: huellas regeneradas (−15 rutas y sus funciones); flujo (60), migraciones, hotel de pruebas (19), referencias (11) y E2E (57): OK.
+
+---
+
 ## 2026-11-08 17:00 — [Control Pedidos / Infra] Logs de arranque revisados; mejora de arranque anotada (v12.33.98)
 
 - **Revisado**: 4 arranques en Render el 8 nov (despliegues de v12.33.86 a v12.33.96). Todos con `Auto-migración OK`, sin `[MIGRACION] Paso … falló`, y con las 11 tareas programadas iniciadas.

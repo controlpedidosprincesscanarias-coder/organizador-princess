@@ -26,6 +26,7 @@ import hashlib
 import secrets as _secrets
 import time
 import urllib.request
+import urllib.parse
 import urllib.error
 
 from db.sqlite import (CONFIG_FILE, get_bridge_credentials, get_nombre_usuario,
@@ -251,7 +252,10 @@ def existe_en_plataforma(username_win: str):
     (en ese caso el llamante debe decidir un fallback, p.ej. usar el
     registro local si existe)."""
     try:
-        data = _request_json(f"/api/bridge/existe?usuario_windows={username_win}")
+        # (v4.18.06) El usuario va codificado: con un espacio (o caracteres
+        # como «ñ») la petición no llegaba a salir (InvalidURL) y la ventana de
+        # acceso decía «Sin conexión con Control de Pedidos» aunque la hubiera.
+        data = _request_json("/api/bridge/existe?usuario_windows=" + urllib.parse.quote(username_win, safe=""))
         return bool(data.get("existe", False))
     except Exception:  # noqa: BLE001
         _log_warning()

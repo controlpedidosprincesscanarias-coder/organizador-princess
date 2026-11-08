@@ -136,7 +136,13 @@ def _init_db_usuarios():
             bridge_password TEXT DEFAULT ''
         )
     """)
+    # (v4.18.06) Solo se añaden las columnas que falten: antes se intentaba
+    # el ALTER cada vez (esta función se llama en cada lectura) y fallaba con
+    # «duplicate column name», dejando dos avisos en el log en cada llamada.
+    existentes = {fila[1] for fila in cur.execute("PRAGMA table_info(config_usuarios)")}
     for col in ("bridge_user", "bridge_password"):
+        if col in existentes:
+            continue
         try:
             cur.execute(f"ALTER TABLE config_usuarios ADD COLUMN {col} TEXT DEFAULT ''")
         except Exception:  # noqa: BLE001

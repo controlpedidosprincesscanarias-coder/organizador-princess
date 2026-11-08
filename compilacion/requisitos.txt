@@ -1,0 +1,9 @@
+# Dependencias para compilar el Organizador Princess (las usa .github/workflows/compilar.yml).
+# Mismos paquetes que instala compilar.bat, más los de la interfaz y PyInstaller.
+pyinstaller
+ttkbootstrap
+pillow
+requests
+python-socketio[client]
+websocket-client
+cryptography

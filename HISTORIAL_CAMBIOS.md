@@ -51,6 +51,20 @@
 
 ---
 
+## 2026-11-08 21:38 — [Organizador] Compilación automática del instalador en GitHub, con Release en borrador
+
+- **Petición** (Víctor): compilar automáticamente y dejar el `.exe` de actualización en la Release, pero desactivado, para que no les salte la actualización a los usuarios hasta que se decida.
+- **Nuevo** `.github/workflows/compilar.yml` («Compilar Organizador»), solo a mano desde Actions, en Windows de GitHub:
+  - comprueba versión y notas → compila el código y pasa `test_filtrado_popups.py` → PyInstaller con `main.spec` → Inno Setup con el `.iss` → `.sha256` en el formato que lee `update_service.py`;
+  - destino «solo-descarga»: el instalador queda como descarga del workflow, sin Release;
+  - destino «borrador»: crea la Release en **borrador**. `/releases/latest` nunca devuelve borradores, así que ningún equipo se actualiza hasta pulsar «Publish release».
+- **Nuevo** `compilacion/preparar_release.py`: `APP_VERSION` = `MyAppVersion`, número par, `release_notes.md` empieza por esa versión, y no hay ya una Release con esa versión (comparada como números). Si falla, no se crea nada. Las notas de la Release salen del primer bloque de `release_notes.md`, sin la línea interna «Al publicar».
+- **Nuevo** `compilacion/requisitos.txt` (dependencias de compilación).
+- README y CLAUDE.md: cómo usarlo. No cambia el código de la aplicación ni su versión, y no se crea ninguna Release.
+- Pendiente: primera ejecución en «solo-descarga» con la 4.18.04 para comparar ese instalador con el compilado a mano. Desde esta sesión no se puede lanzar ni ver Actions.
+
+---
+
 ## 2026-11-08 21:30 — [Control Pedidos] Limpieza de funciones sin uso de la parte SAP (v12.34.12)
 
 - **Petición**: punto 6 de los pendientes, retirar lo que quedó sin llamadas al quitar en v12.34.00 las rutas antiguas de SAP.

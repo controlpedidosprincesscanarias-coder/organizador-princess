@@ -1,5 +1,26 @@
-✨ Organizador Princess v4.18.04
+✨ Organizador Princess v4.18.06
 ================================================================
+
+🛠 CORRECCIONES (4.18.06)
+
+• Cuando Control de Pedidos no respondía, el aviso de conexión podía
+  volver a arrancar el Organizador por dentro (una segunda ventana y
+  avisos repetidos) en vez de mostrarse. Arreglado.
+• Chat: si un archivo adjunto no se podía descargar, ahora sí aparece el
+  aviso de error (antes no salía nada).
+
+🔄 ACTUALIZACIONES (4.18.06)
+
+• El Organizador busca versiones nuevas al arrancar y después cada 2
+  horas (antes, cada 30 minutos).
+• Si GitHub limita las consultas de la oficina, ya no sale la ventana
+  roja de «Error al comprobar actualizaciones»: espera y vuelve a mirar
+  más tarde, sin avisar.
+
+📘 MANUALES (4.18.06)
+
+• Puestos al día: frecuencia de las actualizaciones y, en el manual de
+  administrador, la nueva forma de publicar versiones.
 
 🔔 AVISOS DE CONTROL DE PEDIDOS (4.18.04)
 

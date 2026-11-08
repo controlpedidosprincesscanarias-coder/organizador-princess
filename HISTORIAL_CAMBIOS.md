@@ -51,6 +51,23 @@
 
 ---
 
+## 2026-11-08 21:07 — [Control Pedidos] Pruebas en producción como admin y arreglo al eliminar pedidos (v12.34.08)
+
+- **Pruebas en producción** («usuario prueba» con rol admin), v12.34.06:
+  - **API**: 34 de 35 comprobaciones bien. El fallo era del propio script: llamaba a `/api/techo`, y la ruta es `/api/techo/resumen`.
+    - Página V 12.34.06 y los 8 JS servidos; las rutas retiradas dan 404.
+    - Seguimiento en bloque, Excel de faltantes y evento del recordatorio, correctos.
+    - Flujo en PR: proveedor a mano, firma, PDF oficial con coincidencia de proveedor, campo `refs_deducidas`, ENVIADO, ENTREGA PARCIAL y Excel del pedido. El pedido de prueba (id 14072) se eliminó al final.
+  - **Interfaz** (Chromium): 17 pantallas y las ventanas de Nuevo pedido, Cargar listados DALI / SAP, Seguimiento en bloque, Faltantes (Excel) y la ficha, sin errores de JS ni 5xx.
+  - El silencio total ya estaba desactivado por Víctor.
+- **Errores encontrados y corregidos** (`servicios/pedidos.py`, `_guardar_y_borrar_pedido`):
+  - `whatsapp_log.pedido_id` referencia a `pedidos` sin `ON DELETE`, así que eliminar un pedido con WhatsApp registrado daba un 500. Ahora `UPDATE whatsapp_log SET pedido_id = NULL` antes del `DELETE`.
+  - `emails_sistema_pendientes.pedido_id` no tiene clave ajena: los correos sin enviar de un pedido eliminado se seguían enviando. Ahora se marcan con `descartado_en`.
+- **Pruebas**: `test_flujo.py`, sección 18 (de 76 a 79; falla con el código anterior). Huellas, migraciones y hotel de pruebas, OK.
+- **Nota**: los 2 correos de la prueba en producción (pedido PR ya eliminado) se encolaron antes del arreglo. Al ser del hotel PR, solo pueden llegar al buzón de «usuario prueba».
+
+---
+
 ## 2026-11-08 17:59 — [Control Pedidos] Arranque: fuera la corrección retroactiva de v12.32.13 que corría en cada arranque (v12.34.06)
 
 - **Medición** (log de Render de v12.34.04): aplicación creada en 1,8 s, conexión a la BD en 0,2 s, **migraciones 43,4 s** (40,6 s antes del primer mensaje), listo para atender a los 49,0 s.

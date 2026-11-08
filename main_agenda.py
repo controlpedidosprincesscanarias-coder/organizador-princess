@@ -114,7 +114,7 @@ LIGHT = "#D8E8F0"
 NUM_OPCIONES = 30
 NUM_ACCESOS_RAPIDOS = 6
 MARGEN = 44   # px aprox. 2 dedos en cada borde
-APP_VERSION  = "v4.16.8"   # ← actualizar en cada release (debe coincidir con el tag del release en GitHub)
+APP_VERSION  = "v4.18.04"   # ← actualizar en cada release (debe coincidir con el tag del release en GitHub)
 GITHUB_REPO  = "controlpedidosprincesscanarias-coder/organizador-princess"  # repo de releases
 _update_mod.APP_VERSION = APP_VERSION  # propagar a services/update_service.py
 _update_mod.GITHUB_REPO = GITHUB_REPO
@@ -1199,6 +1199,13 @@ def abrir_calendario():
     renderizar()
 
     # ── Funciones de impresión ────────────────────────────
+    def _esc(valor):
+        # (v4.16.9) Todo lo que viene de la agenda (títulos, horas, nombre de
+        # usuario) se escapa antes de meterlo en el HTML de impresión: un evento
+        # importado con <script> ya no se ejecuta en el navegador.
+        import html as _html
+        return _html.escape(str(valor), quote=True)
+
     def _nombre_dia_largo(fecha_dt):
         nombres = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"]
         return nombres[fecha_dt.weekday()]
@@ -1236,14 +1243,14 @@ def abrir_calendario():
         if eventos or vacs or fests:
             for ev in sorted(eventos, key=lambda x: x.get("hora", "")):
                 filas += (f"<tr><td>{fecha_str}</td><td>{dia_nombre}</td>"
-                          f"<td>{ev.get('hora','—')}</td>"
-                          f"<td>{ev.get('titulo','')}</td></tr>")
+                          f"<td>{_esc(ev.get('hora','—'))}</td>"
+                          f"<td>{_esc(ev.get('titulo',''))}</td></tr>")
             for v in vacs:
                 filas += (f"<tr><td>{fecha_str}</td><td>{dia_nombre}</td>"
-                          f"<td>🏖</td><td>{v.get('titulo','Vacaciones')}</td></tr>")
+                          f"<td>🏖</td><td>{_esc(v.get('titulo','Vacaciones'))}</td></tr>")
             for ft in fests:
                 filas += (f"<tr><td>{fecha_str}</td><td>{dia_nombre}</td>"
-                          f"<td>🎉</td><td>{ft.get('titulo','Festivo')}</td></tr>")
+                          f"<td>🎉</td><td>{_esc(ft.get('titulo','Festivo'))}</td></tr>")
         return filas
 
     def _abrir_html_impresion(titulo, subtitulo, cuerpo_filas):
@@ -1256,13 +1263,13 @@ def abrir_calendario():
                             "Sin eventos registrados para este período.</td></tr>")
         html = f"""<!DOCTYPE html>
 <html lang="es">
-<head><meta charset="utf-8"><title>{titulo}</title>{_html_estilos()}</head>
+<head><meta charset="utf-8"><title>{_esc(titulo)}</title>{_html_estilos()}</head>
 <body>
   <div class="cabecera">
-    <h1>{titulo}</h1>
+    <h1>{_esc(titulo)}</h1>
     <p class="usuario">
-      {subtitulo}&nbsp;&nbsp;|&nbsp;&nbsp;
-      <strong>Usuario:</strong> {usuario}&nbsp;&nbsp;|&nbsp;&nbsp;
+      {_esc(subtitulo)}&nbsp;&nbsp;|&nbsp;&nbsp;
+      <strong>Usuario:</strong> {_esc(usuario)}&nbsp;&nbsp;|&nbsp;&nbsp;
       Impreso: {ahora}
     </p>
   </div>
@@ -1795,6 +1802,139 @@ def abrir_manual():
         )
 
 
+# =========================================================
+# VISTA DEL MENÚ PRINCIPAL — extendida (la de siempre) o reducida (v4.18.00)
+# =========================================================
+VISTA_ACCESOS_REDUCIDA = 4    # accesos dorados que se ven en la reducida (los 4 primeros)
+VISTA_MAX_AZULES       = 10   # botones azules de la reducida: 2 filas x 5
+
+
+def _vista_actual():
+    """(modo, [números de botones azules de la reducida]). Valores por defecto
+    seguros si falta o está mal la clave "vista_menu" del config."""
+    cfg = config.get("vista_menu")
+    if not isinstance(cfg, dict):
+        cfg = {}
+    modo = "reducida" if cfg.get("modo") == "reducida" else "extendida"
+    sel = []
+    for v in cfg.get("reducida_opciones") or []:
+        try:
+            n = int(v)
+        except (TypeError, ValueError):
+            continue
+        if 1 <= n <= NUM_OPCIONES and n not in sel:
+            sel.append(n)
+    sel = sorted(sel)[:VISTA_MAX_AZULES] or list(range(1, VISTA_MAX_AZULES + 1))
+    return modo, sel
+
+
+def _ventana_vista_menu(parent):
+    """Ventana de Admin para elegir vista extendida/reducida y qué botones azules
+    se ven en la reducida. Al guardar se aplica al momento."""
+    modo_ini, sel_ini = _vista_actual()
+    dlg = ttk.Toplevel(parent)
+    dlg.withdraw()
+    dlg.title("Vista del menú principal")
+    dlg.resizable(False, False)
+    _apply_icon(dlg)
+    dlg.transient(parent)
+
+    body = ttk.Frame(dlg, padding=(20, 16, 20, 8))
+    body.pack(fill="both", expand=True)
+    ttk.Label(body, text="\U0001F5A5  Vista del menú principal",
+              font=("Segoe UI", 12, "bold")).pack(anchor="w")
+
+    var_modo = StringVar(value=modo_ini)
+    ttk.Radiobutton(
+        body, variable=var_modo, value="extendida",
+        text="Extendida (la de siempre)",
+    ).pack(anchor="w", pady=(12, 0))
+    ttk.Label(body, font=("Segoe UI", 8), foreground=LIGHT, wraplength=560, justify="left",
+              text=f"Cabecera completa, {NUM_ACCESOS_RAPIDOS} accesos dorados y los {NUM_OPCIONES} botones azules.",
+              ).pack(anchor="w", padx=(24, 0), pady=(0, 6))
+    ttk.Radiobutton(
+        body, variable=var_modo, value="reducida",
+        text="Reducida",
+    ).pack(anchor="w")
+    ttk.Label(body, font=("Segoe UI", 8), foreground=LIGHT, wraplength=560, justify="left",
+              text=(f"Logo y cabecera, los {VISTA_ACCESOS_REDUCIDA} primeros accesos dorados, Agenda / "
+                    f"Calendario / Chat y solo los botones azules que marques abajo (máximo "
+                    f"{VISTA_MAX_AZULES}, en 2 filas de 5). La ventana se hace más pequeña."),
+              ).pack(anchor="w", padx=(24, 0), pady=(0, 4))
+
+    ttk.Separator(body).pack(fill="x", pady=(8, 8))
+    fila_cuenta = ttk.Frame(body)
+    fila_cuenta.pack(fill="x")
+    ttk.Label(fila_cuenta, text="Botones azules de la vista reducida:",
+              font=("Segoe UI", 9, "bold")).pack(side="left")
+    lbl_cuenta = ttk.Label(fila_cuenta, text="", font=("Segoe UI", 9), foreground=GOLD)
+    lbl_cuenta.pack(side="right")
+
+    lista = ttk.Frame(body)
+    lista.pack(fill="x", pady=(6, 0))
+    for c in range(3):
+        lista.columnconfigure(c, weight=1, uniform="vista")
+    vars_sel = {}
+
+    def _actualizar_cuenta():
+        n = sum(1 for v in vars_sel.values() if v.get())
+        lbl_cuenta.configure(text=f"{n} de {VISTA_MAX_AZULES}")
+
+    def _al_marcar(i):
+        if sum(1 for v in vars_sel.values() if v.get()) > VISTA_MAX_AZULES:
+            vars_sel[i].set(False)
+            messagebox.showwarning(
+                "Vista reducida",
+                f"Se pueden marcar como máximo {VISTA_MAX_AZULES} botones.\n"
+                "Desmarca alguno para poder elegir otro.", parent=dlg)
+        _actualizar_cuenta()
+
+    por_columna = (NUM_OPCIONES + 2) // 3
+    for i in range(1, NUM_OPCIONES + 1):
+        nombre = get_nombre(ctx, f"opcion_{i:02d}", i)
+        if len(nombre) > 30:
+            nombre = nombre[:29] + "…"
+        vars_sel[i] = tk.BooleanVar(value=(i in sel_ini))
+        ttk.Checkbutton(
+            lista, text=f"{i:02d} · {nombre}", variable=vars_sel[i],
+            command=lambda ix=i: _al_marcar(ix),
+        ).grid(row=(i - 1) % por_columna, column=(i - 1) // por_columna,
+               sticky="w", padx=(0, 10), pady=1)
+    _actualizar_cuenta()
+
+    ttk.Label(body, text="Se muestran siempre en el orden numérico del menú.",
+              font=("Segoe UI", 8), foreground=LIGHT).pack(anchor="w", pady=(8, 0))
+
+    def _guardar():
+        sel = sorted(i for i, v in vars_sel.items() if v.get())
+        modo = var_modo.get()
+        if modo == "reducida" and not sel:
+            messagebox.showwarning("Vista reducida",
+                                   "Marca al menos un botón azul para la vista reducida.", parent=dlg)
+            return
+        config["vista_menu"] = {"modo": modo, "reducida_opciones": sel}
+        save_config(config)
+        dlg.destroy()
+        _aplicar_vista()
+
+    ttk.Separator(dlg).pack(fill="x")
+    btns = ttk.Frame(dlg, padding=(20, 10, 20, 12))
+    btns.pack(fill="x")
+    ttk.Button(btns, text="\u2714  Guardar y aplicar", bootstyle="success",
+               command=_guardar).pack(side="left", padx=(0, 8))
+    ttk.Button(btns, text="Cancelar", bootstyle="secondary",
+               command=dlg.destroy).pack(side="left")
+    dlg.bind("<Escape>", lambda e: dlg.destroy())
+
+    dlg.update_idletasks()
+    w, h = dlg.winfo_reqwidth(), dlg.winfo_reqheight()
+    x = max(0, (dlg.winfo_screenwidth() - w) // 2)
+    y = max(20, (dlg.winfo_screenheight() - h) // 2 - 20)
+    dlg.geometry(f"{w}x{h}+{x}+{y}")
+    dlg.deiconify()
+    dlg.grab_set()
+
+
 def abrir_admin():
     """Solicita credenciales y, si son correctas, abre el panel de administración.
     Si ya se autenticó en esta sesión, abre directamente el panel."""
@@ -2059,6 +2199,13 @@ def abrir_admin():
             text="👤  Mi Usuario",
             bootstyle="info-outline",
             command=_ventana_modificar_usuario,
+        ).pack(side="right", padx=(0, 8), ipadx=4)
+
+        ttk.Button(
+            hdr,
+            text="\U0001F5A5  Vista",
+            bootstyle="warning-outline",
+            command=lambda: _ventana_vista_menu(win),
         ).pack(side="right", padx=(0, 8), ipadx=4)
 
         ttk.Separator(win).pack(fill="x", padx=20, pady=(0, 8))
@@ -2480,6 +2627,18 @@ for r in range(5):
 
 btn_ipad = 4
 _btn_wrap = max(100, WIN_W // 6 - 20)
+btn_cells = {}   # opcion_key -> Frame contenedor (para mostrar/ocultar según la vista)
+btn_lbls  = {}   # opcion_key -> Label con el texto (para ajustar el ajuste de línea)
+
+
+def _colocar_celda(cell, row, col, ncols, nrows):
+    """Coloca una celda del grid azul: sin margen en los bordes exteriores,
+    mayor separación entre botones."""
+    cell.grid(row=row, column=col,
+              padx=(0 if col == 0 else 4, 0 if col == ncols - 1 else 4),
+              pady=(0 if row == 0 else 4, 0 if row == nrows - 1 else 4),
+              sticky="nsew")
+
 
 for i in range(1, NUM_OPCIONES + 1):
     opcion = f"opcion_{i:02d}"
@@ -2489,16 +2648,9 @@ for i in range(1, NUM_OPCIONES + 1):
     row = (i - 1) // 6
     col = (i - 1) % 6
 
-    # Padding: sin margen en bordes exteriores, mayor separación entre botones
-    px_left  = 0 if col == 0 else 4
-    px_right = 0 if col == 5 else 4
-    py_top   = 0 if row == 0 else 4
-    py_bot   = 0 if row == 4 else 4
-
     cell = ttk.Frame(grid_frame)
-    cell.grid(row=row, column=col,
-              padx=(px_left, px_right), pady=(py_top, py_bot),
-              sticky="nsew")
+    _colocar_celda(cell, row, col, 6, 5)
+    btn_cells[opcion] = cell
     cell.rowconfigure(0, weight=1)
     cell.columnconfigure(0, weight=1)
 
@@ -2529,6 +2681,7 @@ for i in range(1, NUM_OPCIONES + 1):
     lbl.bind("<Leave>", lambda e, lw=lbl: lw.configure(background=app.style.colors.primary))
 
     btn_widgets[opcion] = btn
+    btn_lbls[opcion] = lbl
 
 # =========================================================
 # PIE DE PAGINA
@@ -2553,6 +2706,67 @@ ttk.Label(
     foreground=GOLD,
     anchor="e"
 ).pack(side="right")
+
+def _aplicar_vista():
+    """Reorganiza el menú principal según config["vista_menu"] (v4.18.00):
+    extendida = como siempre; reducida = 4 accesos dorados (2x2) y los botones
+    azules elegidos (2 filas x 5), con la ventana ajustada a ese contenido."""
+    modo, sel = _vista_actual()
+    red = (modo == "reducida")
+
+    # Accesos dorados
+    cols_ar = 2 if red else 3
+    for i in range(1, NUM_ACCESOS_RAPIDOS + 1):
+        w = ar_widgets.get(f"acceso_rapido_{i:02d}")
+        if w is None:
+            continue
+        if red and i > VISTA_ACCESOS_REDUCIDA:
+            w.grid_remove()
+        else:
+            w.grid(row=(i - 1) // cols_ar, column=(i - 1) % cols_ar,
+                   padx=4, pady=2, sticky="nsew", ipady=5)
+    for c in range(3):
+        if c < cols_ar:
+            ar_frame.columnconfigure(c, weight=1, uniform="ar", minsize=60)
+        else:
+            ar_frame.columnconfigure(c, weight=0, uniform="", minsize=0)
+
+    # Botones azules
+    visibles = sel if red else list(range(1, NUM_OPCIONES + 1))
+    ncols, nrows = (5, 2) if red else (6, 5)
+    for i in range(1, NUM_OPCIONES + 1):
+        cell = btn_cells.get(f"opcion_{i:02d}")
+        if cell is None:
+            continue
+        if i in visibles:
+            k = visibles.index(i)
+            _colocar_celda(cell, k // ncols, k % ncols, ncols, nrows)
+        else:
+            cell.grid_remove()
+    for c in range(6):
+        if c < ncols:
+            grid_frame.columnconfigure(c, weight=1, uniform="col")
+        else:
+            grid_frame.columnconfigure(c, weight=0, uniform="", minsize=0)
+    for r in range(5):
+        grid_frame.rowconfigure(r, weight=1 if r < nrows else 0, minsize=0)
+
+    # Tamaño y posición de la ventana
+    app.update_idletasks()
+    if red:
+        w_ven = min(WIN_W, max(header_frame.winfo_reqwidth() + 40, ncols * 150 + 40))
+        h_ven = min(WIN_H, header_frame.winfo_reqheight() + nrows * 96
+                    + footer_frame.winfo_reqheight() + 44)
+        ajuste = max(100, w_ven // ncols - 20)
+    else:
+        w_ven, h_ven = WIN_W, WIN_H
+        ajuste = _btn_wrap
+    for lbl_b in btn_lbls.values():
+        lbl_b.configure(wraplength=ajuste)
+    app.geometry(f"{w_ven}x{h_ven}+{WIN_X}+{WIN_Y}")
+
+
+_aplicar_vista()
 
 # FIX: forzar que ttkbootstrap genere y aplique las imágenes de estilo
 # de los botones (primary.TButton, etc.) ANTES de mostrar la ventana,

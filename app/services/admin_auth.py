@@ -403,7 +403,9 @@ def verificar_acceso(username_win: str, password: str) -> dict:
         return {"ok": True, "nombre": reg.get("nombre", username_win), "modo": "offline"}
 
     bridge_user, bridge_password = get_bridge_credentials(username_win)
-    if bridge_password and _secrets.compare_digest(password, bridge_password):
+    # (v4.16.9) compare_digest sobre bytes: con str lanza TypeError si la contraseña
+    # lleva ñ, tildes u otros caracteres no ASCII.
+    if bridge_password and _secrets.compare_digest(password.encode('utf-8'), bridge_password.encode('utf-8')):
         resetear_intentos(username_win)
         nombre = get_nombre_usuario() or username_win
         # Aprovechamos para poblar también el registro propio de admin_auth,

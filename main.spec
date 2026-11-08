@@ -45,6 +45,8 @@ datas += [('assets/logo.ico', 'assets')]
 # (sys.path.insert). Se declaran explícitamente aquí.
 hiddenimports += [
     'db.sqlite',
+    'ui.dnd_windows',    # v4.18.00: arrastrar y soltar archivos en el chat
+    'db.dpapi',          # v4.16.9: cifrado de la contraseña del puente con DPAPI
     'utils.fechas',
     'utils.sonido',
     'utils.rutas',       # ANTI-REGRESION: _lanzar_ruta movida aquí desde main_agenda

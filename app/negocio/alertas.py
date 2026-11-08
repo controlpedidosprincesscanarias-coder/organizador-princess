@@ -793,7 +793,7 @@ def _construir_popup(aviso, clave_silencio: str = None):
     # repeticion="ninguna" (su propio recordatorio lo gestiona el bridge, no
     # este mecanismo), pero igualmente pueden quedarse abiertos indefinida-
     # mente si nadie está delante, bloqueando el resto de la cola. Para esos
-    # se fuerza un tope fijo de 30 min, se marquen o no con repetición.
+    # se fuerza un tope fijo de 10 min (v4.18.04; antes 30), se marquen o no con repetición.
     _INTERVALO_REPETICION_MIN = {
         "cada_30min": 30,
         "cada_hora":  60,
@@ -802,7 +802,7 @@ def _construir_popup(aviso, clave_silencio: str = None):
         "mensual":    1440 * 30,   # aproximado (mes ≈ 30 días)
         "anual":      1440 * 365,
     }
-    _AUTOCIERRE_BRIDGE_MIN = 30  # popups de Control de Pedidos (pedidos_agenda_bridge.py)
+    _AUTOCIERRE_BRIDGE_MIN = 10  # popups de Control de Pedidos (pedidos_agenda_bridge.py); v4.18.04: 30 → 10 min
 
     if aviso.get("_bridge_gestionado"):
         _autocierre_ms = _AUTOCIERRE_BRIDGE_MIN * 60 * 1000

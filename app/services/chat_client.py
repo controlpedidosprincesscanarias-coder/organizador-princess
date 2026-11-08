@@ -58,17 +58,19 @@ import logging
 import mimetypes
 import os
 import queue
+import re
 import subprocess
 import sys
 import threading
 import base64
+import urllib.parse
 from io import BytesIO
 
 import requests
 import socketio
 from PIL import Image
 
-from db.sqlite import get_bridge_credentials
+from db.sqlite import get_bridge_credentials, load_config
 
 log = logging.getLogger(__name__)
 
@@ -87,6 +89,55 @@ _USER_AGENT = (
     "AppleWebKit/537.36 (KHTML, like Gecko) "
     "Chrome/124.0.0.0 Safari/537.36"
 )
+
+# ── Seguridad de los adjuntos (v4.16.9) ─────────────────────────────────────
+# El nombre del archivo y la URL los pone el servidor a partir de lo que mandó
+# otro usuario, así que aquí NO se confía en ellos: se limpia el nombre, se
+# comprueba que la URL es del almacén de adjuntos y solo se abren
+# directamente tipos inofensivos.
+_HOSTS_ADJUNTOS = (".supabase.co",)          # ampliable con config.json: "chat_hosts_adjuntos"
+_ADJUNTO_MAX_DESCARGA = 12 * 1024 * 1024     # el servidor limita a 10 MB
+_RESERVADOS_WIN = {"con", "prn", "aux", "nul", *{f"com{i}" for i in range(1, 10)},
+                   *{f"lpt{i}" for i in range(1, 10)}}
+_RE_NOMBRE_MALO = re.compile(r'[\x00-\x1f\x7f<>:"/\\|?*\u202a-\u202e\u2066-\u2069]')
+# Se abren con el programa por defecto SOLO estas extensiones; el resto se
+# guarda y se muestra en el Explorador (el usuario decide).
+EXT_ABRIR_DIRECTO = {
+    ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp", ".pdf", ".txt", ".csv",
+    ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".odt", ".ods", ".odp", ".rtf",
+}
+
+
+def nombre_adjunto_seguro(nombre) -> str:
+    """Nombre base sin rutas ni caracteres peligrosos ni nombres reservados."""
+    nombre = str(nombre or "").replace("\\", "/").split("/")[-1]
+    nombre = _RE_NOMBRE_MALO.sub("_", nombre).strip(" .")
+    if not nombre:
+        nombre = "archivo"
+    base, ext = os.path.splitext(nombre)
+    if base.lower() in _RESERVADOS_WIN:
+        nombre = "_" + nombre
+    if len(nombre) > 120:
+        ext = ext if len(ext) <= 10 else ""
+        nombre = nombre[:120 - len(ext)] + ext
+    return nombre
+
+
+def url_adjunto_permitida(url) -> bool:
+    try:
+        u = urllib.parse.urlparse(str(url))
+    except Exception:
+        return False
+    if u.scheme != "https" or not u.hostname:
+        return False
+    extra = ()
+    try:
+        extra = tuple(h.lower() for h in (load_config().get("chat_hosts_adjuntos") or []))
+    except Exception:
+        pass
+    host = u.hostname.lower()
+    return any(host.endswith(h) for h in _HOSTS_ADJUNTOS + extra)
+
 
 # Tipos de evento que se encolan para la UI (ver ChatClient.eventos)
 EVT_CONECTADO      = "conectado"
@@ -324,32 +375,57 @@ class ChatClient:
 
     def descargar_adjunto(self, url: str, nombre_archivo: str) -> str:
         """Descarga un adjunto a la carpeta Descargas del usuario (nombre
-        libre de colisiones) y devuelve la ruta local. Lanza excepción si
-        falla — quien llame decide cómo avisar al usuario."""
-        resp = requests.get(url, timeout=30)
-        resp.raise_for_status()
-        carpeta = os.path.join(os.path.expanduser("~"), "Downloads")
+        limpio y libre de colisiones) y devuelve la ruta local. Lanza
+        excepción si falla — quien llame decide cómo avisar al usuario.
+
+        (v4.16.9) El nombre se limpia aquí aunque el servidor ya lo haga
+        (los mensajes antiguos pueden traer nombres con rutas), la URL debe
+        ser del almacén de adjuntos y el archivo se crea de forma exclusiva
+        dentro de Descargas."""
+        if not url_adjunto_permitida(url):
+            raise ValueError("La dirección del adjunto no es de confianza.")
+        nombre = nombre_adjunto_seguro(nombre_archivo)
+        carpeta = os.path.realpath(os.path.join(os.path.expanduser("~"), "Downloads"))
         os.makedirs(carpeta, exist_ok=True)
-        base, ext = os.path.splitext(nombre_archivo)
-        ruta = os.path.join(carpeta, nombre_archivo)
-        n = 1
-        while os.path.exists(ruta):
-            ruta = os.path.join(carpeta, f"{base} ({n}){ext}")
-            n += 1
-        with open(ruta, "wb") as f:
-            f.write(resp.content)
-        return ruta
+        base, ext = os.path.splitext(nombre)
+        with requests.get(url, timeout=30, stream=True, allow_redirects=False) as resp:
+            resp.raise_for_status()
+            declarado = int(resp.headers.get("Content-Length") or 0)
+            if declarado > _ADJUNTO_MAX_DESCARGA:
+                raise ValueError("El adjunto es demasiado grande.")
+            datos = bytearray()
+            for trozo in resp.iter_content(65536):
+                datos.extend(trozo)
+                if len(datos) > _ADJUNTO_MAX_DESCARGA:
+                    raise ValueError("El adjunto es demasiado grande.")
+        n = 0
+        while True:
+            ruta = os.path.join(carpeta, nombre if n == 0 else f"{base} ({n}){ext}")
+            if os.path.dirname(os.path.realpath(ruta)) != carpeta:
+                raise ValueError("Nombre de archivo no válido.")
+            try:
+                with open(ruta, "xb") as f:      # "x": nunca pisa un archivo existente
+                    f.write(datos)
+                return ruta
+            except FileExistsError:
+                n += 1
 
     @staticmethod
     def abrir_archivo(ruta: str):
-        """Abre un archivo ya descargado con la aplicación predeterminada
-        de Windows (visor de imágenes, Word, Adobe Reader, etc.)."""
+        """Abre un adjunto ya descargado. Solo se abre directamente con el
+        programa por defecto si es un tipo inofensivo (imágenes, PDF,
+        Office, texto); cualquier otro se muestra en el Explorador sin
+        ejecutarlo. (v4.16.9)"""
+        ext = os.path.splitext(ruta)[1].lower()
         if sys.platform.startswith("win"):
-            os.startfile(ruta)  # noqa: S606 — abrir con la app por defecto es justo lo que se pide
+            if ext in EXT_ABRIR_DIRECTO:
+                os.startfile(ruta)  # noqa: S606
+            else:
+                subprocess.Popen(["explorer", "/select,", os.path.normpath(ruta)])
         elif sys.platform == "darwin":
-            subprocess.Popen(["open", ruta])
+            subprocess.Popen(["open", ruta] if ext in EXT_ABRIR_DIRECTO else ["open", "-R", ruta])
         else:
-            subprocess.Popen(["xdg-open", ruta])
+            subprocess.Popen(["xdg-open", ruta if ext in EXT_ABRIR_DIRECTO else os.path.dirname(ruta)])
 
     # ── Historial / listados (REST — funciona con o sin socket conectado) ──
 

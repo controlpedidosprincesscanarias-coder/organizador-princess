@@ -12,7 +12,7 @@ Aplicación de escritorio desarrollada en **Python + ttkbootstrap**, que combina
 - 🔔 Sistema de notificaciones en segundo plano (bridge) conectado a Control de Pedidos: recibe los mismos avisos que Telegram (techo de gastos, familias repetidas, solicitudes de usuario, cambios de estado de pedidos…) como popup en pantalla, filtrados automáticamente según el usuario y su rol.
 - 🔄 Actualizaciones automáticas desde GitHub Releases, con ventana de "novedades" al terminar de instalar.
 - 🖼️ Interfaz basada en **ttkbootstrap**, con logo corporativo embebido e icono multirresolución para Windows.
-- 📖 Manual de Usuario accesible desde la propia aplicación.
+- 📖 Manual de Usuario accesible desde la propia aplicación, y Manual de Administrador (menú Inicio y carpeta `docs/`).
 - 🗂️ Compatible con Windows 10/11, distribuido como instalador `.exe` (Inno Setup) — no requiere tener Python instalado en el equipo destino.
 
 ---
@@ -40,7 +40,8 @@ Aplicación de escritorio desarrollada en **Python + ttkbootstrap**, que combina
 │   ├── release_notes.md            (historial completo acumulado — nombre fijo, no lleva versión)
 │   └── release_notes_actual.txt    (solo la versión actual, texto plano — se muestra en el instalador)
 ├── OrganizadorPrincess_Setup.iss   (script de Inno Setup)
-├── Manual_Usuario_OrganizadorPrincess.pdf
+├── Manual_Usuario_OrganizadorPrincess.pdf   (el que abre el botón «Manual»)
+├── docs/                           (manuales de usuario y de administrador, .docx y .pdf)
 └── README.md
 ```
 

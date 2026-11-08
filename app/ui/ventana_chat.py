@@ -10,8 +10,10 @@ hilo de fondo (ver services/chat_client.py) y se drenan aquí con
 ventana.after(...), nunca tocando widgets desde el hilo del socket.
 """
 
+import os
 import threading
 import logging
+import tempfile as _tempfile
 import tkinter as tk
 import tkinter.font as tkfont
 import ttkbootstrap as ttk
@@ -179,6 +181,47 @@ def _ventana_chat(ctx):
 
     entry_msg.bind("<Return>", _enviar)
 
+    def _enviar_rutas(rutas):
+        """Envía uno o varios archivos al canal abierto (cada uno en su propio hilo)."""
+        canal_envio = canal_actual["id"] if canal_actual["id"] != "general" else "general"
+        destinatario = canal_actual["otro"] if canal_actual["id"] != "general" else None
+        for ruta in rutas:
+            def _hilo(ruta=ruta):
+                resultado = cliente.enviar_archivo(ruta, canal_id=canal_envio, destinatario=destinatario)
+                if "captura_chat_" in ruta and ruta.startswith(_tempfile.gettempdir()):
+                    try: os.remove(ruta)       # temporal de una captura pegada
+                    except OSError: pass
+                if resultado.get("ok"):
+                    win.after(0, lambda r=resultado: _pintar_mensaje(r["mensaje"], propio=True))
+                else:
+                    error = resultado.get("error", "No se pudo enviar el archivo")
+                    win.after(0, lambda e=error: lbl_estado.configure(text=f"🔴 {e}", bootstyle="danger"))
+            threading.Thread(target=_hilo, daemon=True, name="Chat-EnviarArchivo").start()
+
+    def _destino_texto():
+        return "el chat General" if canal_actual["id"] == "general" else f"«{canal_actual['otro'] or 'esta conversación'}»"
+
+    def _confirmar_y_enviar(rutas, etiquetas=None):
+        """Arrastrar y pegar piden confirmación: un archivo soltado por error en una
+        conversación no se puede deshacer."""
+        _os = os
+        rutas = [r for r in rutas if _os.path.isfile(r)]
+        if not rutas:
+            lbl_estado.configure(text="🔴 Solo se pueden enviar archivos, no carpetas", bootstyle="danger")
+            return
+        if len(rutas) > 5:
+            messagebox.showwarning("Chat", "Se pueden enviar como máximo 5 archivos a la vez.", parent=win)
+            return
+        nombres = etiquetas or [_os.path.basename(r) for r in rutas]
+        lista = "\n".join(f"  • {n}" for n in nombres)
+        if messagebox.askyesno("Chat", f"¿Enviar a {_destino_texto()}?\n\n{lista}", parent=win):
+            _enviar_rutas(rutas)
+        else:
+            for r in rutas:        # capturas pegadas: se borra el temporal si no se envía
+                if r.startswith(_tempfile.gettempdir()) and "captura_chat_" in r:
+                    try: _os.remove(r)
+                    except OSError: pass
+
     def _adjuntar():
         ruta = filedialog.askopenfilename(
             parent=win,
@@ -191,19 +234,34 @@ def _ventana_chat(ctx):
         )
         if not ruta:
             return
+        _enviar_rutas([ruta])
 
-        def _hilo():
-            resultado = cliente.enviar_archivo(
-                ruta,
-                canal_id=canal_actual["id"] if canal_actual["id"] != "general" else "general",
-                destinatario=canal_actual["otro"] if canal_actual["id"] != "general" else None,
-            )
-            if resultado.get("ok"):
-                win.after(0, lambda: _pintar_mensaje(resultado["mensaje"], propio=True))
-            else:
-                error = resultado.get("error", "No se pudo enviar el archivo")
-                win.after(0, lambda: lbl_estado.configure(text=f"🔴 {error}", bootstyle="danger"))
-        threading.Thread(target=_hilo, daemon=True, name="Chat-EnviarArchivo").start()
+    def _pegar(event=None):
+        """Ctrl+V: si el portapapeles trae una imagen (captura de pantalla) o archivos
+        copiados en el Explorador, se ofrece enviarlos; si trae texto, pega como siempre."""
+        try:
+            from PIL import ImageGrab
+            contenido = ImageGrab.grabclipboard()
+        except Exception:
+            return None                       # sin soporte → pegado normal de texto
+        if contenido is None:
+            return None
+        if isinstance(contenido, (list, tuple)):
+            _confirmar_y_enviar([str(r) for r in contenido])
+            return "break"
+        try:                                   # es una imagen
+            _os = os
+            nombre = "captura_chat_" + datetime.now().strftime("%Y%m%d_%H%M%S") + ".png"
+            ruta = _os.path.join(_tempfile.gettempdir(), nombre)
+            contenido.save(ruta, format="PNG")
+            _confirmar_y_enviar([ruta], etiquetas=["Imagen del portapapeles"])
+            return "break"
+        except Exception as exc:
+            logging.getLogger("chat").warning("No se pudo pegar la imagen del portapapeles: %s", exc)
+            return None
+
+    entry_msg.bind("<Control-v>", _pegar)
+    entry_msg.bind("<Control-V>", _pegar)
 
     ttk.Button(frm_envio, text="📎", bootstyle="info-outline", width=4,
                command=_adjuntar).pack(side="left", padx=(0, 6), ipady=4, ipadx=2)
@@ -388,6 +446,16 @@ def _ventana_chat(ctx):
         _HANDLER = None
         win.destroy()
     win.protocol("WM_DELETE_WINDOW", _on_cerrar)
+
+    # Arrastrar archivos desde el Explorador sobre la ventana (v4.18.00).
+    # Si no se puede activar (no es Windows, error de la API) queda el botón 📎 y Ctrl+V.
+    # Interruptor: "chat_arrastrar_soltar": false en config.json lo desactiva sin tocar el programa.
+    try:
+        if ctx.config.get("chat_arrastrar_soltar", True):
+            from ui.dnd_windows import hook_dropfiles
+            hook_dropfiles(win, _confirmar_y_enviar)
+    except Exception as exc:
+        logging.getLogger("chat").warning("Arrastrar y soltar no disponible: %s", exc)
 
 
 def _abrir_nueva_conversacion(cliente, parent, ctx, on_elegido):

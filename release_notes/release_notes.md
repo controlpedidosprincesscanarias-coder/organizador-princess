@@ -1,3 +1,64 @@
+# ✨ Organizador Princess v4.18.04
+
+## 🔔 Avisos de Control de Pedidos
+
+- Lo que Control de Pedidos envía **mientras el Organizador está cerrado ya no aparece al abrirlo** (se pierde). Al abrir solo ves lo que programaste en el calendario, tus eventos, vacaciones y festivos, y los avisos que lleguen a partir de ese momento.
+- Los popups de Control de Pedidos se **cierran solos a los 10 minutos** si no se pulsa Cerrar (antes, 30).
+
+**Al publicar:** el tag del release debe ser `v4.18.04` y subir también `OrganizadorPrincess_Setup_4.18.04.exe.sha256`
+
+---
+
+# ✨ Organizador Princess v4.18.02
+
+## 🛠 Corrección
+
+- **Chat:** al arrastrar un archivo sobre la ventana del chat se cerraba la aplicación. Arreglado (arrastrar y soltar rehecho de forma más segura). Si aún así te diera problemas, en `%APPDATA%\OrganizadorPrincess\config.json` puedes poner `"chat_arrastrar_soltar": false` y seguir usando 📎 y Ctrl+V.
+
+---
+---
+
+# ✨ Organizador Princess v4.18.00
+
+## 🖥 Vista reducida del menú principal
+
+- Nuevo botón **Vista** en Admin: **Extendida** (la de siempre) o **Reducida** (logo y cabecera, los 4 primeros accesos dorados, Agenda / Calendario / Chat y hasta 10 botones azules a elegir, en 2 filas de 5; la ventana se hace más pequeña).
+- Se aplica al guardar, sin reiniciar, y se recuerda en este equipo.
+
+## 💬 Chat
+
+- Arrastrar y soltar archivos sobre la ventana del chat (hasta 5) y **Ctrl+V** para pegar capturas o archivos copiados. Se pide confirmación antes de enviar.
+
+## 📘 Manuales
+
+- Nuevos **Manual de usuario** y **Manual de administrador** (PDF y Word, carpeta `docs`). El botón **Manual** del menú abre el de usuario; el de administrador queda en el menú Inicio.
+
+(PowerShell: `(Get-FileHash .\OrganizadorPrincess_Setup_4.18.02.exe -Algorithm SHA256).Hash.ToLower() + "  OrganizadorPrincess_Setup_4.18.02.exe" | Out-File -Encoding ascii OrganizadorPrincess_Setup_4.18.02.exe.sha256`).
+
+================================================================
+
+# ✨ Organizador Princess v4.16.9
+
+**Seguridad** (auditoría de octubre 2026):
+
+- **`app/services/chat_client.py`** — adjuntos del chat: el nombre se
+  limpia (sin rutas ni caracteres peligrosos), la URL tiene que ser de
+  `*.supabase.co` (ampliable con `chat_hosts_adjuntos` en `config.json`),
+  la descarga tiene tope de 12 MB, el archivo se crea sin pisar otros y
+  solo se abren directamente imágenes, PDF, Office y texto; el resto se
+  muestra en el Explorador.
+- **`app/db/dpapi.py`, `app/db/sqlite.py`, `pedidos_agenda_bridge.py`** —
+  la contraseña de `usuarios.db` se cifra con DPAPI de Windows y se migra
+  sola; el puente la lee a través de `get_bridge_credentials()`.
+- **`app/services/update_service.py`** — se quita el respaldo sin
+  verificación TLS y se comprueba el SHA-256 si el release publica
+  `<instalador>.sha256` o `SHA256SUMS`.
+- **`app/services/admin_auth.py`** — `compare_digest` sobre bytes (con ñ
+  o tildes lanzaba `TypeError`).
+- **`main_agenda.py`** — HTML de impresión escapado.
+
+================================================================
+
 # ✨ Organizador Princess v4.16.8
 
 **`app/ui/ventana_chat.py`, `app/ui/chat_popup.py`** — corregidos los

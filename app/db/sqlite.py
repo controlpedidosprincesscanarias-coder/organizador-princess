@@ -7,6 +7,8 @@ import os
 import json
 import sqlite3
 
+from db import dpapi   # (v4.16.9) cifrado de la contraseña del puente con DPAPI
+
 # ── Rutas y archivos ──────────────────────────────────────────────────────────
 
 def get_config_path():
@@ -198,11 +200,34 @@ def get_bridge_credentials(username_win=None):
         row = cur.fetchone()
         con.close()
         if row:
-            return (row[0] or "", row[1] or "")
+            usuario, guardada = row[0] or "", row[1] or ""
+            # (v4.16.9) Una contraseña antigua en claro se cifra sola la
+            # primera vez que se lee (solo en Windows).
+            if guardada and not dpapi.esta_protegido(guardada) and dpapi.disponible():
+                _migrar_bridge_password(username_win, guardada)
+            return (usuario, dpapi.desproteger(guardada))
     except Exception:  # noqa: BLE001
         import sys as _sys, traceback as _tb
         print(f"[WARNING] {_tb.format_exc().splitlines()[-1]}", file=_sys.stderr)
     return ("", "")
+
+
+def _migrar_bridge_password(username_win, en_claro):
+    """Sustituye la contraseña en claro por la cifrada y compacta el fichero
+    (VACUUM) para que no queden restos legibles en páginas libres."""
+    cifrada = dpapi.proteger(en_claro)
+    if not dpapi.esta_protegido(cifrada):
+        return   # DPAPI no disponible o falló: se deja como estaba
+    try:
+        con = sqlite3.connect(DB_FILE)
+        con.execute("UPDATE config_usuarios SET bridge_password=? WHERE username_win=?",
+                    (cifrada, username_win))
+        con.commit()
+        con.execute("VACUUM")
+        con.close()
+    except Exception:  # noqa: BLE001
+        import sys as _sys, traceback as _tb
+        print(f"[WARNING] {_tb.format_exc().splitlines()[-1]}", file=_sys.stderr)
 
 
 def tiene_nombre_configurado():
@@ -234,7 +259,7 @@ def update_bridge_credentials(username_win, bridge_user, bridge_password):
            ON CONFLICT(username_win) DO UPDATE SET
                bridge_user=excluded.bridge_user,
                bridge_password=excluded.bridge_password""",
-        (username_win, username_win, username_win, bridge_user, bridge_password)
+        (username_win, username_win, username_win, bridge_user, dpapi.proteger(bridge_password))
     )
     con.commit()
     con.close()

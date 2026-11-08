@@ -700,18 +700,11 @@ def _cargar_credenciales_desde_db():
     if BRIDGE_USER and BRIDGE_PASSWORD:
         return
     try:
-        import sqlite3 as _sq3
-        uwin    = os.getenv("USERNAME", "").lower()
-        appdata = os.environ.get("APPDATA", os.path.expanduser("~"))
-        db_path = os.path.join(appdata, "OrganizadorPrincess", "usuarios.db")
-        con = _sq3.connect(db_path)
-        cur = con.cursor()
-        cur.execute(
-            "SELECT bridge_user, bridge_password FROM config_usuarios WHERE username_win = ?",
-            (uwin,)
-        )
-        row = cur.fetchone()
-        con.close()
+        # (v4.16.9) Pasa por get_bridge_credentials(): la contraseña está
+        # cifrada con DPAPI y ese es el único sitio que la descifra.
+        from db.sqlite import get_bridge_credentials
+        uwin = os.getenv("USERNAME", "").lower()
+        row = get_bridge_credentials(uwin)
         if row and row[0]:
             BRIDGE_USER     = row[0]
             BRIDGE_PASSWORD = row[1] or ""
@@ -871,6 +864,18 @@ def get_resumen_alertas() -> dict:
 
 _estado_popups: dict  = {}
 _push_procesados: set = set()
+
+# (v4.18.04) Lo que Control de Pedidos manda MIENTRAS el Organizador está
+# cerrado se pierde. Petición de Víctor: «todo aquello que llega desde
+# Control de Pedidos si main_agenda está cerrada se pierde»; al abrir solo
+# deben verse los avisos que el usuario programó en el calendario, sus
+# eventos y las vacaciones y festivos. Control de Pedidos entrega y marca
+# como entregado lo pendiente en la primera consulta con sesión (alertas y
+# notificaciones inmediatas): esa primera respuesta es la acumulada con la
+# app cerrada, así que se consulta (para que no vuelva a llegar) pero NO se
+# muestra. Lo que ocurra desde entonces se muestra con normalidad.
+_descartar_alertas_acumuladas: bool = True
+_descartar_push_acumulado: bool = True
 
 
 def _hoy_str() -> str:
@@ -1093,14 +1098,22 @@ def _sincronizar_alertas(agenda_data, save_agenda_fn, mostrar_alerta_fn):
     if hoy != _dia_actual:
         _dia_actual = hoy
 
+    global _descartar_alertas_acumuladas
+    descartar = _descartar_alertas_acumuladas
+    _descartar_alertas_acumuladas = False
     for alerta in alertas:
         pid   = alerta.get("id")
         nivel = alerta.get("nivel_alerta", "aviso")
+        if descartar:
+            log.info("Bridge: alerta acumulada con la app cerrada, se descarta → pedido #%s (%s)", pid, nivel)
+            continue
         if not _shutdown.is_set():
             mostrar_alerta_fn(_aviso_para_popup(alerta))
         log.info("Bridge: popup entregado (dedup servidor) → pedido #%s (%s)", pid, nivel)
 
-    if alertas:
+    if alertas and descartar:
+        log.info("Bridge alertas → %d alerta(s) acumuladas con la app cerrada, descartadas", len(alertas))
+    elif alertas:
         log.info("Bridge alertas → %d popup(s) nuevos entregados", len(alertas))
 
     # v12.29.46: totales SIN filtrar, para el resumen del saludo diario.
@@ -1152,6 +1165,9 @@ def _procesar_push(agenda_data, save_agenda_fn, mostrar_alerta_fn):
         return
 
     notifs = resp.get("notificaciones", [])
+    global _descartar_push_acumulado
+    descartar = _descartar_push_acumulado
+    _descartar_push_acumulado = False
     if not notifs:
         return
 
@@ -1160,6 +1176,10 @@ def _procesar_push(agenda_data, save_agenda_fn, mostrar_alerta_fn):
         if nid in _push_procesados:
             continue
         _push_procesados.add(nid)
+
+        if descartar:
+            log.info("Bridge push: acumulada con la app cerrada, se descarta → tipo=%s id=%s", notif.get("tipo"), nid)
+            continue
 
         popup = _popup_desde_push(notif)
         if not _shutdown.is_set():
@@ -1238,6 +1258,9 @@ def iniciar_bridge_pedidos(agenda_data, save_agenda_fn, app_root_legacy=None, ap
     _shutdown.clear()   # FIX: resetear por si se llama de nuevo tras un reinicio
     _estado_popups.clear()
     _push_procesados.clear()
+    global _descartar_alertas_acumuladas, _descartar_push_acumulado
+    _descartar_alertas_acumuladas = True
+    _descartar_push_acumulado = True
     _dia_actual = _hoy_str()
     _bridge_listo.clear()
 

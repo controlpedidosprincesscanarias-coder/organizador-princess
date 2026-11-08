@@ -5,12 +5,13 @@
 ; ================================================================
 
 #define MyAppName    "Organizador Princess"
-#define MyAppVersion "4.16.8"
+#define MyAppVersion "4.18.04"
 #define MyAppExe     "OrganizadorPrincess.exe"
 #define MyAppID      "OrganizadorPrincess"
 #define MyAssets     SourcePath + "assets"
 #define MyDist       SourcePath + "dist"
 #define MyManual     SourcePath + "Manual_Usuario_OrganizadorPrincess.pdf"
+#define MyManualAdmin SourcePath + "docs\Manual_Administrador_OrganizadorPrincess.pdf"
 ; Notas de la versión — nombres FIJOS, no llevan el número de versión.
 ; En cada release solo hay que actualizar el CONTENIDO de estos dos
 ; ficheros (carpeta release_notes\), nunca hay que tocar esta ruta:
@@ -97,6 +98,7 @@ ButtonFinish=Finalizar
 Source: "{#MyDist}\{#MyAppExe}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#MyDist}\*";           DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#MyManual}";             DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyManualAdmin}";        DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 ; Copia local permanente de las novedades — queda en el PC como
 ; referencia sin depender de GitHub ni de conexión a internet.
 ; release_notes.md ya trae el historial completo acumulado (es el
@@ -112,6 +114,7 @@ Name: "{group}\{#MyAppName}";              Filename: "{app}\{#MyAppExe}"
 Name: "{group}\Desinstalar {#MyAppName}";  Filename: "{uninstallexe}"
 Name: "{commondesktop}\{#MyAppName}";      Filename: "{app}\{#MyAppExe}"; Tasks: desktopicon
 Name: "{group}\Manual de Usuario";           Filename: "{app}\Manual_Usuario_OrganizadorPrincess.pdf"
+Name: "{group}\Manual de Administrador";     Filename: "{app}\Manual_Administrador_OrganizadorPrincess.pdf"
 
 ; ----------------------------------------------------------------
 ;  Tareas opcionales

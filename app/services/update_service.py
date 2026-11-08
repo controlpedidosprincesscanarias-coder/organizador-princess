@@ -62,6 +62,36 @@ _gracia_update_en_curso = False
 _gracia_update_lock     = threading.Lock()
 
 
+# ── (v4.16.9) Comprobación de integridad del instalador descargado ──────────
+# Si el release publica un fichero «<instalador>.sha256» (o «SHA256SUMS» /
+# «SHA256SUMS.txt»), se compara el SHA-256 de lo descargado con el publicado.
+# Detecta descargas corruptas o alteradas por el camino; NO sustituye a la
+# firma de código del .exe (quien controle el release controla también el hash).
+import hashlib
+import re as _re_hash
+
+def _asset_hash(assets, nombre_exe):
+    """Asset con el hash del instalador, o None."""
+    candidatos = {nombre_exe.lower() + ".sha256", "sha256sums", "sha256sums.txt"}
+    for a in assets:
+        if (a.get("name") or "").lower() in candidatos:
+            return a
+    return None
+
+def _extraer_hash(texto, nombre_exe):
+    """Hash (64 hex) para `nombre_exe` dentro del contenido de un .sha256 o
+    SHA256SUMS. Acepta «<hash>», «<hash>  <fichero>» y «<hash> *<fichero>»."""
+    lineas = [l.strip() for l in texto.splitlines() if l.strip()]
+    for l in lineas:
+        m = _re_hash.match(r"^([0-9a-fA-F]{64})\s+\*?(.+)$", l)
+        if m and m.group(2).strip().lower() == nombre_exe.lower():
+            return m.group(1).lower()
+    if len(lineas) == 1:
+        m = _re_hash.match(r"^([0-9a-fA-F]{64})(\s.*)?$", lineas[0])
+        if m:
+            return m.group(1).lower()
+    return None
+
 def _conceder_gracia_update(app_root):
     """
     Primer fallo del check de actualizaciones: no avisa, programa un único
@@ -109,17 +139,18 @@ def _check_update_github(app_root, _es_reintento_gracia: bool = False):
 
     def _ssl_ctx():
         """
-        Contexto SSL tolerante al proxy corporativo con SSL inspection.
-        Intento 1: almacén de certificados de Windows (lo correcto).
-        Intento 2: sin verificación (fallback para PCs con proxy muy restrictivo).
-        En PCs sin proxy el contexto por defecto funciona igual que siempre.
+        Contexto SSL con verificación, usando el almacén de certificados de
+        Windows (así funciona también detrás de un proxy corporativo con
+        inspección SSL cuyo certificado raíz esté instalado en el equipo).
+
+        (v4.16.9) Se quita el respaldo SIN verificación que había antes: si el
+        contexto no se puede crear, la comprobación de actualización falla con
+        un error normal en vez de continuar sin comprobar el certificado de
+        GitHub (de ahí se baja un instalador que se ejecuta como administrador).
         """
-        try:
-            ctx = _ssl.create_default_context()
-            ctx.load_default_certs()   # usa el almacén de Windows
-            return ctx
-        except Exception:
-            return _ssl._create_unverified_context()
+        ctx = _ssl.create_default_context()
+        ctx.load_default_certs()   # usa el almacén de Windows
+        return ctx
 
     # ── LOG DE DIAGNÓSTICO ────────────────────────────────────────────────────
     # Escribe en %APPDATA%\OrganizadorPrincess\update_check.log
@@ -404,6 +435,8 @@ def _check_update_github(app_root, _es_reintento_gracia: bool = False):
         (a for a in assets if a.get("name", "").lower().endswith(".exe")),
         None
     )
+    asset_sha      = _asset_hash(assets, asset_exe["name"]) if asset_exe else None
+    url_sha        = asset_sha["browser_download_url"] if asset_sha else ""
     url_descarga   = asset_exe["browser_download_url"] if asset_exe else ""
     nombre_asset   = asset_exe["name"] if asset_exe else ""
     size_mb        = round(asset_exe["size"] / 1_048_576, 1) if asset_exe else 0
@@ -530,6 +563,7 @@ def _check_update_github(app_root, _es_reintento_gracia: bool = False):
 
             def _hilo_descarga():
                 try:
+                    sha = hashlib.sha256()
                     with urllib.request.urlopen(url_descarga, timeout=120, context=_ssl_ctx()) as r:
                         total = int(r.headers.get("Content-Length", 0))
                         descargado = 0
@@ -540,6 +574,7 @@ def _check_update_github(app_root, _es_reintento_gracia: bool = False):
                                 if not bloque:
                                     break
                                 f_out.write(bloque)
+                                sha.update(bloque)
                                 descargado += len(bloque)
                                 if total:
                                     pct = descargado / total * 100
@@ -551,12 +586,35 @@ def _check_update_github(app_root, _es_reintento_gracia: bool = False):
                                             text=f"Descargando... {d} / {t} MB  ({p:.0f}%)")
                                     ))
 
+                    # ── Integridad (v4.16.9) ──
+                    estado_hash = "sin_hash"
+                    if url_sha:
+                        with urllib.request.urlopen(url_sha, timeout=20, context=_ssl_ctx()) as rh:
+                            esperado = _extraer_hash(rh.read(65536).decode("utf-8", "ignore"), nombre_asset)
+                        if not esperado:
+                            estado_hash = "hash_ilegible"
+                        elif esperado != sha.hexdigest():
+                            try:
+                                _os.remove(dest_path)
+                            except OSError:
+                                pass
+                            raise RuntimeError(
+                                "El instalador descargado no coincide con el hash publicado "
+                                "(SHA-256). Se ha borrado; vuelve a intentarlo.")
+                        else:
+                            estado_hash = "ok"
+
                     # ── Descarga completada ──
                     def _ui_descarga_ok():
                         var_prog.set(100)
                         pb.configure(bootstyle="success")
+                        _txt_hash = {
+                            "ok": "\n🔒  Integridad verificada (SHA-256).",
+                            "sin_hash": "\n⚠  Esta versión no publica hash: integridad sin verificar.",
+                            "hash_ilegible": "\n⚠  No se pudo leer el hash publicado: integridad sin verificar.",
+                        }.get(estado_hash, "")
                         lbl_prog.configure(
-                            text=f"✅  Instalador guardado en:\n{dest_path}")
+                            text=f"✅  Instalador guardado en:\n{dest_path}{_txt_hash}")
 
                         # Mensaje informativo
                         lbl_info = ttk.Label(

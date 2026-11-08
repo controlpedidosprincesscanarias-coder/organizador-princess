@@ -51,6 +51,15 @@
 
 ---
 
+## 2026-11-08 17:00 — [Control Pedidos / Infra] Logs de arranque revisados; mejora de arranque anotada (v12.33.98)
+
+- **Revisado**: 4 arranques en Render el 8 nov (despliegues de v12.33.86 a v12.33.96). Todos con `Auto-migración OK`, sin `[MIGRACION] Paso … falló`, y con las 11 tareas programadas iniciadas.
+- **Anotado en `PENDIENTES.md`** (petición de Víctor): arrancar más rápido sin repetir las migraciones antiguas ya aplicadas. Primero hay que medir dónde se van los ~45 s, porque las migraciones con log tardan ~2 s y el plan Free también apaga el servicio tras un rato sin uso.
+- **Cerrado**: Private Key de EmailJS (configurada y funcionando, según Víctor).
+- Sin cambios de código.
+
+---
+
 ## 2026-11-08 16:53 — [Organizador / Control Pedidos] Retirada de la documentación la antigua contraseña fija de Administración (v12.33.96)
 
 - **Petición**: Víctor: «eliminar la contraseña antigua».

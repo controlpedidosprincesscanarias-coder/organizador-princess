@@ -51,6 +51,28 @@
 
 ---
 
+## 2026-11-08 21:30 — [Control Pedidos] Limpieza de funciones sin uso de la parte SAP (v12.34.12)
+
+- **Petición**: punto 6 de los pendientes, retirar lo que quedó sin llamadas al quitar en v12.34.00 las rutas antiguas de SAP.
+- **Cómo se ha comprobado**: un script recorre con `ast` todos los `.py` (también los tests), el JS y las plantillas. Da por muerta una función de primer nivel cuyo nombre no aparece fuera de su propio cuerpo ni dentro de otras ya descartadas, en cálculo transitivo. Después se ha revisado cada aparición con `grep`: las que quedaban eran comentarios o llamadas desde otras funciones muertas.
+- **Retiradas (17 funciones, ~1.500 líneas)**:
+  - `servicios/sap_crear_pedidos.py`: `_comparar_listado_albaranes_logica`, `_aplicar_coincidencia_albaran`, `_serializar_entrada_albaran`, `_ejecutar_comparacion_albaranes_bg`;
+  - `servicios/sap_listado_detallado.py`: `_ejecutar_actualizacion_departamentos_bg`, `_ejecutar_importacion_albaranes_bg`, `_extraer_albaranes_detallado_completo`, `_importar_albaranes_listado`, y los patrones `_PATRON_PERIODO_ALBARANES` / `_PATRON_LISTADO_ALBARANES`;
+  - `servicios/sap_comparar_pdf.py`: `_email_resumen_pdf_sap`, `_ejecutar_comparacion_pdf_bg`;
+  - `servicios/sap_albaranes_compra.py`: `_motivo_sin_pedido`, `_email_resumen_comparacion_albaranes`;
+  - `servicios/sap_departamentos.py`: `_auditoria_departamento_restaurante_bares_gy_it_mt_ta`;
+  - `servicios/sap_carga_unificada.py`: `_extraer_albaranes_resumido`;
+  - `servicios/sap_listado_guardado.py`: `_info_listado_sap_guardado`;
+  - `servicios/normalizacion.py`: `_match_departamento_prefijo`;
+  - `servicios/notificaciones.py`: `_get_usuarios_hotel_rol_telegram`.
+- Imports sin uso quitados con autoflake; `pyflakes` sin avisos en `servicios/`. Comentarios que citaban las funciones, actualizados.
+- README: fuera de la tabla `rutas/sap_comparar_pdf.py` y `rutas/sap_crear_pedidos.py` (no existen desde v12.34.00). CLAUDE.md: se quita la mejora anotada.
+- `tests/huella_app.py` regenerada: solo desaparecen esas 17 funciones del inventario; rutas, tareas y hooks, iguales.
+- Revisados `GUIA_DESPLIEGUE.md`, `PENDIENTES.md` e `INSTRUCCIONES_RESTAURACION.md`: no aplica.
+- Sin cambios de datos ni de funcionamiento.
+
+---
+
 ## 2026-11-08 21:15 — [Control Pedidos] Pruebas en producción con rol compras; pendientes al día (v12.34.10)
 
 - **Rol compras** («usuario prueba»), producción v12.34.06:

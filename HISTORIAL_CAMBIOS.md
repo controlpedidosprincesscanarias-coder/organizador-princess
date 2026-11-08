@@ -1,16 +1,503 @@
 # Historial de Cambios — Ecosistema Princess Compras (unificado)
 
+> **Autoría:** la idea y el desarrollo de la aplicación Control Pedidos Princess Canarias, incluidas sus pruebas, son de **Víctor Alejandro Martín Andrade**, para el Departamento de Central de Compras de Princess Hotels en Canarias. Ver `AUTORIA.md`.
+
 > Documento único de seguimiento. Se actualiza cambio a cambio, entrada
 > más reciente arriba. Componentes: **Organizador** (main_agenda,
 > desktop), **Control Pedidos** (backend Flask principal), **Chat**
-> (backend Flask/SocketIO independiente), **Infra** (Render /
-> Cloudflare / GitHub Actions, no es código de la app).
+> (backend Flask/SocketIO independiente), **DALI** (catálogo de
+> artículos/materiales — repo `dali-sap-articulos-app`, aparte pero
+> integrado con Control Pedidos vía SSO desde el 2026-08-14, ver más
+> abajo), **Infra** (Render / Cloudflare / GitHub Actions, no es código
+> de la app).
+
+> **Normas de entrega (obligatorias para cualquier cambio, ya lo
+> implemente Claude, otra IA o cualquier programador humano):**
+> 1. No se entrega el proyecto completo (ni el ZIP entero): solo los
+>    archivos individuales modificados o creados, indicando su ruta
+>    dentro del proyecto.
+> 2. Toda entrega debe registrar una entrada nueva aquí (más reciente
+>    arriba) y en `CHANGELOG.md`, describiendo petición, causa/hallazgo
+>    y corrección aplicada.
+> 3. `README.md`: la línea "Versión actual" se actualiza en **todas**
+>    las entregas, sin excepción (no solo cuando el cambio es visible) —
+>    quedó desincronizada 2 versiones seguidas (v12.30.82 y v12.30.83) por
+>    no tratarla como obligatoria, ver entrada de la v12.30.83. Además,
+>    el resto del README (funcionalidades, requisitos, secciones como
+>    "Rendimiento") se actualiza si el cambio afecta a algo que documenta.
+> 4. Subir el número de versión en el badge de `templates/index.html`
+>    (formato `V MAJOR.MINOR.PATCH`), coherente con el de `CHANGELOG.md`
+>    y esta entrada.
+> 5. Revisar en cada entrega si el cambio afecta a algún otro documento
+>    de mantenimiento del proyecto — `GUIA_DESPLIEGUE.md`,
+>    `PENDIENTES.md`, `INSTRUCCIONES_RESTAURACION.md`,
+>    `docs/hallazgo-seguridad-princess.md` — y actualizarlo si es así.
+>    Dejar constancia en la entrada de este historial de qué se revisó,
+>    aunque la conclusión sea "no aplica" (para que quede claro que se
+>    comprobó y no que se olvidó).
+>    **Nota sobre `docs/hallazgo-seguridad-princess.md`** (aclarada en
+>    v12.32.46, tras una auditoría que señaló la ambigüedad): el archivo
+>    no existe en este repo desde antes de v12.30.93 — no hay una entrada
+>    previa que registre cuándo ni por qué se quitó de aquí, lo cual es en
+>    sí mismo un incumplimiento de esta misma norma 5 que quedó sin
+>    detectar hasta ahora. Lo que sí consta, verificado en v12.30.74: el
+>    fallo que describía (contraseñas en texto plano sin hash) llevaba
+>    corregido desde v12.29.37, mucho antes de esa fecha. Este documento
+>    era, en origen, un análisis del proyecto DALI usando este backend
+>    como referencia de qué NO hacer — su versión completa (con el
+>    recuadro "✅ RESUELTO" añadido) sigue existiendo fuera de este repo.
+>    A partir de aquí, las entradas de norma 5 pueden limitarse a "no
+>    existe en este repo" sin repetir la explicación completa.
 
 ---
 
-## 2026-10-24
+## 2026-11-08 16:48 — [Organizador / Control Pedidos] Código del Organizador en GitHub e historial unificado (v4.18.04 / v12.33.94)
 
-### [Organizador] v4.18.04 — Los avisos de Control de Pedidos recibidos con la app cerrada se pierden, y los popups se cierran solos a los 10 minutos
+- **Petición**: Víctor sube el código del Organizador para guardarlo en GitHub y que el historial vuelva a ser el mismo en los dos proyectos.
+- **Organizador** (repo `organizador-princess`, rama `codigo/v4.18.04`):
+  - código de la v4.16.8 y, encima, el de la **v4.18.04** (la publicada en la Release v4.18.4), tal cual;
+  - fuera del repositorio: `__pycache__`, `Thumbs.db` y los ZIP del Chat;
+  - `.gitignore`: `main.spec` sí se versiona; se ignoran `*.exe`, `*.zip` y `Thumbs.db`;
+  - nuevos `CLAUDE.md` (normas, y sobre todo la actualización automática) y `AUTORIA.md`; línea de autoría en el `README.md`;
+  - `HISTORIAL_CAMBIOS.md` y `docs/archivo/` iguales a los de Control Pedidos.
+- **Revisado en el código del Organizador**:
+  - sin contraseñas ni tokens escritos: la del puente es la de cada usuario, cifrada en su equipo;
+  - el actualizador solo usa las Releases públicas (`releases/latest` y el `.sha256`), así que el repositorio **debe seguir siendo público**; subir el código no le afecta.
+- **Control Pedidos**: el historial recupera 8 entradas del Organizador y del Chat que solo estaban en el del Organizador, cada una en su fecha:
+  - Organizador v4.16.6, v4.16.8, v4.16.9, v4.18.00, v4.18.02 y v4.18.04;
+  - Chat v1.2.1 y v1.2.2.
+- **Nota**: en notas antiguas (Organizador v4.10.6) aparece citada la antigua contraseña fija de Administración, eliminada en esa versión. Ya no la usa nada. No debe reutilizarse en ninguna cuenta.
+
+---
+
+## 2026-11-08 16:24 — [Control Pedidos] Manuales regenerados con «DALI / SAP» (v12.33.92)
+
+- **Petición**: Víctor pide fusionar y regenerar los manuales.
+- **Cambio**:
+  - Capturas nuevas con `docs/manuales_fuente/` (datos inventados en Postgres local).
+  - Textos de los manuales con «DALI / SAP».
+  - Nota sobre las referencias deducidas en el manual del Comprador.
+  - `docs/Manual_Usuario_*.docx/.pdf` sustituidos (16, 29 y 22 páginas).
+- **Fusión**: PR #3 fusionado en `main`. Los PR #4 a #7 van juntos en el #7 (base `main`), pendientes de que Víctor lo fusione desde GitHub.
+
+---
+
+## 2026-11-08 16:16 — [Control Pedidos] Referencias del proveedor en pedidos sin PDF oficial (v12.33.90)
+
+- **Petición**: en la copia del pedido en PDF (pedidos sin PDF oficial subido) faltaba la referencia del proveedor; Víctor propone sacarla de otros PDF ya subidos, porque cada código DALI corresponde a una referencia de cada proveedor.
+- **Cambio**:
+  - `servicios/formato.py`: nuevas `_completar_refs_proveedor()` y `_norm_codigo_articulo()`.
+    - Rellenan `ref_proveedor` vacía con la de las líneas `origen='pdf'` de otros pedidos del mismo `proveedor_id` y el mismo código, comparado sin espacios ni ceros a la izquierda.
+    - Prefieren las no leídas por OCR y, después, la más reciente.
+    - Solo modifican los diccionarios en memoria; no escriben en la BD.
+  - Se usan en `servicios/pdf_pedido._generar_pdf_pedido` (copia en PDF) y en `GET /api/pedidos/<id>/lineas`, que añade el campo `refs_deducidas`.
+  - `static/js/app.js`: en la tabla de artículos, la referencia deducida sale en azul con «*» y una nota.
+- **Pruebas**:
+  - `tests/test_referencias_proveedor.py`, nueva (11 OK);
+  - huellas regeneradas (2 funciones nuevas y el campo nuevo en `/lineas`);
+  - flujo (60) y E2E (57) OK.
+
+---
+
+## 2026-11-08 16:11 — [Control Pedidos] «DALI / SAP» en textos y trazabilidad automática (v12.33.88)
+
+- **Petición**: Víctor quiere que se lea «DALI / SAP» mientras dure la transición entre ambos sistemas, también en la trazabilidad de los procesos automáticos.
+- **Cambio**:
+  - Textos visibles en `templates/index.html`, `static/js/app.js` e `importar_pedidos.js`, y mensajes al usuario en `rutas/` y `servicios/` (carga de listados, albaranes, correos, Telegram, copia del pedido en PDF).
+  - `servicios/sap_comun.py`: `_AUTOR_SAP_AUTO` pasa a «Carga automática DALI / SAP»; «Carga automática SAP» se añade a `_AUTORES_SAP_AUTO_ANTIGUOS`, que ya se unifican al arrancar. Observaciones y notas del historial en el nuevo formato.
+  - JS: `_esAutorCargaAuto()` reconoce el nombre antiguo y el nuevo.
+  - Las búsquedas por la nota «Pedido creado automáticamente desde el listado …» admiten los dos formatos.
+- ⚠️ **Datos de producción** (`core/migraciones.py`, paso 125, idempotente): renombra en `pedidos.observaciones` y `historial_estados.nota` los textos automáticos con el formato antiguo. El autor lo renombra el paso de unificación ya existente. Probado en BD local con datos simulados, ejecutando la migración dos veces.
+- **Sin cambiar**: «Código SAP» del proveedor (dato distinto del código DALI), mensajes internos del log y nombres de funciones.
+- **Revisado**: huella sin BD, huella BD, migraciones, flujo (60), hotel de pruebas (19) y E2E (57): todo OK.
+
+---
+
+## 2026-11-08 15:59 — [Control Pedidos] Retirada la ventana «Comparar listado PDF» (v12.33.86)
+
+- **Petición**: Víctor decide retirar la ventana, que quedó sin botón desde la carga unificada de v12.32.97.
+- **Cambio**:
+  - `templates/index.html`: fuera `modal-comparar-pdf`.
+  - `static/js/app.js`: fuera las funciones que solo usaba esa ventana:
+    - `abrirModalCompararListado`, `compararListadoPdf`, `_pollCompararListadoPdf`, `_renderCompararPdfResultado`, `enviarResumenComparacionPdf`;
+    - el bloque «Pedidos + Albaranes» (`_pollCompararListadoAlbaranes`…);
+    - el bloque «Crear pedidos desde SAP» (`_cargarPedidosPendientesCrearSap`…);
+    - `_crearPedidoDesdeComparacion`.
+  - Ninguna tenía llamadas fuera de la propia ventana.
+  - El servidor no cambia: «Cargar listados SAP» (`servicios/sap_carga_unificada.py`) sigue usando `servicios/sap_comparar_pdf.py`.
+- **Pendiente anotado en CLAUDE.md**:
+  - 5 endpoints que ya nada llama desde la interfaz;
+  - otras dos ventanas sin botón: «Actualizar departamentos» e «Importar albaranes».
+- **Revisado**: sintaxis JS OK, huella sin BD idéntica, E2E navegador 57 pasos sin errores.
+
+---
+
+## 2026-11-08 13:30 — [Control Pedidos] Manuales de usuario Hotel, Comprador y Administrador (v12.33.84)
+
+- **Petición**: actualizar los manuales (Hotel V 12.33.19 y Comprador V 12.33.25), crear el de Administrador y hacerlos ilustrativos y fáciles de entender, con una mención sencilla al hotel PR.
+- **Cambio**:
+  - `docs/Manual_Usuario_HOTEL_Control_Pedidos.docx/.pdf` y `docs/Manual_Usuario_COMPRADOR_Control_Pedidos.docx/.pdf`, rehechos.
+  - `docs/Manual_Usuario_ADMINISTRADOR_Control_Pedidos.docx/.pdf`, nuevo.
+  - Capturas anotadas con datos inventados sobre una Postgres local.
+  - `docs/manuales_fuente/`, nueva:
+    - `demo_datos.py`, `demo_privacidad.sql`, `capturas.py` (Playwright);
+    - `lib.js` y `manual_*.js` (docx de Node), `generar.sh` (LibreOffice) y `README.md`.
+    - Las capturas y la salida quedan fuera del repositorio (`.gitignore`).
+- **Hallazgo (sin corregir, pendiente de decidir)**: la ventana «Comparar listado PDF» (`modal-comparar-pdf`, `abrirModalCompararListado()` en `static/js/app.js`) no tiene ningún botón que la abra desde v12.32.97, cuando se unificó en «Cargar listados SAP». El manual de Administrador ya no la menciona. Queda decidir si se retira el código o se vuelve a enlazar.
+- **Revisado**: los tres PDF, página a página; huella sin BD OK.
+
+---
+
+## 2026-11-08 12:40 — [Control Pedidos] Revisión final: permisos de alertas, fase 2, traza SAP, comentarios y limpieza (v12.33.82)
+
+- **Petición**: dejar la aplicación sin errores y bien documentada.
+- **Hallazgos y correcciones**:
+  - `rutas/alertas.py`: `alerta_email_preview`, `alerta_enviar_email`, `alerta_log_whatsapp` y `alerta_enviar_telegram` solo comprobaban la sesión. Nuevo `_sin_permiso_alertas()`: 403 si el rol no es admin/compras; 404 si el pedido es del hotel PR y el usuario no puede verlo.
+  - `rutas/solicitudes_acceso.py`: `registrar_envio_fase2` pasa a `@admin_required`.
+  - `servicios/sap_albaranes_compra.py`: el filtro de la traza buscaba `app.py`. Nuevo `_es_codigo_propio()`, que reconoce cualquier archivo del proyecto (no site-packages); el mensaje incluye la ruta relativa.
+  - 83 comentarios con «en app.py» / «templates/index.html» actualizados al módulo o JS real. Verificado: AST idéntico salvo `sap_albaranes_compra`.
+  - pyflakes: importaciones y variables sin uso retiradas. Solo quedan las importaciones intencionadas de `app.py`.
+- **Pruebas**: `tests/test_flujo.py` secciones 12-13 (cola de correos y avisos por alerta). Huellas regeneradas (función nueva). Huella, huella BD, migraciones, rotación EmailJS, techo, flujo, hotel de pruebas, E2E y las 11 tareas programadas: OK.
+
+---
+
+## 2026-11-08 12:05 — [Control Pedidos] Autoría en toda la documentación y el código (v12.33.80)
+
+- **Petición**: dejar constancia en toda la documentación de que la idea y el desarrollo de la aplicación, incluidas las pruebas, son de Víctor Alejandro Martín Andrade para el Dpto. Central de Compras Princess en Canarias.
+- **Cambio**:
+  - `AUTORIA.md` nuevo.
+  - Línea «Autoría» al principio de `README.md`, `CLAUDE.md`, este historial, `GUIA_DESPLIEGUE.md`, `INSTRUCCIONES_RESTAURACION.md` (junto al «© VAMA 2026» que ya tenía), `PENDIENTES.md`, `tests/CHECKLIST_PRUEBAS_MANUALES_TECHO.md` y los dos archivos de `docs/archivo/`.
+  - En `CHANGELOG.md`, al final: `/api/changelog` lee la primera línea como versión.
+  - Docstrings de `app.py`, `core/`, `servicios/`, `jobs/` y `rutas/` (`__init__.py`).
+  - `<meta name="author">` en `templates/index.html`.
+  - `CLAUDE.md`: sección «Autoría» con la regla de conservarla y añadirla en documentos nuevos.
+- **Organizador**: este historial es compartido; al copiar las entradas al del Organizador, copiar también la línea de autoría de la cabecera si corresponde a ese proyecto.
+- **Revisado**: huella sin BD (comprueba `/api/version` y `/api/changelog`) OK; sin cambios de código funcional.
+
+## 2026-11-08 11:45 — [Control Pedidos] ETag débil para el Worker, caché del id de PR y notas de versión legibles (v12.33.78)
+
+- **Despliegue de v12.33.76 (fusión del PR #1, `774a0c7`)**: Render desplegó solo a las 11:40 UTC y `/api/version` = `9a3eacfe51da` (el esperado). El aviso de nueva versión saltó en el navegador de Víctor (captura).
+- **Sonda de admin en producción, antes (v12.33.52) y después (v12.33.76)**:
+  - mismos códigos en las 47 rutas y misma forma del JSON;
+  - tiempos parecidos (`/api/exportar` de 13,6 a 10,9 s);
+  - el CSS y los 7 JS con un año de caché y gzip; logos con 7 días; cabeceras de seguridad iguales.
+  - Comparada con la sonda local de v12.33.76, solo difiere `/api/dali/sso` (secreto ausente en local).
+- **Hallazgo**: por el Worker, `index` seguía llegando sin ETag aunque ya llevaba comillas (`index_304_con_etag` = 200).
+  - Directo a Render: `content-encoding: gzip` y `etag: "9a3eacfe51da"`.
+  - Por el Worker: `content-encoding: br` y sin ETag.
+  - `app.js` (gzip, sin recomprimir) y `favicon.png` sí conservan el suyo.
+  - Cloudflare elimina los ETag fuertes cuando recomprime y conserva los débiles. La explicación de v12.33.74 (comillas) era incompleta: las comillas eran necesarias, pero no suficientes.
+- **Corrección**:
+  - `index()` envía `ETag: W/"<hash>"`; la comparación ya aceptaba todas las formas.
+  - `tests/huella_app.py` exige el ETag débil y el 304.
+- **Mejora de consumo**: `_id_hotel_pruebas()` guarda en memoria el id de PR (no se guarda si el hotel no existe). `_hotel_es_de_pruebas(hotel_id)` deja de consultar y `_pedido_es_de_pruebas` hace una consulta sin JOIN. Motivo: `_resolver_notificacion` se llama desde las tareas de cada minuto.
+- **Notas de versión**: `_renderChangelog` (`static/js/nueva_version.js`) trata `# v…` como `## v…` y convierte `**negrita**`, `` `código` `` y sublistas con sangría (`  - `). Probado con captura del aviso simulando un despliegue, sin errores de JS.
+- **Prueba**: batería completa en verde (huella sin BD regenerada: función nueva `_id_hotel_pruebas`; flujo 51, hotel de pruebas 19, E2E 57).
+- **Pendiente**:
+  - Tras desplegar, comprobar por el Worker que llega `etag: W/"…"` y que el condicional da 304.
+  - Hacer el flujo con escritura en PR (proveedor PRUEBAS, departamento SSTT).
+  - Copiar las entradas al historial del Organizador.
+- **Revisado**: `CLAUDE.md` (nota del Worker), `README.md`, `CHANGELOG.md` y badge actualizados.
+
+## 2026-11-08 11:35 — [Control Pedidos] Hotel de pruebas: todos sus avisos a «usuario prueba» (v12.33.76)
+
+- **Petición**: que todas las pruebas (departamentos, etc.) vayan siempre al correo del usuario de pruebas.
+- **Contexto**: antes de probar con escritura en producción se comprobó a quién avisaría un pedido de PR. PR no tiene compradores ni correo de departamento, pero los 4 contactos adicionales (`notificacion_contacto_reglas`) son globales por departamento («no varía por hotel»). Administrativo A&B, Chef Ejecutivo y Director Alojamiento reciben ENVIADO AL PROVEEDOR en los departamentos 1-5 y 8, y Director Compras recibe el exceso de techo autorizado en los 14. Además, las tareas de alertas no excluían PR (al contrario de lo que decía el comentario de `core/config.py`).
+- **Puntos de salida cubiertos**:
+  - **Correos**: todos los de pedidos pasan por la cola (`_encolar_email_sistema`, `_encolar_email_pedido_retrasado`; `enviar_emails_estado` ya solo encola). Se redirigen si `pedido_id` es de PR o, con el nuevo parámetro `hotel_id`, si el hotel es PR (resúmenes de comparar listado PDF y de albaranes).
+  - **Propuesta manual de alertas**: `alerta_email_preview` → para PR, Para = cuenta de pruebas, sin CC, compradores ni WhatsApp, y con el aviso en el cuerpo.
+  - **Telegram y avisos emergentes por hotel**: `_resolver_notificacion(evento, canal, hotel_id)` → para PR devuelve solo `usuario prueba`. Cubre `_enviar_telegram_compradores`, `_telegram_cambio_estado` y las tareas.
+  - **Copias de supervisión a admins por hotel**: nuevo `_destinatarios_supervision` en `jobs/techo.py` (techo urgente y pedido sin autorización previa, por pedido) y en `jobs/alertas.py` (familia repetida).
+- **Helpers** (`servicios/destinatarios.py`): `_usuario_pruebas`, `_hotel_es_de_pruebas`, `_pedido_es_de_pruebas` y `_redirigir_correo_pruebas`.
+  - `_redirigir_correo_pruebas` cambia Para, CC y Responder a por los correos de `usuario prueba`, antepone «[PRUEBAS]» al asunto y un recuadro con los destinatarios originales (HTML y texto).
+  - Sin correo de pruebas → `None` y no se encola.
+- **No cubierto, a propósito**: correos de solicitudes de acceso, códigos de login y restablecimiento de contraseña (no están ligados a pedidos), y el puente con DALI (`rutas/externo.py`, correos de Catálogo sin pedido de PR).
+- **Prueba**:
+  - `tests/test_hotel_pruebas.py` (19/19): con proveedor, comprador, contacto de departamento y admin con Telegram «reales», un pedido de PR enviado al proveedor deja sus 2 correos solo a la cuenta de pruebas con el aviso, y uno de GC los deja a los reales. También comprueba el resolutor por hotel, la supervisión, el resumen por `hotel_id`, la propuesta de alertas y que sin correo de pruebas no se encola nada.
+  - Las 11 tareas programadas con freezegun OK.
+  - Huellas (sin BD regenerada por 6 funciones nuevas; con BD idéntica), flujo 51/51, E2E 57/57, techo, migraciones y EmailJS OK.
+- **Revisado**: `CLAUDE.md` (regla del hotel de pruebas y test), `README.md`, `core/config.py` (comentario), `CHANGELOG.md` y badge actualizados.
+- **Pendiente**: copiar esta entrada al historial del Organizador.
+
+## 2026-11-08 11:03 — [Control Pedidos] Cola de correos solo admin/compras + ETag de index.html entre comillas (v12.33.74)
+
+- **Contexto**: Víctor pide pruebas reales en Render y da acceso con `usuario prueba` (rol hotel, PR). Producción, por el Worker `proxy.controlpedidosprincess-canarias.workers.dev`, sirve v12.33.52 (`/api/version` = md5 del `index.html` de `main`). Sonda de solo lectura: GET públicos, login, GET sin parámetros y logout. Antes de lanzarla se excluyeron 3 GET que escriben: `/api/bridge/notificaciones`, `/api/emails-sistema-pendientes` y `/api/externo/dali-sap/proveedores`.
+- **Hallazgo 1 (seguridad)**: `GET /api/emails-sistema-pendientes` y `POST /api/emails-sistema-pendientes/<id>/marcar-enviado[-no-confirmado]` solo llevaban `@login_required`.
+  - El GET devuelve y reserva hasta 20 correos (destinatario, asunto, cuerpo, CC) y les suma `intentos`.
+  - Los POST los dan por enviados.
+  - El frontend solo arranca el sondeo para admin/compras, pero el servidor no lo exigía.
+  - **Corrección**: `_solo_admin_o_compras()` en `rutas/emails_sistema.py` → 403 para cualquier otro rol en las tres rutas.
+- **Hallazgo 2 (egress)**: `index()` enviaba `ETag: e22f754850f2` sin comillas (inválido según RFC 7232).
+  - Medido: directo a onrender llega el ETag y `If-None-Match` da 304. Por el Worker no llega ningún ETag (aunque un `If-None-Match` enviado a mano sí da 304). En cambio, el ETag de `/static/favicon.png` (Flask, entre comillas) sí atraviesa el Worker.
+  - El navegador nunca revalidaba y descargaba `index.html` completo en cada carga. Con la Fase 2 son unas 3.300 líneas en lugar de 17.000, pero sigue siendo innecesario.
+  - **Corrección**: `ETag: "<hash>"`; la comparación acepta el hash con o sin comillas, `W/` y listas; el 304 lleva también el ETag.
+- **Otros datos de la sonda (v12.33.52 en producción, referencia para comparar tras desplegar)**: favicon y logos con `no-cache` (confirma el fallo de caché de v12.33.64); 10 bloques `<script>` en línea; `index` 1.011.626 bytes; cabeceras de seguridad presentes.
+- **Bloqueo de la sonda**: `usuario prueba` tiene `debe_cambiar_password` activo, así que `_exigir_cambio_password` devuelve 403 en casi todas las rutas `/api/` (solo pasan `/api/me`, `/api/version`, `/ping` y `/`). Falta cambiar esa contraseña temporal para completar el resto.
+- **Prueba**: `test_flujo.py` 51/51 (apartado 12: hotel → 403 en las 3 rutas; admin → 200). `huella_app` exige ETag entre comillas y 304. `huella_bd` regenerada: único cambio, `hotel GET /api/emails-sistema-pendientes` 200 → 403. E2E 57/57; migraciones, EmailJS y techo OK.
+- **Revisado**: `CLAUDE.md` (URL del Worker y nota del ETag), `README.md` (versión), `CHANGELOG.md` y badge actualizados.
+- **Pendiente**: copiar esta entrada al historial del Organizador.
+
+## 2026-11-08 00:14 — [Control Pedidos] Rol hotel: solo ENTREGA PARCIAL / ENTREGADO, sin altas (v12.33.72)
+
+- **Petición**: Víctor decide que el usuario de hotel solo pueda poner «entrega parcial y entregado» (pregunta abierta de v12.33.70).
+- **Cambio**:
+  - `rutas/pedidos.py`: `ESTADOS_PERMITIDOS_HOTEL = ("ENTREGA PARCIAL", "ENTREGADO")`. En la rama de hotel de `update_pedido()`, si el estado cambia y no está en esa lista → 403. Se conservan los mensajes específicos de CANCELADO y ENVIADO AL PROVEEDOR.
+  - `create_pedido()`: 403 para el rol hotel.
+  - `static/js/app.js` (modo hotel de la ficha): se desactivan todas las opciones del estado salvo esas dos (antes solo CANCELADO).
+- **Hallazgos arreglados (ya existían)**:
+  1. El bloqueo de ENVIADO AL PROVEEDOR de la rama de hotel (2026-09-09) comparaba el estado pedido, no el cambio. Como la interfaz envía siempre `val('p-estado')`, guardar un pedido ya enviado (p. ej. solo el albarán) daba 403. Detectado por `test_flujo.py`. Ahora los tres bloqueos van con `_cambia_estado_hotel`.
+  2. `create_pedido()` no comprobaba el rol: un usuario de hotel podía crear pedidos por la API y para cualquier `hotel_id` (no se validaba contra `hoteles_ids`).
+- **Prueba**:
+  - `test_flujo.py`, apartado 11 con `usuario prueba` (hotel PR) sobre un pedido enviado: alta → 403; PENDIENTE COTIZACIÓN, firma hotel, Vº Bº DG, DENEGADO y CANCELADO → 403 sin cambiar nada; guardar el albarán sin cambiar de estado → 200; ENTREGA PARCIAL sin base imponible → 422; con ella → 200; ENTREGADO → 200. Total 47/47.
+  - `e2e_navegador.py`: `usuario prueba` abre un pedido de PR y solo tiene activas ENTREGA PARCIAL y ENTREGADO (57/57).
+  - Huellas, migraciones, EmailJS y techo OK.
+- **Revisado**: `CLAUDE.md` (regla del rol HOTEL; quitada la pregunta abierta), `README.md` (versión), `CHANGELOG.md` y badge actualizados.
+- **Pendiente**: copiar esta entrada al historial del Organizador.
+
+## 2026-11-08 00:08 — [Control Pedidos] Rechazo de alta en estado de firma + pregunta de duplicado tapada en el simplificado (v12.33.70)
+
+- **Petición**: «que el servidor rechace» (decisión sobre el hallazgo de v12.33.68).
+- **Antes de cambiar**: se revisó quién crea pedidos con `POST /api/pedidos`.
+  - El formulario «paso a paso» ya bloquea los estados de firma antes de guardar (`_pedirDatosFirma`: «Guarda primero el pedido…»).
+  - El **«Pedido simplificado»** (`_spCrear`) creaba el pedido directamente en el estado de firma propuesto (`_spEstadoPropuesto`) y subía el `vb_eml` después: un rechazo a secas lo habría roto.
+  - Las altas de Activo Operacional (`rutas/externo.py`) e Importar Excel insertan por su cuenta: no afectadas.
+  - Ningún estado de cotización o firma envía correo ni Telegram (`ESTADOS_EMAIL_INTERNO`), así que crear y después cambiar de estado no genera avisos nuevos.
+- **Cambio**:
+  - `create_pedido`: estado por defecto `PENDIENTE COTIZACIÓN`; si `estado` está en `ESTADOS_PENDIENTE_FIRMA` → 422 con `estado_inicial_sugerido`.
+  - `_spCrear` (`static/js/app.js`): con un estado de firma crea en PENDIENTE COTIZACIÓN, sube los archivos y hace `PUT` al estado elegido con `fecha_envio_visto_bueno`; despacha los `emails_pendientes` de las dos respuestas; si el `PUT` falla, muestra «Estado sin cambiar».
+- **Hallazgo y arreglo (ya existía)**: `_preguntarPosibleDuplicado` usaba `z-index` 1300 y el asistente (`.cp-bloq`) 3000. La pregunta quedaba debajo, el `await` no terminaba nunca y la pantalla se quedaba en «Creando…». Detectado por la prueba E2E: el `POST` devolvía 409 `requiere_confirmacion` y no se veía ningún diálogo. Ahora `z-index` 3100.
+- **Prueba**:
+  - `test_flujo.py`: los tres estados de firma y ENVIADO → 422 sin crear nada; sin estado → PENDIENTE COTIZACIÓN; resto del ciclo igual. 34/34.
+  - `e2e_navegador.py`, nuevo flujo «pedido simplificado del hotel PR en estado de firma»: justificante como `vb_eml`, respuesta «es otro pedido distinto» a la pregunta de duplicado, y en la BD estado PENDIENTE FIRMA DIRECCION COMPRAS, fecha Vº Bº, adjunto `vb_eml` e historial [PENDIENTE COTIZACIÓN → PENDIENTE FIRMA DIRECCION COMPRAS]. 57/57.
+  - Huellas, migraciones, EmailJS y techo OK.
+- **Pregunta abierta para Víctor (sin cambiar)**: la rama del rol **hotel** en `update_pedido()` solo bloquea CANCELADO y ENVIADO AL PROVEEDOR; acepta cualquier otro estado sin validar. Y la interfaz le ofrece todos menos CANCELADO, sin el diálogo de firma (`_alCambiarEstadoManual` sale para el rol hotel). Así, un usuario de hotel puede pasar un pedido a un estado de firma sin fecha ni justificante, o a PENDIENTE Vº Bº DIRECCIÓN GENERAL / DENEGADO. Falta decidir qué estados debe poder poner el hotel.
+- **Revisado**: `CLAUDE.md` (regla de estados de firma, pregunta abierta), `README.md` (versión), `CHANGELOG.md` y badge actualizados.
+- **Pendiente**: copiar esta entrada al historial del Organizador.
+
+## 2026-11-07 23:53 — [Control Pedidos] Tests de techo y de flujo + checklist manual del techo (v12.33.68)
+
+- **Petición**: crear los tests que citaba el `CLAUDE.md` y que no existían («posiblemente nunca se crearon»).
+- **`tests/test_techo_gastos.py`**: ejecuta las funciones reales `_check_techo`, `_techo_snapshot`, `_resolver_fecha_entrega_prevista` y `_calcular_fecha_entrega_prevista` contra la Postgres local, con la configuración fijada en la BD (3000/6000/1/0). Cubre:
+  - las 4 reglas del techo;
+  - las 5 exclusiones (otro mes, otro hotel, no sujeto, el propio pedido, filtro por `mes_consumo_techo` y no por `creado_en`);
+  - la foto presupuestaria;
+  - 8 casos de fechas (prioridad de la fecha específica; date, datetime y texto; datos que faltan o ilegibles).
+  - Resultado: 25/25.
+- **`tests/test_flujo.py`**: el cliente de pruebas de Flask como admin recorre:
+  - alta en PENDIENTE COTIZACIÓN;
+  - a firma (422 sin `vb_eml`/fecha; OK con justificante subido por `/api/pedidos/<id>/adjuntos`);
+  - a ENVIADO (422 sin proveedor/PDF; OK con contacto principal con email, `pedido_num`, `total_pedido`, `pedido_doc` y tarifa acordada; `mes_consumo_techo` = mes actual);
+  - 2.º pedido de la familia → PENDIENTE Vº Bº DG + `expediente_exceso` pendiente (2000/4000); reintento → 422 con `expediente_pendiente_id`, sin duplicar;
+  - aprobar tras consumir otros 1000 → la foto sigue en 2000/4000;
+  - denegar sin motivo (rechazado) y con motivo;
+  - ENTREGA PARCIAL/ENTREGADO con validación de albarán y base imponible;
+  - CANCELADO (libera el techo) e historial.
+  - Resultado: 28/28.
+- **`tests/CHECKLIST_PRUEBAS_MANUALES_TECHO.md`**: pasos con resultado esperado para Render: arranque (`Auto-migración OK` / `[MIGRACION] Paso N`) y aviso de nueva versión; configuración; dentro del techo; desvío; aprobación con foto congelada e informe; denegación; cancelación; fechas; visibilidad de PR; limpieza.
+- **Hallazgo (sin cambiar, pendiente de decisión)**: `create_pedido` usa por defecto el estado «PENDIENTE FIRMA DIRECCION COMPRAS» y acepta crear el pedido en un estado de firma sin fecha de envío ni justificante. La regla de v12.32.83 solo se comprueba en `update_pedido` al cambiar de estado. La interfaz sí lo pide (`_pedirDatosFirma`), así que afecta solo a llamadas directas a la API. No se cambia sin decidir antes cómo debe funcionar: al crear, el pedido aún no puede tener adjuntos. Anotado en `CLAUDE.md` → «Mejoras anotadas».
+- **Revisado**: `CLAUDE.md` (sección Tests y mejoras anotadas), `README.md` (versión y tests), `CHANGELOG.md` y badge actualizados. Sin cambios de código de la app: huellas no afectadas.
+- **Pendiente**: copiar esta entrada al historial del Organizador.
+
+## 2026-11-07 23:47 — [Control Pedidos] CLAUDE.md actualizado y añadido al repositorio (v12.33.66)
+
+- **Petición**: preparar el `CLAUDE.md` nuevo tras la reorganización.
+- **Cambio**: `CLAUDE.md` en la raíz, a partir de la versión que tenía Víctor:
+  - Se mantienen todas las reglas de trabajo (versionado +2, historial compartido, ramas, ⚠️ en cambios de datos) y las notas de los módulos delicados, con su ubicación nueva verificada con grep.
+  - Se completan las partes marcadas con ⚠️: arranque en local, variables de entorno (solo nombres, sacados del código) y cómo lanzar los tests.
+  - Se añaden la estructura por capas, las reglas de dependencia, las trampas al mover código, la regla de las migraciones con `_aviso_paso` y la regla 7 («los errores encontrados se reparan»).
+- **Corrección de un dato**: tras releer `PENDIENTES.md`, el servicio de Render está creado con runtime Python nativo, no Docker (el `runtime: docker` de `render.yaml` se ignora y el Dockerfile no se usa). La versión anterior decía «Start Command» (correcto) y el borrador de esta entrega decía Docker (incorrecto, corregido antes del commit).
+- **Sin cambios de código**: huellas no afectadas.
+- **Pendiente**: copiar esta entrada al historial del Organizador. Los tests que citaba el `CLAUDE.md` anterior (`test_techo_gastos.py`, `test_flujo.py`, checklist manual de techo) siguen sin estar en el repositorio.
+
+## 2026-11-07 23:50 — [Control Pedidos] Fase 3: archivo del CHANGELOG y del historial + caché de /static (v12.33.64)
+
+- **Petición**: fase 3 del plan (archivar el CHANGELOG y el historial antiguos).
+- **Archivo**:
+  - Un solo corte por documento, sin reordenar: lo que hay desde la primera entrada anterior a 2026-10-01 hasta el final pasa tal cual a `docs/archivo/`. No se agrupa por meses porque hay una entrada fuera de orden en septiembre en cada documento (v12.32.64/65 y 2026-09-16/17) y la sección «Julio 2026 (antes de esta sesión)».
+  - `CHANGELOG.md`: líneas 1-1201 en el principal (v12.33.64 a v12.32.70) y 1202-11744 en `docs/archivo/CHANGELOG_2026-06_a_2026-09.md`.
+  - Historial: cabecera de normas + octubre y noviembre + «## Convenciones de este historial» en el principal; el resto en `docs/archivo/HISTORIAL_CAMBIOS_2026-07_a_2026-09.md`.
+  - Cada archivo lleva una cabecera explicativa y el principal, una nota con el enlace. Verificado que principal + archivo reconstruyen el original exacto.
+  - `/api/changelog` sigue leyendo la primera entrada (huella OK). El admin recibe ahora 156 KB en lugar de 1 MB.
+- **Hallazgo (caché de /static)**: el arreglo de egress de julio estaba en un `@app.route("/static/<path:filename>")` propio con `max_age=604800`, pero Flask registra su ruta `/static` al crear la app y es la que atiende siempre. Comprobado en el monolito original y en la rama: logos y favicon salían con `no-cache`.
+- **Corrección**:
+  - Se quita la ruta propia, que no se usaba (huella regenerada: 171 rutas).
+  - `_max_age_estaticos()` (`rutas/estaticas.py`) da 7 días al resto de `static/` y un año a `css/` y `js/`.
+  - Solo cuando el endpoint es `static` y la ruta real del archivo está dentro de `static/`. Flask le pasa a veces la ruta absoluta: en el 404, que devuelve `templates/index.html`, la primera versión de esta función le daba 7 días; detectado y corregido antes del commit.
+  - Comprobado: favicon, logos y ejemplos con 7 días; CSS/JS con un año; `/static/no-existe.png`, `/static/../app.py`, `/no-existe` y `/` con `no-cache`, como antes.
+- **Prueba**: huellas (sin BD regenerada por la ruta quitada; con BD idéntica), E2E navegador 56/56, `test_migraciones` y `test_emailjs_rotacion` OK.
+- **⚠️ Organizador**: este historial es compartido. Para que los dos sigan iguales hay que aplicar el mismo corte en el `HISTORIAL_CAMBIOS.md` de la raíz del Organizador (mover todo lo anterior a 2026-09-25 inclusive, salvo «## Convenciones de este historial», a un archivo equivalente) y copiar las entradas de hoy. Desde esta sesión no hay acceso de escritura a ese repositorio.
+- **Revisado**: `README.md` (versión, estructura, documentos relacionados), `CHANGELOG.md` y badge actualizados. Los manuales de `docs/` (.docx y .pdf, ~15 MB) se dejan como están: son para los usuarios.
+
+## 2026-11-07 23:35 — [Control Pedidos] Fase 2: CSS/JS fuera de index.html + pruebas E2E en navegador (v12.33.62)
+
+- **Petición**: seguir con la fase 2 y hacer comprobaciones de funcionamiento real con el hotel PR.
+- **Sobre probar en producción**: no se hizo. La rama no está desplegada (Render despliega `main`). Una segunda instancia contra la BD real ejecutaría migraciones y tareas programadas (correos y Telegram duplicados, ver `PENDIENTES.md`). El login con usuario y contraseña no debe pasar por el chat. En su lugar: navegador real (Chromium + Playwright) contra gunicorn y una Postgres local con datos del hotel PR.
+- **`tests/e2e_navegador.py`** (nuevo):
+  - Siembra `usuario prueba` (rol hotel, PR) además de los datos de `huella_bd.py`.
+  - Recorre las vistas del menú de cada rol según `data-roles`: las permitidas deben mostrarse y las bloqueadas no deben abrirse.
+  - Alta por «Nuevo pedido → paso a paso» (hotel PR, departamento, observaciones) y edición a «PENDIENTE DE FIRMA DIRECCION HOTEL». La app pide la fecha y el justificante (`cp-firma-file`) y se sube un PDF generado con reportlab.
+  - Comprueba en la BD el estado, las observaciones, el adjunto `vb_eml` y `historial_estados`.
+  - Visibilidad del hotel PR: `usuario prueba` lo ve y `hotel prueba` no.
+  - Falla con cualquier `pageerror`, `console.error` o respuesta 5xx. Se ignoran solo los errores del CDN de EmailJS y de Google Fonts, bloqueados en el entorno de pruebas.
+  - Resultado: 56/56 OK, igual con el monolito 0a0fbb5 que con la rama.
+- **Fase 2**:
+  - Los 8 bloques `<style>`/`<script>` en línea de `templates/index.html` (salvo el pequeño de configuración de EmailJS en `<head>`) pasan a `static/css/app.css` y a `static/js/` (`app.js`, `importar_pedidos.js`, `avisos_alerta.js`, `impresion_pedidos.js`, `impresion_techo_alertas.js`, `emails_sistema.js`, `nueva_version.js`). Cada uno se sustituye en la misma línea por `<link>`/`<script src>` sin `defer`, así que el orden de ejecución no cambia.
+  - Reconstrucción byte a byte del `index.html` original verificada y `node --check` OK en los 7 JS.
+  - Un primer intento cortó mal el último bloque (incluía HTML y otros 2 scripts): la prueba E2E lo detectó («Unexpected token '<'», `restoreCargarLista is not defined`) y se rehízo detectando todos los bloques automáticamente.
+- **Caché**:
+  - `rutas/estaticas.py`: `_versionar_estaticos()` cambia `?v=__V__` por el md5 (10 caracteres) de cada archivo de `static/`, al leer `index.html`, así que `/api/version` (md5 de lo servido) cambia si cambia cualquier CSS/JS.
+  - `_max_age_estaticos()` da un año de caché solo a `static/css/` y `static/js/`. Logos y favicon siguen con el comportamiento de Flask.
+  - Aviso de nueva versión probado: con la app abierta, al añadir una línea a un JS, `_pollVersion()` muestra el modal; sin cambios, no.
+- **Pruebas**:
+  - Capturas de las 51 pantallas con el `index.html` anterior y con el nuevo: las diferencias son píxeles sueltos de suavizado de letras (el 0,2 %). Dos ejecuciones del mismo `index.html` anterior ya difieren en 35 capturas por lo mismo.
+  - Huellas (ampliadas: cada CSS/JS enlazado debe servirse y su `?v=` debe ser el hash del archivo), `test_emailjs_rotacion`, `test_migraciones` y E2E OK.
+- **Pendiente**:
+  - Probar en Render con el hotel PR tras fusionar (lo hace Víctor), sobre todo el primer arranque y el aviso de nueva versión.
+  - `app.js` sigue teniendo ~8.500 líneas: partirlo por temas exige comprobar qué funciones se usan al cargar cada archivo (orden de declaración), así que se deja para más adelante.
+  - Copiar esta entrada al historial del Organizador.
+- **Revisado**: `README.md` (stack, estructura, versión en la URL de CSS/JS, tests), `CHANGELOG.md` y badge actualizados; `Dockerfile` (`COPY . .` incluye `static/`) y `GUIA_DESPLIEGUE.md` → no aplica.
+
+## 2026-11-07 23:20 — [Control Pedidos] _auto_migrate: cada paso con su propio try/except (v12.33.60)
+
+- **Petición**: seguir con la reorganización por `_auto_migrate` (pendiente del `CLAUDE.md`: fallo intermitente «Auto-migración omitida»).
+- **Hallazgo**: 184 sentencias dentro de `with db.cursor()`, de las que 143 no tenían try/except. La conexión es autocommit (un fallo no arrastra la transacción), pero la excepción salía al `except` general y cortaba el resto de la función. Con el log anterior no se podía saber qué sentencia fallaba en producción. Reproducido inyectando un fallo en el `CREATE INDEX idx_prov_contactos`: «Auto-migración omitida» y, por ejemplo, `sap_albaranes_cab_hotel_albaran_uk` sin crear.
+- **Corrección** (herramienta automática, sin reescribir a mano):
+  - Cada sentencia se envuelve en `try: … except Exception as _exc_paso: _aviso_paso(N, descripción, _exc_paso)`.
+  - Se agrupan en un mismo paso las sentencias inseparables: las que leen el resultado del cursor (`fetchone`/`rowcount`) o usan variables recién asignadas (9 grupos, p. ej. `SELECT COUNT(*)` + `fetchone` + `if`).
+  - No se envuelven los 41 bloques que ya tenían try/except, las funciones internas ni las asignaciones triviales.
+  - Las líneas de continuación de los textos SQL multilínea no se reindentan.
+  - `_aviso_paso` acumula los pasos omitidos y el resumen final sustituye a «Auto-migración OK» cuando hay alguno. El `log.exception` general queda para fallos de conexión.
+- **Prueba**: AST de las 184 sentencias idéntico al anterior quitando los try nuevos. BD nueva + segundo arranque: «Auto-migración OK», `pg_dump --schema-only` idéntico y datos iniciales de 7 tablas idénticos. `tests/test_migraciones.py` pasa con el código nuevo y falla con el anterior. Huellas, `test_emailjs_rotacion.py` y pyflakes OK.
+- **⚠️ Producción**: no modifica datos. Solo cambia qué pasa cuando una migración falla (se sigue en vez de parar). Tras desplegar, conviene mirar el log de arranque: si aparece algún «[MIGRACION] Paso N», ese es el fallo intermitente que estaba pendiente.
+- **Revisado**: `README.md` (regla de migraciones, tests), `CHANGELOG.md` y badge actualizados; `GUIA_DESPLIEGUE.md` → no aplica.
+- **Pendiente**: copiar esta entrada al `HISTORIAL_CAMBIOS.md` del Organizador.
+
+## 2026-11-07 23:10 — [Control Pedidos] Reorganización fase 1 completa: app.py → core/ servicios/ jobs/ rutas/ (v12.33.58)
+
+- **Petición**: seguir ordenando el código (continuación de v12.33.54).
+- **Método**:
+  - Grafo de dependencias de las sentencias de nivel superior de `app.py`: 0 ciclos.
+  - Cada función o constante se asigna a un módulo temático según su sección y unas reglas: las rutas van a `rutas/`; los helpers de rutas, a `servicios/`; los helpers genéricos (normalización, destinatarios, firma, config), a módulos propios.
+  - Capas `core` < `servicios` < `jobs` < `rutas`. Si algo de capa inferior necesita algo de una superior, eso baja a la capa de quien lo usa. Comprobado: 0 ciclos entre los 69 módulos.
+  - Extracción módulo a módulo con una herramienta que copia verbatim (con los comentarios previos de cada bloque) y se niega a mover código que dependa de algo que se queda en `app.py`. `tests/huella_app.py` se pasa tras cada módulo.
+- **Cambios no verbatim (necesarios)**:
+  - `core/aplicacion.py` crea `Flask("app", root_path=raíz)`: mismo nombre, raíz, plantillas, estáticos y configuración que `Flask(__name__)` en `app.py` (comparado).
+  - Las rutas conservan `@app.route` importando ese `app`, así que los endpoints y su orden de registro no cambian (sin Blueprints).
+  - `rutas/estaticas.py` usa `_RAIZ_PROYECTO` en lugar de `__file__` para leer `templates/index.html` y `CHANGELOG.md` (con `__file__`, `/api/version` devolvía «unknown»).
+  - `app.py` reescrito como punto de entrada de 87 líneas: hooks en el mismo orden (`_cabeceras_seguridad`, `_comprimir_respuesta_gzip`, `_track_egress`; `_exigir_cambio_password`, `_limitar_sesion_puente`), migraciones, bucket, rutas y scheduler.
+  - Importaciones de cada módulo agrupadas (biblioteca estándar, externas, proyecto).
+- **Prueba**:
+  - Las dos huellas idénticas a las generadas con el monolito original. Huella ampliada con el valor de `/api/version`, `GET /` y `/api/changelog`; detecta el fallo de `__file__` si se reintroduce.
+  - `tests/test_emailjs_rotacion.py` OK.
+  - Las 11 tareas programadas ejecutadas con freezegun (2026-11-04 10:00) y pedidos sembrados en 6 estados, con el código de v12.33.56 (worktree aparte) y con el nuevo: log idéntico (salvo el tamaño físico de la BD) y BD idéntica (salvo `NOW()` y la sal del hash de contraseña).
+  - gunicorn con la orden de Render: «Auto-migración OK», login y 8 endpoints con 200, ETag correcto, gzip y cabeceras de seguridad presentes, 0 errores en el log.
+  - pyflakes: 0 nombres sin definir.
+- **Pendiente para las siguientes fases**: partir `core/migraciones.py` (2.594 líneas, una sola función) en bloques con try/except propio; separar CSS/JS de `templates/index.html`; archivar el CHANGELOG/historial antiguos. Algunos comentarios del código aún dicen «más abajo en app.py» (solo texto).
+- **Revisado**: `README.md` (stack, estructura, tabla «Dónde está cada cosa», rutas de `_auto_migrate`/`login_required`/gzip), `GUIA_DESPLIEGUE.md`, `PENDIENTES.md`, `render.yaml` y `Dockerfile` (solo comentarios que apuntaban a `app.py`), `CHANGELOG.md` y badge actualizados.
+- **Pendiente**: copiar esta entrada al `HISTORIAL_CAMBIOS.md` del Organizador.
+
+## 2026-11-07 22:50 — [Control Pedidos] Arreglos: rotación automática de cuenta EmailJS y orden de migraciones en BD nueva (v12.33.56)
+
+- **Petición**: reparar los fallos encontrados durante la reorganización, aunque ya estuvieran en la aplicación.
+- **Hallazgo 1 (EmailJS)**: `_registrar_envio_emailjs_interno` usaba `pytz` sin importarlo, en la rama del cambio automático de cuenta. Reproducido con Postgres local: contador en 194, umbral en 195 y 2 cuentas completas → `NameError`; tras el rollback, el contador sigue en 194 y la cuenta en 1. El contador no podía pasar nunca del umbral − 1 y la rotación no se completaba.
+- **Corrección 1**: `import pytz` local, como en el resto de `app.py`. Mismo escenario → cuenta 2, contador 0 y `emailjs_cambio_automatico_en` rellenado. Test de regresión `tests/test_emailjs_rotacion.py` (falla sin el arreglo y pasa con él).
+- **Hallazgo 2 (migraciones)**: en una BD nueva, `_auto_migrate` hacía `ALTER TABLE sap_pedidos_listado` y `_SQL_FECHA_SOLICITUD_AUTO_SAP` antes del `CREATE TABLE sap_pedidos_listado`, y `idx_prov_codigo_dali_trgm` antes de `ADD COLUMN codigo_dali`. La conexión es autocommit, así que no arrastraba a otras sentencias, pero dejaba 3 avisos y el índice sin crear en el primer arranque.
+- **Corrección 2**: el `CREATE TABLE`/`CREATE UNIQUE INDEX` de `sap_pedidos_listado` pasa justo antes de su primer uso, con try/except propio (antes no lo tenía), y el `ADD COLUMN codigo_dali` pasa antes del bucle de índices trigram. Se deja una nota en la posición antigua. Todo idempotente: en producción no hace nada.
+- **Prueba**: arranque sobre BD nueva y segundo arranque sobre la misma → «Auto-migración OK» sin ningún aviso en los dos, 45 tablas, ambos índices creados. `tests/huella_app.py` y `tests/huella_bd.py` idénticas. pyflakes: ningún nombre sin definir en `app.py`.
+- **Revisado**: `README.md` (versión y test nuevo), `CHANGELOG.md` y badge actualizados; `GUIA_DESPLIEGUE.md`, `PENDIENTES.md` → no aplica.
+
+## 2026-11-07 22:45 — [Control Pedidos] Reorganización fase 1, paso 1: `core/config.py`, `core/db.py`, `core/storage.py` + huellas de seguridad (v12.33.54)
+
+- **Petición**: ordenar el código porque ha crecido demasiado (`app.py` 30.123 líneas, `templates/index.html` 17.385).
+- **Plan acordado**: fase 0, red de seguridad; fase 1, partir `app.py` en módulos con Blueprints sin cambiar URLs; fase 2, separar CSS y JS de `index.html`; fase 3, archivar el CHANGELOG y el historial antiguos. Rama `refactor/modulos`; `main` no se toca sin confirmación.
+- **Fase 0**: `tests/huella_app.py` importa la app sin BD y fija rutas, jobs, orden de hooks, errorhandlers, respuesta anónima de cada endpoint e inventario de funciones. `tests/huella_bd.py` monta un esquema limpio en una Postgres LOCAL (rechaza cualquier host que no sea localhost porque borra el esquema), ejecuta `_auto_migrate`, siembra admin/compras/hotel (PR), un proveedor y un pedido, y recorre los 79 GET con cada rol.
+- **Cambio**: movidos verbatim a `core/` los bloques de configuración (15 nombres), base de datos (14) y Storage (5), con una herramienta que se niega a mover código que dependa de algo que se queda en `app.py`. Los hooks `teardown_appcontext(close_db)` y `after_request(_track_egress)` se registran en `app.py` en la misma posición. `_db_pool` no se importa en `app.py`: el reintento de `/api/emails-sistema-pendientes` lo lee de `core.db`. Logger `"app"` en los módulos nuevos para que el log salga igual.
+- **Prueba**: las dos huellas, generadas con el `app.py` original, salen idénticas tras el cambio (172 rutas, 11 jobs, 171 respuestas anónimas, 532 funciones; 240 respuestas con BD, 108 con 200 y ninguna 500). pyflakes sin nombres sin definir en `core/`.
+- **Hallazgos (sin corregir en esta entrega)**:
+  - `_registrar_envio_emailjs_interno` usa `pytz` sin importarlo: el cambio automático de cuenta EmailJS al llegar al tope lanza `NameError`. Ya estaba antes de este cambio.
+  - En una BD vacía, `_auto_migrate` toca `sap_pedidos_listado` antes de que exista (2 avisos) y crea `idx_prov_codigo_dali_trgm` antes de la columna `codigo_dali`. No afecta a producción (las tablas ya existen), pero es un problema de orden a resolver al partir `_auto_migrate`.
+  - El `CLAUDE.md` menciona `tests/test_techo_gastos.py` y `test_flujo.py`, que no están en el repositorio.
+- **Pendiente**: este historial es compartido con el Organizador (`HISTORIAL_CAMBIOS.md` en su raíz). Copiar esta entrada allí; desde esta sesión no hay acceso de escritura a ese repositorio.
+- **Revisado**: `README.md` (versión, estructura, cómo pasar las huellas), `CHANGELOG.md` y badge actualizados; `GUIA_DESPLIEGUE.md`, `Dockerfile`, `render.yaml` → no aplica (mismo comando de arranque, `COPY . .` incluye `core/`).
+
+## 2026-11-07 17:45 — [Control Pedidos] Copia del pedido en PDF con diseño oficial + Admin → Datos de hoteles (v12.33.52)
+
+- **Petición**: que los pedidos sin PDF subido (altas automáticas) tengan siempre su pedido en PDF para ver y descargar, generado con el diseño oficial a partir del listado detallado. Los datos de sociedad y hotel se introducen desde un apartado de Admin, precargado con «Datos de facturación y entrega» y con los teléfonos de los compradores.
+- **Hallazgo**: `_generar_pdf_pedido` (v12.33.50) solo se usaba en los correos y con diseño propio. No conviene guardarla como `pedido_doc`, porque ese tipo es la «verdad absoluta» del pedido: manda sobre el Total Pedido, hace que `_volcar_lineas_sap_hotel` se salte el pedido y se lee para el proveedor y el almacén. La caja Sociedad y la dirección del hotel no estaban en la BD.
+- **Corrección**:
+  - `_generar_pdf_pedido` reescrita con reportlab imitando `static/ejemplos/pedido_pdf_ejemplo.jpg`. Almacén de cabecera = el único almacén de las líneas (sin código) o, si hay varios, el departamento. La columna Almacén de la línea solo se rellena si es distinta de la cabecera. Cantidad con 4 decimales y precio con 2, como el oficial.
+  - `_CAMPOS_DATOS_HOTEL` / `_DATOS_HOTEL_INICIALES` + `ALTER TABLE hoteles` y precarga «solo vacíos» en `_auto_migrate`.
+  - `GET/PUT /api/admin/hoteles-datos`, vista `view-hoteles-datos` (Datos maestros · Admin).
+  - (17:45, a petición de Víctor) **Teléfono = móvil del comprador asignado**: no se guarda en `hoteles`. `_SQL_MOVIL_COMPRADOR_HOTEL` lo saca de `usuarios.movil` vía `usuario_comprador_hoteles` (índice único: un comprador por hotel, solo usuarios activos), tanto en el PDF como en Admin, donde se ve como campo `readonly` con el nombre del comprador. El PUT lo ignora. `_MOVIL_COMPRADORES_INICIAL` carga al arrancar el móvil de centralcompras1-6 (por `email`/`email2`, sin distinguir mayúsculas) solo si la ficha lo tiene vacío.
+  - `GET /api/pedidos/<id>/pdf-generado` (con login y acceso al hotel) y `copia_generada` en `GET /api/pedidos/<id>/adjuntos` (sin PDF subido y con líneas). `cargarAdjuntos()` añade el elemento en `adj-pedido-list`.
+- **Discrepancias en los PDF de origen (se usó «Datos de facturación y entrega»)**: Jandía C/ Gran Canaria **13** (en «Contactos» pone 11); razón social de Mogán «MOGAN RESORTS, S.L.» (en «Contactos», «MOGAN RESORT, S.L.»); «MASPALONAS» corregido a MASPALOMAS. Se pueden cambiar en Admin.
+- **Prueba**: Postgres local con los pedidos reales de La Palma. PDF de 1 y de 2 páginas revisados visualmente; ruta inline y ruta de descarga; pedido sin líneas → sin copia y 404; sin login → 401; guardado en Admin y rearranque sin pisar lo editado. Teléfono: móvil vacío cargado por correo y móvil existente no pisado; cambiar el móvil del comprador cambia el PDF; hotel sin comprador → sin teléfono; el PUT no admite teléfono.
+- **Revisado**: `GUIA_DESPLIEGUE.md`, `PENDIENTES.md`, `INSTRUCCIONES_RESTAURACION.md` → no aplica; `docs/hallazgo-seguridad-princess.md` no existe en el repo (ver nota de la norma 5) → no aplica. `README.md` (versión y funcionalidades), `CHANGELOG.md` y badge de `templates/index.html` actualizados.
+
+## 2026-11-07 14:00 — [Control Pedidos] Cargar listados SAP: solo Pedidos resumido, Pedidos detallado y Albaranes por proveedor (v12.33.51)
+
+- **Petición**: dejar el apartado de listados para automatización con solo tres tipos (pedidos resumido, pedidos detallado y albaranes por proveedor «COMPRA»), que se puedan subir juntos o por separado, y que todo lo cargado se guarde para actualizar control_pedidos siempre que se pueda.
+- **Hallazgo**: con esos tres basta. Los listados antiguos de albaranes no aportan nada que no traiga el «COMPRA». El resumido sí hace falta: es la única fuente de `estado_sap` (Abierto/Cerrado) e importes exactos. Además, el resultado dependía del orden: con el detallado antes que el resumido, las altas nacían «Enviado al proveedor» con `importe` 0 y no se corregían al llegar el resumido.
+- **Corrección**:
+  - `_TIPOS_LISTADO_SAP` / `_ORDEN_CARGA_LISTADOS_SAP` solo con `pedidos_resumido`, `pedidos_detallado` y `albaranes_pedido`. Nuevo `_TIPOS_LISTADO_SAP_RETIRADOS` para rechazar con mensaje los antiguos. `_MAX_PDF_CARGA_SAP` = 20.
+  - Nueva `_completar_estado_altas_con_resumido()` (paso 1a de `_cargar_listados_sap_logica`): altas automáticas sin intervención manual → estado por `_entrega_estado()` (solo hacia delante) e `importe` desde la base del resumido. Se muestra en el resultado («estado completado por el listado resumido»).
+  - Aviso de listados que el hotel aún no tiene guardados.
+  - `POST /api/albaranes/importar-listado` y `POST /api/pedidos/comparar-listado-albaranes` → 410.
+  - `templates/index.html`: texto del modal, máximo 20, sin «Cargas por separado (avanzado)»; se conserva el botón de revisión de entregas pendientes.
+- **Prueba**: Postgres local con los PDF reales de La Palma (resumido, detallado, PILSA y DELFIN): junto, por separado (albaranes → detallado → resumido, y resumido → DELFIN → detallado → PILSA) y carga repetida → los 151 pedidos idénticos (estado, entradas, total e importe). Rechazo de un listado de albaranes antiguo y de un PDF desconocido verificado.
+- **Añadido (14:05) — fecha de solicitud de los pedidos automáticos**: `_SQL_FECHA_SOLICITUD_AUTO_SAP` = LEAST(tramitación, creación en SAP `fecha_hora_fecha`) − 1 día, solo con `fecha_solicitud` vacía y pedido automático (`creado_por_nombre` = autor SAP o nota de alta). Se aplica en `_crear_pedidos_sap_lote` (alta), en `_completar_estado_altas_con_resumido` (cada carga/regularización) y en `_auto_migrate` (relleno de los ya creados). Hallazgo: los avisos de Enviado/Entrega parcial usan `fecha_tramitacion`; la solicitud vacía afectaba al filtro por fechas de la lista, a la agrupación por mes y al Excel. Prueba: 152 altas → 121 con tramitación − 1 y 31 con creación − 1; relleno al arrancar idéntico; fecha manual y pedido manual intactos.
+- **Añadido (14:38) — trazabilidad**: Víctor veía «duplicada» la trazabilidad de los pedidos recién creados (creación y última modificación con el mismo autor y hora, porque el alta rellena las dos). `_renderTrazabilidadPedido()` muestra una sola línea «Sin cambios desde la creación» cuando coinciden autor y hora (±60 s). Solo pantalla.
+- **Revisado**: `GUIA_DESPLIEGUE.md`, `PENDIENTES.md`, `INSTRUCCIONES_RESTAURACION.md` → no aplica; `docs/hallazgo-seguridad-princess.md` no existe en el repo (ver nota de la norma 5) → no aplica. `README.md` (versión y funcionalidades), `CHANGELOG.md` y badge de `templates/index.html` actualizados.
+
+## 2026-10-28 — [Control Pedidos] Copia del pedido en PDF para pedidos sin PDF oficial (v12.33.50)
+
+- **Petición**: la reclamación del Pedido Nº 16756 llegó sin documento. Víctor pide generar un PDF con lo leído del Listado de Pedidos detallado y, si son pocas líneas, ponerlas en el cuerpo del correo.
+- **Corrección**:
+  - `_generar_pdf_pedido()` (reportlab) crea la copia a partir de `pedidos` + `pedido_lineas`.
+  - Ruta pública `/descargas/pedido/<token>`: token itsdangerous firmado con SECRET_KEY, sal `pedido-pdf-generado`, 180 días, sin tabla.
+  - `_enlaces_descarga_pedido_doc()` añade ese enlace (`generado=True`) cuando no hay PDF subido y sí hay líneas.
+  - En `_email_template_enviado_proveedor`, sin PDF oficial y con hasta `_MAX_LINEAS_EN_CUERPO`=15 líneas, también van en el cuerpo.
+- `requirements.txt`: `reportlab==4.4.10`.
+- Prueba: `t_v50.py` (1 línea → botón + cuerpo; 32 líneas → solo botón, PDF de 2 páginas; PDF oficial → como antes; token alterado → 404).
+
+## 2026-10-28 — [Control Pedidos] Reclamación al proveedor: referencias pendientes y botón de descarga del pedido (v12.33.49)
+
+- **Petición**: en los avisos automáticos al proveedor, si es entrega parcial, indicar las referencias y cantidades aún no entregadas; si es enviado al proveedor, un botón con la descarga del pedido.
+- **Hallazgo**: `_JOB_PEDIDO_SQL` y `PEDIDO_SELECT_ALERTA` no traían `entrada_albaran_num` ni `total_pedido`. La reclamación (automática y manual) salía sin el bloque de entregas ni el total, y `_datos_pendientes` no veía las entradas sin detalle.
+- **Corrección**:
+  - Se añaden las dos columnas a las dos consultas.
+  - `_html_botones_descarga_pedido()` (reutiliza `_enlaces_descarga_pedido_doc`) va en `_email_template_enviado_proveedor`; sin PDF, va `_html_referencias_pedido()`.
+  - En `_email_template_entrega_parcial`, si no hay tabla de pendientes fiable, se ponen las referencias del pedido y se pide confirmación.
+  - `_obtener_o_crear_token_adjunto` solo reutiliza tokens con más de 30 días de vigencia.
+- Prueba: `t_v49.py` con los pedidos de GY cargados desde los listados SAP reales.
+
+## 2026-10-27 20:15 — [Control Pedidos] Cargar listados SAP con solo dos PDF: Pedidos detallado + Albaranes con su pedido (v12.33.48)
+
+- **Petición**: automatizar pedidos y albaranes con dos listados en lugar de cuatro: el Listado de Pedidos detallado y el documento «COMPRA» de albaranes en bloque (un albarán por página, con «Pedido/s»). Regla de Víctor para las líneas: si coinciden el nº de pedido y la descripción, se dan por buenas aunque el código cambie.
+- **Hallazgo**: el documento COMPRA es el mismo formato que la confirmación de un albarán suelto (`_extraer_albaran_confirmacion_individual`), pero con muchos albaranes; un albarán que no cabe sigue en la página siguiente repitiendo la cabecera («Página 2 de 1»). En los PDF reales de GY los códigos de artículo del albarán y del pedido no coinciden en 249 líneas (el pedido usa otro código interno), pero la descripción sí; y `_cruce_lineas_sap_hotel` no usaba `pedido_num_sap_confirmado`.
+- **Corrección**:
+  - `_detectar_tipo_listado_sap`: tipo `albaranes_pedido` (comprobado el primero; si no, se tomaba por Pedidos detallado). `_ORDEN_CARGA_LISTADOS_SAP` lo procesa antes que los listados antiguos de albaranes.
+  - `_extraer_albaranes_con_pedido` (pdfplumber, agrupa por «Código», total: «Total (con Dtos.)» con decimales → «Total:» → suma de líneas) e `_importar_albaranes_con_pedido` (sustituye las líneas de cada albarán en `sap_albaranes_lineas` con `pedido_num_sap_confirmado` y hace upsert de la cabecera en `sap_albaranes_cab`; en albaranes de varios pedidos reparte cada línea por código/descripción y, si no puede, la deja sin pedido).
+  - `_clave_desc_sap`, `_clave_cod_sap`, `_casar_linea_con_pedido_sap`: casado por código (sin ceros a la izquierda), descripción exacta o descripción que empieza por la otra (≥ 12 caracteres); solo si sale un único código del pedido.
+  - `_cruce_lineas_sap_hotel`: primero asigna las líneas con pedido confirmado (con el código del pedido); lo recibido que falte se busca como antes entre las líneas sin pedido. Motivos nuevos para revisar: línea que no casa, albaranes que suman más de lo recibido, albaranes de un pedido sin nada recibido en SAP. Solo las asignaciones por proveedor+artículo entran en el desempate por fecha.
+  - `_cargar_listados_sap_logica`: varios PDF del mismo tipo; aviso «sin fecha» por albarán sin cabecera. `_importar_albaranes_listado` ya no pisa albaranes con pedido. `/api/sap/cargar-listados` y la pantalla: hasta 10 PDF (`_MAX_PDF_CARGA_SAP`) y texto nuevo del modal.
+- **Verificación** (Postgres local, PDF reales de GY): 33 creados, 31 aplicados, 0 para revisar, 2 sin recepción; base de entradas = recibido en SAP al céntimo en los 33; segunda pasada sin cambios. `t_v48.py`: 11 comprobaciones (casado por código/descripción/partida/ambigua, reparto de albarán con dos pedidos, el listado antiguo no pisa un albarán con pedido, listado de pedidos desactualizado → revisar y se aplica al actualizarlo). No probado: la pantalla en un navegador con la app desplegada.
+- **Norma 5**: no aplica (sin tablas ni variables nuevas).
+- **Documentos revisados**: `README.md` (versión y apartado «Cargar listados SAP»), `CHANGELOG.md`; `GUIA_DESPLIEGUE.md`, `PENDIENTES.md` e `INSTRUCCIONES_RESTAURACION.md` — no aplica.
+
+## 2026-10-26 — [Control Pedidos] Los avisos diarios de pedidos ya no se repiten cada minuto (v12.33.46)
+
+- **Petición**: el popup de alerta urgente del Pedido SAP 40861 (GY, Casa Delfín, 77 días) salía cada pocos minutos. Debe salir una vez el día que toca y, si ese día el Organizador está cerrado, perderse.
+- **Causa**: `_job_alertas_diarias_inner` solo escribía el dedup `telegram_auto` con los resultados de Telegram. Si el hotel tiene destinatarios de popup y ninguno de Telegram, no se escribía nada y se encolaba un popup nuevo en cada pasada (cada 60 s). Lo mismo pasaba en `_job_techo_urgente_admins_inner` con un admin sin `telegram_chat_id`.
+- **Corrección**:
+  - `_log_alerta_solo_popup()` apunta `solo-popup` (enviado=1) o `sin-destinatarios` (enviado=0) en los dos caminos del job. `_enviar_telegram_compradores(..., info)` devuelve cuántos popups ha encolado.
+  - En el techo urgente se apunta `solo-popup|usuario|hotel`.
+  - `_encolar_bridge_notificacion` no encola un popup idéntico ya encolado hoy (hora de Canarias); se excluye `solicitud_acceso*`.
+  - `GET /api/bridge/notificaciones` marca como leídos, sin devolverlos, los `alerta_auto`/`techo`/`familia_repetida`/`supervision` de días anteriores.
+- Prueba: `t_v46.py` (5 pasadas del job → 1 popup; dedup; caducidad).
+
+## 2026-10-24 — [Organizador] v4.18.04 — Los avisos de Control de Pedidos recibidos con la app cerrada se pierden, y los popups se cierran solos a los 10 minutos
+
 - **Petición (Víctor):** «los envíos realizados los días que no se abre main agenda deberían desaparecer y no mostrarse el siguiente día que se abre, solo mostrar aquello que se programa directamente en el calendario, eventos propios y vacaciones y festivos»; y «cuando llegan popup de Control de Pedidos y main agenda está abierto, a los 10 minutos de mostrar en pantalla si no se pulsa cerrar se debería cerrar automáticamente».
 - **Causa:** Control de Pedidos guarda lo pendiente de cada usuario (alertas por estado/plazo en `bridge_popup_visto`, notificaciones inmediatas en `bridge_notificaciones`) y lo entrega, marcándolo como entregado, en la primera consulta con sesión; todo lo acumulado con la app cerrada salía de golpe al abrirla.
 - **`pedidos_agenda_bridge.py`:** la primera respuesta de `/api/bridge/alertas` y la primera de `/api/bridge/notificaciones` tras cada arranque se consultan (así el servidor las da por entregadas y no vuelven) pero **no se muestran** (`_descartar_alertas_acumuladas`, `_descartar_push_acumulado`; se rearman en `iniciar_bridge_pedidos`). Lo que llega después, con la app abierta, se muestra como siempre. El recuento del saludo (total/urgentes) sigue saliendo del servidor y no cambia. No se toca la agenda local: avisos programados, eventos, vacaciones y festivos funcionan igual.
@@ -18,9 +505,108 @@
 - **Verificación:** `py_compile`; prueba con sesión simulada: la primera consulta de alertas y de notificaciones no muestra nada, las siguientes sí, y si la primera venía vacía la siguiente ya se muestra. Pendiente probar con el Control de Pedidos real en Windows. Matiz: si la primera consulta con éxito tarda (sin red al arrancar), lo que llegara entre medias con la app abierta también se descarta.
 - `APP_VERSION` → "v4.18.04"; `MyAppVersion` → "4.18.04".
 
-## 2026-10-23
+---
 
-### [Organizador] v4.18.02 — Corrección: al soltar un archivo en el chat se cerraba la aplicación
+## 2026-10-24 — [Control Pedidos] Proveedor sin ficha: enlace a «Nuevo proveedor» en lugar de correo (v12.33.45)
+
+**Petición de Víctor:** «Mejor, ¿por qué no se da un aviso en pantalla para que se cree el proveedor para poder crear el nuevo pedido? Con un enlace de apertura directa del apartado Proveedores en Control de Pedidos; enviar el correo no lo veo funcional.»
+
+**Cambios:** fuera `_avisar_proveedores_sin_ficha_ao()` y `aviso_sin_ficha` de la respuesta de `_ao_vb_dividir()`. `templates/index.html`: `_enlaceProveedorInit` lee `?nuevo_proveedor=<nombre>` (máx. 200) y `_abrirProveedorEnlace` abre Proveedores, `openNuevoProveedorModal()` y rellena `pv-nombre-input` (si no es admin, toast de que solo un administrador puede crearlo). El aviso y el bloqueo del envío están en Activo Operacional v1.18.2.
+
+**Verificación:** `t_v44` (14 comprobaciones; la del correo cambia a «no se encola ningún correo»); `vistoBueno.test.mjs` de Activo Operacional contra este Flask: TODO OK (36), incluidos aviso con enlace `?nuevo_proveedor=`, envío bloqueado con 409 y, tras crear los proveedores con otra escritura del nombre («CASA DELFIN, S.A.» frente a «CASA DELFIN SA»), «Volver a comprobar» ya no avisa. Los bloques `<script>` de `index.html` siguen compilando igual que antes. No probado: el enlace en un navegador con la app desplegada.
+
+**Norma 5:** no aplica (sin tablas ni variables nuevas).
+
+**Documentos revisados:** `README.md` (versión), `CHANGELOG.md`; `GUIA_DESPLIEGUE.md`, `PENDIENTES.md` e `INSTRUCCIONES_RESTAURACION.md` — no aplica.
+
+## 2026-10-24 — [Control Pedidos] V.º B.º dividido: presupuesto adjunto en cada pedido y aviso de proveedor sin ficha (v12.33.44)
+
+**Petición de Víctor** (sobre los criterios por defecto de la v12.33.39): original con el proveedor de mayor importe — OK; las copias mantienen pedido original, fecha de solicitud y fecha de envío a V.º B.º, cada una con su documento filtrado por sus referencias — OK (ya era así); importe sin rellenar — OK; «adjuntar cada presupuesto y Nº presupuesto a su correspondiente pedido en el apartado presupuesto»; proveedor sin ficha: «sí, pero notificarlo para crearlo».
+
+**Cambios:**
+- `_ao_vb_dividir()`: acepta `documentos[].presupuestos[].{nombre, pdf_base64}` (PDF, ≤ 5 MB, 400 si no lo es) y los inserta como `pedido_adjuntos.tipo='presupuesto_doc'` en el pedido de su proveedor, salvo si ya hay uno con el mismo contenido (`md5(datos)`). La respuesta añade `pedidos[].presupuestos_adjuntos` y `aviso_sin_ficha`.
+- `_avisar_proveedores_sin_ficha_ao()` (nuevo): tras el commit, encola un correo de sistema (`ao_proveedor_sin_ficha`) a los compradores del hotel (`_get_compradores_cc` + email2) o, si no hay, al usuario del envío, con cada proveedor sin ficha y el enlace a su pedido.
+
+**Verificación:** `t_v44` (Postgres 16 + Flask, 14 comprobaciones): dos documentos (proveedor con ficha y sin ella) → 2 pedidos con las mismas fechas, cada uno con su presupuesto (y no el del otro), su documento de V.º B.º, Nº y fecha de presupuesto; correo encolado a los compradores con el Nº del pedido; reenvío sin duplicar el PDF y añadiendo el documento nuevo; versión nueva del presupuesto sí se añade; un «presupuesto» que no es PDF → 400. Contrato con Activo Operacional v1.18.1 (`divisionPorProveedor.test.mjs` con `CP_TEST_URL`): 5/5. `t_v43` sigue en verde. No probado: despliegue real en Render.
+
+**Norma 5:** no aplica (sin tablas, columnas ni variables nuevas).
+
+**Documentos revisados:** `README.md` (versión), `CHANGELOG.md`; `GUIA_DESPLIEGUE.md`, `PENDIENTES.md` e `INSTRUCCIONES_RESTAURACION.md` — no aplica.
+
+## 2026-10-24 — [Control Pedidos] El Nº de orden de un pedido eliminado no se reutiliza (v12.33.43)
+
+**Petición de Víctor:** «¿Puedes revisarlo en la aplicación?» — en Pedidos Eliminados había dos «Nº 1006» (Maspalomas, eliminado a mano a las 15:20, y Guayarmina, creado a las 15:21 desde Activo Operacional).
+
+**Causa:** `_next_norden()` = `MAX(norden)` de `pedidos` del año + 1; el pedido eliminado ya no está en `pedidos`, así que su número quedaba libre. Igual en la importación por Excel (`base_norden`).
+
+**Cambios:**
+- `_max_norden_anio(cur, year)`: `GREATEST` de `pedidos` (año de `creado_en`) y `pedidos_eliminados` (año de `COALESCE(pedido_creado_en, eliminado_en)`), tras `pg_advisory_xact_lock(724113)` (se suelta en el commit/rollback de la petición). Lo usan `_next_norden()` (alta manual, SAP, Activo Operacional, copias del V.º B.º) y la importación por Excel.
+- `_auto_migrate()`: `ALTER TABLE pedidos_eliminados ADD COLUMN IF NOT EXISTS pedido_creado_en TIMESTAMPTZ`. `_guardar_y_borrar_pedido()` la rellena con `pedido.creado_en`.
+
+**Verificación:** `t_v43` (Postgres 16 + Flask, 10 comprobaciones): alta → Nº 4, se elimina, la siguiente → Nº 5 (antes 4); un eliminado antiguo sin fecha de alta borrado este año cuenta; uno de otro año no; 4 altas simultáneas → 4 números distintos; `_next_norden` coincide. No probado: despliegue real en Render.
+
+**Límite conocido:** los eliminados anteriores a esta versión no tienen fecha de alta y cuentan por el año en que se borraron; si alguno de 2025 con un Nº alto se borró en 2026, la numeración de 2026 saltaría por encima de él (salto, nunca repetición).
+
+**Norma 5:** no aplica a `GUIA_DESPLIEGUE.md` ni a `PENDIENTES.md` (sin variables nuevas; la columna `pedidos_eliminados.pedido_creado_en` la crea `_auto_migrate()`). Restauración: si `restore_agent.py` (en el PC, fuera de este repo) copia `pedidos_eliminados` con una lista fija de columnas, la columna nueva queda vacía al restaurar, que equivale a un registro anterior a esta versión; no rompe nada.
+
+**Documentos revisados:** `README.md` (versión), `CHANGELOG.md`; `GUIA_DESPLIEGUE.md`, `PENDIENTES.md` e `INSTRUCCIONES_RESTAURACION.md` — no aplica.
+
+## 2026-10-24 — [Control Pedidos] Borrado de pedidos de prueba de Activo Operacional (v12.33.42)
+
+**Petición de Víctor:** «Necesito poder eliminar los pedidos que estamos realizando de prueba en material operacional y poner contador a cero.» Elegido: los pedidos de Control de Pedidos vinculados van a «Pedidos Eliminados», con un botón en Activo Operacional.
+
+**Cambios:**
+- `_guardar_y_borrar_pedido(pedido, pid, motivo, uid, nombre)`: `INSERT pedidos_eliminados` + `DELETE pedidos`, sin `commit`. Lo usan `delete_pedido` y la ruta nueva.
+- `api_externo_ao_eliminar_pedidos` → `POST /api/externo/activo-operacional/pedidos/eliminar`: firma `AO_BRIDGE_SECRET` (`_dali_bridge_firma_valida`, un solo uso), `refs` con `^AO-\d{1,9}$` (máx. 200), busca `ref = r OR ref LIKE r || '/%'` con `FOR UPDATE`, borra y hace un único `commit`; devuelve `eliminados` y `no_encontradas`.
+- README: secciones «Seguridad» y «Copias de seguridad y restauración»; tabla de variables completa. `render.yaml`: variables del puente declaradas (`sync: false`).
+
+**Verificación:** con Postgres 16 + Flask real (puerto 4301) y Activo Operacional v1.18.0 en local, `pedidosPrueba.test.mjs` (16 comprobaciones): borra `AO-175` y su copia `AO-175/2`, las dos quedan en `pedidos_eliminados` con el motivo, la referencia queda libre y repetir el borrado desde Activo Operacional da 404 (ya no existe). `python -W error -c "import ast; ast.parse(open('app.py').read())"` sin avisos. No probado: despliegue real en Render.
+
+**Norma 5:** no aplica (sin tablas ni variables nuevas; las variables que ahora declara `render.yaml` ya existían en producción desde v12.33.36).
+
+**Documentos revisados:** `README.md` (versión, variables, seguridad, copias), `CHANGELOG.md`, `render.yaml`; `GUIA_DESPLIEGUE.md`, `PENDIENTES.md` e `INSTRUCCIONES_RESTAURACION.md` — no aplica.
+
+## 2026-10-24 — [Control Pedidos] Las peticiones firmadas del puente no se pueden reenviar (v12.33.41)
+
+**Origen:** hallazgo N-2 de la revisión completa: dentro de la ventana de 5 minutos una firma capturada se podía repetir.
+
+**Cambios:**
+- `_bridge_firma_ya_usada()` + `_BRIDGE_FIRMAS_USADAS` (diccionario en memoria con candado, TTL = 2 × margen + 60 s, tope 20.000): `_dali_bridge_firma_valida()` registra cada firma válida de las peticiones que no son `GET`/`HEAD`/`OPTIONS` y rechaza (401 + `logging.warning`) la segunda vez. Solo se guardan firmas válidas, y las lecturas quedan fuera porque AO y Catálogo consultan con cuerpo vacío y dos llamadas del mismo segundo comparten firma sin ser un reenvío.
+- Sin tablas ni variables nuevas. Límite: memoria por proceso (un worker en Render).
+
+**Verificación:** `t_v41` (Postgres 16 + Flask, 12 comprobaciones): la misma petición dos veces → 200 y 401 (un solo correo encolado); otra petición en el mismo segundo y la misma con otra marca de tiempo → 200; firma con secreto equivocado y caducada → 401; `GET` repetido con la misma firma → pasa; `POST` de AO reenviado → 401; purga de entradas caducadas. `t_v35`, `t_v37`, `t_v38`, `t_v39` y `t_v40` siguen en verde (20, 33, 18, 41 y 9 comprobaciones). No probado: despliegue real en Render ni varios workers.
+
+**Documentos revisados:** `README.md` (versión), `CHANGELOG.md`; `GUIA_DESPLIEGUE.md` (sin variables nuevas), `PENDIENTES.md` e `INSTRUCCIONES_RESTAURACION.md` — no aplica.
+
+## 2026-10-24 — [Control Pedidos] IP del cliente fiable y errores internos sin detalle (v12.33.40)
+
+**Origen:** revisión completa de las actualizaciones (N-1, CP-09 residual, N-4).
+
+**Cambios:**
+- `_ip_cliente()`: ya no toma el primer valor de `X-Forwarded-For` (lo controla el cliente); toma el N-ésimo por la derecha, con N = `IP_PROXIES_CONFIABLES` (por defecto 1; 0 usa `remote_addr`; si la cabecera trae menos valores, el primero). El límite por IP del login (`_RL_*`) y la IP de trazabilidad de las solicitudes de acceso dependen de ella.
+- Nuevo `_error_interno(exc, contexto)`: referencia aleatoria de 6 hex, log con traceback y texto genérico al cliente. Sustituye a `str(exc)`/`str(e)` en 32 respuestas 500 de `api_*`; `server_error` y `unhandled_exception` ya no devuelven el texto de excepciones que no sean HTTP (las HTTP conservan el suyo). Se dejan los 400 con mensaje pensado para el usuario.
+- Cadena de documentación con `\\` escapada (sin `SyntaxWarning`).
+
+**Verificación:** `t_v40` (Postgres 16 + Flask): 1 y 2 proxies, cabecera corta, 0 y valor no numérico; 12 intentos con la cabecera cambiando → 8×401 y bloqueo desde el 9.º (antes 30); otra IP real entra; un fallo forzado de `query()` no devuelve su texto. `t_v35`, `t_v37`, `t_v38`, `t_v39` siguen en OK.
+
+**Documentos revisados:** `README.md` (versión), `GUIA_DESPLIEGUE.md` (variable nueva en la tabla), `PENDIENTES.md` e `INSTRUCCIONES_RESTAURACION.md` — no aplica.
+
+## 2026-10-24 — [Control Pedidos] Un pedido por proveedor al enviar a V.º B.º desde Activo Operacional (v12.33.39)
+
+**Origen:** petición de Víctor: «cuando pulsemos enviar para visto bueno a dirección ... mantendríamos el ya creado y se realizarían 3 copias más con la misma info hasta ahora pero con la diferencia que ya tenemos nombre de proveedor ... y en cada una colocaremos el presupuesto correspondiente enviado para firma».
+
+**Cambios:**
+- `_auto_migrate` y `models.py`: columna `pedidos.proveedor_ao TEXT` (nombre del proveedor tal como lo manda Activo Operacional).
+- `api_externo_ao_visto_bueno`: lee también `proveedor`, `presupuestos` y `total` de cada documento; con `dividir: true` delega en la nueva `_ao_vb_dividir()`; sin él, todo igual que en la v12.33.33.
+- `_ao_vb_dividir`: bloquea (`FOR UPDATE`) el original y su grupo (`AO-<n>/%`); ordena los documentos por importe; empareja cada documento con un pedido del grupo (1.º por `proveedor_ao`, 2.º por ficha de proveedor, 3.º el original si aún no tiene proveedor) o crea una copia (`_next_norden`, solicitud_doc copiado, historial); rellena `proveedor_id` (si hay ficha), `proveedor_ao`, `presupuesto_num` (varios separados por coma), `fecha_presupuesto`, `fecha_envio_visto_bueno`, adjunta el documento (`vb_eml`) y aplica la misma transición de estado; devuelve `pedidos[]` (id, Nº, ref, creado, estado) y `huerfanos[]`. Todo en una transacción; los avisos de cambio de estado salen después del `commit`.
+- No se rellena `importe` ni se adjunta el presupuesto original del proveedor (decisión por defecto, pendiente de confirmar con Víctor).
+
+**Verificación:** `t_v39` (Postgres 16 + Flask, firma HMAC real): firma incorrecta → 401; ref con `/` → 400; ref inexistente → 404; 4 proveedores → 4 pedidos (original con el de mayor importe, 3 copias, Nº de orden distintos, estado, hotel/departamento/fecha/observaciones copiados, 1 solicitud_doc y 1 vb_eml cada uno, importe sin tocar); proveedor con ficha, sin ficha y sin presupuesto; reenvío idéntico → mismos pedidos y 2 vb_eml; reenvío con orden/importes distintos, proveedor nuevo y uno que desaparece (huérfano intacto); un solo proveedor → sin copias; modo antiguo (sin `dividir`) intacto; fallo simulado a mitad → 500 sin cambios. `t_v37` y `t_v38` siguen en OK.
+
+**Documentos revisados:** `README.md` (versión), `GUIA_DESPLIEGUE.md`, `PENDIENTES.md`, `INSTRUCCIONES_RESTAURACION.md` — no aplica más allá de lo anotado (sin variables nuevas).
+
+## 2026-10-23 — [Organizador] v4.18.02 — Corrección: al soltar un archivo en el chat se cerraba la aplicación
+
 - **Síntoma (Víctor, Windows):** al arrastrar un archivo (PDF de 4,6 MB) sobre la ventana del chat se cerraba el Organizador entero. Con 📎 y con Ctrl+V no ocurría.
 - **Causa probable (no reproducible fuera de Windows):** `app/ui/dnd_windows.py` v1.0 cambiaba el procedimiento de ventana con `SetWindowLongPtrW` en todas las ventanas del chat (unas 40) y, al cerrar el chat, liberaba los callbacks de `ctypes` mientras esas ventanas seguían apuntando a ellos; además tocaba tkinter desde dentro del callback nativo. Cualquiera de las dos cosas puede tumbar el proceso sin dejar mensaje (la app va sin consola).
 - **Corrección (`dnd_windows.py` v2.0):** `SetWindowSubclass` / `DefSubclassProc` de comctl32 (la API documentada para esto, que encadena bien y se desengancha sola al destruir la ventana) solo sobre la ventana de nivel superior (marco de Tk y su área cliente; Windows busca el destino subiendo por las ventanas padre); los callbacks no se liberan nunca; el callback nativo solo lee las rutas con `DragQueryFileW` y las deja en una `queue.Queue` — nunca llama a tkinter — y un `after` de 150 ms las recoge en el hilo normal y llama a `_confirmar_y_enviar`; cualquier excepción dentro del callback se traga y devuelve 0.
@@ -28,14 +614,20 @@
 - **Verificación:** prueba de la lógica con la API nativa simulada (Tk 8.6, Xvfb): el callback responde 0 a `WM_DROPFILES`, reenvía el resto a `DefSubclassProc`, no llama a la función del chat dentro del callback, las rutas con ñ y espacios llegan enteras, una excepción en la función del chat no rompe el sondeo. **Sin probar: el arrastre real en Windows** — si volviera a cerrarse, usar el interruptor y avisar.
 - `APP_VERSION` → "v4.18.02"; `MyAppVersion` → "4.18.02" (numeración par); manuales con la versión nueva.
 
-### [Organizador] v4.18.00 — Vista reducida del menú principal y chat con arrastrar/pegar archivos
+---
+
+## 2026-10-23 — [Organizador] v4.18.00 — Vista reducida del menú principal y chat con arrastrar/pegar archivos
+
 - **Vista reducida/extendida (`main_agenda.py`).** Clave nueva en `config.json`: `vista_menu = {"modo": "extendida"|"reducida", "reducida_opciones": [n…]}` (sin ella, extendida; si faltan opciones, las 10 primeras). `_vista_actual()` valida y normaliza (1–30, sin repetidos, máx. 10). `_aplicar_vista()` reorganiza sin reiniciar: en reducida muestra los 4 primeros accesos dorados en 2×2 (`grid_remove` de los 5 y 6), los botones azules elegidos en 2×5 y ajusta tamaño y `wraplength`; la ventana se calcula con el tamaño real de la cabecera (`winfo_reqwidth/height`) y queda en la misma esquina (`WIN_X`, `WIN_Y`). En extendida restaura todo (6 columnas × 5 filas). Las celdas azules se guardan en `btn_cells`/`btn_lbls` y se colocan con `_colocar_celda()`. `_ventana_vista_menu()` + botón «Vista» en la cabecera del panel Admin: selector de modo, casillas de los 30 botones con contador «n de 10» y «Guardar y aplicar».
 - **Chat: arrastrar y soltar y Ctrl+V.** `app/ui/dnd_windows.py` (nuevo): `hook_dropfiles(ventana, func)` activa `WM_DROPFILES` con `ctypes` (sin dependencias nuevas) en la ventana y en todos sus widgets con ventana propia, con tipos explícitos para 32 y 64 bits y `DragQueryFileW` (Unicode); fuera de Windows o ante cualquier error no hace nada. `app/ui/ventana_chat.py`: `_enviar_rutas()`, `_confirmar_y_enviar()` (solo archivos, máx. 5, pregunta «¿Enviar a …?»), `_pegar()` en `Ctrl+V` (`PIL.ImageGrab.grabclipboard()`: imagen → PNG temporal `captura_chat_*.png` que se borra tras enviar o cancelar; lista de rutas → archivos copiados; `None` → pegado de texto normal). El botón 📎 usa ahora `_enviar_rutas`. Los límites los sigue aplicando `chat_client.enviar_archivo` y el servidor (10 MB, extensiones prohibidas).
 - `main.spec`: `ui.dnd_windows` en `hiddenimports`. `APP_VERSION` → "v4.18.00"; `MyAppVersion` → "4.18.00" (se salta la 4.16.10 y la 4.17.x: numeración par a petición de Víctor).
 - **Verificación:** arranque real de `main_agenda.py` con Tk 8.6 y pantalla virtual (Xvfb): extendida 6 dorados + 30 azules; reducida 4 + 10 en 2×5, con ventana de 1518×411 frente a 1817×946; cambio en caliente en los dos sentidos; diálogo con 30 casillas, límite de 10 con aviso, guardado en memoria y en disco. Lectura de rutas de `DragQueryFileW` con ñ y espacios (simulada). **Sin probar aquí:** el arrastre real, `Ctrl+V` con imagen y archivos, y el aspecto con las fuentes de Windows.
 - **Manuales nuevos (Usuario y Administrador).** `docs/Manual_Usuario_OrganizadorPrincess.(docx|pdf)` (14 págs.) y `docs/Manual_Administrador_OrganizadorPrincess.(docx|pdf)` (11 págs.), con el mismo estilo que los de Activo Operacional (portada, capítulos numerados, capturas con marcas rojas, avisos). El manual de usuario anterior (v4.12.6, con secciones de Telegram y alertas que ya no existen) se sustituye: el PDF nuevo ocupa su sitio en la raíz (`Manual_Usuario_OrganizadorPrincess.pdf`, el que abre el botón «Manual» y copia el instalador). El instalador copia además el manual de administrador (`docs\Manual_Administrador_OrganizadorPrincess.pdf`, `skipifsourcedoesntexist`) y crea el acceso «Manual de Administrador» en el menú Inicio. Las capturas son de la propia app con datos de ejemplo, generadas con Tk 8.6 en pantalla virtual (Linux): las fuentes y el aspecto exacto en Windows pueden variar algo.
 
-### [Organizador] v4.16.9 — Seguridad: adjuntos del chat, contraseña cifrada, actualizador (auditoría de octubre, anexo main_agenda)
+---
+
+## 2026-10-23 — [Organizador] v4.16.9 — Seguridad: adjuntos del chat, contraseña cifrada, actualizador (auditoría de octubre, anexo main_agenda)
+
 - **MA-01 · `app/services/chat_client.py`.** Antes `descargar_adjunto` hacía `os.path.join(Descargas, nombre_archivo)` con el nombre que mandaba el remitente y `abrir_archivo` ejecutaba `os.startfile` sobre el resultado. Con `..\` o una ruta absoluta el archivo se escribía fuera de Descargas, y un `.bat`/`.exe`/`.lnk` se ejecutaba al pulsar la burbuja. Ahora: `nombre_adjunto_seguro()` (nombre base, sin caracteres de ruta/control, sin nombres reservados de Windows, máx. 120), `url_adjunto_permitida()` (https y host `*.supabase.co`, más los de `config.json` → `chat_hosts_adjuntos`), descarga en streaming con tope de 12 MB y sin seguir redirecciones, creación exclusiva (`"xb"`) comprobando que queda dentro de Descargas, y `abrir_archivo` solo abre con el programa por defecto una lista corta de extensiones (`EXT_ABRIR_DIRECTO`); el resto → `explorer /select,`.
 - **MA-02 · `app/db/dpapi.py` (nuevo), `app/db/sqlite.py`, `pedidos_agenda_bridge.py`.** `config_usuarios.bridge_password` se guarda como `dpapi1:` + base64 del blob de `CryptProtectData` (solo el mismo usuario de Windows en el mismo equipo lo descifra). Una contraseña antigua en claro se migra al leerla y se hace `VACUUM` para no dejar restos. Si DPAPI falla al cifrar se guarda como antes; si falla al descifrar (otro equipo/usuario) devuelve vacío y hay que reescribirla en Admin → Mi Usuario. El puente (`_cargar_credenciales_desde_db`) ya no lee la columna por su cuenta: usa `get_bridge_credentials()`. `main.spec`: `db.dpapi` en `hiddenimports`.
 - **MA-03 · `app/services/update_service.py`.** `_ssl_ctx()` ya no cae a un contexto sin verificación. Si el release publica `<instalador>.sha256` o `SHA256SUMS(.txt)` se calcula el SHA-256 durante la descarga y, si no coincide, se borra el archivo y se avisa; si no publica hash, se dice en pantalla que la integridad no está verificada. El hash del mismo release no protege frente a quien controle el release: lo que sí lo haría es firmar el `.exe` (pendiente).
@@ -45,1871 +637,891 @@
 - **Verificación:** `t_ma` (Python 3.13 en Linux; el cifrado DPAPI se simuló porque la llamada real a Windows no se puede ejecutar aquí), 35 comprobaciones: nombres con `..\`, ruta absoluta, UNC, `:` y nombres reservados; URL con `http`, host ajeno, `supabase.co.evil.example` y `@`; descarga dentro de Descargas, colisión → `evil (1).pdf`, archivo grande con y sin `Content-Length` rechazado y sin restos; PDF → `startfile`, `.exe`/`.bat` → Explorador; migración de la contraseña antigua sin restos en el fichero, ida y vuelta con ñ, fallo de DPAPI → vacío sin excepción. `ast.parse` de todos los módulos modificados. **Pendiente de probar en un PC con Windows:** la llamada real a DPAPI, la descarga de un adjunto y el hash del instalador.
 - `APP_VERSION` → "v4.16.9"; `MyAppVersion` → "4.16.9"; `release_notes.md` y `release_notes_actual.txt` actualizados. Al publicar el release hay que subir también el `.sha256` (comando en `release_notes.md`).
 
-### [Chat] v1.2.2 (`app.py`, `requirements.txt`, `.github/workflows/keep-alive-chat.yml`) — Seguridad: adjuntos, usuario activo, límites
+---
+
+## 2026-10-23 — [Chat] v1.2.2 (`app.py`, `requirements.txt`, `.github/workflows/keep-alive-chat.yml`) — Seguridad: adjuntos, usuario activo, límites
+
 - **CH-01.** `_sanear_nombre_archivo()` en `POST /api/chat/mensajes/archivo`: nombre base, sin caracteres de ruta/control/inversión de texto, máx. 120; rechaza (400) las extensiones de `EXTENSIONES_PROHIBIDAS` en cualquier segmento (`a.exe.pdf` y `a.pdf.exe`). `_mime_seguro()` deduce el tipo de la extensión. Ruta en Storage codificada y `x-upsert: false`.
 - **CH-02.** `_error_sesion()` (REST y socket): comprueba `activo` en `usuarios` con caché de 60 s (fail-open si falla la consulta o no hay `DATABASE_URL`) y rechaza con 403 las sesiones con `debe_cambiar_password`.
 - **CH-03.** `MAX_CONTENT_LENGTH`, límite de ritmo en memoria (60 mensajes/min, 10 archivos/min, 10 grupos/h), destinatario y miembros de grupo validados contra `usuarios` (máx. 50), 413 con mensaje claro.
 - **CH-04.** Error 500 sin detalle, `CHAT_CORS_ORIGINS` opcional (por defecto `*`), `requirements.txt` con tope, cron del keep-alive válido en verano e invierno.
 - **Verificación:** `t_chat` (Postgres 16 + cliente de Flask + cliente de Socket.IO), 47 comprobaciones.
 
-### [Control Pedidos] v12.33.37 — Sesión del puente limitada a `/api/bridge/*`
-- Ver `CHANGELOG.md` de Control Pedidos (CP-10).
+---
+
+## 2026-10-23 — [Control Pedidos] Solicitud de acceso: sin correos duplicados y con cuenta atrás (v12.33.38)
+
+**Origen:** aviso de Víctor, dos correos idénticos de "Verificación de acceso" en una sola solicitud de prueba.
+
+**Cambios:**
+- `solicitar_usuario_fase1`: `pg_advisory_xact_lock` por correo + comprobación de solicitud abierta del mismo correo en los últimos `SOLICITUD_VENTANA_DUPLICADA_MIN` (10) minutos; si existe devuelve `{"duplicada": true, "sol_id": …}` sin insertar ni encolar nada.
+- `admin_enviar_fase2`: espera `FASE2_REENVIO_ESPERA_S` (60 s) calculada desde `token_expira - 72 h` y desde `emails_sistema_pendientes.enviado_en`; 429 con `retry_after` si no ha pasado o si la fila de la cola está reservada (`en_proceso_desde` < 2 min). Al regenerar el token marca `descartado_en` la fila de cola `solicitud_acceso_fase2` pendiente (llevaba el token anterior).
+- `admin_listar_solicitudes`: el LEFT JOIN ignora filas descartadas.
+- `templates/index.html`: helper genérico de cuenta atrás (`_cdIniciar/_cdRestante/_cdPintar`, atributos `data-cd-key`/`data-cd-texto`, persistido en `localStorage` con try/catch) aplicado al botón del formulario público (60 s tras enviar, 5 s tras error, guarda contra doble clic) y al botón "Enviar/reenviar Fase 2" del panel; aviso `sol-f1-dup` cuando el servidor devuelve `duplicada`.
+- No hay cambios de esquema ni de variables.
+
+## 2026-10-23 — [Control Pedidos] Seguridad: sesión del puente limitada (v12.33.37)
+
+**Origen:** hallazgo CP-10 de la auditoría de main_agenda (anexo de la auditoría de octubre).
+
+**Cambios:**
+- `_completar_login` marca `session["via_bridge"] = True` cuando `metodo == "bridge"`.
+- `@app.before_request _limitar_sesion_puente`: con esa marca, en rutas `/api/` solo pasan `/api/bridge/*`, `/api/login*`, `/api/logout`, `/api/version` y `/ping`; el resto devuelve 403 y deja un aviso en el log.
+- `bridge_login`: se elimina el aviso por no definir `BRIDGE_USUARIOS` (la variable opcional se mantiene). Corrige la recomendación de la v12.33.35.
+
+**Verificación:** `t_v37` (Postgres 16 + Flask), con una cuenta de compras y una de administrador: tras `bridge/login`, `/api/bridge/alertas` y `/api/bridge/notificaciones` → 200; `/api/me`, `/api/pedidos`, `/api/usuarios`, `/api/maestros`, `/api/admin/solicitudes-acceso`, `/api/config-avisos/resolver` y `POST /api/cambiar-password` → 403; `logout` → 200 y después 401; el login normal no queda limitado y, tras una sesión de puente, entrar con `/api/login` en el mismo cliente quita la marca; `/ping` y `/` siguen respondiendo. `t_v34`, `t_v35` y `t_v36` siguen en TODO OK (en `t_v36` la comprobación de `bridge/login` ahora exige 403 en `/api/pedidos` y 200 en las alertas).
+
+## 2026-10-23 — [Control Pedidos] Seguridad: cambio obligatorio de contraseña temporal y secretos por canal (v12.33.36)
+
+**Origen:** pendientes de la v12.33.35, «cambio forzado de la contraseña temporal» (CP-04) y hallazgo X-01 (un solo `DALI_SSO_SECRET` para tres canales).
+
+**Cambios:**
+- **Columna.** `_auto_migrate`: `usuarios.debe_cambiar_password BOOLEAN NOT NULL DEFAULT FALSE` junto a `ultima_verificacion_login`.
+- **Marca.** `admin_aprobar_solicitud`, `create_usuario` y `update_usuario` (solo si el administrador cambia la contraseña de OTRO usuario) ponen la columna a TRUE. `cambiar_password_con_token` y el nuevo endpoint la ponen a FALSE.
+- **Sesión.** `_completar_login` guarda `session["debe_cambiar_password"]` (salvo `metodo="bridge"`) y lo devuelve en la respuesta; `/api/me` también lo informa.
+- **Bloqueo.** `@app.before_request _exigir_cambio_password`: con la marca en sesión, solo pasan `/api/me`, `/api/logout`, `/api/cambiar-password`, `/api/login*`, `/api/password-reset/*`, `/api/version` y `/ping`; el resto devuelve 403 con `debe_cambiar_password`.
+- **Endpoint.** `POST /api/cambiar-password` (`login_required`): comprueba la actual con `_verifica_y_migra_password`, valida la nueva con `_validar_password_nueva` (8–128 caracteres, letras y números, distinta de la actual y del usuario), límite de 5 fallos/15 min con el limitador de la v12.33.35, traza `password_cambiada`.
+- **Pantalla.** `templates/index.html`: `_forzarCambioPassword()` (superposición con contraseña actual, nueva y repetición) llamada desde `_entrarEnApp()` y desde el arranque con sesión; botón para cerrar sesión.
+- **X-01.** `_secretos_puente_ruta()` y `_dali_bridge_firma_valida()`: según la ruta (`/api/externo/activo-operacional/*` o `/api/externo/dali-sap/*`, y método para la lectura de AO) se admiten `AO_BRIDGE_SECRET` o `DALI_BRIDGE_SECRET`, más `DALI_SSO_SECRET` si `BRIDGE_ACEPTA_SSO_SECRET != "0"`. La comparación recorre todos los secretos sin cortocircuito.
+- Correo de bienvenida (HTML y texto) y `GUIA_DESPLIEGUE.md` (variables).
+
+**Verificación:** `t_v36` (Postgres 16 + Flask + Chromium), 42 comprobaciones: alta manual y aprobada marcadas; con la marca `/api/pedidos`, `/api/maestros` y `/api/usuarios` → 403 y `/api/me` → 200; actual errónea, nueva corta, igual a la actual, solo números, solo letras o igual al usuario → 400 y sigue marcada; cambio correcto → 200, marca fuera y la API vuelve; la temporal deja de entrar; 6.º intento con la actual errónea → 429; el administrador que fija la clave de otro lo marca y la suya no; restablecer por enlace quita la marca; `bridge/login` no queda bloqueado; por canal: el secreto de Catálogo no vale en Activo Operacional, el de Activo Operacional no vale para encolar correos, y con `BRIDGE_ACEPTA_SSO_SECRET=0` el `DALI_SSO_SECRET` deja de valer; en el navegador aparece la pantalla, avisa si no coinciden, desaparece al guardar y no reaparece al recargar. `t_v34` y `t_v35` siguen en TODO OK; `init_db.py` + dos arranques en base vacía correctos.
+
+**Pendiente:** retirar el `DALI_SSO_SECRET` de los servicios que ya no lo necesitan y poner `BRIDGE_ACEPTA_SSO_SECRET=0` cuando Catálogo y Activo Operacional estén desplegados con los suyos; un tiempo máximo de vida para la contraseña temporal (hoy no caduca).
+
+## 2026-10-22 — [Control Pedidos] Seguridad: límite de intentos, contraseñas temporales y dependencias (v12.33.35)
+
+**Origen:** segunda parte de la auditoría de Control Pedidos. Hallazgos CP-04, CP-05, CP-08, CP-09 (parte) y vulnerabilidades de dependencias.
+
+**Cambios:**
+- **CP-04, sin límite de intentos.** Nuevo limitador en memoria (`_rl_segundos_bloqueo`, `_rl_registrar`, `_rl_limpiar`, `_rl_golpe`, `_rl_respuesta_429`, `_reglas_login`) junto a `_ip_cliente()`. `login`: 8 fallos/15 min por cuenta+IP, 30 por cuenta, 60 por IP. `verificar_codigo_login`: 5 fallos/10 min por cuenta (y 40 por IP); al excederse se marcan como usados los códigos vigentes. `solicitar_reset_password`: 3/h por usuario, 20/h por IP, con respuesta genérica. `cambiar_password_con_token`: 20 fallos/h por IP. Solicitudes públicas (`solicitar_usuario_fase1`, `_directo`, `_fase2`): 15/h por IP. Las claves combinan cuenta e IP para que un tercero no pueda bloquear a un usuario desde otra IP.
+- **CP-04, contraseña temporal.** `admin_aprobar_solicitud` usa `secrets.choice` sobre un alfabeto sin ambiguos, 12 caracteres (antes `Princess` + `randint(1000, 9999)`).
+- **CP-05, `bridge_login`.** Mismo límite de intentos; variable opcional `BRIDGE_USUARIOS` (lista de usernames) que restringe quién puede saltarse la verificación por email. Sin ella, igual que antes con aviso en el log. Documentada en `GUIA_DESPLIEGUE.md`.
+- **CP-08, base vacía.** CREATE TABLE IF NOT EXISTS de `emails_sistema_pendientes` antes de sus primeros ALTER en `_auto_migrate`.
+- **CP-09 (parte).** `login`, `verificar_codigo_login`, `bridge_login`, `solicitar_reset_password` y `cambiar_password_con_token` aplican `str()` a los campos recibidos.
+- **Dependencias** (`requirements.txt`): Pillow 12.3.0→13.0.0, pypdf 6.16.2→6.21.2, cryptography 46.0.7→50.0.2, certifi→2026.10.19, urllib3 2.7.0→2.8.0, werkzeug 3.1.8→3.1.9.
+
+**Verificación:** `t_v35` (Postgres 16 + cliente de Flask), 21 comprobaciones: 8 fallos → 401 y el noveno, con la clave correcta, → 429 con `Retry-After`; la misma cuenta desde otra IP entra; rotar `X-Forwarded-For` acaba bloqueado por cuenta; 5 códigos malos → 401 y el sexto, con el código correcto, → 429 y el código queda invalidado; 5 solicitudes de reset generan 3 tokens; solicitudes públicas 15 → 200, después 429; bridge: cuenta fuera de `BRIDGE_USUARIOS` → 401, dentro → 200, sin variable → 200, y 429 tras 8 fallos. `t_v34` sigue en TODO OK. En un entorno virtual limpio con las dependencias nuevas: pypdf, pdfplumber, miniaturas de Pillow y `pip check` correctos; `pip-audit` sin vulnerabilidades. Base nueva: `init_db.py` + dos arranques sin errores.
+
+**Limitaciones conocidas:** el limitador se pierde al reiniciar y asume 1 worker; la IP sale de `X-Forwarded-For` (primer elemento), por eso hay también un umbral solo por cuenta. Los mensajes `str(exc)` de endpoints autenticados no se han tocado. Falta el cambio forzado de la contraseña temporal en el primer acceso (requiere pantalla).
+
+## 2026-10-22 — [Control Pedidos] Seguridad: correcciones de la auditoría (v12.33.34)
+
+**Origen:** auditoría completa de Control Pedidos, Catálogo Asignaciones y Activo Operacional pedida por Víctor («auditoría completa, si hay alguna vulnerabilidad»). Informe: «Auditoría de las tres aplicaciones Princess (octubre 2026)». Hallazgos CP-01, CP-02, CP-03, CP-06 y CP-07, más una parte de CP-09.
+
+**Cambios:**
+- **CP-01, XSS almacenado sin autenticación.** `adminCargarSolicitudes()` y unos 80 puntos más de `templates/index.html` pintaban datos de usuario con `innerHTML` sin escapar; ahora usan `_escHtmlCp()` (nombres, apellidos, correo, hoteles, usuario Windows, usuarios, adjuntos, historial, notas, observaciones, hoteles y proveedores). Los atributos `value="${esc(...)}"` pasan a `_escHtmlCp()` porque `esc()` solo escapa la comilla simple.
+  - Segunda barrera en `app.py`: `_con_marcado()` rechaza `<`, `>`, `"` y caracteres de control en `solicitar_usuario_fase1`, `solicitar_usuario_directo`, `solicitar_usuario_fase2`, `bridge_solicitar_alta`, `create_usuario` y el cambio de nombre de usuario, con tope de 300 caracteres en las solicitudes.
+  - `upload_adjunto` sustituye esos caracteres en el nombre del archivo.
+- **CP-02, adjuntos sin control de hotel.** Nuevos `_hotel_accesible()`, `_sin_acceso_pedido()` y `_adjunto_hotel_id()`; los cinco endpoints (`get_adjuntos`, `upload_adjunto`, `download_adjunto`, `download_adjunto_thumb`, `delete_adjunto`) devuelven 403 si un usuario de rol hotel no tiene ese hotel. La descarga pública por token no se toca.
+- **CP-03, `aprobar_expediente` y `denegar_expediente`** devuelven 403 si el rol no es admin ni compras.
+- **CP-06, cabeceras y cookie.** Nuevo `after_request` `_cabeceras_seguridad`; `SESSION_COOKIE_SECURE` (variable `COOKIE_SECURE`, por defecto sí), `SESSION_COOKIE_SAMESITE=Lax`, `MAX_CONTENT_LENGTH` de 80 MB.
+- **CP-07.** `solicitar_reset_password` ya no escribe el enlace en el log.
+- **CP-09 (parte).** Observaciones escapadas con `_html_escape` en los correos HTML de estado y de alertas.
+
+**Verificación:** contra Postgres 16 y el cliente de pruebas de Flask, con Chromium (Playwright):
+- usuario hotel A: listar, descargar, miniatura, subir y borrar adjuntos del hotel B → 403 (antes 200/201); con su propio pedido → 200/201;
+- usuario hotel: aprobar y denegar expediente → 403 y el expediente sigue pendiente; compras: denegar → 200 y aprobar pasa el control de rol;
+- cookie con `Secure; SameSite=Lax; HttpOnly` y cinco cabeceras de seguridad presentes;
+- solicitud pública con `<img onerror>` → 400; solicitud normal con apóstrofo → 200; admin que crea un usuario con HTML → 400;
+- con datos ya envenenados en la base (solicitud, nombre de usuario, observaciones, historial, nombre de adjunto) la versión anterior ejecutaba 7 scripts; esta, ninguno, y la solicitud se ve como texto;
+- `py_compile` correcto y sin errores de JavaScript en la página.
+
+**Pendiente (otra versión):** límite de intentos de login, código y restablecimiento; contraseñas temporales con `secrets` y cambio forzado; `bridge/login`; actualizar Pillow, pypdf y cryptography; arranque en base vacía.
+
+**Norma 5:** no aplica (sin variables obligatorias ni tablas nuevas; `COOKIE_SECURE=0` es opcional y solo para desarrollo local sin HTTPS).
+
+## 2026-10-21 — [Control Pedidos] V.º B.º desde Activo Operacional: estado de firma y correo de Dirección (v12.33.33)
+
+**Petición de Víctor:**
+- «Si al enviar a Vº Bº se cambiara el ESTADO en control pedidos a PENDIENTE FIRMA DIRECCION HOTEL, se incluye la firma y se incluyen los PDF asociados a la firma pendiente.»
+- «El correo de la dirección de los hoteles se encuentra en el apartado departamentos, cada uno en su hotel.»
+
+**Cambios:**
+- **`api_externo_ao_visto_bueno()`** acepta `cambiar_estado` (por defecto, sí).
+  - Si el pedido está en `_AO_VB_ESTADOS_PREVIOS` (PENDIENTE COTIZACIÓN, PENDIENTE FIRMA DIRECCION COMPRAS), pasa a `_AO_VB_ESTADO_FIRMA` (PENDIENTE DE FIRMA DIRECCION HOTEL) en la misma transacción en que se ponen la fecha y los PDF `vb_eml`, que es lo que exige `_faltan_datos_envio_firma()`.
+  - La fila de `historial_estados` recoge el cambio con la nota.
+  - Después se llama a `_notificar_cambio_estado()`, como en un cambio a mano; si falla, solo se registra en el log.
+  - Respuesta con `estado_antes`, `estado`, `estado_cambiado` y `estado_motivo` (cuando no se cambia porque el pedido ya va más adelante).
+- **Nueva ruta `api_externo_ao_departamentos_hotel()`** → `GET /api/externo/activo-operacional/departamentos-hotel?hotel=<código>`.
+  - Firma HMAC con cuerpo vacío, como el resto de GET del puente.
+  - Lee `departamento_hotel_email` del hotel.
+  - Devuelve `departamentos: [{nombre, emails}]` y `direccion` (los de la fila DIRECCION, sin tildes ni mayúsculas en la comparación).
+
+**Verificación:** prueba de punta a punta desde Activo Operacional (`test/vistoBueno.test.mjs`) contra este Flask en local:
+- sin fila DIRECCION en GY, Activo Operacional lo avisa; con ella, la usa;
+- el pedido pasa de PENDIENTE COTIZACIÓN a PENDIENTE DE FIRMA DIRECCION HOTEL;
+- al reenviar ya no cambia;
+- en ENVIADO AL PROVEEDOR no se toca y se explica;
+- hotel inexistente → 404 y firma incorrecta → 401.
+
+**Norma 5:** no aplica (sin variables ni tablas nuevas).
+
+## 2026-10-21 — [Control Pedidos] Envío a V.º B.º de Dirección desde Activo Operacional (v12.33.32)
+
+**Petición de Víctor:** desde la comparativa de presupuestos de Activo Operacional, «enviar presupuestos para visto bueno de dirección» con un documento por proveedor; en Control de Pedidos, que quede la «Fecha de envío para V.º B.º» con los documentos adjuntos.
+
+**Cambios:**
+- Nueva ruta `api_externo_ao_visto_bueno()` → `POST /api/externo/activo-operacional/pedidos/visto-bueno`.
+  - Comprueba la firma (`_dali_bridge_firma_valida`), `ref`, `fecha` y los PDF (hasta 30, cada uno ≤ `MAX_BYTES_DOCUMENTO`).
+  - Busca el pedido por `ref_activo_operacional` (404 si no existe).
+  - Pone `fecha_envio_visto_bueno` y `modificado_por`; inserta cada PDF en `pedido_adjuntos` con tipo `vb_eml` (`es_correo` falso).
+  - Añade una fila en `historial_estados` con el mismo estado y la nota recibida. No cambia el estado.
+
+**Verificación:** prueba de punta a punta desde Activo Operacional (`test/vistoBueno.test.mjs`) contra este Flask en local: fecha de hoy, los 2 PDF en el apartado «Envío para Vº Bº / firma», nota en el historial y estado sin tocar; pedido inexistente → 404; firma incorrecta → 401.
+
+**Norma 5:** no aplica (sin variables ni tablas nuevas; usa columnas y tipos de adjunto que ya existían).
+
+## 2026-10-20 — [Control Pedidos] Enlace directo a la ficha de un proveedor (v12.33.31)
+
+**Petición de Víctor:** «cuando se va a solicitar presupuesto, si el proveedor no tiene correo electrónico asignado, se deberá dar la opción de abrir la ficha del proveedor directamente para cumplimentar la info».
+
+**Cambios:**
+- `api_externo_dali_proveedores` añade `id` a cada proveedor (campo nuevo; Catálogo Asignaciones no lo lee).
+- `get_proveedores` acepta `?id=<id>`.
+- **Frontend:**
+  - `_enlaceProveedorInit()` guarda `?proveedor=<id>` al cargar la página y limpia la URL;
+  - `_abrirProveedorEnlace()`, después del login o al restaurar la sesión, va a Proveedores, trae ese proveedor (`/api/proveedores?id=`), lo mete en `_provCache` y abre `openProveedorModal()` con el aviso «Completa los contactos (correo) del proveedor y guarda».
+
+**Verificación:**
+- Con el cliente de pruebas de Flask:
+  - el puente devuelve el `id`;
+  - `?id=` devuelve solo ese proveedor.
+- En el navegador: `/?proveedor=<id>` → login → código de verificación → se abre «Editar proveedor» con su nombre, sin errores.
+
+**Norma 5:** no aplica (sin variables ni tablas nuevas).
+
+## 2026-10-20 — [Control Pedidos] Pedidos desde Activo Operacional en PENDIENTE COTIZACIÓN (v12.33.30)
+
+Petición de Víctor: «desde que el comprador pulsa en crear en control de pedido, pase el estado a tramitación en activo operacional y el nuevo que se crea en control-pedidos el estado deberá ser pendiente de cotización».
+
+Cambio: `api_externo_ao_crear_pedido()` crea el pedido con el estado `PENDIENTE COTIZACIÓN` en vez del estado inicial por defecto. El historial y `enviar_emails_estado()` usan ese estado. Si el pedido se vincula a uno existente (`vincular_a`), su estado no se toca. Activo Operacional v1.10.3 pasa a la vez su propio pedido a «En trámite».
+
+Verificación: cliente de pruebas de Flask y prueba de punta a punta desde Activo Operacional. El pedido nace en PENDIENTE COTIZACIÓN y el resto de comprobaciones de la v12.33.28/29 siguen OK.
+
+Norma 5: no aplica (sin variables ni tablas nuevas).
+
+## 2026-10-20 — [Control Pedidos] Aviso de posible pedido duplicado al dar de alta (v12.33.29)
+
+**Petición de Víctor:** «para evitar duplicidades en control-pedidos, cuando se vaya a crear un nuevo pedido tanto manual como automático, al introducir hotel y departamento, la aplicación debe verificar que no exista ningún pedido abierto con esta configuración y sin número de pedido aún adjudicado. Si existe, preguntar al usuario que compruebe que no es el mismo inicio de pedido nuevamente».
+
+**Backend:**
+- `_pedidos_abiertos_sin_numero(hotel_id, departamento_id)` busca los pedidos que cumplen todo esto (como mucho 20, los más recientes primero):
+  - mismo hotel y departamento;
+  - `pedido_num` vacío;
+  - estado distinto de ENTREGADO, CANCELADO y DENEGADO POR DIRECCION GENERAL.
+- Endpoint nuevo `GET /api/pedidos/abiertos-sin-numero`, que usa el formulario.
+- `create_pedido()` devuelve 409 con `requiere_confirmacion`, `tipo: "posible_duplicado"` y la lista, salvo que llegue `confirmar_duplicado`. `api()` del frontend ya trata ese 409 como respuesta normal, así que no hace falta tocar nada más para que pase.
+- `api_externo_ao_crear_pedido()`, con la misma comprobación y dos salidas:
+  - `confirmar_duplicado` crea el pedido igualmente;
+  - `vincular_a=<id de la lista>` enlaza ese pedido: pone `ref_activo_operacional`, adjunta el PDF como `solicitud_doc` y lo apunta en el historial. No crea otro pedido. Se niega si ese pedido ya está vinculado a otro del Activo Operacional.
+
+**Frontend:**
+- Aviso `#p-aviso-duplicados` en el modal al cambiar hotel o departamento, solo en altas.
+- `_preguntarPosibleDuplicado()`, la pregunta en un modal propio, en `savePedido()` y `_spCrear()`. Si la respuesta es «es otro», se repite la petición con `confirmar_duplicado`.
+
+**Verificación:**
+- Cliente de pruebas de Flask:
+  - el 1.º pedido GY·COCINA no pregunta;
+  - el aviso lo encuentra;
+  - el 2.º igual → 409;
+  - confirmado → se crea;
+  - otro departamento → no pregunta;
+  - si los abiertos ya tienen Nº → no pregunta.
+- Desde Activo Operacional:
+  - 409;
+  - vincular (referencia + PDF);
+  - no se puede vincular a uno ya vinculado;
+  - «es otro» → se crea.
+- Navegador con la app levantada:
+  - el aviso aparece al elegir GY + COCINA;
+  - Guardar → la pregunta;
+  - «Cancelar y revisarlo» no crea nada;
+  - «Es otro pedido distinto» crea y abre el pedido;
+  - con PISOS no hay aviso.
+
+**Encontrado de paso** (sin tocar): en una base de datos vacía, `_auto_migrate()` hace `ALTER TABLE emails_sistema_pendientes` antes del `CREATE TABLE` de esa tabla y se detiene. No afecta a producción, donde la tabla ya existe; solo a una instalación nueva desde cero.
+
+**Norma 5:** sin variables ni tablas nuevas. `GUIA_DESPLIEGUE.md`, `PENDIENTES.md` e `INSTRUCCIONES_RESTAURACION.md` no aplican.
+
+## 2026-10-20 — [Control Pedidos] Pedidos iniciados desde Activo Operacional (v12.33.28)
+
+**Petición de Víctor:** «una vez recibida la propuesta de pedido, el comprador/administrador deberá en caso de comenzar el proceso, añadir nuevo pedido a la aplicación control de pedidos, con la fecha de la solicitud y acceso al PDF del pedido en el apartado de solicitud, debería existir un botón que antes incluso de solicitar los presupuestos indique el comienzo y creación del pedido, se cumplimentan los campos hotel, departamento, fecha solicitud y se agrega el acceso al pdf del pedido en este punto, todo esto automáticamente».
+
+**Cambio:** endpoint nuevo `POST /api/externo/activo-operacional/pedidos` (`api_externo_ao_crear_pedido`). Usa la firma HMAC de `_dali_bridge_firma_valida` sobre el cuerpo crudo.
+
+Recibe:
+- `ref` (AO-<nº>) y el nº del pedido;
+- el código del hotel y el nombre del departamento;
+- `fecha_solicitud` (la del envío del hotel);
+- observaciones;
+- el PDF en base64;
+- el email y el nombre de quien lo inicia.
+
+Hace lo mismo que `create_pedido()`:
+- `_next_norden`, el estado inicial por defecto e `historial_estados` con la nota «Pedido creado desde Activo Operacional (pedido X)»;
+- `enviar_emails_estado()`, es decir, los mismos correos internos que al crear un pedido;
+- el PDF va a `pedido_adjuntos` con tipo `solicitud_doc`: el apartado de Fecha solicitud, «Solicitud del hotel»;
+- «Creado por» es el usuario con ese email o email2; si no hay ninguno, solo el nombre.
+
+Validaciones:
+- el hotel tiene que existir y estar activo;
+- el departamento se busca por nombre normalizado (`_normalizar_texto_generico`), así que «Temáticos» = TEMATICOS y «Restaurante & Bares» = RESTAURANTE & BARES; si no existe, devuelve 422 con instrucciones (crearlo en Administración → Departamentos);
+- el PDF tiene que empezar por %PDF y no pasar de `MAX_BYTES_DOCUMENTO`.
+
+**Idempotencia:** columna `pedidos.ref_activo_operacional` con índice único parcial (`_auto_migrate` y models.py). Repetir la llamada, aunque sea a la vez (UniqueViolation), devuelve el pedido existente con `ya_existia: true`.
+
+**Verificación** con el cliente de pruebas de Flask y con la app levantada (Activo Operacional → este Flask, de punta a punta):
+- firma mala → 401;
+- se crea el pedido con GY · COCINA · fecha de solicitud · estado inicial;
+- «Creado por» sale del usuario con ese email;
+- el PDF real del pedido (21 KB) queda en solicitud_doc;
+- el historial lo registra;
+- repetir la llamada no duplica;
+- TEMÁTICOS inexistente → 422 legible;
+- «Restaurante & Bares» casa con su departamento;
+- un PDF no válido → 400.
+
+**Norma 5:**
+- `GUIA_DESPLIEGUE.md`: sin variables nuevas (usa `DALI_SSO_SECRET`);
+- `INSTRUCCIONES_RESTAURACION.md`: la columna nueva se crea sola al arrancar;
+- `PENDIENTES.md`: no aplica.
+
+## 2026-10-19 — [Control Pedidos] Contactos de proveedor por hotel para Activo Operacional (v12.33.27)
+
+Pregunta de Víctor: «en control pedidos, ya se indican las cuentas de correo de cada proveedor por hotel, ¿se utiliza esto?». No: `GET /api/externo/dali-sap/proveedores` quitaba de cada contacto sus hoteles (`proveedor_contacto_hoteles`).
+
+Cambio: cada contacto del endpoint lleva `hoteles` (códigos de hotel, todos los hoteles incluido el de pruebas; lista vacía = contacto general). Activo Operacional v1.7.1 elige con eso los destinatarios de las solicitudes de presupuesto con la misma regla que `_get_proveedor_emails_principales()`: los principales de ese hotel; si no hay ninguno, los principales sin hotel asignado. Campo nuevo y opcional: Catálogo Asignaciones no lo lee y sigue igual.
+
+Verificación: probado con el cliente de pruebas de Flask contra la base de datos local: un proveedor con un contacto principal de GY, uno principal general y uno no principal devuelve `hoteles` = `['GY']`, `[]` y `[]`. Firma igual que antes.
+
+Norma 5: `GUIA_DESPLIEGUE.md`, `PENDIENTES.md`, `INSTRUCCIONES_RESTAURACION.md`: no aplica (sin variables ni tablas nuevas); `docs/hallazgo-seguridad-princess.md`: no existe en este repo.
+
+## 2026-10-18 — [Control Pedidos] Compradores por hotel para Activo Operacional (v12.33.26)
+
+Petición de Víctor: «en mi aplicación control pedidos, los compradores tienen los hoteles seleccionados, ¿podríamos utilizar esta configuración? la idea es que si se cambia en control pedido la asignación de los compradores, también se cambie en [Activo Operacional], los correos se envían a los compradores asignados, pero la visualización de pedidos, al igual que pasa en catálogo de asignaciones, puede ser visualizada por todos los compradores y administradores».
+
+Cambio: endpoint nuevo `GET /api/externo/dali-sap/compradores-hoteles` (servidor a servidor, misma firma HMAC con `DALI_SSO_SECRET` que el resto del puente con DALI). Devuelve cada hotel activo con su(s) comprador(es) de `usuario_comprador_hoteles` (rol compras o admin, activos, con email): nombre, email, email2 y móvil. Mismo criterio que `_get_todos_usuarios_hotel()`. Activo Operacional lo consulta en vivo al pasar cada pedido para avisar por correo al comprador del hotel, así que cambiar la asignación aquí se aplica al pedido siguiente. No cambia nada de lo existente.
+
+Verificación: probado con el cliente de pruebas de Flask contra una base de datos local creada con `init_db.py`: sin firma → 401, firma mala → 401, firma buena → hoteles con su comprador (incluido un admin con hotel asignado y el email2), un comprador inactivo no sale, hoteles sin comprador con lista vacía.
+
+Norma 5: `GUIA_DESPLIEGUE.md` actualizado (la fila de `DALI_SSO_SECRET` menciona Activo Operacional); `PENDIENTES.md`, `INSTRUCCIONES_RESTAURACION.md`: no aplica; `docs/hallazgo-seguridad-princess.md`: no existe en este repo.
 
 ---
 
-## 2026-08-19
+## 2026-10-13 — [Control Pedidos] Manual de usuario del rol COMPRADOR (v12.33.25)
 
-### [Organizador] v4.16.8 (`app/ui/ventana_chat.py`, `app/ui/chat_popup.py`) — Mensajes propios duplicados en el chat (una burbuja sin hora, otra con hora)
-- Reportado por Víctor Martín con captura: al enviar un mensaje propio
-  (p. ej. "hola"), aparecía dos veces en la ventana — una sin hora, otra
-  con hora. Al cerrar y reabrir la ventana, solo quedaba la correcta (con
-  hora), confirmando que la copia "de más" era la pintada al vuelo.
-- **Causa**: al enviar, el mensaje se pinta al instante en el cliente
-  (pintado optimista, para que se sienta rápido) sin `id` — el socket es
-  "fire and forget" y no lo devuelve. Cuando el servidor confirma el
-  mensaje por el socket (evento `nuevo_mensaje`), llega el eco real con
-  su `id` y su hora, y se volvía a pintar aparte, porque la
-  deduplicación existente solo comparaba por `id` (y el pintado
-  optimista no tenía ninguno). Mismo problema, dos copias: la ventana
-  completa del chat (`ventana_chat.py`) y la burbuja flotante
-  (`chat_popup.py`).
-- **Cambio**: en los dos archivos, el pintado optimista registra ahora
-  el mensaje (canal + contenido) en una lista de "pendientes propios".
-  Cuando llega el eco real con `id` y coincide con algo pendiente, se
-  descarta ese eco (ya está en pantalla) en vez de repintarlo. Solo
-  queda una burbuja por mensaje.
-- Los archivos compilan sin errores (`python3 -m py_compile`).
-- `APP_VERSION` → "v4.16.8" en `main_agenda.py`; `MyAppVersion` →
-  "4.16.8" en `OrganizadorPrincess_Setup.iss`. Se salta adrede
-  "v4.16.7" (sin cambios adicionales pendientes de ese número) para
-  mantener el hueco documentado. `release_notes.md` y
-  `release_notes_actual.txt` actualizados.
-
-### [Chat] v1.2.1 (`app.py`, servicio `control-pedidos-chat` en Render) — Nombre del interlocutor mal calculado en chats privados (salían números sueltos: "2", "3", "4", "6")
-- Reportado por Víctor Martín con captura: en el menú izquierdo del
-  chat, algunos contactos salían como "2", "3", "4", "6" en vez de su
-  nombre. Se descartó que fueran datos sucios de las pruebas iniciales
-  del chat (verificado con una consulta SQL sobre `chat_canales` /
-  `chat_participantes`: los canales y participantes eran correctos,
-  p. ej. `dm:comprascan:comprascan2` con `comprascan` y `comprascan2`
-  como participantes reales).
-- **Causa**: `GET /api/chat/canales` calculaba el "otro usuario" con
-  `canal_id.replace("dm:", "").replace(yo, "").replace(":", "")`.
-  `.replace(yo, "")` sustituye cualquier aparición de ese texto en el
-  string, no solo el segmento que le corresponde. El usuario de chat
-  `comprascan` es prefijo literal de `comprascan2`, `comprascan3`,
-  `comprascan4` y `comprascan6` — así que al calcular el otro usuario
-  del canal `dm:comprascan:comprascan2`, se comía también el prefijo
-  `comprascan` de dentro de `comprascan2` y dejaba solo `"2"`.
-- **Cambio**: se sustituye el `.replace()` en cadena por un
-  `canal_id.split(":", 2)` y comparación exacta del segmento contra
-  `yo`, sin sustituciones de substring. No requiere ningún cambio ni
-  limpieza en los datos — los canales existentes eran correctos, solo
-  se interpretaban mal al mostrarlos.
-- Compila sin errores. Versión del servicio → "v1.2.1" en
-  `CHANGELOG.md` (servicio independiente, con su propio versionado —
-  no afecta a `APP_VERSION` de `main_agenda.py`).
-- **Pendiente**: desplegar `app.py` en el servicio de Render
-  `control-pedidos-chat` — no toca base de datos, solo código.
+Petición de Víctor: manual del rol comprador igual que los del rol hotel (alcance completo, PDF + Word). Solo documentación: `docs/Manual_Usuario_COMPRADOR_Control_Pedidos.pdf` y `.docx` (15 capítulos con capturas numeradas hechas sobre datos de demostración, no reales). Contenido contrastado con el código: un comprador ve los pedidos de todos los hoteles (los hoteles asignados determinan a quién llegan los avisos); aprobar/denegar un expediente de techo está abierto al comprador y al aprobar el pedido se envía solo al proveedor; la nota solo es obligatoria al reabrir un CANCELADO o al denegar; ENTREGADO no queda en solo lectura para Compras. Cambio de código: solo la insignia `V 12.33.25` en `templates/index.html`.
 
 ---
 
-## 2026-08-19
+## 2026-10-13 — [Control Pedidos] Administrador con hoteles asignados (v12.33.24)
 
-### [Organizador] v4.16.6 (`app/ui/saludo.py`) — Regresión: avisos "Diario"/"Cada hora"/"Cada 30 min" con fecha de inicio futura volvían a saltar antes de tiempo (solo en el saludo y en el detalle del día)
-- Reportado por Víctor Martín con capturas: el 19-08-2026, tanto el
-  popup de bienvenida ("¡Buenos días!") como el detalle del día
-  (botón "Ver eventos") mostraban el aviso "ENVIAR LISTADO PARA
-  COTIZAR LICITACION CARNES", configurado con repetición Diaria y
-  fecha de inicio 15-01-2027 — casi 5 meses en el futuro.
-- **Causa**: este mismo bug ya se había corregido en v4.10.2 (avisos
-  con fecha de inicio futura sonando antes de tiempo), pero la
-  corrección solo llegó a `app/ui/agenda_helpers.py`. `app/ui/saludo.py`
-  contiene una segunda copia, independiente, de la misma lógica de
-  "qué avisos caen hoy" (una para el popup de bienvenida
-  `mostrar_saludo_diario()`, otra para el detalle del día que abre su
-  botón "Ver eventos"), y en ninguna de las dos se llegó a añadir la
-  comprobación de fecha de inicio: para `rep == "diario"` y para
-  `rep in ("cada_hora", "cada_30min")` el aviso se añadía siempre a la
-  lista, sin comparar la fecha de hoy con `aviso["fecha"]`.
-- **Cambio en `app/ui/saludo.py`**: en los dos bloques (líneas ~55-83
-  y ~225-259), se añade `fecha_inicio = av.get("fecha", "")` y la
-  condición `fecha_str >= fecha_inicio` antes de añadir el aviso, para
-  los casos `"diario"`, `"semanal"`, `"mensual"` y
-  `("cada_hora", "cada_30min")` — igual que ya hacía
-  `agenda_helpers.py`. Los casos `"semanal"` y `"mensual"` ya
-  comprobaban coincidencia de día de la semana/mes, pero tampoco
-  comprobaban el suelo de fecha de inicio; ahora sí.
-- **Pendiente**: unificar ambas copias de esta lógica (y la tercera en
-  `agenda_helpers.py`) en una sola función compartida, para que un
-  fix futuro no tenga que aplicarse a mano en varios sitios — ya pasó
-  una vez (v4.10.2) y ha vuelto a pasar aquí. Anotado para una
-  refactorización posterior, no incluida en esta entrega.
-- `APP_VERSION` → "v4.16.6" en `main_agenda.py`. No se ha tocado
-  `OrganizadorPrincess_Setup.iss` ni `release_notes/` en esta entrega
-  (a petición expresa: solo archivo(s) corregido(s) + historial).
+Petición de Víctor: que un admin pueda tener hoteles asignados, sin obligación. Decisión (confirmada con él): el admin con hoteles actúa como comprador de ellos. `app.py`: las consultas que resuelven el comprador de un hotel (`_get_compradores_hotel`, `_get_todos_usuarios_hotel`, `/api/compradores-por-hotel`, comprobaciones de Integridad «hotel sin comprador» y duplicados, protecciones de huérfanos al reasignar/desactivar/eliminar) pasan de `rol='compras'` a `rol IN ('compras','admin')` — seguro porque un admin solo aparece en `usuario_comprador_hoteles` si se le han asignado hoteles; `_validar_cambio_activo` y `delete_usuario` aplican la protección también a admins; `/api/admin/config-avisos` devuelve `es_comprador`. `templates/index.html`: bloque de hoteles de compras visible para admin (opcional, con nota), guardado y columna Hoteles de la tabla, y pestaña «Compradores y Hoteles» de Config. Avisos con los admins que tengan hoteles. Sin hoteles asignados, el comportamiento del admin no cambia (sigue viendo todo; no se cuenta como «comprador sin hoteles»). Probado con Postgres real, API y Playwright. Documentos de norma 5 revisados: no aplica.
+
 
 ---
 
-## 2026-08-04
+## 2026-10-13 — [Control Pedidos] Usuarios: trazabilidad de conexiones y activar/desactivar (v12.33.23)
 
-### [Organizador] v4.16.5 (`update_service.py`) — Misma gracia de 5 min aplicada al check de actualizaciones de GitHub
-- Detectado al revisar el fix anterior (v4.16.4): el check de
-  actualizaciones contra GitHub (`_check_update_github()`,
-  `app/services/update_service.py`) tenía el mismo síntoma que el
-  bridge de Control de Pedidos, pero SIN NINGÚN límite — cada fallo
-  (HTTPError, URLError, excepción inesperada) mostraba el diálogo
-  "⚠️ Error al comprobar actualizaciones" al momento y se reprogramaba
-  a los 30 min sin más, sin tope diario. Con GitHub inalcanzable un
-  rato (proxy, incidencia, corte puntual), el diálogo podía repetirse
-  cada 30 minutos indefinidamente.
-- Cambio: `_check_update_github()` gana el parámetro
-  `_es_reintento_gracia` (default `False`). El primer fallo llama a
-  `_conceder_gracia_update()`, que programa un único reintento
-  silencioso a los 5 minutos del mismo check en vez de avisar. Si el
-  reintento tiene éxito, se descarta en silencio (log únicamente); si
-  también falla, se muestra el diálogo con el error de ese segundo
-  intento, y el propio reintento retoma el ciclo normal de 30 min al
-  reprogramarse él solo.
-- `APP_VERSION` → "v4.16.5" en `main_agenda.py`; `MyAppVersion` →
-  "4.16.5" en `OrganizadorPrincess_Setup.iss`; entrada añadida en
-  `release_notes/release_notes.md` y `release_notes_actual.txt`.
+Petición de Víctor: saber cuándo se conectó cada usuario por última vez y desde dónde, y que el admin pueda siempre activar/desactivar un usuario (ya existía algo equivalente en DALI: `conexiones_usuarios`, `TrazabilidadUsuarioModal`). Cambios: tabla `usuarios_trazabilidad` (en `_auto_migrate` y `models.py`) alimentada desde `_completar_login` (métodos `login`, `login_verificado`, `bridge`) con IP (`X-Forwarded-For`), país (`CF-IPCountry`) y dispositivo derivado del User-Agent; endpoint `GET /api/usuarios/<id>/trazabilidad`; `GET /api/usuarios` devuelve `ultimo_login` y último IP/dispositivo; `PUT /api/usuarios/<id>/activo` y la validación común `_validar_cambio_activo` (se elimina el bloqueo duro por hoteles huérfanos, que pasa a aviso con `forzar`; no autodesactivarse; debe quedar un admin activo); eventos «activado/desactivado» con el admin autor. `login_required`, `admin_required` y `/api/me` cortan la sesión de una cuenta desactivada (cache de 20 s, 1 worker); mensaje específico al intentar entrar con contraseña correcta. Interfaz: columna «Último acceso», botones 🔍 y Desactivar/Activar, modal de trazabilidad. Probado con Postgres real, API y Playwright. Documentos revisados (`GUIA_DESPLIEGUE.md`, `PENDIENTES.md`, `INSTRUCCIONES_RESTAURACION.md`, `docs/hallazgo-seguridad-princess.md`): no aplica, salvo que la tabla nueva se crea sola en el arranque.
 
-### [Organizador] v4.16.4 (`pedidos_agenda_bridge.py` v4.9) — Gracia de 5 min antes de avisar de un corte de conexión
-- Petición: el diálogo "⚠️ Error de conexión con Control de Pedidos"
-  saltaba con el primer fallo de red (login, `/api/bridge/alertas` o
-  `/api/bridge/notificaciones`), aunque fuera un corte puntual que se
-  resuelve solo (wifi, cold start de Render, una petición perdida).
-- Cambio: ningún fallo de conexión abre el diálogo al momento. La
-  primera vez que falla cualquiera de esas tres operaciones se llama
-  a la nueva `_reportar_fallo_conexion()`, que NO avisa — programa un
-  único reintento a los 5 minutos (`_GRACIA_RECONEXION_SEGUNDOS`) de
-  la misma operación que falló. Si el reintento tiene éxito, el
-  fallo se descarta en silencio (queda constancia en
-  `bridge_errors.log`). Si el reintento también falla, entonces sí se
-  abre el diálogo, con el error de ese segundo intento (puede no
-  coincidir con el del primero). Varios fallos casi a la vez (p. ej.
-  login y alertas juntos) no programan un reintento cada uno — todos
-  son síntoma del mismo corte, basta con uno (`_gracia_en_curso`).
-- `login()` se divide en `_intentar_login()` (silenciosa, devuelve
-  `(ok, titulo, cuerpo)`) + `login()` (delega en
-  `_reportar_fallo_conexion()` si falla), para reutilizar el mismo
-  intento en la llamada normal y en el reintento a los 5 min.
-  `_sincronizar_alertas()` y `_procesar_push()` siguen el mismo patrón
-  con closures locales.
-- Sin cambios en el límite de "1 diálogo por tipo de error y día" de
-  `_mostrar_error_bridge()` (v4.3) — la gracia de 5 min ocurre antes
-  de llegar a ese punto, no lo sustituye.
-- `APP_VERSION` actualizado a "v4.16.4" en `main_agenda.py` y
-  `MyAppVersion` a "4.16.4" en `OrganizadorPrincess_Setup.iss`; entrada
-  añadida en `release_notes/release_notes.md` y
-  `release_notes/release_notes_actual.txt`.
-
-### [Control Pedidos] v12.29.48 — Fix: aviso "familia repetida" saltaba con el primer pedido, sin duplicado real
-- Reportado: el comprador seguía recibiendo el aviso 🔴
-  "Familia/Partida REPETIDA" de forma constante tras v12.29.47, pese a
-  que en el hotel no existía ningún pedido duplicado de esa familia —
-  solo un único pedido sujeto a techo.
-- Causa raíz: `_job_familia_repetida_inner()` (`app.py`, Control de
-  Pedidos) contaba TODOS los pedidos de la familia sin excluir
-  ninguno, y comparaba con `HAVING COUNT(*) >= techo_max_pedidos_familia`.
-  Con el valor por defecto de `techo_max_pedidos_familia` (= 1), la
-  condición ejecutada era en la práctica `COUNT(*) >= 1`: el primer y
-  único pedido de cualquier familia ya la marcaba como "repetida".
-  Inconsistente con `_check_techo()` (bloqueo al enviar al
-  proveedor), que sí excluye el propio pedido del recuento y por eso
-  no tenía este problema.
-- Corrección: `HAVING COUNT(*) >= %s` pasa a `HAVING COUNT(*) > %s`
-  en la consulta del job — solo alerta cuando el número de pedidos de
-  la familia supera de verdad el máximo configurado.
-- Detalle completo en `CHANGELOG.md` (Control Pedidos, v12.29.48).
-
-### [Organizador + Control Pedidos] v4.16.3 / v12.29.46 — Prueba: popup entregado una única vez (dedup en servidor)
-- Motivo: comprador de INSIRE reportó el mismo popup repitiéndose
-  "continuamente" en el mismo día.
-- Causa probable: el dedup de repetición de popups vivía en memoria de
-  Organizador Princess (`_estado_popups`), se perdía al reiniciar la
-  app y volvía a mostrar avisos ya vistos.
-- Prueba: el dedup se mueve a Control de Pedidos (tabla
-  `bridge_popup_visto`, persistente). `/api/bridge/alertas` ahora solo
-  entrega cada aviso una vez por usuario/pedido/nivel, para siempre —
-  si la app está cerrada cuando el pedido entra en alerta, se entrega
-  en cuanto reconecte, pero solo esa vez, sin reintentos posteriores.
-  Detalle completo en `CHANGELOG.md` (Control Pedidos, v12.29.46) y en
-  el docstring de `_sincronizar_alertas()` (Organizador, v4.8).
-
-## 2026-08-01
-
-### [Organizador] v4.16.2 — Corrección: "Limpiar chat" afectaba a varias conversaciones a la vez
-- Reportado: el botón "Limpiar chat" debería borrar solo la
-  conversación abierta, no todas.
-- Causa raíz en `app/db/sqlite.py`: al abrir una conversación privada
-  NUEVA (sin mensajes todavía), `_abrir_nueva_conversacion()` pasa
-  `canal_id=None` a propósito (lo resuelve el backend con el primer
-  mensaje). Sin guarda, `set_chat_limpiado(None, ...)` guardaba la
-  marca bajo la clave JSON `"null"` — y TODAS las conversaciones
-  nuevas sin resolver comparten ese mismo `canal_id=None` hasta que
-  reciben su primer mensaje. Limpiar una conversación nueva marcaba
-  como limpiadas también todas las demás conversaciones nuevas sin
-  resolver que hubiera en ese momento, no solo la abierta.
-- Corregido con una guarda (`if not canal_id`) en
-  `get_chat_limpiado()`/`set_chat_limpiado()` — un canal sin resolver
-  simplemente no guarda ni aplica ninguna marca (tampoco hace falta:
-  si no tiene `canal_id` es porque no tiene mensajes todavía). No
-  hizo falta tocar `ventana_chat.py` ni `chat_popup.py`, ya llamaban
-  bien a estas funciones — el fallo estaba solo en el almacenamiento.
-- Los archivos compilan sin errores. `APP_VERSION` → `v4.16.2`;
-  `release_notes_actual.txt` y `release_notes.md` actualizados.
-
-### [Organizador] v4.16.0 — Corrección: solicitud de acceso volvía a bloquear el panel Admin
-- Reportado (con captura del diálogo de solicitud): tras crear la
-  contraseña momentánea, cerrar y reabrir el Organizador dejaba sin
-  poder entrar al panel de Administración — volvía a salir el
-  formulario de "Enviar solicitud" en vez del de acceso.
-- Bug real en el fix de v4.14.4: `_solicitud_pendiente` exigía
-  además `not _bp_pend` (contraseña bridge vacía). Cubría el primer
-  reinicio (recién enviada la solicitud, sin contraseña local
-  todavía), pero en cuanto el usuario creaba su contraseña momentánea
-  (bloque "1-bis" de `admin_auth.verificar_acceso()`, que la guarda
-  con `update_bridge_credentials`), `bridge_password` dejaba de estar
-  vacío — y en el siguiente reinicio la condición volvía a fallar,
-  forzando otra vez `_modo_alta()`. Resultado: quien ya se había
-  creado su contraseña momentánea se quedaba bloqueado para siempre,
-  sin poder usarla.
-- Corregido: se quita el requisito de contraseña vacía —
-  `_solicitud_pendiente` pasa a ser solo "el usuario de Windows ya
-  tiene una solicitud registrada" (`bridge_user == uwin`), tenga o no
-  tenga ya contraseña local. El subtítulo del diálogo se adapta
-  (invita a "crear" la contraseña si aún no hay, o a "introducirla"
-  si ya existe), pero en ambos casos se queda en modo login sin
-  forzar nunca el formulario de alta mientras la solicitud siga sin
-  aprobar.
-- Confirmado de paso que el guardado automático en "Mi Usuario" →
-  credenciales bridge ya funcionaba bien (se relee de la BD local
-  cada vez que se abre esa ventana) — el usuario no llegaba a verlo
-  por este bloqueo previo, no era un problema aparte.
-- `main_agenda.py` compila sin errores. `APP_VERSION` → `v4.16.0`;
-  `release_notes_actual.txt` y `release_notes.md` actualizados.
-
-### [Organizador] v4.14.8 — "Limpiar chat" pasa a ser persistente por equipo
-- Petición: que el histórico desaparezca de verdad cada vez que se
-  pulsa "Limpiar chat", no solo la vista de esa sesión — hasta ahora,
-  al salir del chat y volver a entrar, todo reaparecía (diseño
-  deliberado desde v4.14.2, pero se pidió cambiarlo).
-- `app/db/sqlite.py` — 3 funciones nuevas sobre el mismo `config.json`
-  que ya usa el resto de la app (sin tocar SQLite):
-  `get_chat_limpiado(canal_id)` / `set_chat_limpiado(canal_id,
-  marca_iso)` (guardan/leen, por canal, la fecha/hora ISO 8601 UTC del
-  último "Limpiar chat"), y `filtrar_mensajes_limpiados(canal_id,
-  mensajes)` (descarta los mensajes con `creado_en` anterior o igual a
-  esa marca — comparación de strings directa, sin parsear fechas).
-- `app/ui/ventana_chat.py`: `_limpiar_chat()` guarda la marca antes de
-  vaciar la vista; `_cargar_historial()` filtra por ella antes de
-  pintar. Texto del diálogo de confirmación actualizado para explicar
-  el nuevo alcance.
-- `app/ui/chat_popup.py`: mismo filtro aplicado en `_cargar()`, para
-  que la burbuja flotante sea coherente con la ventana principal.
-- **Alcance — local por equipo, no de servidor:** no hay acceso desde
-  este proyecto al backend de chat (Flask/SocketIO independiente), así
-  que es un filtro en el cliente — el marcador vive en `config.json`
-  de `%APPDATA%\OrganizadorPrincess`. No borra nada del servidor: el
-  resto de participantes del canal sigue viendo el historial completo,
-  y si el mismo usuario entra desde otro PC también lo verá ahí hasta
-  que limpie también en ese equipo. Un borrado real de servidor
-  requeriría tocar el backend de chat, fuera del alcance de este repo.
-- Los 3 archivos compilan sin errores. `APP_VERSION` → `v4.14.8`;
-  `release_notes_actual.txt` y `release_notes.md` actualizados.
-
-### [Organizador] v4.14.6 — Contraste de "Limpiar chat" y texto de ayuda (chat)
-- Petición: mejorar el contraste del botón "Limpiar chat" y del texto
-  bajo "Elige uno o varios compañeros" en el chat; verificar de paso
-  si "Limpiar chat" realmente limpia algo, dado que al salir y volver
-  a entrar todo sigue ahí.
-- Causa del contraste: la app usa el tema oscuro `superhero`, donde
-  `bootstyle="secondary"` (`#4e5d6c`) contra el fondo `bg` (`#2b3e50`)
-  da un ratio de contraste de ~1.6:1 — muy por debajo del mínimo
-  legible (4.5:1 texto normal, WCAG AA). Verificado consultando la
-  paleta real del tema (`ttkbootstrap.themes.standard.
-  STANDARD_THEMES["superhero"]`), no a ojo.
-- Corregido en `app/ui/ventana_chat.py`:
-  - Botón "🧹 Limpiar chat": `secondary-outline` → `info-outline`
-    (`#5bc0de` ≈ 4.8:1 de contraste).
-  - Texto de ayuda bajo "Elige uno o varios compañeros:" (diálogo
-    `_abrir_nueva_conversacion`): `secondary` → `light` (`#ABB6C2` ≈
-    5.0:1).
-  - De propina (mismo problema, no pedido explícitamente): la
-    etiqueta `lbl_estado` ("Conectando…", estado inicial antes de
-    resolver a 🟢/🟡/🔴) también usaba `secondary` → cambiada a
-    `light` igual que las anteriores.
-  - `app/ui/chat_popup.py` no tiene ni el botón ni el selector de
-    compañeros (solo existen en la ventana principal) — nada que
-    tocar ahí para estos 2 puntos.
-- (Ver corrección posterior el mismo día: se decidió cambiar este
-  comportamiento — el histórico SÍ desaparece ahora al pulsar
-  "Limpiar chat".) `APP_VERSION` v4.14.6.
-
-### [Organizador] v4.14.4 — Fix: contraseña momentánea no dejaba continuar con solicitud ya enviada
-- Reportado: al reabrir «⚙ Admin» tras haber enviado ya una solicitud
-  de acceso (pendiente de aprobación), volvía a salir siempre el
-  formulario de "Enviar solicitud" en vez de dejar escribir la
-  contraseña momentánea.
-- Causa: `_comprobar_existencia_bg()` forzaba `_modo_alta()` cada vez
-  que `existe_en_plataforma(uwin)` devolvía `False`, sin distinguir
-  "nunca se ha pedido acceso" de "ya se pidió, pendiente de
-  aprobación" — ambos casos dan `existe=False` porque el usuario aún
-  no existe de verdad en Control de Pedidos.
-- Corregido en `main_agenda.py`: se comprueba
-  `get_bridge_credentials(uwin)` — si `bridge_user == uwin` y
-  `bridge_password` está vacío (estado que deja `_crear_acceso()` al
-  enviar la solicitud, vía `update_bridge_credentials(uwin, uwin,
-  "")`), se considera solicitud pendiente y se mantiene el modo login
-  con subtítulo explicativo, en vez de forzar el formulario de alta.
-  Así se llega al bloque "1-bis" ya existente en
-  `admin_auth.verificar_acceso()` (2026-07-28), que acepta la primera
-  contraseña introducida ahí como contraseña momentánea de acceso
-  local — antes nunca se llegaba a esa pantalla. No hizo falta tocar
-  `admin_auth.py`, esa lógica ya funcionaba bien.
-- Nota aparte, no relacionada con este fix: el correo de aprobación
-  de la solicitud no llega al usuario — no es un bug de este proyecto
-  (el Organizador solo hace la petición HTTP al proxy de Control de
-  Pedidos; el envío del correo lo genera el backend de Control de
-  Pedidos al aprobar la solicitud, fuera del alcance de este repo).
-  Pendiente de revisar desde el lado de Control de Pedidos si se
-  aporta acceso a ese código.
-- `main_agenda.py` compila sin errores. `APP_VERSION` v4.14.4.
-
-### [Ecosistema] A partir de ahora: HISTORIAL_CAMBIOS.md es un único documento compartido
-- Petición del usuario: como Organizador y Control de Pedidos van
-  relacionados, el historial de ambas aplicaciones debe ser siempre
-  el mismo archivo — no dos copias que se van desincronizando (esta
-  misma sesión, la copia de Organizador se había quedado en el 29 de
-  julio mientras la de Control de Pedidos seguía sumando entradas).
-  Fusionadas aquí las 2 entradas de Organizador que solo estaban en
-  su copia (v4.14.6 y v4.14.4) — de aquí en adelante, cada entrega
-  actualiza este único documento, y hay que subirlo igual a los dos
-  repos (o valorar que uno de los dos lo referencie en vez de
-  duplicarlo).
 
 ---
 
-## 2026-07-31 (27)
+## 2026-10-12 — [Control Pedidos] Pedido simplificado, Fase 3 y trazabilidad fuera de los correos al proveedor (v12.33.22)
 
-### [Control Pedidos] v12.29.2 — Revisión del zip v12.29.0 + 2 correos sin logo
-- A petición del usuario, revisión completa del zip subido (v12.29.0)
-  contra el código real, no solo contra el propio CHANGELOG.
-- ✅ Confirmado correcto: Techo de gastos por familia (v12.28.0 y
-  v12.29.0) — `_check_techo()` Reglas 2 y 4, job de familia repetida
-  con `HAVING COUNT(*) >= %s` configurable, los 2 endpoints de resumen
-  (`/api/techo/resumen` y `-historico`) devolviendo
-  `familias_conteo`/`familias_importe`/`max_pedidos_familia`/
-  `max_importe_familia`, y su renderizado en frontend (tarjetas +
-  exportación/impresión) — todo revisado línea a línea.
-- ✅ Confirmado correcto: logo en las 7 plantillas de proveedor/
-  internas (v12.27.22) — `_email_header_html()` con tabla (no
-  flexbox, más compatible con Outlook y similares), usada
-  exactamente en las 7 plantillas que dice el CHANGELOG.
-- ❌ Encontrado: 2 correos se quedaron sin logo pese al "sí, a
-  todos" — el código de verificación de login
-  (`_email_html_simple()`, la plantilla de la captura original que
-  motivó la petición) y el de restablecimiento de contraseña, que ni
-  siquiera usaba `_email_html_simple()` (párrafos sueltos sin
-  plantilla). Corregido: `_email_html_simple()` ahora envuelve el
-  cuerpo con `_email_header_html()`; el email de reset de contraseña
-  pasa a usar `_email_html_simple()` igual que el resto de correos
-  cortos tipo "código/enlace". Probado con datos de ejemplo — salida
-  limpia.
-- ❌ Encontrado: `CHANGELOG.md` con 2 cabeceras de versión perdidas
-  (v12.28.0 y v12.27.22 — el contenido estaba, pero sin su línea
-  `# vX.Y.Z — fecha`, quedando concatenadas bajo la versión
-  siguiente). Mismo tipo de fallo que ya se dio un par de veces en
-  esta conversación al insertar una entrada nueva encima de una
-  existente. Corregido. `docs/HISTORIAL_CAMBIOS.md` sí las tenía
-  bien, no hizo falta tocarlo por eso.
-- `app.py` compila sin errores en todo momento durante la revisión.
-- Badge de versión del sidebar actualizado a "V 12.29.2"; entrada
-  añadida en `CHANGELOG.md`.
+Problema reportado por Víctor (captura de un correo de reclamación, pedido 16080 de La Palma Princess): en los pedidos creados automáticamente desde SAP, el campo Observaciones lleva una línea de trazabilidad interna («Alta automática · Carga automática SAP · fecha · Nº SAP … · Datos y artículos tomados de los listados de SAP…») y las plantillas de correo la mostraban al proveedor. Corrección en `app.py`: `_obs_para_proveedor` elimina las líneas que empiezan por «Alta automática ·» y `_pedido_para_proveedor` entrega una copia depurada; se aplica en `_email_template_enviado_proveedor`, `_email_template_entrega_parcial`, `_email_template_pendiente_cotizacion` y en el «motivo» de cancelación de `enviar_emails_estado`. Las observaciones escritas a mano se conservan; los correos internos (comprador/directores) mantienen la trazabilidad.
+
+Fase 3 del pedido simplificado: `_extraer_datos_presupuesto_archivo` lee PDF, .docx (zip/XML, sin dependencias nuevas), .xlsx (openpyxl, ya en requirements) y .eml (asunto, cuerpo y adjuntos; fecha de cabecera como respaldo con confianza baja). `_pres_proveedor_sugerido` busca en el texto el nombre de un proveedor del catálogo (el más largo, solo si es único) o el dominio del remitente entre los correos de contacto. `simplificado_analizar` clasifica correos con presupuesto adjunto y Word/Excel por contenido. Nueva tabla `presupuesto_lecturas` (creada en `_auto_migrate` y en models.py) y endpoints `POST /api/pedidos/simplificado/lectura` y `GET /api/presupuestos/lecturas` (admin). `templates/index.html`: origen del documento, proveedor propuesto, aviso de proveedor distinto, registro de la lectura al crear y aviso de proveedor probable en el paso a paso.
+
+Pruebas: Word, Excel, .eml con PDF adjunto y .eml con presupuesto en el cuerpo correctos; plantillas de correo comprobadas con una observación automática (no aparece) y con una manual añadida (se conserva).
 
 ---
 
-## 2026-07-31 (26)
+## 2026-10-12 — [Control Pedidos] Pedido simplificado, Fase 2: lectura de presupuestos y fecha del presupuesto (v12.33.21)
 
-### [Control Pedidos] v12.29.0 — Techo de gastos: importe máximo (€) también configurable por hotel/mes y familia
-- Petición del usuario, continuación directa de v12.28.0: además de limitar
-  el **Nº de pedidos** por hotel/mes y familia, se pide poder limitar el
-  **importe (€)** que puede acumular una familia concreta en el mes —
-  hasta ahora el único tope en € era el mensual del hotel entero
-  (`techo_max_mes`, Regla 3 de `_check_techo`).
-- Nuevo parámetro editable en Config alertas → 💳 Techo de gastos:
-  **"Techo — Importe máximo mensual por hotel y familia (€)"**
-  (nueva clave `techo_max_mes_familia`, independiente de
-  `techo_max_pedidos_familia` que ya limitaba el Nº de pedidos).
-  Por defecto **0 = sin límite**, para no cambiar nada en producción hasta
-  que un admin ponga un valor > 0.
-- `_check_techo()`: nueva **Regla 4** — suma el importe de los pedidos de
-  esa familia en el hotel/mes y, si `techo_max_mes_familia > 0`, bloquea
-  el pedido cuando ese acumulado superaría el límite (mismo mecanismo que
-  ya usaba la Regla 3 a nivel de hotel/mes total, incluido el "forzar"
-  para usuarios con permiso).
-- `/api/techo/resumen` y `/api/techo/resumen-historico`: devuelven ahora
-  también `familias_importe` (€ acumulado por familia este mes) y
-  `max_importe_familia`, además de los campos ya añadidos en v12.28.0.
-- Pestaña 📉 Techo de gastos (tarjetas por hotel): la línea "Familias:"
-  añade el importe acumulado de cada familia frente al nuevo límite
-  (`Nombre (n/máx pedidos · importe/máx €)`) cuando el límite en € está
-  activo, y resalta en ámbar tanto por Nº de pedidos como por importe.
-- Exportación/impresión del resumen de Techo de gastos: el resaltado de
-  "familia repetida" ahora también se dispara si el importe acumulado de
-  la familia alcanza el nuevo límite en €, no solo por Nº de pedidos.
-- Migración `ON CONFLICT DO NOTHING` (auto-ejecutada por `_auto_migrate()`
-  al arrancar la app) + seed para instalaciones nuevas — **no requiere
-  ninguna acción manual en Supabase**.
-- Pendiente / fuera de alcance de esta petición: no se ha dado de alta un
-  aviso automático dedicado (Telegram/popup) para cuando se supera este
-  importe por familia — de momento solo bloquea la creación del pedido y
-  se ve reflejado en el resumen/dashboard. Para una alerta proactiva
-  habría que registrar un nuevo evento en `eventos_aviso`, igual que
-  existe para "Familia repetida".
-- Badge de versión del sidebar → "V 12.29.0".
+Víctor envió 13 presupuestos reales (Casa Delfín, Pilsa, Mabecan, Ditenerife, Crisol, Dihova, Servicios Electrónicos, Lormacan, Vamac Sport —uno con texto y otro escaneado y girado—, TM Leader, Reverón y Aliseo —escaneado y firmado—). Formatos muy dispares: números sin etiqueta (justo antes de la fecha, o pegados a «Nº PROFORMA»), importes «1.234,56» y «1,234.56», cifras de totales pegadas («0,9713,89») y un proveedor con IVA mixto y sin base impresa.
 
-## 2026-07-31 (25)
+Corrección/implementación (`app.py`): `_extraer_datos_presupuesto` (+ `_pres_*`): Nº por etiquetas habituales con respaldo «código antes de la fecha»; fecha tras «Fecha» ignorando validez/vencimiento/entrega; importe sin IGIC por **triple coherente base + impuesto = total** del propio documento (descartado si no cuadra con la cifra etiquetada como base) y, si no, por etiquetas (Base imponible, Importe neto, Subtotal…). Escaneados: OCR con Tesseract a 150 ppp con corrección de orientación (OSD), una sola pasada. Resultado: 13/13 correctos. Columna nueva `pedidos.fecha_presupuesto` (TEXT 'YYYY-MM-DD', como el resto de fechas; la primera prueba con DATE reproducía el problema de JSON de `_normalizar_fecha_entrega_especifica`). `create_pedido`/`update_pedido` la guardan; `upload_adjunto` (presupuesto_doc PDF) devuelve la propuesta sin escribirla; `simplificado_analizar` reutiliza una única lectura OCR para clasificar y leer.
 
-### [Control Pedidos] v12.28.0 — Techo de gastos: Nº de pedidos configurable por hotel/mes y familia (antes fijo a 1)
-- Petición del usuario: hasta ahora una familia de artículos solo podía
-  usarse **una vez al mes por hotel** — regla fija en código dentro de
-  `_check_techo()` (Regla 2: "Ya existe un pedido de la familia... solo
-  puede usarse una vez al mes"). El único número editable desde Config
-  alertas → 💳 Techo de gastos era el máximo de pedidos **totales** por
-  hotel/mes (`techo_max_pedidos`), no el máximo por familia.
-- Nuevo parámetro editable **"Techo — Nº máximo de pedidos por hotel/mes y
-  familia"** (`techo_max_pedidos_familia`), por defecto **1** (mismo
-  comportamiento que antes hasta que un admin lo cambie), en el mismo
-  grupo que los 4 campos existentes de Techo de gastos.
-- `_check_techo()`: la Regla 2 deja de bloquear con un mensaje fijo de
-  "ya usada este mes" y pasa a comparar el nº de pedidos de esa familia
-  en el hotel/mes contra el nuevo límite configurable (mismo patrón que
-  la Regla 1, que ya hacía esto a nivel de hotel/mes total).
-- Job `_job_familia_repetida_inner` (alerta 🔴 "Familia/Partida REPETIDA"
-  a comprador y admins, cada 2 días por defecto): el `HAVING COUNT(*) > 1`
-  fijo en SQL pasa a `HAVING COUNT(*) >= techo_max_pedidos_familia`, para
-  que dispare exactamente en el mismo umbral que ahora bloquea la
-  creación del pedido — antes de este cambio, con el límite en 1, esta
-  alerta y el bloqueo de creación ya coincidían por casualidad (>1 y
-  bloqueo a partir de 1 repetición); con el límite configurable, sin este
-  ajuste se habrían desincronizado.
-- `/api/techo/resumen` y `/api/techo/resumen-historico`: devuelven ahora
-  `familias_conteo` (nº de pedidos por familia este mes) y
-  `max_pedidos_familia`, además de los campos ya existentes.
-- Pestaña 📉 Techo de gastos (tarjetas por hotel): la línea "Familias:"
-  pasa de listar solo nombres a mostrar el conteo de cada familia frente
-  al límite (`Nombre (n/máximo)`), resaltando en ámbar las que están al
-  límite o por encima.
-- Exportación/impresión del resumen de Techo de gastos: el resaltado de
-  "familia repetida" (antes fijo a `> 1`) usa ahora el mismo límite
-  configurable por hotel.
-- No hizo falta tocar el HTML de Config alertas: el panel se pinta
-  dinámicamente desde la tabla `config_alertas`, así que el nuevo campo
-  aparece solo en cuanto existe la fila en BD.
-- Migración `ON CONFLICT DO NOTHING` (auto-ejecutada por `_auto_migrate()`
-  al arrancar la app) + seed para instalaciones nuevas — **no requiere
-  ninguna acción manual en Supabase**.
-- Badge de versión del sidebar → "V 12.28.0".
+`templates/index.html`: campo «Fecha del presupuesto» (ficha), autorrelleno de campos vacíos al adjuntar el presupuesto, y en el asistente simplificado bloque Presupuesto (Nº, fecha, importe editables, marca «compruebe»), techo de gasto con importe del presupuesto y aviso si no coincide con el total del PDF del pedido.
 
-## 2026-07-31 (24)
-
-### [Control Pedidos] v12.27.22 — Cabecera con logo también en emails de proveedor / internos de pedidos
-- Petición del usuario: el logo aplicado en v12.27.19-21 solo cubría
-  los emails de acceso/admin (verificación, Fase 1, Fase 2...). Faltaban
-  los emails "de negocio" — proveedores y avisos internos de pedidos.
-- Localizados 7 puntos de envío sin el patrón de cabecera con logo:
-  enviado al proveedor, entrega parcial, pendiente de cotización,
-  pendiente de firma (Dirección de Compras / Dirección del Hotel),
-  cotización sin proveedor asignado, confirmación de recepción al
-  proveedor y aviso interno de cambio de estado. Los 5 primeros tenían
-  una banda de color plana sin logo; los 2 últimos no llevaban ninguna
-  cabecera.
-- Creada una única función `_email_header_html(...)` que genera la
-  cabecera estándar (título/subtítulo a la izquierda, logo Princess a
-  la derecha) — es ahora el único punto de configuración de la
-  cabecera para todos los emails de la app, presentes y futuros.
-  Las 7 plantillas se han migrado a usarla, respetando el color rojo
-  (proveedor) o navy (interno) que ya tenían.
-- Badge de versión del sidebar → "V 12.27.22".
-
-## 2026-07-31 (23)
-
-### [Control Pedidos] v12.27.21 — Fix: logo no aparecía en 3 de las 6 cabeceras + contraste del subtítulo
-- Reportado con captura real del correo "[FASE 1] Nueva solicitud de
-  acceso": la franja navy no mostraba el logo (ni siquiera el icono
-  de imagen rota) y el subtítulo "Control de Pedidos · Princess
-  Canarias" apenas se distinguía.
-- Causa raíz del logo: 3 de las 6 plantillas tocadas en v12.27.20
-  (Fase 1 a admins, alta desde el Organizador, Fase 2 completada)
-  calculaban `app_url` con `os.environ.get("APP_URL", "")` — fallback
-  vacío. Si la variable de entorno `APP_URL` no está definida en
-  Render, el `src` de la imagen queda como ruta relativa
-  (`/static/logo-sidebar.png`), que no resuelve dentro de un cliente
-  de correo (no hay "página actual" de la que colgar la ruta) — de
-  ahí que no se viera ni el icono de imagen rota, directamente no se
-  intentaba cargar. Igualado el fallback en las 3 al mismo que ya
-  usaban las otras 3 plantillas: `https://control-pedidos-princess.onrender.com`.
-- Causa raíz del contraste: el subtítulo usaba
-  `color:rgba(255,255,255,.6)`. Clientes de correo basados en el
-  motor de Word (Outlook de escritorio clásico) son conocidos por
-  ignorar `rgba()` en `color`, cayendo a un color por defecto poco
-  legible sobre fondo navy. Cambiado a un hex sólido
-  (`color:#b9c3dc`) en las 5 cabeceras que llevan subtítulo, para
-  que se renderice igual en todos los clientes.
-- Alcance: los 3 fallbacks de `app_url` corregidos son exactamente
-  los mismos 3 tocados en v12.27.20 más el compacto de "Cuenta
-  creada automáticamente" (que reutiliza el `app_url` ya corregido
-  de la misma función). No se ha tocado el `app_url` de la línea
-  5917 (usado solo para el enlace de fallback por Telegram, no
-  aparece en el cuerpo del email).
-- Badge de versión del sidebar actualizado a "V 12.27.21".
-- Pendiente de confirmar tras desplegar: probar con una solicitud
-  nueva (no un correo ya recibido antes del despliegue) para
-  verificar que ahora sí carga el logo.
+Limitaciones conocidas: presupuestos en Word/Excel/correo no se leen aún (Fase 3); el OCR puede equivocar una cifra (se avisa «compruebe»); la fecha del presupuesto aún no se incluye en exportaciones ni correos.
 
 ---
 
-## 2026-07-31 (22)
+## 2026-10-12 — [Control Pedidos] Pedido simplificado, Fase 1: alta de pedido subiendo todos los archivos de una vez (v12.33.20)
 
-### [Control Pedidos] v12.27.20 — Logo aplicado a todas las cabeceras de email restantes
-- Petición: extender a todos el mismo tratamiento de logo aplicado en
-  v12.27.19 al correo de "Verificación de acceso".
-- Localizadas 6 plantillas de email con cabecera en banda de color +
-  título + (opcional) subtítulo. Solo 3 son estrictamente "navy"
-  (`#0f2044`): Fase 1 a admins, Fase 2 (hecha en v12.27.19) y
-  bienvenida al usuario (ya tenía logo, pero en otra posición —
-  ver abajo). Las otras 3 usan la misma estructura en verde (`#065f46`):
-  alta desde el Organizador, Fase 2 completada, y el aviso compacto
-  "Cuenta creada automáticamente" a admins. Se ha aplicado el mismo
-  patrón a las 6, no solo a las navy, para que todo el sistema de
-  emails quede visualmente consistente.
-- Cabecera del email de bienvenida (única que ya llevaba logo)
-  reconvertida al mismo patrón de tabla de dos columnas: antes el
-  logo iba apilado arriba del título (38px, `margin-bottom`); ahora
-  va a la derecha ocupando la franja completa (64px), igual que el
-  resto.
-- Aviso compacto "Cuenta creada automáticamente" (banda más baja,
-  sin subtítulo) recibe un logo más pequeño (40px) con paddings
-  proporcionalmente más ajustados (10px/20px) para no desbordar esa
-  franja, que es más corta que las demás.
-- `app_url` no estaba definida en el ámbito de la función de "Fase 2
-  completada" (`solicitar_usuario_fase2`) — no hacía falta hasta
-  ahora porque esa plantilla no usaba ninguna URL en el cuerpo del
-  email. Añadida la asignación (`os.environ.get("APP_URL", "")`)
-  justo antes del `body_html` para poder referenciar el logo.
-- Todas las cabeceras usan ahora `<table>` de dos columnas en vez de
-  `<div>` — más fiable en Outlook, que ignora flex/grid.
-- Badge de versión del sidebar actualizado a "V 12.27.20".
+Petición de Víctor: simplificar la creación manual de pedidos para no subir los archivos paso a paso. «Nuevo pedido» (solo comprador/admin) ofrece **Simplificado** o **Paso a paso** (sin cambios). Acordado con Víctor: fechas de solicitud y Vº Bº al inicio; todos los archivos de una vez; análisis sin escribir en BD; tabla editable de destino con «¿Dónde lo coloco?» solo para lo dudoso; con PDF oficial se dan por buenos hotel, departamento, proveedor y fecha de tramitación (= Fecha Pedido) y se pregunta la fecha de entrega, y el estado se elige en la ventana «Pedido cargado correctamente»; sin PDF se pregunta hotel → departamento y se propone estado según la documentación (cotización / firma de Dirección / Vº Bº DG si supera techo). Defaults de Fase 1: presupuesto sin Vº Bº → se pide fecha y documento de envío en la propia pantalla; techo con importe tecleado a mano.
+
+Implementación: `app.py` — `simplificado_analizar` (clasifica PDF oficial reutilizando `_parsear_pdf_pedido_oficial`, presupuestos por palabras clave, correos por asunto, imágenes; máx. 12 archivos; OCR limitado a 2 PDF escaneados por análisis; detecta el pedido existente con `_detectar_pedido_num_duplicado`) y `simplificado_techo` (`_check_techo`, solo consulta). El alta es `POST /api/pedidos` + subida de cada archivo con su tipo por `/api/pedidos/<id>/adjuntos` (mismas validaciones del paso a paso); con PDF oficial el pedido nace en PENDIENTE COTIZACIÓN y se abre la ficha con la ventana de estado. `templates/index.html` — `nuevoPedido()`, asistente `_sp*`, estilos `.sp-*`. Sin migraciones.
+
+Fase 2 (necesita presupuestos de ejemplo de los proveedores más frecuentes): nº de presupuesto y nueva fecha de presupuesto (columna + migración), importe → techo, comparación con el total del pedido. Fase 3: aprendizaje del formato por proveedor, fechas desde correos.
 
 ---
 
-## 2026-07-31 (21)
+## 2026-10-11 — [Control Pedidos] Rol Hotel: se oculta el texto de «adjuntar PDF del pedido oficial» (v12.33.19)
 
-### [Control Pedidos] v12.27.19 — Logo en la cabecera del email de "Verificación de acceso" (Fase 2)
-- Petición: añadir el logo a la cabecera navy del correo "Verificación
-  de acceso" (el que lleva el enlace "Continuar verificación →" tras
-  una solicitud de alta), agrandado y a la derecha de la franja,
-  ocupando su alto.
-- Corregido un matiz sobre el origen de esta plantilla: pese a que en
-  la petición se atribuía a `_email_html_simple()`, ese correo en
-  realidad se construye en `_construir_email_fase2()`, con su propia
-  cabecera fija (`<div style="background:#0f2044...">`), estructuralmente
-  igual a la del email de bienvenida pero sin logo. `_email_html_simple()`
-  no lleva cabecera propia — solo genera el cuerpo (párrafos/botón) que
-  se inserta en la plantilla externa de EmailJS, así que no era el sitio
-  a tocar.
-- Cabecera pasada de `<div>` a una `<table>` de dos columnas (más fiable
-  en clientes de correo tipo Outlook, que ignoran flex/grid): columna
-  izquierda con el título + subtítulo igual que antes, columna derecha
-  con `<img src=".../logo-sidebar.png">` a 64px de alto, alineada a la
-  derecha (`align="right"`, `margin-left:auto`).
-- Alturas de padding cuadradas a propósito entre ambas columnas
-  (texto: `24px 0 24px 28px`; logo: `14px 28px 14px 16px`) para que el
-  logo quede centrado verticalmente y visualmente ocupe la franja
-  completa con un margen de 14px arriba/abajo, en vez de tocar los
-  bordes.
-- Alcance: solo este correo (Fase 2 / verificación de acceso). El
-  resto de plantillas con la misma cabecera navy sin logo (aviso Fase 1
-  a admins, aviso de alta a admins, y las que use en el futuro
-  `_email_html_simple()` si se le añade cabecera propia) se quedan
-  igual, pendientes de que se pida explícitamente.
-- Badge de versión del sidebar actualizado a "V 12.27.19".
+Detectado al actualizar el manual del rol Hotel: el hotel no puede adjuntar el PDF del pedido pero veía sus instrucciones y el enlace «Ver ejemplo» (v12.33.18). Se oculta `#nota-pedido-doc` en la rama de rol Hotel, junto al botón. Comprobado con Playwright como usuario Hotel (el texto ya no aparece; el PDF adjunto sigue visible para consulta). Sin migraciones. Documentos de mantenimiento: no aplica. Manual del rol Hotel actualizado a esta versión.
 
 ---
 
-## 2026-07-31 (20)
+## 2026-10-11 — [Control Pedidos] Imagen de ejemplo del PDF de albarán y de pedido antes de subirlo (v12.33.18)
 
-### [Control Pedidos] v12.27.18 — Aviso de nueva versión: sin cierre sin recargar + cuenta atrás
-- Petición: tras el fix de v12.27.16 (pestañas obsoletas seguían
-  despachando la cola de emails con lógica antigua), reforzar el
-  propio aviso de nueva versión — que no se pueda cerrar sin recargar,
-  y que se recargue sola pasados 5 minutos por si nadie está delante
-  de la pantalla en ese momento.
-- Quitado el botón "Ahora no" del modal — ahora solo queda "↻
-  Recargar ahora". Comprobado que no había backdrop-click ni tecla
-  Escape que lo cerrasen (el listener de Escape ya existente solo
-  afecta a `modal-backup-log` y `modal-restore`, no a este).
-- Eliminada `_cerrarModalVersion()` — era la única vía para
-  descartar el aviso sin recargar (guardaba el hash de versión y
-  ocultaba el modal sin más); sin uso una vez quitado el botón que la
-  llamaba.
-- Nuevo temporizador `_iniciarCuentaAtrasNuevaVersion()`: al mostrar
-  el modal arranca una cuenta atrás de 5:00 minutos visible en el
-  propio aviso (`<strong id="modal-nv-countdown-num">`); al llegar a
-  0:00 llama sola a `_recargarConVersion()`. Guardado contra
-  duplicados (`if (_nvCountdownTimer) return`) por si
-  `_mostrarModalNuevaVersion()` se invoca más de una vez estando ya
-  visible. Se limpia (`clearInterval`) si el usuario recarga a mano
-  antes de que termine la cuenta atrás.
-- Badge de versión del sidebar actualizado a "V 12.27.18"; entrada
-  añadida en `CHANGELOG.md`.
+Petición de Víctor: que cualquier usuario vea cuál es el documento exacto que se espera al subir un albarán (DALI «Compras» → Imprimir → PDF) o el PDF oficial del pedido. Se añaden dos imágenes de ejemplo (`static/ejemplos/`, generadas a partir de PDF reales con usuario y datos de contacto del proveedor tapados y los datos clave numerados) y la ventana `abrirAyudaPdf()` que se muestra antes del selector de archivo, con «No volver a mostrar» (localStorage, en try/catch) y enlaces «Ver ejemplo». Probado con Playwright: ventana del albarán y del pedido (imagen cargada, abre el selector con «Elegir el PDF…», sin ayuda tras marcar «No volver a mostrar», enlace «Ver ejemplo» solo informativo) y la subida del albarán sigue funcionando. Sin migraciones. Documentos de mantenimiento: no aplica. Pendiente opcional: añadir la imagen al manual del rol Hotel / comprador.
 
 ---
 
-## 2026-07-31 (19)
+## 2026-10-11 — [Control Pedidos] Albaranes PDF: cantidades partidas en la celda leídas como 0 (v12.33.17)
 
-### [Control Pedidos] v12.27.16 — Fix: pestañas con versión desactualizada seguían despachando la cola de emails
-- Detectado en pruebas reales: un email de "[FASE 1] Nueva solicitud
-  de acceso" llegó al administrador en texto plano (con separadores
-  `====`), pese a que el usuario confirmó que tanto `app.py` como
-  `index.html` de v12.27.12 ya estaban desplegados (index desplegado
-  primero, app.py después).
-- Causa raíz encontrada revisando `_cerrarModalVersion()`: al pulsar
-  "Ahora no" en el aviso de nueva versión, la pestaña actualiza su
-  hash de versión conocido **sin recargar la página** — deja de
-  avisar de nuevo, pero sigue ejecutando el JS antiguo indefinidamente.
-  Ese correo de Fase 1 se envía automáticamente vía la cola
-  `emails_sistema_pendientes`, despachada por "el primer admin que
-  tenga la app abierta" — si esa pestaña es una que quedó desactualizada,
-  usa la lógica antigua (`cuerpo_text` antes que `cuerpo_html`) sin que
-  nadie se entere.
-- Fix: `_mostrarModalNuevaVersion()` (punto único llamado desde los 4
-  sitios donde se detecta versión nueva: chequeo al cargar, polling
-  cada 30s/60s, `refreshCurrentView`) ahora para el timer del poller
-  de emails de sistema (`_emailsSistemaPollTimer`) en cuanto se
-  dispara — una pestaña obsoleta deja de despachar correos con lógica
-  vieja; la cola queda pendiente para otra pestaña actualizada.
-- No corrige el correo de Fase 1 ya enviado (histórico), solo evita
-  que se repita hacia adelante.
-- Badge de versión del sidebar actualizado a "V 12.27.16"; entrada
-  añadida en `CHANGELOG.md`.
+Problema reportado por Víctor (pedido 00042523, albarán 81988): llegaban 1.008 copas y no se registraba ninguna, seguía figurando que faltaban 1.002; había que registrar las 1.008 e indicar el sobrante. Causa: la cantidad salía en dos líneas dentro de la celda del PDF («1.008,» / «0000»), no se convertía en número, valía 0 y la línea se ignoraba. Corrección: se quitan espacios/saltos de línea de cantidad, precio e importe al leer el albarán, y una cantidad ilegible rechaza el albarán con mensaje en lugar de ignorarse. Probado con el PDF real 81988 y Postgres real + Playwright (1.008 registradas, +6 de sobrante, 10 saleros pendientes, ENTREGA PARCIAL, guardado con detalle en BD); regresión de las pruebas anteriores sin cambios. Sin migraciones. Documentos de mantenimiento: no aplica.
 
 ---
 
-## 2026-07-31 (18)
+## 2026-10-11 — [Control Pedidos] Completar las referencias de un albarán ya registrado sin ellas (v12.33.16)
 
-### [Control Pedidos] v12.27.14 — Logo de empresa en el email de bienvenida
-- Tras confirmar por captura que el email de "cuenta creada" ya
-  llegaba con el HTML completo (cabecera navy, tarjeta de
-  credenciales, botón dorado), se pidió añadir el logo de la empresa.
-- Preguntado el alcance (solo este email vs. las ~5 plantillas con la
-  misma cabecera navy): el usuario eligió limitarlo solo al email de
-  bienvenida.
-- Añadido `<img src="{app_url}/static/logo-sidebar.png">` en la
-  cabecera de `body_html_u`, reutilizando el mismo logo que ya se usa
-  en el sidebar de la app (pensado para fondo navy) y el mismo
-  `app_url` que ya usaba esta función para el botón "Acceder al
-  sistema" — necesario porque un email requiere URL absoluta.
-- Badge de versión del sidebar actualizado a "V 12.27.14"; entrada
-  añadida en `CHANGELOG.md`.
+Problema reportado por Víctor: el albarán 86886 del pedido 00015173 ya estaba guardado sin referencias y al volver a subir el PDF solo decía «ya registrado», sin dejar recargarlo. Corrección: `_entrada_sin_referencias()`; si la entrada está en este pedido pero sin detalle de referencias, el botón del pedido y la carga en lote la completan (sin duplicar la entrada y recalculando el estado); si ya tiene referencias o está en otro pedido, se mantiene el aviso de ya registrado / conflicto. Probado con Postgres real (botón y lote simulado/aplicado, segunda subida → ya registrado) y con Playwright (una sola fila, «1 ref. ✔», guardado con detalle en BD). Sin migraciones. Documentos de mantenimiento: no aplica.
 
 ---
 
-## 2026-07-31 (17)
+## 2026-10-11 — [Control Pedidos] Albaranes PDF: referencias emparejadas por descripción cuando el código no coincide (v12.33.15)
 
-### [Control Pedidos] v12.27.12 — Correos EmailJS en HTML real (antes texto plano)
-- Motivo: los correos vía EmailJS salían en texto plano
-  (`{{message}}`, doble llave) aunque casi todos los endpoints ya
-  construían un `body_html` cuidado con estilos que se descartaba
-  antes de llegar al frontend. El usuario cambió la plantilla EmailJS
-  (`template_1zrv4ze`) a `{{{message}}}` (triple llave, sin escapar,
-  en modo Code editor) para poder aprovecharlo.
-- Backend (`app.py`): 3 endpoints que ya generaban `body_html` /
-  `body_html_u` / `body_html_a` pero no lo devolvían en el JSON ahora
-  sí lo incluyen (fase 2 completada → aviso admin; alta de
-  usuario/admins al aprobar solicitud). Nuevo helper reutilizable
-  `_email_html_simple()` para correos cortos tipo código/enlace, usado
-  en el nuevo `body_html` del código de verificación de login (único
-  caso que no tenía versión HTML previa).
-- Frontend (`index.html`): los 8 puntos que llaman a
-  `enviarEmailJS(...)` pasan a priorizar `body_html`/`cuerpo_html`
-  sobre `body_text`/`cuerpo_text` en el campo `message` (login, reset
-  de contraseña, fase 2, aprobar solicitud ×2, cambios de estado de
-  pedido, preview de alerta manual, cola de emails de sistema).
-- Verificado con capturas reales del usuario: plantilla EmailJS
-  guardada correctamente con triple llave, campos `to_email` /
-  `reply_to` / `bcc` alineados con el payload, y el email de
-  bienvenida llegando ya con el HTML completo (cabecera navy, tarjeta
-  de credenciales, botón).
-- Fix adicional durante la verificación: quitado `white-space:
-  pre-wrap` de la plantilla EmailJS (a petición, editado por el
-  usuario) — con HTML real ese estilo hacía que el navegador respetara
-  también los saltos de línea/indentación "de formato del código
-  fuente" de los f-strings Python, duplicando el espaciado.
-- Badge de versión del sidebar actualizado a "V 12.27.12"; entrada
-  añadida en `CHANGELOG.md`.
+Problema reportado por Víctor (pedido 00015173, albarán 86886): al subir el PDF se rellenaba la entrada pero las referencias no se registraban. Causa: el albarán trae el código interno de DALI (00010049) y el pedido lleva como código la referencia del proveedor (1900658); solo se comparaba el código. Corrección: `_emparejar_linea_albaran()` (código/ref. proveedor → misma descripción normalizada → descripción ≥ 90 % parecida con mismo precio ±0,01), usado en el botón del pedido, en la carga en lote y en la localización del pedido sin «Pedido/s»; las líneas emparejadas por descripción se avisan. Probado con el PDF real 86886 y Postgres real (descripción igual con otro caso/acentos, parecida con mismo precio, parecida con precio distinto → no empareja, sin coincidencia, lote simulado/aplicado, lote sin «Pedido/s» por proveedor) y con Playwright (botón «1 ref. ✔», ENTREGA PARCIAL, guardado y detalle en BD); regresión de las pruebas de v12.33.12–.14 sin cambios. Sin migraciones. Documentos de mantenimiento: no aplica.
 
 ---
 
-## 2026-07-31 (16)
+## 2026-10-11 — [Control Pedidos] Carga de albaranes PDF en lote y ciclo completo desde el pedido (v12.33.14)
 
-### [Control Pedidos] Verificación end-to-end del backup automático EmailJS — cerrado
-- v12.27.10 desplegada y confirmada en el panel Admin → Config
-  Alertas → EmailJS: cuenta 1 (principal) en uso con sus 3
-  credenciales correctas, cuenta 2 (backup) rellena con la cuenta
-  EmailJS anterior (`service_dwwha2g` / `template_krpvmda` /
-  `WCiU7q8WT1i8AQTbR`).
-- Prueba real solicitada al usuario: envío de una notificación real
-  desde Alertas → el contador subió de 8 a 9 correctamente,
-  confirmando que `enviarEmailJS()` + `/api/emailjs/registrar-envio`
-  funcionan de punta a punta en producción (no solo la pantalla).
-- Asunto cerrado: backup automático de cuenta EmailJS (contador,
-  cambio bidireccional 1↔2 con reinicio, panel de administración e
-  Integridad) queda dado por bueno en producción.
+Petición de Víctor: desde «Confirmar albaranes sueltos» (admin) cargar varios albaranes a la vez, completando todo el ciclo (pedido, entrada, referencias, estado, historial, avisos, cruce con SAP); desde el pedido lo mismo para compras/hotel (admin en todos); un albarán ya registrado no se duplica y, si está en un pedido erróneo, se avisa para que el usuario decida. Nuevo `POST /api/albaranes/cargar-lote` (simula o aplica), `POST /api/pedidos/<id>/registrar-albaran-sap`, detección de albarán ya registrado (`_pedidos_con_albaran`) en el lote y en el botón del pedido, y nueva ventana de revisión/aplicación. Probado con el PDF real del albarán 87343 y Postgres real: simulación sin escribir, aplicación, re-subida (ya registrado), pedido completo (ENTREGADO), hotel equivocado, albarán en pedido erróneo, sin «Pedido/s» (único/ambiguo/conflicto), dos albaranes del mismo pedido en una carga y ficheros no PDF; y con Playwright (ventana de lote, botón del pedido, guardado y confirmación en el cruce con SAP). Sin migraciones. Documentos de mantenimiento: no aplica.
 
 ---
 
-## 2026-07-31 (15)
+## 2026-10-11 — [Control Pedidos] Hoteles duplicados en el filtro de Pedidos (v12.33.13)
 
-### [Control Pedidos] v12.27.10 — Backup EmailJS bidireccional + reinicio de contador
-- El usuario confirmó los datos de v12.27.8 (cuenta 1 activa,
-  contador en 8) y aportó una cuenta 2 de backup ya existente (otra
-  cuenta EmailJS previa: `service_dwwha2g` / `template_krpvmda` /
-  Public Key `WCiU7q8WT1i8AQTbR`), aclarando que el contador debe
-  reiniciarse a 0 en cada cambio — "siempre empieza en 1 y termina en
-  195".
-- `POST /api/emailjs/registrar-envio` corregido: antes solo cambiaba
-  1→2 una vez y nunca reiniciaba el contador (seguía subiendo por
-  encima de 195 indefinidamente tras el cambio). Ahora:
-  - El cambio es bidireccional — calcula `destino = 2 if activa==1
-    else 1` y cambia a esa cuenta sea cual sea la activa.
-  - El contador se reinicia a `0` en la misma transacción del
-    cambio, para que la cuenta recién activada empiece su propio
-    ciclo de 1 a 195.
-  - Pensado para funcionar como round-robin continuo entre las 2
-    cuentas: cuando la segunda también llegue al umbral, lo normal es
-    que la primera ya se haya renovado del lado de EmailJS (ciclo
-    gratuito mensual), y vuelva a servir de backup.
-- Comprobación de Integridad (`_validar_integridad_operativa`)
-  generalizada del mismo modo: en vez de asumir siempre "activa=1,
-  backup=2", calcula `_otra = 2 if _activa==1 else 1` y evalúa la
-  completitud de las credenciales de esa cuenta, sea cual sea.
-- Nota del panel Admin → Config Alertas → EmailJS actualizada
-  ("rellena ambas cuentas... cambia a la OTRA cuenta... reinicia el
-  contador a 0").
-- Nota: las credenciales reales de las 2 cuentas ya confirmadas por
-  el usuario NO se tocan por migración (viven como datos ya
-  existentes en la base de datos de producción, con
-  `ON CONFLICT DO NOTHING`) — se rellenan/confirman directamente
-  desde el panel de administración ya construido en v12.27.8.
-- Badge de versión del sidebar actualizado a "V 12.27.10"; entrada
-  añadida en `CHANGELOG.md`.
+Hallazgo de Víctor: cada hotel salía dos veces en el desplegable de filtro de Pedidos. `loadMaestros()` añadía opciones a `f-hotel`/`f-estado`/`f-depto` sin vaciarlos, y se ejecuta de nuevo al volver a entrar sin recargar la página. Ahora se vacían antes de rellenarlos. Probado con Playwright (3 cargas seguidas, mismo número de opciones). Solo frontend; sin migraciones. Documentos de mantenimiento: no aplica.
 
 ---
 
-## 2026-07-31 (14)
+## 2026-10-11 — [Control Pedidos] Subir el PDF de un albarán y rellenar la entrada solo (v12.33.12)
 
-### [Control Pedidos] v12.27.8 — Backup automático de cuenta EmailJS
-- Motivo: a raíz de haberse quedado sin cuota EmailJS (200/mes) a
-  mitad de ciclo por exceso de pruebas — se pidió un recuento de
-  correos enviados que, al llegar a 195 (5 antes del límite), cambie
-  solo las 3 credenciales para que los envíos sigan sin cortarse,
-  dejando constancia del cambio en Integridad.
-- Nuevas claves en `config_alertas` (grupo `emailjs`, migración
-  `ON CONFLICT DO NOTHING`): `emailjs_public_key_1/2`,
-  `emailjs_service_id_1/2`, `emailjs_template_id_1/2` (cuenta 1 =
-  activa por defecto, inicializada con las credenciales ya en uso en
-  producción; cuenta 2 = backup, vacía hasta que el admin la rellene),
-  `emailjs_cuenta_activa`, `emailjs_contador`, `emailjs_umbral_cambio`
-  (195 por defecto) y `emailjs_cambio_automatico_en`.
-- `GET /api/emailjs/config` (sin login, igual que antes con las
-  constantes hardcodeadas — el public key ya era público de por sí):
-  credenciales de la cuenta activa + contador/umbral, para que el
-  frontend inicialice `emailjs.init()` dinámicamente.
-- `POST /api/emailjs/registrar-envio` (con login): incrementa el
-  contador de forma atómica (`UPDATE ... RETURNING`, sin razas entre
-  usuarios concurrentes). Si se alcanza el umbral con la cuenta 1
-  activa y la cuenta 2 tiene las 3 credenciales completas, cambia a
-  la cuenta 2 y registra la fecha (`pytz Atlantic/Canary`, mismo
-  criterio de zona horaria que el resto de la app). Si la cuenta 2 no
-  está lista, NO cambia — para no dejar la app sin poder enviar — y
-  se marca como aviso urgente en Integridad.
-- Frontend: `emailjs.init()` en `<head>` ahora es asíncrono
-  (`window._emailjsCfgReady`), cargado desde `/api/emailjs/config` en
-  vez de una Public Key fija. Nuevo helper central `enviarEmailJS()`
-  que sustituye a las 9 llamadas directas a
-  `emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, ...)` — tras
-  cada envío correcto llama a `/api/emailjs/registrar-envio` y, si el
-  backend indica que hubo cambio de cuenta, reinicializa
-  `emailjs.init()` con la nueva Public Key sobre la marcha (sin
-  recargar la página) para que el resto de envíos de esa misma sesión
-  ya usen la cuenta nueva.
-- Admin → Config Alertas: nuevo panel especial "📧 EmailJS — cuentas
-  y backup automático" (renderizado aparte del bucle genérico
-  numero/bool, porque necesita campos de texto) — barra de progreso
-  contador/umbral, cuenta activa, y las 3 credenciales de cada una de
-  las 2 cuentas en cajas separadas; reutiliza el mismo
-  `saveConfigAlertas()` genérico (ya recogía cualquier
-  `input[id^="cfg_"]`, sin cambios ahí).
-- Admin → Integridad: nueva clave `emailjs` en
-  `_validar_integridad_operativa()` con 3 posibles avisos (cambio ya
-  realizado / umbral alcanzado sin backup — crítico / cerca del
-  umbral sin backup — aviso), y su tarjeta correspondiente en el
-  panel visual ("📧 Cuenta EmailJS", gravedad dinámica según el tipo
-  de aviso).
-- Badge de versión del sidebar actualizado a "V 12.27.8"; entrada
-  añadida en `CHANGELOG.md`.
+Petición de Víctor: botón para subir el PDF del albarán que la aplicación interprete y rellene Nº de entrada, fecha, base imponible y referencias; que verifique que corresponde al pedido (por «Pedido/s» o, si no lo trae, por las referencias) y marque ENTREGADO si completa el pedido o ENTREGA PARCIAL si no, manteniendo el modo manual. Nuevo endpoint de solo lectura `POST /api/pedidos/<id>/leer-albaran-pdf` (reutiliza el lector de «Confirmar un albarán suelto») y botón «📎 Subir albarán PDF» en la ficha: aplica el resultado sobre el formulario con el mismo tratamiento que una entrada manual (detalle de referencias, «Entrada final», avisos de faltantes/sobrantes y de diferencia de importe); no guarda hasta «Guardar». Probado con el PDF real del albarán 87343 y con Postgres real (pedido coincidente, pedido distinto, sin pedido en el PDF con y sin referencias incluidas, pedido completo y parcial). Documentos revisados (`GUIA_DESPLIEGUE.md`, `PENDIENTES.md`, `INSTRUCCIONES_RESTAURACION.md`): no aplica; sin migraciones.
 
 ---
 
-## 2026-07-31 (13)
+## 2026-10-10 — [Control Pedidos] Los pedidos eliminados no se recrean con las altas automáticas (v12.33.11)
 
-### [Control Pedidos] v12.27.6 — Correos por hotel: invertido el criterio por defecto
-- Petición: tras implementar v12.27.4, el usuario pidió invertir el
-  planteamiento — que cada contacto nazca con TODOS los hoteles
-  marcados (en vez de ninguno = "general" invisible), y que el admin
-  desmarque los que no le correspondan. Y que los contactos que ya
-  existen en este momento queden marcados así automáticamente, sin
-  tener que hacerlo uno por uno a mano.
-- Migración automática añadida junto a la de v12.27.4 (misma sección
-  del arranque, ejecutada en cada deploy pero solo con efecto la
-  primera vez): `INSERT ... SELECT pc.id, h.id FROM
-  proveedor_contactos pc CROSS JOIN hoteles h WHERE NOT EXISTS
-  (SELECT 1 FROM proveedor_contacto_hoteles WHERE contacto_id=pc.id)`
-  — marca todos los hoteles a cada contacto que a día de hoy no tenga
-  ninguna fila en `proveedor_contacto_hoteles`, es decir, todos los
-  contactos existentes (la función es nueva, nadie ha marcado nada
-  todavía). Es idempotente por construcción: un contacto que ya tenga
-  al menos una fila (porque se restringió a mano después) queda fuera
-  del `NOT EXISTS` y no se vuelve a tocar.
-- Frontend (`_pvFillContactoHoteles`): cuando un contacto no tiene
-  ninguna restricción guardada (`selected.length === 0` — contacto
-  nuevo, o caso residual), las casillas de hoteles se muestran ahora
-  TODAS marcadas por defecto, en vez de todas vacías. Si ya tiene una
-  selección guardada, se respeta tal cual sin cambios.
-- Textos de ayuda actualizados (cabecera "Contactos" y por-fila) para
-  reflejar "desmarca los que no le correspondan" en vez de "vacío =
-  general".
-- Sin cambios en `_get_proveedor_emails_principales()` ni en el
-  guardado de contactos — ya guardaban correctamente lo que estuviera
-  marcado; solo cambiaba qué se veía marcado por defecto en pantalla,
-  y ahora además hay datos reales en BD para los contactos ya
-  existentes en vez de depender del fallback implícito.
-- Badge de versión del sidebar actualizado a "V 12.27.6"; entrada
-  añadida en `CHANGELOG.md`.
+Petición de Víctor: la carga automática de listados SAP volvía a dar de alta pedidos que ya se habían eliminado (ej. 00041455). Ahora `pedidos_eliminados` guarda también `hotel_id` (rellenado en los registros antiguos), el detector `_pedidos_sap_no_registrados()` excluye los eliminados del hotel, `_crear_pedidos_sap_lote()` los omite con el motivo y la carga unificada avisa de cuáles se han saltado. Alta manual e importación Excel sin cambios. Archivos: `app.py`, `templates/index.html` (solo insignia), `CHANGELOG.md`, este historial, `README.md`. Revisado: `GUIA_DESPLIEGUE.md`, `PENDIENTES.md`, `INSTRUCCIONES_RESTAURACION.md`, `docs/hallazgo-seguridad-princess.md` — no aplica.
 
 ---
 
-## 2026-07-31 (12)
+## 2026-10-10 — [Control Pedidos] Ordenar «Referencias de la entrada» por columnas (v12.33.10)
 
-### [Control Pedidos] v12.27.4 — Correos específicos por hotel en contactos de proveedor
-- Petición: poder asignar en la ficha de un proveedor uno o varios
-  hoteles a cada contacto, para que las reclamaciones automáticas
-  vayan al contacto responsable del hotel del pedido en concreto (no
-  a todos los principales generales del proveedor a la vez),
-  manteniendo la copia al comprador de ese hotel (ya existía desde
-  antes, sin cambios).
-- Nueva tabla `proveedor_contacto_hoteles` (contacto_id, hotel_id, PK
-  compuesta, ON DELETE CASCADE en ambos sentidos) — migración
-  incremental en `app.py` (CREATE TABLE IF NOT EXISTS) y definición en
-  `models.py` para instalaciones nuevas.
-- `_get_proveedor_emails_principales(proveedor_id, hotel_id=None)`:
-  si se pasa `hotel_id` y hay contactos ★ principal asignados
-  específicamente a ese hotel, se usan SOLO esos; si no hay ninguno
-  (o no se pasa hotel_id), cae al comportamiento de siempre —
-  contactos principales SIN ningún hotel asignado (generales). Un
-  contacto sin filas en la tabla nueva sigue siendo general.
-- Actualizados los 5 puntos donde se llama a esa función para pasar
-  también `pedido.get("hotel_id")` (o el hotel_id calculado en el
-  caso de la validación al pasar a ENVIADO AL PROVEEDOR, que antes
-  solo se calculaba dentro de un `if` de techo de gastos — ahora se
-  calcula siempre que hace falta).
-- `_prov_with_contactos()` (listado de proveedores) ahora también
-  devuelve `hotel_ids` por contacto (array_agg vía subconsulta
-  correlacionada). `create_proveedor()` y `update_proveedor()`
-  guardan los `hotel_ids` de cada contacto tras el INSERT (usando el
-  id devuelto por `RETURNING id`) — el patrón de "borrar y
-  reinsertar todos los contactos" que ya usaba la ficha se mantiene
-  igual, y el `ON DELETE CASCADE` limpia solo la tabla nueva.
-- Frontend: cada fila de contacto en la ficha de proveedor tiene ahora
-  una sección "🏨 Hoteles asignados a este contacto" con checkboxes
-  de todos los hoteles (cargados una vez, cacheados en
-  `_pvHotelesCache`, vía `/api/maestros`); vacío = general. La tabla
-  de listado de proveedores muestra un indicador 🏨 con los códigos
-  de hotel cuando un contacto tiene alguno asignado. Añadida nota
-  explicativa sobre el comportamiento junto al título "Contactos".
-- Badge de versión del sidebar actualizado a "V 12.27.4"; entrada
-  añadida en `CHANGELOG.md`.
+Petición de Víctor: al pulsar el título de una columna de la ventana de referencias de una entrada se ordena (texto A→Z / Z→A, números mayor→menor / menor→mayor, ☑ marcadas primero). Solo reordena las filas en pantalla, sin tocar cantidades ni lo guardado; vacíos («—») siempre al final y orden original a igualdad. Archivos: `templates/index.html`, `CHANGELOG.md`, este historial, `README.md`. Revisado: `GUIA_DESPLIEGUE.md`, `PENDIENTES.md`, `INSTRUCCIONES_RESTAURACION.md`, `docs/hallazgo-seguridad-princess.md` — no aplica.
 
 ---
 
-## 2026-07-31 (11)
+## 2026-10-10 — [Control Pedidos] Silencio total de avisos durante la actualización de la base de datos (v12.33.09)
 
-### [Control Pedidos] v12.27.2 — Correo interno de cambio de estado mejorado
-- Petición: el correo interno de cambio de estado (mostrado con
-  captura real de un ENTREGADO) llegaba muy básico — se pidió
-  redacción más cuidada/profesional, extenderlo también a ENVIADO AL
-  PROVEEDOR (antes solo cubierto por el BCC del correo externo, sin
-  aviso interno propio), y que indique el nombre del usuario que
-  realizó el cambio (dato que nunca debe salir en el correo al
-  proveedor).
-- `enviar_emails_estado()` ahora acepta `usuario_nombre` — se pasa
-  desde `_notificar_cambio_estado()` (cambios manuales, ya recibía
-  `usuario_nombre` para Telegram pero no lo pasaba a los emails) y
-  desde `create_pedido()` (alta directa en un estado con correo
-  interno, usando `session.get("nombre")`). Se añade como línea
-  "Realizado por:" en el correo interno (HTML y texto), solo si hay
-  nombre disponible.
-- Quitada la exclusión de ENVIADO AL PROVEEDOR del bloque de correo
-  interno (antes `ESTADOS_EMAIL_INTERNO - ESTADOS_EMAIL_PROVEEDOR`,
-  ahora directamente `ESTADOS_EMAIL_INTERNO`, que ya lo incluía) —
-  para ese estado ahora se envían DOS correos: el externo al
-  proveedor (con BCC a los internos, sin cambios) y este interno
-  nuevo, dirigido solo a comprador(es) + usuario(s) hotel.
-- Redacción del cuerpo: icono por estado en asunto y cabecera (📤
-  enviado al proveedor, 📦 entrega parcial, ✅ entregado, ❌
-  cancelado), separador visual (línea de guiones), secciones "📋
-  Datos del pedido" y "📦 [histórico de entregas]" cuando aplica, pie
-  de aviso automático al final. Aplicado igual en `body_text_i` (el
-  que realmente se entrega, ya que EmailJS usa `cuerpo_text ||
-  cuerpo_html`) y en `body_html_i`.
-- Destinatarios sin cambios — `_todos_internos` ya combinaba
-  compradores + usuarios hotel del hotel del pedido (con soporte de
-  `email2` desde v12.25.8); simplemente ahora también se usa para
-  ENVIADO AL PROVEEDOR.
-- Probado con datos de ejemplo (Pedido 23979, TUI Blue Suite Princess)
-  reproduciendo el caso de la captura — salida verificada limpia y
-  bien estructurada.
-- Badge de versión del sidebar actualizado a "V 12.27.2"; entrada
-  añadida en `CHANGELOG.md`.
+Petición de Víctor: la pausa del job diario no frenaba los avisos de cambio de estado (correo/Telegram/popup), que salían al instante durante las cargas masivas. Nueva casilla «SILENCIO TOTAL» (`silencio_total_avisos`, Parámetros de Alertas) que corta todos los canales en sus puntos únicos de salida y en el despacho de la cola, detiene los jobs de alertas, descarta al activarla lo ya encolado y muestra un aviso rojo fijo a los administradores. Excepciones: solicitudes de acceso, resúmenes enviados a mano, códigos/restablecimiento de contraseña y alertas del propio sistema (consumo, salud). Archivos: `app.py`, `templates/index.html`, `CHANGELOG.md`, este historial, `README.md`. Revisado: `GUIA_DESPLIEGUE.md`, `PENDIENTES.md`, `INSTRUCCIONES_RESTAURACION.md`, `docs/hallazgo-seguridad-princess.md` — no aplica.
 
 ---
 
-## 2026-07-31 (10)
+## 2026-10-10 — [Control Pedidos] Departamento distinto al del PDF oficial: se pregunta cuál dejar (v12.33.08)
 
-### [Control Pedidos] v12.27.0 — El email de usuario no debe bloquear el guardado
-- Corrección sobre v12.25.8: el usuario aclaró que la ficha de usuario
-  SÍ debe poder guardarse sin email — la falta de email en
-  compradores/admins activos ya se detecta y avisa en Admin →
-  Integridad (`_validar_integridad_operativa()`, claves
-  `compradores_sin_email` / `admins_sin_email`), así que bloquear el
-  guardado era redundante e innecesariamente restrictivo. Además, un
-  admin debe poder dejar el email vacío A PROPÓSITO como forma de
-  anular el envío de correos a un usuario concreto sin tener que
-  desactivar la cuenta entera.
-- Quitada la validación "El email es obligatorio" tanto en
-  `/api/usuarios` (POST `create_usuario` y PUT `update_usuario`) como
-  en `saveUsuario()` del frontend.
-- Ficha de usuario: quitado el asterisco de obligatorio del campo
-  Email, añadida nota explicando que dejarlo vacío anula los envíos a
-  ese usuario y que Integridad lo señalará como aviso informativo si
-  corresponde (sin bloquear nada).
-- `email2` no se ve afectado por este cambio, sigue opcional sin
-  ninguna validación.
-- Badge de versión del sidebar actualizado a "V 12.27.0"; entrada
-  añadida en `CHANGELOG.md`.
+Pregunta «PDF o indicado a mano» al subir el PDF y al enviar al proveedor; columna `departamento_pdf_aceptado_id` y endpoint `/api/pedidos/<id>/departamento-pdf`; la validación del backend respeta la decisión. Detalle y pruebas en `CHANGELOG.md` (v12.33.08). Documentos revisados: `GUIA_DESPLIEGUE.md`, `PENDIENTES.md`, `INSTRUCCIONES_RESTAURACION.md` — no aplica (la columna se crea sola al arrancar).
 
 ---
 
-## 2026-07-31 (9)
+## 2026-10-09 — [Control Pedidos] Candado anti-duplicados de Nº de pedido en la base de datos (v12.33.07)
 
-### [Control Pedidos] v12.25.8 — Segundo email opcional por usuario
-- Petición: poder asignar en la ficha de usuarios un segundo email
-  (opcional, el primero sigue siendo obligatorio), de forma que cuando
-  un comprador tenga los 2 asignados, todos los correos que se envíen
-  sobre sus hoteles lleguen a ambos — pero que la firma de los correos
-  salientes siga usando solo el primero.
-- Nueva columna `email2` en `usuarios` (migración `ALTER TABLE ... ADD
-  COLUMN IF NOT EXISTS`, más la definición de tabla actualizada en
-  `models.py` para instalaciones nuevas).
-- Nuevo helper `_emails_usuario(u)` → devuelve `[email]` o `[email,
-  email2]` sin duplicados; usado exclusivamente para listas de
-  destinatarios, nunca para la firma.
-- Actualizados los 6 puntos donde se construían listas de
-  destinatarios a partir de compradores para que incluyan `email2`
-  cuando exista:
-  1. BCC del correo de confirmación de recepción al proveedor
-     (`_emails_compradores` en el flujo de cambio de estado)
-  2. Destinatarios de `_encolar_aviso_cotizacion_sin_proveedor()`
-  3. Destinatarios de `_encolar_aviso_firma_pendiente_auto()`
-  4. CC de `_encolar_reclamacion_proveedor_auto()`
-  5. TO/CC del endpoint manual `/api/alertas/<id>/email-preview`
-  6. CC recalculado en backend de `/api/alertas/<id>/enviar-email`
-     (comparando contra el conjunto de direcciones ya en el TO, no
-     solo una — el TO puede traer 2 direcciones si el destinatario
-     interno tiene email2)
-- `_get_compradores_hotel()` y `_get_todos_usuarios_hotel()`
-  (compradores) ahora seleccionan también `email2` en su SQL.
-- API `/api/usuarios`: `email` obligatorio (validado en POST y PUT,
-  error 400 si viene vacío), `email2` opcional; el listado GET
-  devuelve también `email2`.
-- Frontend: nuevo campo "Email 2 (opcional)" en la ficha de usuario
-  con nota explicativa; el email principal se marca como obligatorio
-  (`Email *`) con validación también en el propio formulario antes de
-  guardar. La tabla de usuarios muestra el segundo email debajo del
-  principal cuando existe.
-- Badge de versión del sidebar actualizado a "V 12.25.8"; entrada
-  añadida en `CHANGELOG.md`.
+Índice único (hotel, Nº de pedido normalizado) creado al arrancar si no hay duplicados; comprobación previa en la creación automática y en la importación Excel; manejador global 409. Detalle y pruebas en `CHANGELOG.md` (v12.33.07). Documentos revisados: `GUIA_DESPLIEGUE.md`, `PENDIENTES.md`, `INSTRUCCIONES_RESTAURACION.md` — no aplica (no cambia despliegue ni restauración; el índice se crea solo).
 
 ---
 
-## 2026-07-31 (8)
+## 2026-10-09 — [Control Pedidos] Departamento de los pedidos automáticos desde SAP (v12.33.06)
 
-### [Control Pedidos] v12.25.6 — La firma corporativa se quedó a medias en 2 plantillas
-- Reportado con capturas reales de Gmail (carpeta Enviados de
-  `controlpedidosprincess.canarias@gmail.com`) tras confirmar v12.25.4
-  desplegada: el espaciado ya salía limpio (arreglo de v12.25.4 OK),
-  pero la firma de un correo de "Solicitud de cotización" seguía en
-  formato antiguo ("Nombre / email · Móvil: xxx"), sin "Dpto. Central
-  de Compras Canarias" ni la dirección — el cambio de v12.25.0 no
-  había llegado del todo.
-- Causa encontrada revisando el código: al aplicar la firma
-  corporativa en v12.25.0, el reemplazo masivo (script Python contando
-  3 ocurrencias) solo sustituyó el BLOQUE DE VISUALIZACIÓN final
-  (quitar "Dpto. Central de Compras Princess en Canarias" / "Princess
-  Hotels & Resorts" duplicados antes de `{_firma_contacto}`), pero NO
-  tocó la construcción de la variable `_firma_contacto` en sí en 2 de
-  las 3 plantillas — solo `_email_template_enviado_proveedor` se
-  actualizó a `_firma_comprador_html()` explícitamente en ese momento;
-  `_email_template_entrega_parcial` y
-  `_email_template_pendiente_cotizacion` conservaban la construcción
-  manual antigua (`· Móvil:`), que seguía compilando sin dar ningún
-  error — por eso no se detectó hasta ver un correo real.
-- Corregido: las 3 plantillas usan ahora
-  `_firma_comprador_html(comprador_nombre, comprador_email,
-  comprador_movil)` de forma consistente. Verificado con `grep` que no
-  queda ningún "· Móvil:" en `app.py`.
-- Badge de versión del sidebar actualizado a "V 12.25.6"; entrada
-  añadida en `CHANGELOG.md`.
+- **Corrección**: `_completar_departamentos_sap_hotel` asigna el departamento (código del listado o de las líneas del detallado) a los pedidos automáticos que lo tengan vacío; se llama en alta, carga, regularización y apertura; avisos de lo que quede sin departamento.
 
 ---
 
-## 2026-07-31 (7)
+## 2026-10-09 — [Control Pedidos] Corrección datetime/float en tareas de carga SAP (v12.33.05)
 
-### [Control Pedidos] v12.25.4 — Líneas en blanco duplicadas en correos automáticos
-- Reportado con una captura de un correo real de Entrega Parcial (56
-  días, Cocina): llegaba con líneas en blanco entre casi cada dato
-  (Pedido Nº, Hotel, Departamento, Estado actual...) — "muy
-  desorganizado" — pero SIN línea en blanco entre "Días transcurridos"
-  y "Observaciones", pista clave para dar con la causa.
-- Causa: `_html_a_texto_plano()` (fallback que convierte `body_html` a
-  texto plano cuando no hay `cuerpo_text` explícito — reclamación
-  automática al proveedor, aviso de firma pendiente, aviso de
-  cotización sin proveedor) no neutralizaba los saltos de línea/
-  indentación que trae el propio código fuente Python (las plantillas
-  son f-strings multilínea) antes de insertar sus propios saltos de
-  línea al convertir `<br>`/`</p>` — el resultado eran saltos dobles
-  en casi todas partes, salvo en el único `<br>` que estaba en la
-  misma línea de código que el texto siguiente (el caso de
-  Observaciones, que no tenía el salto de línea "extra" del código
-  fuente porque no hay ninguno ahí).
-- Corregido: ahora se colapsa TODO el espacio en blanco crudo del HTML
-  de entrada a un único espacio antes de insertar los saltos de línea
-  con significado (igual que hace un navegador). `</p>`/`</div>`/
-  `</h1-6>` → línea en blanco; `<br>`/`</tr>`/`</li>` → salto simple.
-  Probado localmente contra un HTML equivalente al del correo real
-  reportado — resultado limpio.
-- Nota para el usuario: la firma que aparecía en esa misma captura
-  (sin "Dpto. Central de Compras Canarias" ni dirección, formato
-  "email · Móvil: xxx") es la firma ANTIGUA, de antes de v12.25.0 —
-  indica que el `app.py` desplegado en Render en ese momento aún no
-  incluía el cambio de firma corporativa; pendiente de confirmar con
-  el usuario si ya se ha redesplegado desde entonces.
-- Badge de versión del sidebar actualizado a "V 12.25.4"; entrada
-  añadida en `CHANGELOG.md`.
+- **Corrección**: `regularizar_sap` guardaba `creado_en` como `datetime`; ahora `time.time()` y purga de tareas antiguas, como el resto de cargas.
 
 ---
 
-## 2026-07-31 (6)
+## 2026-10-09 — [Control Pedidos] Regularizar con lo ya guardado en la base de datos, sin PDF (v12.33.04)
 
-### [Control Pedidos] v12.25.2 — Cambio de cuenta EmailJS por agotamiento de cuota
-- Motivo: la cuenta EmailJS anterior (Service ID `service_dwwha2g`)
-  quedó a 5 peticiones de agotar el límite gratuito de 200/mes, con
-  15 días aún por delante hasta el reset del ciclo (14 agosto) —
-  muchas pruebas y ajustes de la app consumieron la cuota.
-- Se guió al usuario paso a paso para crear una cuenta EmailJS nueva
-  e independiente (contador propio desde 0): conectar el mismo Gmail
-  `controlpedidosprincess.canarias@gmail.com` como servicio, crear una
-  plantilla nueva replicando los campos que la app ya manda en sus
-  llamadas `emailjs.send(...)` (destinatarios: `to_email`, `bcc`,
-  `reply_to`; contenido: `{{subject}}` y `{{message}}`, con
-  `white-space: pre-wrap` para respetar los saltos de línea del texto
-  plano), y obtener Public Key / Service ID / Template ID.
-- Credenciales actualizadas en `templates/index.html`:
-  - Public Key: `WCiU7q8WT1i8AQTbR` → `bxFzHypsIrNqcDh15`
-  - Service ID: `service_dwwha2g` → `service_shvrzuv`
-  - Template ID: `template_krpvmda` → `template_1zrv4ze`
-- La cuenta anterior no se elimina — queda como reserva con su propio
-  ciclo de reset.
-- Badge de versión del sidebar actualizado a "V 12.25.2"; entrada
-  añadida en `CHANGELOG.md`.
+- **Novedad**: `POST /api/sap/regularizar` + botón en «Cargar listados SAP»; `_cargar_listados_sap_logica` admite `archivos=[]`; `_cruce_lineas_sap_hotel(solo_detalle=True)` y `_aplicar_cruce_lineas_pedido(solo_detalle=True)` completan el detalle de entradas de pedidos ya registrados; relleno de líneas al abrir un pedido antiguo.
 
 ---
 
-## 2026-07-31 (5)
+## 2026-10-09 — [Control Pedidos] Líneas de SAP en los pedidos creados solos; PDF oficial opcional (v12.33.03)
 
-### [Control Pedidos] v12.25.0 — Firma corporativa estándar en los correos
-- Petición: sustituir la firma de los correos con firma de comprador
-  por el formato corporativo que ya se usa en otros correos de la
-  empresa (captura de pantalla de una firma real): nombre, "Dpto.
-  Central de Compras Canarias", línea en blanco, dirección física
-  (Av. Touroperador Tui, s/n — 35100 Maspalomas, Gran Canaria),
-  teléfono con prefijo (+34) y email — cambiando nombre/teléfono/
-  email por los del comprador correspondiente en cada envío.
-- Nuevas funciones compartidas `_firma_comprador_html()` /
-  `_firma_comprador_text()` — departamento y dirección fijos; nombre,
-  (+34) móvil y email variables según el comprador que firma (se
-  omiten sin dejar hueco si falta nombre o móvil).
-- Sustituye la firma en los 4 puntos que ya la llevaban: correo de
-  confirmación de recepción al proveedor, y las plantillas
-  `_email_template_enviado_proveedor`, `_email_template_entrega_parcial`
-  y `_email_template_pendiente_cotizacion` (esta última reutilizada
-  también por la reclamación automática al proveedor). Se quitan las
-  líneas duplicadas "Dpto. Central de Compras Princess en Canarias" /
-  "Princess Hotels & Resorts" que había antes de la firma, y se
-  mantiene solo "Atentamente," como saludo de cierre.
-- Los avisos internos al comprador (firma pendiente, cotización sin
-  proveedor) NO llevan firma personal (van como "Mensaje automático
-  generado por el sistema") — sin cambios ahí, no aplicaba.
-- Badge de versión del sidebar actualizado a "V 12.25.0"; entrada
-  añadida en `CHANGELOG.md`.
-- Pendiente si se quiere ir más allá: la cabecera de color de esos
-  mismos correos sigue diciendo "Dpto. Central de Compras **Princess
-  en** Canarias" (ligeramente distinto al texto de la firma nueva,
-  "Dpto. Central de Compras Canarias") — no se tocó por no ser parte
-  de la firma pedida, pero queda anotado por si se quiere unificar.
+- **Novedad**: `_volcar_lineas_sap_hotel` copia a `pedido_lineas` (origen='sap') las líneas del listado detallado en pedidos sin PDF; panel de líneas y nota «PDF opcional» en la ficha; `_validar_pedido_envio_proveedor` y `savePedido` no exigen el PDF a pedidos creados por «Carga automática SAP».
 
 ---
 
-## 2026-07-31 (4)
+## 2026-10-09 — [Control Pedidos] Avisos de error del formulario de pedidos: persistentes y con detalle (v12.33.02)
 
-### [Control Pedidos] v12.23.8 — Aviso automático al comprador en Pendiente Firma Compras/Hotel
-- Petición: que Pendiente Firma Dirección Compras y Pendiente Firma
-  Dirección Hotel también avisen automáticamente por email al
-  comprador de lo que está pendiente, igual que ya se hizo con
-  Pendiente Cotización.
-- Se preguntó explícitamente con qué criterio disparar el email, dado
-  que estos dos estados tienen el umbral "Urgente" en 0 = nunca por
-  defecto (a diferencia de Enviado al Proveedor / Entrega Parcial /
-  Pendiente Cotización, donde si tiene sentido). Se decidió: mismo
-  criterio que ya usa el Telegram automático para estos dos estados
-  (1ª alerta + repetición por ciclo, sin exigir "urgente").
-- Nueva función `_encolar_aviso_firma_pendiente_auto()`, llamada desde
-  `_job_alertas_diarias_inner()` justo cuando también se envía el
-  Telegram automático (mismo disparo, sin ciclo de dedup propio).
-  Bajo el mismo interruptor maestro que el resto de avisos
-  automáticos por email (`activar_reclamacion_proveedor_auto`) —
-  reetiquetado en el panel admin porque ya no es solo "reclamación a
-  proveedor" (migración `UPDATE`, no `ON CONFLICT`, porque la fila ya
-  existía en producción).
-- Reutiliza `_email_template_pendiente_firma()` (antes solo se usaba
-  en la propuesta manual del panel) — un único envío con todos los
-  compradores del hotel juntos en "Para:". Ajustada la frase de cierre
-  ("gestione con Dirección de Compras/Hotel la revisión y firma...")
-  para que tenga sentido yendo al comprador, que no es quien firma.
-- `_ya_reclamado_hoy_manual()` generalizada con parámetro `tipo`
-  (antes fija a `alerta_proveedor`) — ahora también acepta
-  `alerta_interno`, para que el aviso automático no duplique un envío
-  manual del mismo día hecho desde el panel.
-- Badge de versión del sidebar actualizado a "V 12.23.8"; entrada
-  añadida en `CHANGELOG.md`.
+- **Novedad**: `showFormAlert` se mantiene hasta pulsar una tecla / clic (salvo ✅ éxito o `persistente:false`); `_detalleGuardadoPedido` añade operación, hotel, estado, proveedor, importe, hora y error técnico al fallar `savePedido`. Solo front.
 
 ---
 
-## 2026-07-31 (3)
+## 2026-10-09 — [Control Pedidos] Alertas: tiempo contado desde la fecha de entrega cuando existe (v12.33.01)
 
-### [Control Pedidos] v12.23.6 — Empaquetado de los 3 cambios de hoy
-- Los tres cambios de hoy (firma con nombre/móvil del comprador,
-  reclamación automática extendida a Pendiente Cotización, y aviso al
-  comprador cuando Pendiente Cotización no tiene proveedor) se
-  liberan juntos como v12.23.6. Badge de versión del sidebar
-  (`templates/index.html`) actualizado; entrada añadida en
-  `CHANGELOG.md`.
-- A partir de ahora: en cada entrega se mantienen sincronizados
-  `CHANGELOG.md`, este `HISTORIAL_CAMBIOS.md` y la versión del badge
-  en `templates/index.html`; y solo se entregan los archivos
-  modificados, indicando la ruta exacta del repo donde colocarlos.
-
-### [Control Pedidos] PENDIENTE COTIZACIÓN sin proveedor asignado — aviso al comprador
-- Petición: cuando la reclamación automática de PENDIENTE COTIZACIÓN
-  (añadida en el cambio anterior) no encuentra proveedor asignado en el
-  pedido, en vez de omitirse en silencio, enviar un correo únicamente
-  al/los comprador(es) del hotel indicando que la cotización de la
-  solicitud con fecha X sigue pendiente y que no hay proveedor
-  asignado hasta la fecha.
-- Nueva plantilla `_email_template_cotizacion_sin_proveedor()` (aviso
-  interno, mismo estilo que "pendiente de firma": cabecera azul,
-  tabla con Pedido Nº / Nº Orden / Hotel / Departamento / "Proveedor:
-  Sin proveedor asignado hasta la fecha" / Días en espera /
-  Observaciones si las hay).
-- Nueva función `_encolar_aviso_cotizacion_sin_proveedor()`: un único
-  envío con todos los compradores del hotel juntos en "Para:" (mismo
-  patrón que el resto de envíos a varios destinatarios).
-- `_encolar_reclamacion_proveedor_auto()` ahora, cuando el pedido está
-  en PENDIENTE COTIZACIÓN y no hay ningún email de proveedor
-  disponible, delega en la función de arriba en vez de devolver
-  `False` sin más. Para ENVIADO AL PROVEEDOR / ENTREGA PARCIAL el
-  comportamiento no cambia (siempre se omite si no hay proveedor,
-  porque en esos estados el proveedor ya debería estar asignado).
-- Reutiliza el mismo tipo de dedup en `whatsapp_log`
-  (`reclamacion_proveedor_auto`), así que respeta el mismo ciclo y
-  umbral crítico ya configurados en Config Alertas para Pendiente
-  Cotización (`cotizacion_ciclo`, `cotizacion_urgente`, `dias_critico`)
-  — sin lógica nueva que mantener sincronizada aparte.
+- **Corrección**: `_clasificar_alertas` expone `por_plazo` / `dias_exceso` y ordena por retraso sobre la fecha de entrega; la UI (Alertas, impresión, Dashboard) muestra «N días de retraso», «Vence hoy» o «Faltan N días» (`_alertaTiempo`) en vez de los días desde tramitación. La lógica de cuándo avisar no cambia.
 
 ---
 
-## 2026-07-31 (2)
+## 2026-10-09 — [Control Pedidos] Trazabilidad de lo automático al estilo SAP (v12.33.00)
 
-### [Control Pedidos] Reclamación automática al proveedor extendida a Pendiente Cotización
-- Petición: tras revisar cómo se gestionan los avisos automáticos por
-  tiempo transcurrido (Telegram siempre automático; email casi siempre
-  manual salvo la reclamación automática, antes limitada a ENVIADO AL
-  PROVEEDOR y ENTREGA PARCIAL), extender esa reclamación automática
-  también a PENDIENTE COTIZACIÓN.
-- `_encolar_reclamacion_proveedor_auto()` ahora acepta también el
-  estado PENDIENTE COTIZACIÓN (antes solo ENVIADO AL PROVEEDOR /
-  ENTREGA PARCIAL). `_build_alerta_email()` ya tenía plantilla propia
-  para este estado (`_email_template_pendiente_cotizacion`), así que
-  no requería cambio adicional ahí.
-- Nueva clave de configuración `cotizacion_ciclo` (Admin → Config
-  Alertas → grupo "💬 Pendiente cotización", default 3 días) —
-  antes ese estado no tenía ciclo de repetición (avisaba una sola vez
-  al hacerse urgente); ahora, con `activar_reclamacion_proveedor_auto`
-  activado (ya lo estaba desde el 29/07), la reclamación al proveedor
-  se repetirá cada N días mientras el pedido siga sin cotizar — mismo
-  patrón ya usado en los otros estados con ciclo.
-- Efecto colateral esperado y coherente con el resto de estados: al
-  compartirse la misma clave `ciclo` entre el reenvío de Telegram y el
-  de la reclamación por email, el aviso interno por Telegram de
-  Pendiente Cotización también pasa de "solo una vez" a repetirse
-  cada `cotizacion_ciclo` días — igual que ya ocurre en Enviado al
-  Proveedor, Firma Compras, Firma Hotel y Entrega Parcial.
-- Migración añadida con `ON CONFLICT (clave) DO NOTHING` para que la
-  clave se cree sola en la base de datos de producción ya existente,
-  sin tocar nada a mano.
+- **Novedad**: autor único «Carga automática SAP» (`_AUTOR_SAP_AUTO`) para altas y cambios de la carga de listados, con renombrado de los autores antiguos al arrancar; observación de alta automática en formato de trazabilidad (`_obs_alta_automatica_sap`, con migración de las antiguas); bloque «Trazabilidad» en Editar pedido (`_renderTrazabilidadPedido`) con autor y fecha de creación y de última modificación en formato SAP.
 
 ---
 
-## 2026-07-31
+## 2026-10-09 — [Control Pedidos] Corrección «tuple index out of range» en Cargar listados SAP + errores concretos y persistentes (v12.32.99)
 
-### [Control Pedidos] Firma de correos — nombre y móvil del comprador junto al email
-- Petición: en todos los correos que se envían con la firma del
-  comprador (email en la firma), añadir también su nombre y móvil.
-- Afecta a los dos puntos del código donde se compone esa firma:
-  - Correo de confirmación de recepción al proveedor (al cambiar el
-    pedido a un estado de `ESTADOS_EMAIL_PROVEEDOR`).
-  - Las 3 plantillas de alerta que llevan firma de comprador —
-    `_email_template_enviado_proveedor`, `_email_template_entrega_parcial`,
-    `_email_template_pendiente_cotizacion` — usadas tanto por el envío
-    manual (`_build_alerta_email`) como por la reclamación automática
-    (`_encolar_reclamacion_proveedor_auto`, que reutiliza la misma
-    plantilla).
-- `_get_todos_usuarios_hotel()` ahora también selecciona `u.movil`
-  para los compradores (antes solo `id, username, nombre, email`),
-  necesario para el primer punto; `_get_compradores_hotel()` (usada
-  en el segundo punto) ya devolvía `movil`.
-- Formato de firma: nombre en negrita, salto de línea, email
-  (mailto) y " · Móvil: XXXXXXXXX" a continuación si el comprador
-  tiene móvil registrado; si no tiene nombre o móvil, esa parte se
-  omite sin dejar hueco en blanco.
-- La plantilla de "pendiente de firma" (aviso interno a Dirección de
-  Compras/Hotel) no lleva firma de comprador — no se ha tocado.
+- **Corrección**: `%` sin escapar (`c % 2`) en la consulta de albaranes duplicados de `_cargar_listados_sap_logica` → `%%`; la comprobación pasa a ser opcional (no detiene la carga).
+- **Novedad**: error de la carga con paso, tipo y función/línea (`_csl_paso`); caja roja en el modal y `toast(…, 0)` persistente hasta pulsar una tecla.
 
 ---
 
-## 2026-07-30
+## 2026-10-09 — [Control Pedidos] Contador de tiempo en «Cargar listados SAP» (v12.32.98)
 
-### [Control Pedidos] v12.23.4 — Un envío por contacto "principal" del proveedor, en vez de uno solo
-- Reabre el asunto que se había dado por cerrado — reportado: el
-  pedido 23979 llegó 2 veces, el 40130 3 veces, el 15147 2 veces, el
-  28090 1 vez... coincidía exactamente con cuántos contactos tiene
-  cada proveedor marcados como "principal" en su ficha.
-- Causa: `_encolar_reclamacion_proveedor_auto()` pasaba
-  `proveedor_emails` (lista) como `destinatarios_email` a
-  `_encolar_email_sistema()`, que encola una fila (= un envío) por
-  cada elemento de la lista.
-- Corregido: un único envío, con todos los contactos principales
-  juntos en el "Para:" (`", ".join(proveedor_emails)`) — mismo
-  patrón ya usado correctamente en los otros dos sitios del código
-  que mandan email a proveedor (aviso al cambiar de estado y
-  "Re-notificar" manual), que nunca tuvieron este problema.
-- Badge de versión del sidebar actualizado a "V 12.23.4".
-
-
-- Reportado: la reclamación solo evitaba mandarse dos veces el mismo
-  día, no respetaba ningún ciclo — reclamaría todos los días mientras
-  el pedido siguiera urgente.
-- Petición: que siga las pautas ya configuradas en Config Alertas
-  (controlable desde el panel de administración).
-- `_nunca_notificado()` y `_dias_ultima_notificacion()` ahora aceptan
-  `tipo` (antes fijo a `telegram_auto`), compatible hacia atrás.
-- Camino estándar: reutiliza el mismo `cfg["ciclo"]` configurado por
-  estado — sin ciclo definido para un estado, no repite tras la
-  primera vez.
-- Camino con plazo: sin cambios, ya respetaba su propio ciclo
-  ("Plazo entrega — Ciclo urgente tras vencer") desde el principio.
-- Badge de versión del sidebar actualizado a "V 12.23.2".
-- **✅ Reenviadas a mano las 21 reclamaciones** que salieron con HTML
-  crudo antes de v12.23.0 (borrado su registro de `whatsapp_log` del
-  día para forzar reevaluación) — confirmado que llegaron legibles y
-  que los popups internos (Telegram) correctamente **no** se
-  duplicaron, al ser un registro independiente (`telegram_auto`)
-  que no se tocó.
-- **✅ ASUNTO DADO POR CERRADO** (30/07/2026).
-
-
-- Reportado: aunque la reclamación por fin se disparó (v12.22.8), el
-  proveedor la recibió con etiquetas HTML literales
-  (`<div style="font-family:Arial...`) en vez de un email legible.
-- Causa: el frontend usa `message: p.cuerpo_text || p.cuerpo_html || ''`
-  para EmailJS — `_encolar_reclamacion_proveedor_auto()` era la única
-  de las 5 llamadas a `_encolar_email_sistema()` que no pasaba
-  `cuerpo_text`, así que caía al HTML crudo como si fuera texto plano.
-- Corregido con `_html_a_texto_plano()` (conversor básico HTML→texto),
-  aplicado dentro de `_encolar_email_sistema()` como red de seguridad
-  general — protege también cualquier llamada futura que se olvide de
-  pasar `cuerpo_text`. Revisadas las otras 4 llamadas — todas ya
-  pasaban su propia versión en texto.
-- Badge de versión del sidebar actualizado a "V 12.23.0".
-- **Pendiente:** confirmar con la próxima reclamación real que el
-  email llega legible.
-
-
-- El log de v12.22.6 mostró `dias=None` en TODOS los pedidos pese a
-  fechas válidas — `_dias_desde_fecha()` referenciaba `_d`/`_dt`, dos
-  nombres que nunca existieron en su ámbito (solo imports locales de
-  otras funciones sin relación). Cada llamada lanzaba `NameError`,
-  silenciado por un `except Exception: return None` genérico.
-- **Alcance real, más amplio de lo que parecía** — afecta a 3 sitios:
-  el job diario de alertas, la reclamación automática, y **la alerta
-  inmediata al cambiar el estado de un pedido** (esta última no se
-  había mencionado hasta ahora). El sistema de "días sin avance"
-  llevaba tiempo sin disparar nada nuevo en ninguno de los tres.
-- Corregido usando los nombres bien importados a nivel de módulo
-  (`datetime`, `date as _date`). El `except` ahora registra la
-  excepción real con `log.warning()` en vez de tragársela en
-  silencio, para que esto no vuelva a pasar desapercibido.
-- Badge de versión del sidebar actualizado a "V 12.22.8".
-- **✅ CONFIRMADO EN PRODUCCIÓN** — reclamación real recibida (pedido
-  SAP 27742, Maspalomas & Tabaiba, 55 días, formato correcto) y
-  popups al administrador también llegando bien. Los tres frentes
-  afectados por el bug quedan verificados funcionando.
-
-
-- Job de las 11:00 completó en 336ms con "0 enviadas, 0 omitidas" —
-  demasiado rápido para 33+ alertas reales, y `omitidos` (que sí se
-  incrementa en el primer gate que casi todos deberían tocar) también
-  en 0 → sospecha de que `alertas_raw` (consulta propia del job,
-  distinta de la del panel) devuelve 0 filas.
-- Añadido `RECLAMACION-DEBUG alertas_raw=N filas` tras la consulta, y
-  traza por pedido en la entrada del camino estándar (estado, cfg
-  encontrado, campo/valor de fecha de referencia, días, umbral).
-- Badge de versión del sidebar actualizado a "V 12.22.6".
-- **Pendiente:** revisar logs tras el próximo despliegue y ciclo.
-
-
-- Pedido #13549 (probado en detalle: Fuerteventura, sin plazo, `ENVIADO
-  AL PROVEEDOR`, `URGENTE`, 95 días) seguía sin reclamación tras
-  v12.22.2. Descartados los dos motivos de omisión silenciosa más
-  obvios: proveedor GRUPO DISTRIBUIDRO GARAU sí tiene email
-  (`javier.garcia@garau.es`), y Fuerteventura sí tiene comprador con
-  email (`comprascan4`).
-- Sin Shell disponible en el plan Free de Render para inspeccionar
-  el código desplegado directamente (requiere plan Starter).
-- Añadido logging de diagnóstico (`BUILD-MARKER`, `RECLAMACION-DEBUG`
-  en el bucle principal y en los dos primeros retornos silenciosos de
-  `_encolar_reclamacion_proveedor_auto()`) — sin tocar el
-  comportamiento, solo visibilidad, para localizar la causa real en
-  la próxima ejecución del job vía búsqueda de logs en Render.
-- Badge de versión del sidebar actualizado a "V 12.22.4".
-- **Pendiente:** revisar los logs `RECLAMACION-DEBUG` tras el próximo
-  ciclo del job (07-16h) para identificar la causa exacta.
-
-
-- **Probado tras desplegar v12.20.8:** borrado el registro de
-  `telegram_auto` de hoy para un pedido concreto (13549) en
-  `whatsapp_log`, esperado, repetida la consulta — seguía sin
-  aparecer ninguna reclamación.
-- **Causa real:** el bloque de reclamación estaba DESPUÉS de la
-  lógica de "¿toca reenviar el Telegram interno hoy?" (primer aviso /
-  umbral crítico / ciclo de N días desde el ÚLTIMO envío, sea de hoy
-  o de cualquier día anterior). Si el ciclo interno decía "todavía no
-  toca", el `continue` de esa rama saltaba también la reclamación —
-  borrar solo el registro de HOY no lo arregla, porque el ciclo mira
-  la última notificación en general, no solo la de hoy.
-- **Corregido:** el bloque de reclamación se movió para evaluarse
-  ANTES de esa lógica de ciclo, en los dos caminos (con plazo y
-  estándar), con su propia deduplicación diaria — independiente de
-  si el aviso interno de Telegram está en su turno de reenvío.
-  Eliminado el bloque duplicado que había quedado de v12.20.8.
-- Badge de versión del sidebar actualizado a "V 12.22.2".
-
-
-- **Hallazgo de paso:** la consulta de verificación que se venía usando
-  (`emails_log WHERE tipo='reclamacion_proveedor_auto'`) nunca iba a
-  devolver filas — la reclamación automática registra en
-  `whatsapp_log`, no en `emails_log` (esa tabla es la que usa el envío
-  MANUAL). Consulta correcta documentada en el CHANGELOG.
-- Nuevo campo `reclamacion_auto` en el resumen de notificación de cada
-  alerta; badge naranja "🤖 Reclamado auto hace Xd" en el panel
-  (separado de la notificación normal) y en la vista de impresión.
-- Nueva `_ya_reclamado_hoy_manual()`: si ya se mandó una reclamación
-  manual hoy, la automática se omite ese día — centralizado dentro de
-  `_encolar_reclamacion_proveedor_auto()`, cubre los dos caminos sin
-  tocarlos por separado. No se bloqueó la dirección contraria (manual
-  después de automática) — el indicador visual ya es suficiente aviso.
-- Badge de versión del sidebar actualizado a "V 12.22.0".
-
-### [Control Pedidos] v12.20.8 — Reclamación automática no se disparaba en la práctica
-- **Seguimiento del 29/07:** confirmado con consultas reales
-  (`/api/emails-sistema-pendientes` → `[]`, `emails_log WHERE
-  tipo='reclamacion_proveedor_auto'` → 0 filas) que nunca se había
-  disparado ninguna reclamación pese a llevar la casilla activada y
-  36 alertas urgentes en el panel.
-- **Causa encontrada:** `_job_alertas_diarias_inner()` clasifica los
-  pedidos en dos caminos — (1) con `plazo_entrega_dias` informado por
-  el proveedor, (2) estándar (umbrales generales de Config Alertas).
-  La reclamación automática solo estaba conectada al camino (1); casi
-  ningún pedido real tiene ese campo relleno, así que caen siempre en
-  el (2), donde nunca se llamaba.
-- **Aclarado con el usuario:** el panel "Plazo de entrega proveedor"
-  ajusta los umbrales solo cuando el pedido trae un plazo propio; si
-  no lo trae, deben cumplirse los plazos generales igualmente — la
-  reclamación debía aplicar en ambos caminos.
-- **Corregido:** añadido el mismo bloque de reclamación (mismo
-  gating: activa, `nivel=="urgente"`, no notificado hoy) también al
-  camino estándar, justo después de `_enviar_telegram_compradores()`.
-  El filtro de estado (`ENVIADO AL PROVEEDOR`/`ENTREGA PARCIAL`) ya lo
-  hace internamente `_encolar_reclamacion_proveedor_auto()`, así que
-  no hizo falta añadirlo aparte.
-- Badge de versión del sidebar actualizado a "V 12.20.8".
-- **Pendiente:** confirmar en el próximo ciclo del job (corre cada
-  minuto en horario 07-16h) que aparecen filas nuevas en `emails_log`
-  con `tipo='reclamacion_proveedor_auto'`.
-
-### [Organizador] v4.14.2 — Chat: fecha en mensajes, botón adjuntar más grande, limpiar chat
-- `app/ui/chat_bubbles.py` — nueva `fecha_hora_local()` (formato
-  `DD/MM HH:MM`), usada en vez de `hora_local()` en las dos ventanas;
-  el ancho de burbuja ya se recalculaba dinámicamente, no hizo falta
-  tocar nada más de layout.
-- `app/ui/ventana_chat.py` — botón "📎" ensanchado; nuevo botón
-  "🧹 Limpiar chat" junto al título de la conversación, con
-  confirmación, que solo vacía la vista local (no borra nada del
-  servidor).
-- `app/ui/chat_popup.py` — botón "📎" ensanchado. Sin botón de
-  limpiar — solo se pidió para la ventana principal.
-
-
-- **Reporte inicial:** popups "[URGENTE] Pedido #13537 · Maspalomas &
-  Tabaiba Princess" con un número que no aparecía en ningún listado
-  filtrado por ese hotel — sospecha de alerta cruzada entre hoteles.
-- **Investigado a fondo, sin acceso a la BD en vivo:** identificados
-  tres numeraciones distintas coexistiendo en la misma fila —
-  `norden` ("Nº" del panel, se reinicia cada año,
-  `SELECT MAX(norden) WHERE EXTRACT(YEAR...)`), `pedido_num`
-  ("Pedido DALI/SAP", externo), e `id` (clave primaria real, nunca se
-  reinicia, incluye pedidos de años anteriores y borrados). El popup
-  usaba `id` en el título — de ahí el número "irreconocible".
-- **Confirmado con datos reales del usuario** (no solo teoría de
-  código): captura de la pestaña Network del navegador mostrando
-  `GET /api/pedidos/13537` al editar la fila correcta — el pedido
-  era el correcto, del hotel correcto. Sin fallo de seguridad ni de
-  segmentación de datos.
-- **Corregido igualmente el problema real de fondo (claridad de UI)**
-  que motivó el reporte: título del popup cambiado de `Pedido #{id}`
-  a `Pedido SAP {pedido_num}` (o `Nº{norden}` si no hay SAP), mismo
-  criterio que ya usaba el cuerpo del mensaje de Telegram. Corregido
-  en los dos sitios donde se genera el título: backend
-  (`app.py::_enviar_telegram_compradores`, cola push) y escritorio
-  (`pedidos_agenda_bridge.py::_aviso_para_popup`, polling).
-- Badge de versión del sidebar actualizado a "V 12.20.6".
-
-### [Control Pedidos] v12.20.4 — Quitado el bloque de Telegram de la solicitud (fase 1)
-- `templates/index.html` — eliminado el bloque promocional de Telegram
-  (icono, texto, botones "Descargar para PC" / "Descargar para
-  móvil") que aparecía en `#sol-panel-fase1`, entre el teléfono y la
-  selección de hoteles. No aportaba nada útil en ese punto — quien
-  pide acceso todavía no tiene cuenta; esa info ya vive en el manual,
-  que se entrega tras crear la cuenta.
-- Revisada la fase 2 ("Verificación PC") y el resto del wizard — sin
-  ninguna otra mención a Telegram, no hizo falta tocar nada más.
-- Badge de versión del sidebar actualizado a "V 12.20.4".
-
-### [Control Pedidos] Reclamación automática al proveedor — revisada
-- **Confirmado que `activar_reclamacion_proveedor_auto` estaba
-  desactivado** (captura del panel de Configuración de Alertas, casilla
-  "Enviar reclamación automática por email al proveedor cuando vence
-  el plazo" sin marcar) — aclarado que esto es un sistema distinto de
-  las alertas internas "Email + Telegram" visibles en el listado de
-  Alertas (esas sí estaban activas; la reclamación al proveedor no).
-- **Activada por el usuario hoy** — queda en seguimiento para
-  confirmar que se están encolando reclamaciones reales a proveedores
-  en los próximos pedidos que lleguen a nivel `urgente` (verificable
-  en `emails_log` / `bridge_notificaciones` filtrando por
-  `tipo='reclamacion_proveedor_auto'`).
-
-### [Control Pedidos] Backups — consulta sobre moverlos a la nube
-- **Descartado GitHub como repositorio git normal** para los backups
-  (archivos grandes y cambiantes, límite de 100MB/archivo sin Git
-  LFS, el repo crecería sin parar).
-- **Opción viable identificada:** un **segundo proyecto Supabase
-  gratuito dedicado solo a backups** — el plan Free permite 2
-  proyectos activos por cuenta, cada uno con su propia cuota
-  independiente (500MB BD + 1GB storage + 5GB egress), sin competir
-  con la cuota del proyecto principal. Ya se usa 1 de los 2 huecos
-  gratis (`control_pedidos`), queda margen para 1 más. Único cuidado:
-  los proyectos Free se pausan tras 7 días de inactividad — no
-  debería afectar dado que hay una tarea diaria de backup.
-- **Decisión: por ahora se mantiene tal cual, en la carpeta de red
-  local** (vía `restore_agent.py`) — la consulta fue informativa, sin
-  cambios de código. Queda documentada la opción para retomarla más
-  adelante.
-
-### [Organizador] v4.12.8 — Acceso local mientras se aprueba el alta
-- `main_agenda.py` (`_modo_alta` → `_crear_acceso`) — tras enviar la
-  solicitud de acceso, se precargan en "👤 Mi Usuario": nombre a
-  mostrar (nombre + primer apellido) y el usuario de login del bridge
-  (= usuario de Windows), dejando la contraseña vacía a propósito.
-- `app/services/admin_auth.py` (`verificar_acceso`) — nuevo caso: si
-  el bridge_user ya coincide con el usuario de Windows pero no hay
-  contraseña bridge guardada, la próxima contraseña que se escriba en
-  el diálogo de Acceso Administración se toma como la elegida por el
-  usuario — dando acceso local inmediato al panel (mínimo 4
-  caracteres), **sin** validarla nunca contra Control de Pedidos.
-- **Efecto:** el usuario tiene control de su Organizador (panel Admin,
-  Mi Usuario) desde el minuto uno, independientemente de cuándo se
-  apruebe el acceso real — pero el chat y los avisos de Control de
-  Pedidos siguen bloqueados hasta que llega la cuenta real y el
-  usuario sustituye la contraseña provisional por la definitiva en
-  "Mi Usuario".
-- Sin cambios en el resto de `verificar_acceso()` (online, fallback
-  con hash propio, bloqueo tras 3 intentos) — el caso nuevo se añade
-  como comprobación adicional antes del intento online.
-
-### [Organizador] v4.12.6 — Chat rediseñado (burbujas, copiar, hora)
-- **Framework:** evaluado Flet / PySide/PyQt frente a seguir con
-  ttkbootstrap — descartados ambos: `main.spec` excluye explícitamente
-  `PyQt5`, `PyQt6` y `wx` del build, y ttkbootstrap ya está integrado
-  en 9 archivos de la UI. Se logra el rediseño dentro del mismo
-  framework, sin reescribir la app.
-- **Nuevo módulo `app/ui/chat_bubbles.py`** — widget `BubbleList`
-  compartido entre `ventana_chat.py` y `chat_popup.py` (antes cada
-  ventana mantenía su propia implementación casi idéntica con
-  `tk.Text` y tags de color). Burbujas de verdad: rectángulos
-  redondeados en `Canvas`, ajuste de línea por medición real de
-  fuente, scroll suave con la rueda, y `hora_local()` (convierte
-  `creado_en` UTC a hora local, formato `HH:MM`).
-- **Copiar mensajes:** clic derecho sobre cualquier burbuja → "📋
-  Copiar mensaje" — copia el texto completo al portapapeles (un
-  Canvas no tiene selección nativa de texto como un `Text`).
-- **`chat_popup.py`:** reescrito para usar `BubbleList`. De paso, se
-  corrigió con el patrón correcto (fila de escribir empaquetada
-  primero, `side="bottom"`) el mismo problema de layout que ya se
-  arregló ayer en `ventana_chat.py` — ya no hace falta el `height=16`
-  fijo del ANTI-REGRESIÓN del 21/07. `_cargar()` ahora ordena los
-  mensajes por `creado_en` antes de recortar a los últimos 3 y
-  pintarlos, en vez de confiar en el orden de la API — el más
-  reciente siempre queda abajo, justo encima de la caja de escribir.
-- **`ventana_chat.py`:** `txt_mensajes` sustituido por `msgs`
-  (`BubbleList`); `_cargar_historial()` ordena igual por `creado_en`.
-- **Compatibilidad:** `services/chat_client.py` sin tocar — es un
-  cambio de presentación puro, toda la lógica de red/sockets/canales
-  sigue igual.
-- **Sin poder probar en entorno gráfico real** (sin Windows/Tkinter
-  visual aquí) — todo compila (`py_compile`) sin errores, pero
-  recomendado probar en local el ajuste de línea con mensajes largos
-  y el scroll con la rueda antes de darlo por definitivo.
+- **Novedad**: contador `mm:ss` junto al spinner de la carga (`_cslTimerStart`/`_cslTimerStop`, basado en `Date.now()`). Solo front (`templates/index.html`).
 
 ---
 
-## 2026-07-27
+## 2026-10-09 — [Control Pedidos] Carga única de listados SAP con cruce por líneas (v12.32.97)
 
-### [Control Pedidos] + [Organizador] v12.20.2 / v4.12.4 — Solicitud de acceso en un solo paso
-- **Verificado en producción el 28/07/2026**: probado con `fetch()`
-  desde consola del navegador (solicitud #13) — cuenta creada,
-  aprobada con rol y hoteles asignados; email de credenciales al
-  usuario y email de aviso "solicitud lista para aprobar" a admins,
-  ambos despachados correctamente por EmailJS (confirmados por
-  capturas de bandeja de entrada real).
-- Versión de backend fijada en **v12.20.2** (antes v12.20.0), con
-  entrada añadida al `CHANGELOG.md` del repo `control-pedidos-princess`;
-  de paso se cerró la advertencia "pendiente de aplicar en producción"
-  que quedaba abierta en la entrada de v12.20.0 (los endpoints de
-  bridge del login de Admin, confirmados desplegados hoy también).
-- Pendiente: probar el lado del Organizador de escritorio (v4.12.4)
-  en un PC real sin cuenta previa, de punta a punta.
-- `templates/index.html` — actualizado el badge visual del sidebar de
-  "V 12.20.0" a "V 12.20.2" (texto literal, sin relación con el hash
-  MD5 de `/api/version`, que solo sirve para caché del navegador —
-  ese cambia solo con cualquier edición del HTML).
+- **Petición**: simplificar la carga de listados (Comparar, Departamentos y líneas, Importar albaranes, Sugerencias) y que al cargar se actualicen solos estado, nº de albarán, fecha y base imponible, y se creen los pedidos de proveedores «Sujeto a seguimiento».
+- **Corrección/novedad**: botón «Cargar listados SAP» (`/api/sap/cargar-listados`), detección del tipo de PDF por contenido, lector del listado de albaranes resumido (`sap_albaranes_cab`), cruce por líneas `_cruce_lineas_sap_hotel` y aplicación segura `_aplicar_cruce_lineas_pedido`; resto en «Para revisar» (ver CHANGELOG v12.32.97).
 
-### [Control Pedidos] + [Organizador] v4.12.4 — Solicitud de acceso en un solo paso
-- **Backend** (`app.py`) — nuevo endpoint `POST /api/solicitar-usuario/directo`,
-  para uso exclusivo del Organizador (que ya conoce el usuario de
-  Windows, a diferencia de un navegador). Fusiona fase 1 (datos
-  personales) + fase 2 (verificación) en una sola llamada: valida los
-  6 campos, comprueba que el usuario de Windows no tenga ya cuenta
-  activa (mismo check que la fase 2 real), e inserta la solicitud
-  directamente con `estado='completada'` — sin token ni email
-  intermedio — cayendo en la misma cola de aprobación del panel admin
-  sin tocar ese panel para nada. Notifica por Telegram y encola email
-  a admins (mismo mecanismo fiable de `_encolar_email_sistema` que ya
-  usa la fase 1, en vez de depender de EmailJS en un navegador que
-  aquí no existe). El envío de la contraseña al usuario sigue
-  pasando exactamente igual que hoy, al aprobar la solicitud — este
-  endpoint no toca esa parte.
-- **Desktop** (`app/services/admin_auth.py`, `main_agenda.py`) — el
-  formulario de "Crear acceso" del panel Admin pasa de pedir
-  "nombre a mostrar + contraseña + repetir" (que creaba un acceso
-  local propio vía Telegram sin seguimiento) a pedir los mismos 5
-  campos que la fase 1 web (nombre, apellidos, correo, móvil,
-  hoteles — Listbox de selección múltiple), llamando a la nueva
-  función `solicitar_alta_directa()`. **Cambio de comportamiento
-  importante:** ya no se crea ningún acceso local ni contraseña
-  propia al solicitar — hay que esperar a que un admin apruebe y
-  llegue el correo con las credenciales, igual que en la web.
-  Diálogo ensanchado de 460 a 500px.
-- Decisión explícita del usuario: se acepta perder la "prueba de
-  propiedad del email" que aportaba el token/email intermedio de la
-  fase 2 web, porque el origen aquí es la app interna instalada en
-  el equipo del solicitante, no un navegador sin autenticar.
-- No se borró el código viejo (`registrar_usuario_nuevo`,
-  `solicitar_alta_plataforma`, endpoint `/api/bridge/solicitar-alta`)
-  por si algo más lo referenciaba — queda sin usar desde la UI.
+## 2026-10-09 — [Control Pedidos] Material recibido en exceso en correos y listados de pendientes (v12.32.96)
 
-### [Organizador] v4.12.2 — Corrección
-- `app/services/chat_client.py` — `_get_rest()`, `_post_rest()` y
-  `conectar()` (socket) ahora reintentan `login()` una vez, solas,
-  ante un `401` o un fallo de autenticación en el handshake, y
-  repiten la petición/conexión original con la cookie nueva. Mismo
-  patrón que ya usaba `pedidos_agenda_bridge.py`. Corrige el
-  incidente de hoy: tras un cambio de `SECRET_KEY` en el backend, el
-  chat se quedaba con una cookie muerta hasta cerrar y reabrir el
-  Organizador entero a mano.
-
-### [Manual] Manual de Usuario actualizado a v4.12.0 — cerrado
-- Reescrita por completo la sección "Acceso al Panel ADMIN": fuera el
-  usuario/contraseña fijo (`ADMIN` / `Princess2026`), documentado el
-  flujo real (usuario de Windows autorrelleno, validación online,
-  alta con aviso a un admin, respaldo offline, bloqueo de 5 min).
-- Añadida la subsección "Credenciales de Control de Pedidos (chat y
-  avisos)" dentro de 5.2 Gestión de Usuarios, documentando los campos
-  de "Mi Usuario → Control de Pedidos — credenciales bridge".
-- Corregida una referencia residual al usuario/contraseña viejo que
-  quedó en la tabla de "Resolución de Incidencias Comunes".
-- Revisado el resto del documento en busca de más referencias sueltas
-  al sistema viejo — no queda ninguna.
-- Añadida una **Guía Rápida** (2 páginas) entre la portada y el
-  índice — accesos principales, cómo abrir/configurar botones,
-  avisos, calendario, chat, Mi Usuario, copias de seguridad, Telegram
-  e incidencias frecuentes. Con estilos propios (no usa los mismos
-  `Ttulo1`/`Ttulo2` que el resto), para no meterle entradas nuevas al
-  índice automático.
-- Portada actualizada a v4.12.0. La sección "Chat Interno" (7.6) no
-  necesitó cambios — ya documentaba grupos, imágenes/adjuntos y
-  burbuja flotante hasta v4.10.0.
-- **Manual dado por finalizado.**
-
-### [Organizador] v4.10.8 — Corrección
-- `app/services/admin_auth.py` — `verificar_acceso()` reordenada:
-  ahora comprueba primero en LOCAL (registro propio de admin_auth y,
-  si no coincide, las credenciales de "Mi Usuario" / bridge) antes de
-  intentar conectar con Control de Pedidos. Si hay coincidencia local,
-  se acepta el acceso sin tocar la red — evita esperas de conexión
-  innecesarias con el backend caído. Si no coincide ninguna, cae al
-  intento online como fuente de verdad, igual que antes.
-- `main_agenda.py` — `_ventana_login_admin()`: la ventana de "Acceso
-  Administración" no se redimensionaba tras aparecer el mensaje de
-  error o el aviso de "sin conexión" (ventana fija, alto calculado una
-  sola vez) — se recalcula ahora en ambos casos.
-- `pedidos_agenda_bridge.py` (`_mostrar_error_bridge`) y
-  `app/services/update_service.py` (diálogo de GitHub inaccesible):
-  añadido auto-cierre a los 2 minutos sin interacción — mismo patrón
-  que el auto-cierre de 5 min ya existente en "Nueva versión
-  disponible" (v4.10.3).
-
-### [Infra] Migración de `control_pedidos_chat` a cuenta Render nueva
-- **Motivo:** `control-pedidos-chat` y `control-pedidos-princess`
-  agotaron las 750h gratis del workspace de Render en julio (ambos
-  mantenidos despiertos 24/7 vía UptimeRobot, compitiendo por el mismo
-  pool de horas) → suspendidos por Render hasta el reset del día 1.
-- Nuevo Web Service `control-pedidos-chat` desplegado en cuenta Render
-  distinta (registro nuevo), región Frankfurt. Variables de entorno:
-  `SECRET_KEY` y `DATABASE_URL` copiadas del servicio principal
-  (`control-pedidos-princess`); `CHAT_DATABASE_URL`, `SUPABASE_URL`,
-  `SUPABASE_SERVICE_KEY` copiadas del chat viejo. Start command
-  `gunicorn -k eventlet -w 1 app:app` (Flask-SocketIO, no admite más
-  workers). URL asignada: `control-pedidos-chat-f4m9.onrender.com`.
-- Verificado `/ping` → `OK` y `Auto-migración del chat OK` en logs.
-- Sustituido UptimeRobot por workflow de GitHub Actions
-  (`.github/workflows/keep-alive-chat.yml`, repo
-  `controlpedidosprincesscanarias-coder/control-pedidos-chat`): cron
-  `*/10 5-16 * * 1-5` (05:00–16:50 UTC = 06:00–18:00 hora Canarias en
-  verano; **hay que pasar a `6-17` en horario de invierno**, UTC+0).
-  Consumo estimado ≈260h/mes, muy por debajo del límite de 750h.
-  Probado con `workflow_dispatch` manual → OK.
-- Worker de Cloudflare `proxy-chat.controlpedidosprincess-canarias.workers.dev`
-  reapuntado (`ORIGIN` en `worker.js`) al nuevo servicio. Publicado
-  ("Implementar"). No hizo falta tocar `chat_client.py` del
-  Organizador — ya usaba la URL del Worker, no la de Render directa.
-### [Infra] Migración de `control_pedidos_princess` a cuenta Render nueva (adelantada)
-- **Motivo:** aunque el plan era esperar al reset del 1 de agosto,
-  problemas organizativos de fin de mes obligaron a adelantar la
-  migración — mismo procedimiento que con el chat.
-- **Hallazgo:** la `GUIA_DESPLIEGUE.md` interna estaba desactualizada.
-  Además de `DATABASE_URL`/`SECRET_KEY`/`EMAILS_INTERNOS`, el `app.py`
-  actual (v12.19.1) también necesita `SUPABASE_URL`,
-  `SUPABASE_SERVICE_ROLE_KEY` (⚠️ nombre distinto al
-  `SUPABASE_SERVICE_KEY` del chat — proyecto Supabase distinto),
-  `SUPABASE_STORAGE_BUCKET` (opcional, default `adjuntos-cerrados`) y
-  `TELEGRAM_BOT_TOKEN`. Sin este chequeo, la migración se habría hecho
-  sin Telegram ni adjuntos, sin ningún error visible hasta que alguien
-  los echara en falta.
-- Nuevo Web Service en cuenta Render nueva, región Frankfurt, start
-  command `gunicorn -w 2 app:app` (este SÍ admite varios workers, no
-  usa eventlet/websockets como el chat). URL asignada:
-  `control-pedidos-princess-1k69.onrender.com`.
-- Verificado `/ping` → `OK` y jobs del scheduler
-  (`_job_alertas_diarias`, `_job_familia_repetida`,
-  `_job_techo_urgente_admins`) ejecutándose sin errores en los logs.
-- `keep-alive-princess.yml` actualizado con la nueva URL. Worker de
-  Cloudflare `proxy` (el principal, no `proxy-chat`) reapuntado
-  (`ORIGIN` en `worker.js`) y publicado.
-- **Verificado funcionando end-to-end desde el Organizador**: login
-  de Admin online y login del chat (que depende de este servicio para
-  autenticar antes de conectar a `CHAT_URL`) — ambos confirmados OK.
-- **v12.20.0 desplegada en la cuenta nueva** — incluye los dos
-  endpoints de bridge (`/api/bridge/existe`,
-  `/api/bridge/solicitar-alta`) que el `CAMBIOS.md` original marcaba
-  como "pendiente de aplicar en producción". Confirmados presentes en
-  el `app.py` desplegado, compila sin errores. Con esto queda cerrado
-  también el pendiente original de la sesión.
-- **Cuenta Render original**: **borrada por completo** (no solo el
-  servicio, la cuenta entera) — confirmado que solo contenía este
-  servicio suspendido antes de eliminarla. Ya no existe. Todo el
-  ecosistema Princess Compras vive ahora en dos cuentas Render nuevas
-  independientes (una para princesa, otra para el chat), cada una con
-  su propio pool de 750h/mes, mantenidas despiertas por GitHub Actions
-  en horario laboral en vez de UptimeRobot 24/7.
-### [Organizador] Incidente — chat "Error de conexión" tras la migración
-- **Síntoma:** tras migrar `control-pedidos-princess`, el chat mostraba
-  "Error de conexión" y `401` en `/api/chat/usuarios` y
-  `/api/chat/mensajes`, pese a que el login (`/api/bridge/login`)
-  devolvía `200`.
-- **Descartado por el camino:** cold-start de Render, dominios
-  cruzados en la cookie (`chat_client.py` ya reenvía la cookie a mano
-  vía `_cookie_header()`, no depende del auto-attach por dominio de
-  `requests`), y desajuste de `SECRET_KEY` (se igualó explícitamente
-  copiando el valor entre ambos servicios y el fallo persistió).
-- **Causa real:** `chat_client.py` solo hace `login()` **una vez, al
-  arrancar** el Organizador, y cachea la cookie en memoria durante
-  toda la sesión de la app — a diferencia de
-  `pedidos_agenda_bridge.py`, que sí reintenta el login solo al
-  recibir un `401`. Como el Organizador llevaba abierto desde antes de
-  las migraciones/redeploys de hoy, seguía usando una cookie de sesión
-  ya inválida sin darse cuenta, y ni reabrir la ventana del chat ni
-  reconectarse por escritorio remoto fuerzan un login nuevo (el
-  proceso de fondo sigue siendo el mismo).
-- **Solución aplicada:** cerrar el Organizador por completo (no solo
-  la ventana del Chat) y reabrirlo — fuerza un `login()` nuevo con
-  cookie fresca. Confirmado funcionando.
-- **Pendiente:** arreglar `chat_client.py` para que reintente el login
-  automáticamente tras un `401`, igual que ya hace
-  `pedidos_agenda_bridge.py`, y evitar que esto vuelva a pasar tras el
-  próximo redeploy del backend.
-### [Organizador] v4.12.0 — Corrección
-- `app/ui/ventana_chat.py` — corregidos varios bugs de layout con la
-  misma causa raíz: `pack()` con tamaños fijos adivinados a mano en
-  vez de medir el contenido real.
-  1. **Fila de escribir/adjuntar/enviar** desaparecía en ventanas
-     justas de alto — estaba empaquetada DESPUÉS del área de mensajes
-     (`expand=True`), que se comía todo el hueco. Reordenada para
-     empaquetarse primero (`side="bottom"`) y reservar su sitio.
-  2. **Diálogo "Nueva conversación"** — mismo patrón (botón/label
-     empaquetados después del Listbox expandible). Reordenado igual.
-  3. **Ancho del panel lateral y del diálogo "Nueva conversación"** —
-     sustituido el ancho fijo adivinado (que se quedaba corto con
-     nombres largos como "Jesus Curbelc" o con el propio botón "＋
-     Nueva conversación") por una medición real con
-     `tkinter.font.Font.measure()` del texto más ancho presente cada
-     vez que se refresca la lista o se cargan los usuarios, ajustando
-     `paned.sashpos(0, ...)` o `sel.geometry()` en consecuencia (con
-     tope máximo, y sin encoger nunca por debajo del mínimo).
-- **Revisado `app/ui/chat_popup.py`** (burbuja flotante) por el mismo
-  patrón — no necesitó cambios: ventana de tamaño fijo
-  (`overrideredirect`, no redimensionable, sin listas de nombres), ya
-  protegida desde el 21 de julio con un `height` fijo documentado
-  como anti-regresión para este mismo tipo de bug.
-
-### [Infra] Supabase — Security Advisor
-
-- **ERROR corregido:** tabla `public.notificaciones_config` tenía RLS
-  desactivado (expuesta sin filtro vía API REST de PostgREST). Se
-  activó con `ALTER TABLE public.notificaciones_config ENABLE ROW
-  LEVEL SECURITY;`.
-- **29 avisos de nivel INFO restantes** ("RLS enabled, no policy") en
-  el resto de tablas del proyecto de `control_pedidos_princess` — no
-  requieren acción: la app se conecta directo a Postgres vía
-  `psycopg2`/`DATABASE_URL`, no usa la API REST de Supabase, así que
-  RLS sin políticas bloquea el acceso externo por API sin afectar al
-  funcionamiento normal de la app. Security Advisor queda en 0
-  errores, 0 warnings.
-- **Aparte, sin relación con lo anterior:** el mismo proyecto Supabase
-  entró en grace period por exceso de cuota de Egress del ciclo
-  anterior (hasta el 9 de agosto) — uso actual muy por debajo de
-  cuota, a vigilar sin acción por ahora.
-
-- **Estado a 2026-07-27, cierre de la migración: sin pendientes.**
-  Ambos servicios migrados, verificados end-to-end, cuenta vieja
-  eliminada, UptimeRobot desmontado, workflows de GitHub Actions
-  activos en ambos repos.
+- **Origen**: Víctor: cuando llega más cantidad de la pedida (pedido 16134, +10/+5) debe constar en la reclamación al proveedor, en los correos internos y en los listados de faltantes, como sobrante / material entregado en exceso.
+- **Hallazgo**: el cálculo solo contemplaba lo pendiente; las líneas con recibido > pedido se ignoraban.
+- **Corrección**: `sobrantes` en `_datos_pendientes` y `_calcular_faltantes_pedido`; bloque «Material recibido en exceso» en correo a proveedor, internos (parcial y entregado) y en el listado/PDF de pendientes, con filtro `solo_exceso` (ver CHANGELOG v12.32.96).
+- **Ficheros editados en este repo**: `app.py`, `templates/index.html`, `README.md`, `CHANGELOG.md`, `docs/HISTORIAL_CAMBIOS.md`.
+- **Otros documentos (norma 5)**: sin variables ni SQL de migración; resto: no aplica.
+- **Pendiente / ideas**: opción de registrar la decisión sobre el exceso (devolución / abono / quedárselo) y exportar a Excel.
 
 ---
 
-## Julio 2026 (antes de esta sesión) — main_agenda 4.10.3 / control_pedidos v12.20.0
+## 2026-10-09 — [Control Pedidos] Líneas con el mismo código en un pedido: cada una por separado (v12.32.95)
 
-### [Organizador] Ventana de actualización
-- `app/services/update_service.py` — auto-cierre a los 5 minutos si el
-  usuario no toca nada (aplica la opción segura: "solo actualizar
-  versión"). Cualquier botón (Confirmar/Cancelar) o la X cancela el
-  temporizador.
+- **Origen**: Víctor: en el listado de pendientes, el pedido 28289 mostraba una sola referencia («DUNI», 6 uds.) en vez de las tres líneas del PDF; las referencias sin precio no salían como faltantes.
+- **Hallazgo**: el proveedor usa el mismo código en todas sus líneas y la app agrupaba por código (4+1+1 = 6).
+- **Corrección**: `_claves_lineas()` (código, o `CODIGO#n` si se repite en el pedido) aplicada a pendientes, entregas por referencia, líneas del pedido, buscador y correos de reclamación (ver CHANGELOG v12.32.95).
+- **Ficheros editados en este repo**: `app.py`, `templates/index.html`, `README.md`, `CHANGELOG.md`, `docs/HISTORIAL_CAMBIOS.md`.
+- **Otros documentos (norma 5)**: sin variables ni SQL de migración; resto: no aplica.
+- **Pendiente / ideas**: revisar si algún pedido existente con códigos repetidos tenía detalle de entregas guardado (se asigna a la primera línea del código).
 
-### [Organizador] Festivos y Vacaciones — mismo diseño que Agenda
-- `app/ui/festivos.py`, `app/ui/vacaciones.py` — cabecera unificada
-  (título único, sin subtítulo), ventana redimensionable en
-  horizontal (antes fija), scroll con rueda del ratón, reajuste
-  automático de ancho de filas y wraplength al redimensionar — igual
-  que "Agenda de Avisos".
+---
 
-### [Organizador] + [Control Pedidos] Login Admin sin hardcode
-- `app/services/admin_auth.py` (nuevo módulo) — usuario = usuario de
-  Windows (no editable); si existe en Control de Pedidos, valida
-  contraseña online en cada intento; si no existe, formulario de alta
-  (nombre + contraseña + repetir), guardado local cifrado (Fernet,
-  hash+salt PBKDF2 200k iteraciones), notifica a Control de Pedidos
-  para alta manual por un admin. Bloqueo de 5 min tras 3 intentos
-  fallidos, siempre en local.
-- `main_agenda.py` — eliminadas `ADMIN_USER`/`ADMIN_PASSWORD`
-  hardcodeadas; `_ventana_login_admin()` reescrita con el flujo de
-  arriba.
-- `main.spec` / `compilar.bat` / `README.md` — añadida dependencia
-  `cryptography` (cifrado Fernet).
-- **Control Pedidos** `app.py` — dos endpoints nuevos:
-  - `GET /api/bridge/existe?usuario_windows=...` → `{"existe": bool}`
-    (solo por username, nunca pide/revela contraseña).
-  - `POST /api/bridge/solicitar-alta` `{usuario_windows, nombre}` →
-    notifica por Telegram a los admins (reutiliza
-    `_notify_solicitud_telegram`). Deliberadamente no recibe la
-    contraseña.
-- **Pendiente de decidir en su momento** (ver `CAMBIOS.md` original):
-  criterio de "existe" en `/api/bridge/existe` (¿incluye inactivos?);
-  canal de aviso de alta (Telegram vs email vs tabla de solicitudes);
-  si la contraseña de alta debería viajar al servidor o no (se decidió
-  que NO, para no duplicar el riesgo de `usuarios.password` en claro).
+## 2026-10-09 — [Control Pedidos] Buscar artículo: pedidos con entregas pendientes, listado y detallado en PDF (v12.32.94)
+
+- **Origen**: Víctor: listar en pantalla y PDF los pedidos enviados al proveedor con entregas pendientes (totales o parciales) y poder imprimir el detalle de los faltantes de cada uno.
+- **Hallazgo**: las referencias pendientes ya se calculaban para los correos de reclamación (`_datos_pendientes`), pero solo pedido a pedido y sin vista de conjunto.
+- **Corrección**: endpoint `/api/pedidos/pendientes-entrega` con cálculo en bloque + modo nuevo en «Buscar artículo» con tabla desplegable e impresión (listado / detallado) — ver CHANGELOG v12.32.94.
+- **Ficheros editados en este repo**: `app.py`, `templates/index.html`, `README.md`, `CHANGELOG.md`, `docs/HISTORIAL_CAMBIOS.md`.
+- **Otros documentos (norma 5)**: sin variables ni SQL; resto: no aplica.
+- **Pendiente / ideas**: exportar a Excel; enviar este informe por correo a compras; sustituir el cálculo por el del Listado de Pedidos detallado de SAP cuando se automatice la entrega (ver conversación del 09/10).
+
+---
+
+## 2026-10-09 — [Control Pedidos] Ficha del pedido: tabla de líneas a todo el ancho (v12.32.93)
+
+- **Origen**: Víctor: aprovechar el espacio libre a la derecha en la ficha y ocuparlo con el contenido del pedido.
+- **Hallazgo**: la tabla de líneas estaba dentro de la columna izquierda (media anchura) y la derecha quedaba vacía bajo «Total Pedido».
+- **Corrección**: tabla en fila propia a todo el ancho; «Nº Pedido» a la izquierda a doble altura con «Nº Presupuesto» y «Total Pedido» apilados a la derecha; rol hotel con «Nº Pedido» a fila completa (ver CHANGELOG v12.32.93).
+- **Ficheros editados en este repo**: `templates/index.html`, `README.md`, `CHANGELOG.md`, `docs/HISTORIAL_CAMBIOS.md`.
+- **Otros documentos (norma 5)**: sin variables ni SQL; resto: no aplica.
+- **Pendiente / ideas**: ensanchar el modal cuando el pedido tiene muchas líneas; comparar líneas del PDF con los listados SAP (ver conversación sobre automatización de entregas).
+
+---
+
+## 2026-10-08 — [Control Pedidos] Líneas del PDF oficial: cantidad y precio pegados (v12.32.92)
+
+- **Origen**: Víctor: el PDF del pedido 16756 (Cube Root Cards) no leía las líneas (aviso de fiabilidad).
+- **Hallazgo**: cantidad grande + precio corto salen sin hueco (`10.000,00000,26`) y el lector por posiciones no reconocía la palabra como número.
+- **Corrección**: `_RE_NUM_ES_PEGADO` separa Cantidad y Precio antes de leer la fila; la comprobación de suma contra los importes del texto sigue siendo la garantía (ver CHANGELOG v12.32.92).
+- **Ficheros editados en este repo**: `app.py`, `templates/index.html` (badge), `README.md`, `CHANGELOG.md`, `docs/HISTORIAL_CAMBIOS.md`.
+- **Otros documentos (norma 5)**: sin variables ni SQL; resto: no aplica.
+- **Pendiente / ideas**: valorar guardar el precio exacto (Importe ÷ Cantidad) cuando el PDF lo imprime redondeado; reintento en bloque de PDF con 0 líneas.
+
+---
+
+## 2026-10-08 — [Control Pedidos] Alertas: pedidos con entrega vencida siempre visibles (v12.32.91)
+
+- **Origen**: Víctor: el pedido 41152 (entrega prevista 25/09) no aparecía en Alertas; pidió que, vencido el plazo, la información quede siempre visible independientemente de que toque avisar.
+- **Hallazgo**: la lista usaba `_alertas_plazo_entrega()`, que solo devuelve resultado los días de aviso (ciclo de 2 días tras el vencimiento); el resto de días el pedido vencido se ocultaba.
+- **Corrección**: `_plazo_entrega_vencido()` + parámetro `solo_dias_de_aviso` en `_clasificar_alertas()`; pantalla, badge, dashboard y rol hotel muestran siempre los vencidos (urgente); el puente de popups y todos los avisos automáticos mantienen su ciclo (ver CHANGELOG v12.32.91).
+- **Ficheros editados en este repo**: `app.py`, `templates/index.html` (badge), `README.md`, `CHANGELOG.md`, `docs/HISTORIAL_CAMBIOS.md`.
+- **Otros documentos (norma 5)**: sin variables ni SQL; resto: no aplica.
+- **Pendiente / ideas**: mostrar en la fila el texto «vencido hace N días»; valorar el mismo criterio para el puente de popups si se prefiere.
+
+---
+
+## 2026-10-08 — [Control Pedidos] Techo de Gastos: apuntes pendientes de meses anteriores resolubles (v12.32.90)
+
+- **Origen**: Víctor: el pedido 41699 (GY, ECUS SLEEP) se envió al proveedor el 28/09 sin cambiar el estado en la app; al intentarlo, el sistema exigía aceptar el techo de gastos, pero la pantalla solo mostraba octubre.
+- **Hallazgo**: `techo_resumen` filtraba expedientes por el mes actual; `update_pedido` bloquea mientras haya un apunte `pendiente` de cualquier mes → apunte de septiembre invisible e irresoluble.
+- **Corrección**: pendientes de cualquier mes visibles (con etiqueta de mes); al aprobar uno antiguo se puede marcar «ya enviado al proveedor» (no reenvía el correo al proveedor, imputa el consumo al mes del apunte y anota la regularización) (ver CHANGELOG v12.32.90).
+- **Ficheros editados en este repo**: `app.py`, `templates/index.html`, `README.md`, `CHANGELOG.md`, `docs/HISTORIAL_CAMBIOS.md`.
+- **Otros documentos (norma 5)**: sin variables ni SQL; resto: no aplica.
+- **Pendiente / ideas**: valorar un aviso automático a Dirección General cuando un apunte lleva más de N días pendiente.
+
+---
+
+## 2026-10-08 — [Control Pedidos] Líneas del PDF oficial: códigos alfanuméricos (v12.32.89)
+
+- **Origen**: Víctor: el PDF del pedido 41862 (Redican) no leía las líneas (aviso de fiabilidad).
+- **Hallazgo**: `_RE_CODIGO_LINEA` exigía números de 8 (luego 7) cifras; Redican usa códigos como `4487B` o `39-0000010B`.
+- **Corrección**: la regla acepta palabras de 3-20 caracteres alfanuméricos con `- / . _`; filas sin terna de importes pasan a ser descripción; la comprobación de suma contra los importes sigue siendo la garantía (ver CHANGELOG v12.32.89).
+- **Ficheros editados en este repo**: `app.py`, `templates/index.html` (badge), `README.md`, `CHANGELOG.md`, `docs/HISTORIAL_CAMBIOS.md`.
+- **Otros documentos (norma 5)**: sin variables ni SQL; resto: no aplica.
+- **Pendiente / ideas**: los PDF que quedaron sin líneas por este motivo se recuperan pedido a pedido con «Reintentar la lectura»; valorar un reintento en bloque para todos los que tengan PDF oficial y 0 líneas.
+
+---
+
+## 2026-10-08 — [Control Pedidos] Reclamación manual al proveedor firmada por quien la realiza (v12.32.88)
+
+- **Origen**: Víctor (pedido 40907, GY): la reclamación salía firmada como «Vacante»; debe firmar quien la realiza, sea admin o usuario de hotel, tenga o no el hotel asignado.
+- **Hallazgo**: `_build_alerta_email` usaba siempre el primer comprador del hotel (firma y Reply-To); sin comprador con email la reclamación manual no se podía preparar.
+- **Corrección**: `_firmante_usuario_sesion()` + parámetro `firmante` (vista previa manual); Reply-To del envío manual = firmante; automáticas sin cambios (ver CHANGELOG v12.32.88).
+- **Ficheros editados en este repo**: `app.py`, `templates/index.html`, `README.md`, `CHANGELOG.md`, `docs/HISTORIAL_CAMBIOS.md`.
+- **Otros documentos (norma 5)**: sin variables ni SQL; resto: no aplica.
+- **Pendiente / ideas**: revisar el puesto «Vacante» del hotel (a quién debe firmar la reclamación automática cuando el comprador asignado es un puesto vacante).
+
+---
+
+## 2026-10-08 — [Control Pedidos] Aviso interno de entrega parcial: enlace al pedido en la app y referencias pendientes (v12.32.87)
+
+- **Origen**: Víctor: que el aviso interno a los departamentos por entrega parcial lleve el enlace al pedido y qué referencias y cantidades quedan pendientes.
+- **Hallazgo**: el aviso ya tenía el botón de descarga del PDF y (v12.32.86) la tabla de pendientes solo con detalle completo y sin versión de texto; no existía ningún enlace que abriera un pedido en la app.
+- **Corrección**: enlace `/?pedido=<id>` (captura en la página, apertura tras la sesión), tabla de pendientes también con detalle parcial y aviso (solo interno), y versión de texto; ver CHANGELOG v12.32.87.
+- **Ficheros editados en este repo**: `app.py`, `templates/index.html`, `README.md`, `CHANGELOG.md`, `docs/HISTORIAL_CAMBIOS.md`.
+- **Otros documentos (norma 5)**: sin variables ni SQL; el enlace usa la variable `APP_URL` ya existente (debe apuntar a la URL real del servicio en Render).
+- **Pendiente / ideas**: extender el enlace al resto de avisos internos; exportar a Excel los faltantes.
+
+---
+
+## 2026-10-08 — [Control Pedidos] Reclamación de entrega parcial con referencias y cantidades pendientes (v12.32.86)
+
+- **Origen**: Víctor preguntó si la reclamación del pendiente al proveedor indica las referencias y cantidades que faltan (pedido con dos entradas parciales detalladas).
+- **Hallazgo**: no; `_email_template_entrega_parcial` solo mostraba entradas e importes. El detalle por referencia (v12.32.82) ya estaba en `pedido_lineas_entregas`.
+- **Corrección**: `_html_bloque_pendientes(pedido)` añade la tabla al correo de ENTREGA PARCIAL al proveedor (auto y manual) y al aviso interno; solo si todas las entradas tienen detalle (ver CHANGELOG v12.32.86).
+- **Ficheros editados en este repo**: `app.py`, `templates/index.html` (badge), `README.md`, `CHANGELOG.md`, `docs/HISTORIAL_CAMBIOS.md`.
+- **Otros documentos (norma 5)**: sin variables ni SQL; resto: no aplica.
+- **Pendiente / ideas**: exportar a Excel los faltantes; versión en texto plano de la tabla en el aviso interno.
+
+---
+
+## 2026-10-08 — [Control Pedidos] Ventana de referencias de la entrada: cantidad editable sin marcar la referencia (v12.32.85)
+
+- **Origen**: Víctor: en la entrada parcial 101417 no podía cambiar 10 por 5 uds en la primera referencia.
+- **Hallazgo**: el input de cantidad (`.mel-cant`) estaba `disabled` mientras la casilla no estuviera marcada (v12.32.82).
+- **Corrección**: input siempre editable (salvo solo lectura); escribir una cantidad > 0 marca la referencia; desmarcar conserva el valor (ver CHANGELOG v12.32.85). Solo `templates/index.html`.
+- **Ficheros editados en este repo**: `templates/index.html`, `README.md`, `CHANGELOG.md`, `docs/HISTORIAL_CAMBIOS.md`.
+- **Otros documentos (norma 5)**: sin variables ni SQL; resto: no aplica.
+- **Pendiente / ideas**: ninguna nueva.
+
+---
+
+## 2026-10-08 — [Control Pedidos] Líneas del PDF oficial: códigos de artículo de 7 cifras (v12.32.84)
+
+- **Origen**: Víctor adjuntó el PDF del pedido 41866 (Guayarmina, Dorta): Nº y Total bien, pero aviso de que las líneas no se podían leer con fiabilidad.
+- **Hallazgo**: `_RE_CODIGO_LINEA` exigía 8 cifras exactas; el artículo `2060205` tiene 7 en el PDF, así que su línea se perdía y la comprobación cruzada con los importes (5 vs 4) descartaba todas.
+- **Corrección**: la regla acepta 7 u 8 cifras (código guardado tal como se imprime). Reintentar la lectura en el pedido ya cargado. Ver CHANGELOG v12.32.84.
+- **Ficheros editados en este repo**: `app.py`, `templates/index.html`, `README.md`, `CHANGELOG.md`, `docs/HISTORIAL_CAMBIOS.md`.
+- **Otros documentos (norma 5)**: sin variables ni SQL manual; resto: no aplica.
+- **Pendiente / ideas**: la búsqueda de artículos distingue `2060205` de `02060205` si alguien escribe el código con un cero delante (valorar búsqueda tolerante a ceros iniciales).
+
+---
+
+## 2026-10-07 — [Control Pedidos] Revisión obligatoria del estado tras leer el PDF oficial y fecha + archivo en los estados de firma (v12.32.83)
+
+- **Origen**: Víctor: al cargarse bien el PDF oficial, ventana que confirme la carga y obligue a revisar el estado antes de guardar (¿ENVIADO AL PROVEEDOR u otro?); si se marca pendiente de firma (Compras, Hotel o Dirección General), debe haber fecha y archivo en «enviado para firma», y lo mismo si el estado se cambia a mano.
+- **Hallazgo**: la sección «enviado para firma» es «Fecha de envío para Vº Bº» (`fecha_envio_visto_bueno`) + adjuntos `vb_eml`; hasta ahora no era obligatoria para ningún estado. Nuevo problema detectado de paso: los ZIP de v12.32.81 y v12.32.82 llevaban `README.md` vacío (0 bytes).
+- **Corrección**: ventana bloqueante (no usa `.modal-overlay`, para que Escape/clic fuera no la cierren) con elección obligatoria de estado; ventana «Envío para firma» que pide y sube fecha + archivo; comprobación en `savePedido`; validación 422 en `update_pedido` solo al cambiar de estado; README restaurado desde v12.32.80 (ver CHANGELOG v12.32.83).
+- **Ficheros editados en este repo**: `app.py`, `templates/index.html`, `README.md` (restaurado), `CHANGELOG.md`, `docs/HISTORIAL_CAMBIOS.md`.
+- **Otros documentos (norma 5)**: sin variables ni SQL manual; resto de documentos de mantenimiento: no aplica.
+- **Pendiente / ideas**: copiar al comprador responsable en los correos cuando firma otra persona; mostrar lo pendiente en el correo de entrega parcial; exportar a Excel los faltantes.
+
+---
+
+## 2026-10-07 — [Control Pedidos] Detalle opcional de referencias entregadas por entrada y dónde está la diferencia de importe (v12.32.82)
+
+- **Origen**: Víctor: poder marcar, de forma opcional, las referencias y unidades entregadas en una entrada parcial (confirmando en pantalla y cambiando la cantidad) para ajustar y diagnosticar faltantes; y, en la entrega total con importe distinto del pedido, poder indicar dónde está la diferencia.
+- **Hallazgo**: las entradas (`entrada_albaran_num`) solo guardan Nº, fecha e importe; desde v12.32.75 el pedido tiene líneas (`pedido_lineas`) sobre las que apoyarlo.
+- **Corrección**: tabla `pedido_lineas_entregas` (por pedido + albarán + código), `GET /api/pedidos/<id>/entregas-lineas`, clave `entregas_lineas` en `PUT /api/pedidos/<id>` (misma transacción que el resto del formulario), botón 📋 Referencias por entrada, aviso/ventana de diferencia con comparación de importes (no hotel), columnas Entreg./Pend. en panel de líneas y buscador (ver CHANGELOG v12.32.82).
+- **Ficheros editados en este repo**: `app.py`, `templates/index.html`, `README.md`, `CHANGELOG.md`, `docs/HISTORIAL_CAMBIOS.md`.
+- **Otros documentos (norma 5)**: sin variables ni SQL manual (tabla por `_auto_migrate`); resto de documentos de mantenimiento: no aplica.
+- **Pendiente / ideas**: mostrar lo pendiente en el correo de entrega parcial; exportar a Excel los faltantes.
+
+---
+
+## 2026-10-07 — [Control Pedidos] OCR de pedidos escaneados: motivo del rechazo visible y respaldo de idioma (v12.32.81)
+
+- **Origen**: Víctor, captura con el error de "16885.pdf" tras entregar la v12.32.80.
+- **Hallazgo**: en pruebas se lee bien; sin detalle en el mensaje no se puede saber si es versión sin desplegar o diferencia del OCR del servidor.
+- **Corrección**: detalle técnico del OCR en el error y en el log; respaldo a inglés si falla `spa` (ver CHANGELOG v12.32.81).
+- **Ficheros editados en este repo**: `app.py`, `templates/index.html` (badge), `README.md`, `CHANGELOG.md`, `docs/HISTORIAL_CAMBIOS.md`.
+- **Otros documentos (norma 5)**: sin variables ni SQL; no aplica.
+
+---
+
+## 2026-10-07 — [Control Pedidos] PDF de pedido escaneado/firmado (16886): OCR por consenso + líneas verificadas (v12.32.80)
+
+- **Origen**: Víctor, captura del error al subir el 16886 firmado (+ PDFs 16885, 16886 y 16886 original).
+- **Hallazgo**: una sola pasada de OCR: Nº de pedido mal leído (16836) y totales sumados de líneas mal reconocidas (16885 → 1,07 €) — rechazo o dato equivocado sin aviso.
+- **Corrección**: OCR en grises con hasta 3 pasadas; Nº y Total impreso por coincidencia entre pasadas (sin mayoría → rechazo); líneas reconstruidas con cantidad × precio = importe y aceptadas solo si suman el Total impreso; columna `pedido_adjuntos.lineas_ocr` + avisos en pantalla; lotes de lectura masiva de 4 (ver CHANGELOG v12.32.80).
+- **Ficheros editados en este repo**: `app.py`, `templates/index.html`, `README.md`, `CHANGELOG.md`, `docs/HISTORIAL_CAMBIOS.md`.
+- **Otros documentos (norma 5)**: sin variables ni SQL manual (columna nueva por `_auto_migrate`). Tesseract + paquete `spa` ya estaban en el Dockerfile.
+- **Pendiente / ideas**: mejorar la lectura de descripciones/referencias de escaneados con detección de la cuadrícula de la tabla.
+
+---
+
+## 2026-10-07 — [Control Pedidos] Correo al proveedor por cambio de estado firmado por quien gestiona el pedido (v12.32.79)
+
+- **Origen**: Víctor: los correos de cambio de estado siempre salían firmados por el comprador responsable; si gestiona otro comprador o un administrador deben salir firmados por quien hace la gestión, para trazabilidad.
+- **Hallazgo**: `enviar_emails_estado` usaba `compradores[0]` del hotel como firma y Reply-To del correo al proveedor (único correo de cambio de estado con firma de comprador; el interno ya incluye "Realizado por").
+- **Corrección**: `_resolver_firmante_cambio_estado` — firma/Reply-To = usuario que hace el cambio manual si es comprador/admin activo con email; si no (automático, rol hotel, sin email) el comprador responsable. Los recordatorios automáticos a proveedores no cambian (ver CHANGELOG v12.32.79).
+- **Ficheros editados en este repo**: `app.py`, `templates/index.html` (badge), `README.md`, `CHANGELOG.md`, `docs/HISTORIAL_CAMBIOS.md`.
+- **Otros documentos (norma 5)**: sin variables ni SQL; no aplica.
+- **Pendiente / ideas**: si se quiere, copiar al comprador responsable cuando firme otra persona.
+
+---
+
+## 2026-10-07 — [Control Pedidos] Total Pedido: las etiquetas aproximado/real se veían a la vez (v12.32.78)
+
+- **Origen**: Víctor, captura del pedido 41827 PILSA: "sale tanto aproximado como real ¿por qué?".
+- **Hallazgo**: `display:inline-block` en línea anulaba el atributo `hidden` de ambas etiquetas; "≈ APROXIMADO" estaba siempre visible desde antes de v12.32.77 (el valor del total sí era correcto).
+- **Corrección**: regla CSS que respeta `hidden` en las dos etiquetas (ver CHANGELOG v12.32.78).
+- **Ficheros editados en este repo**: `templates/index.html`, `README.md`, `CHANGELOG.md`, `docs/HISTORIAL_CAMBIOS.md`.
+- **Otros documentos (norma 5)**: sin cambios de backend, variables ni SQL; no aplica.
+
+---
+
+## 2026-10-07 — [Control Pedidos] Total Pedido del PDF oficial: "REAL · SIN IGIC" en lugar de "≈ aproximado" (v12.32.77)
+
+- **Origen**: Víctor: "detalle, si la lectura es del pedido real, ya el total no es aproximado, es real sin igic" (captura con 9196,44 € marcado ≈ APROXIMADO).
+- **Hallazgo**: la marca `total_pedido_aproximado` solo se limpiaba al subir el PDF o al comparar el listado resumido; con el PDF ya cargado (o líneas leídas después, v12.32.75) quedaba visible aunque el total fuera el del PDF.
+- **Corrección**: `get_lineas_pedido` fija total real (suma de líneas = base sin IGIC) y limpia la marca cuando hay PDF oficial con líneas cuadradas; etiqueta verde "✔ REAL · SIN IGIC" en el formulario (ver CHANGELOG v12.32.77).
+- **Ficheros editados en este repo**: `app.py`, `templates/index.html`, `README.md`, `CHANGELOG.md`, `docs/HISTORIAL_CAMBIOS.md`.
+- **Otros documentos (norma 5)**: sin variables nuevas ni SQL manual; resto de documentos de mantenimiento: no aplica.
+
+---
+
+## 2026-10-07 — [Control Pedidos] Buscador de artículos en pedidos: hotel + referencia → nº pedido, cantidad y estado (v12.32.76)
+
+- **Origen**: Víctor: "seria interezante un buscador en el que podamos buscar por hotel y referencia, nos indique nuemero de pedido, cantidad y estado".
+- **Hallazgo**: con las líneas guardadas desde v12.32.75 (`pedido_lineas`) el buscador es una consulta directa; los pedidos con PDF anterior a esa versión no tienen líneas hasta que se abren o se lanza la lectura masiva.
+- **Corrección**: `GET /api/pedidos/lineas/buscar` + `POST /api/pedidos/lineas/leer-pendientes` (admin, lotes de 10) + vista "🔎 Buscar artículo" (ver CHANGELOG v12.32.76). Rol hotel acotado a sus hoteles y sin precios; hotel `PR` oculto a quien no corresponde; límite 300 filas con aviso; aviso de cobertura (pedidos con PDF sin líneas leídas).
+- **Ficheros editados en este repo**: `app.py`, `templates/index.html`, `README.md`, `CHANGELOG.md`, `docs/HISTORIAL_CAMBIOS.md`.
+- **Otros documentos (norma 5)**: sin variables de entorno nuevas ni SQL manual; revisados `GUIA_DESPLIEGUE.md`, `PENDIENTES.md`, `INSTRUCCIONES_RESTAURACION.md`: no aplica.
+- **Pendiente / ideas**: contrastar cantidades pedidas con las recibidas; exportar resultados a Excel.
+
+---
+
+## 2026-10-07 — [Control Pedidos] PDF de pedido oficial: se leen y guardan las líneas (referencias, cantidades, precios) (v12.32.75)
+
+- **Origen**: Víctor: "cuando se carga un pedido PDF, el sistema deberá leer el contenido del pedido, deberemos saber siempre referencias, cantidades etc; actualmente solo lee nombre proveedor almacén número pedido etc".
+- **Hallazgo**: las líneas de artículo solo se leían para sumar su importe (Total Pedido) y se descartaban; `pypdf` desordena las columnas y pega la referencia del proveedor al importe ("298,801000664"), por lo que no es válido para extraerlas. Con `pdfplumber` (posición real de cada palabra) la tabla sale limpia: la línea con el código y los números va en el centro y su descripción se reparte en 1-4 líneas arriba y abajo, así que cada línea de solo texto se asigna al artículo más cercano en vertical.
+- **Corrección**: lector de líneas + tabla `pedido_lineas` + endpoint `GET /api/pedidos/<id>/lineas` + panel en el formulario del pedido (ver CHANGELOG v12.32.75). Salvaguardas: las líneas solo se guardan si sus importes coinciden con los del lector antiguo; PDF escaneado (OCR) sin líneas; lectura retroactiva perezosa para pedidos ya cargados; rol hotel sin precios.
+- **Ficheros editados en este repo**: `app.py`, `templates/index.html`, `README.md`, `CHANGELOG.md`, `docs/HISTORIAL_CAMBIOS.md`.
+- **Otros documentos (norma 5)**: sin variables de entorno nuevas ni SQL manual (la tabla se crea sola al arrancar). `pdfplumber` ya estaba en `requirements.txt`.
+- **Pendiente / ideas**: buscar un artículo por código o referencia en todos los pedidos; contrastar cantidades con las entradas de mercancía.
+
+---
+
+## 2026-10-07 — [Control Pedidos] Excel de proveedores: código DALI, hoteles de cada contacto, servicio por hotel y rutómetro (v12.32.74)
+
+- **Origen**: Víctor: "en control de pedidos, ficha proveedores, este es el excel que exporta actualmente, necesito incluir columna código DALI y también rutómetro, se debe poder identificar también los correos electrónicos por hoteles según esté configurada la ficha".
+- **Hallazgo**: el Excel (`exportar_proveedores`) también sirve de plantilla de importación, y `_parse_excel_proveedores` lee por NOMBRE de cabecera, por lo que se pueden añadir columnas sin romperla. Los hoteles de cada contacto (`proveedor_contacto_hoteles`): sin filas = contacto "general"; con filas = solo esos hoteles; la ficha los crea todos marcados por defecto.
+- **Corrección**: columnas CODIGO DALI, HOTELES DEL CONTACTO, SERVICIO EN HOTELES (v12.32.73) y RUTOMETRO (una línea por ciclo), más filtro automático. El hotel PR no se muestra en el texto de hoteles.
+- **Limitación conocida (anterior a este cambio)**: la importación de proveedores sustituye los contactos y no lee asignaciones de hotel por contacto, ni las lee ahora tampoco; las columnas nuevas son informativas.
+- **Ficheros editados en este repo**: `app.py`, `templates/index.html` (badge), `README.md`, `CHANGELOG.md`, `docs/HISTORIAL_CAMBIOS.md`.
+- **Otros documentos (norma 5)**: sin cambios de despliegue ni de base de datos.
+
+---
+
+## 2026-10-07 — [Control Pedidos / DALI] Rutómetro: servicio por hotel activo por defecto en los 10 hoteles (v12.32.73)
+
+- **Origen**: Víctor, verbatim: "necesito que en la ficha de proveedores el rutómetro se active por defecto a los 10 hoteles y que solo el admin o comprador desmarque aquel o aquellos hoteles que el proveedor no tenga servicio, de esta manera automáticamente se realiza el filtro de materiales en la aplicación Catálogo Asignaciones según proveedores con rutómetro activo".
+- **Hallazgo**: hasta v12.32.72 "tiene rutómetro" equivalía a "tiene filas en `proveedor_rutas`", así que para que DALI filtrara había que crear una ruta por hotel, y un proveedor nuevo no filtraba por omisión. Los días de pedido/reparto y el servicio por hotel son cosas distintas.
+- **Corrección**: tabla `proveedor_hoteles_sin_servicio` (exclusiones: sin filas = todos los hoteles, y los hoteles nuevos nacen cubiertos); bloque "Servicio por hotel" en la ficha con todo marcado por defecto; guardado en `create_proveedor`/`update_proveedor` (si el formulario no manda la clave, se conserva lo guardado, para no borrar datos desde una página en caché); rutas de hoteles sin servicio rechazadas en formulario y backend; el puente DALI devuelve `hoteles_sin_servicio`/`hoteles_con_servicio`. El hotel `PR` queda fuera. Migración y carga inicial automáticas en `_auto_migrate()` (una sola vez, conserva las restricciones actuales: hoteles activos sin ruta de proveedores con rutómetro).
+- **Ficheros editados en este repo**: `app.py`, `models.py` (solo nota), `templates/index.html`, `README.md`, `CHANGELOG.md`, `docs/HISTORIAL_CAMBIOS.md`.
+- **Otros documentos (norma 5)**: `GUIA_DESPLIEGUE.md` y similares no existen/no afectan: sin variables de entorno nuevas ni SQL manual.
+- **Despliegue**: primero esta app, después DALI v1.20.36.
+
+---
+
+## 2026-10-02 — [Control Pedidos / DALI] El Rutómetro decide qué artículos ve activos cada usuario según su hotel (v12.32.72)
+
+- **Origen**: Víctor, verbatim: "necesito que cada usuario solo vea activo
+  los articulos de los proveedores que tienen servicio en su hotel, por
+  ejemplo, Fran y Chemi (1001411) solo tiene reparto en la isla de
+  Fuerteventura (FV y JN); el sistema deberá verificar en la ficha del
+  proveedor el rutómetro y si no tiene reparto en un hotel, los artículos
+  asignados a este proveedor pasan a no activos automáticamente (...) si
+  no tiene rutómetro activo, entonces no hay variación". También pidió
+  una ficha lateral con el rutómetro al pulsar el nombre de un proveedor
+  en el catálogo DALI — lo preparó dejando asignar un hotel a cada
+  usuario de DALI (`usuarios.hoteles_ids`, 2026-10-02, entrega anterior
+  ese mismo día) sin decir todavía para qué, "luego indicaré que función
+  puede tener esto".
+- **Dónde vive cada cosa**: el Rutómetro es un dato de Control Pedidos
+  (`proveedor_rutas`); los artículos y los usuarios con hotel asignado
+  son de DALI. Se cruzan por NOMBRE exacto de proveedor, por el puente ya
+  existente entre las dos apps (`GET /api/externo/dali-sap/proveedores`,
+  v12.30.26 y siguientes) — bastaba con que ese endpoint devolviera
+  también el rutómetro de cada proveedor, sin crear uno nuevo.
+- **Decisión de arquitectura**: se preguntó a Víctor si prefería que DALI
+  guardara una copia sincronizada (botón manual o refresco automático) o
+  consultara Control Pedidos en vivo en cada petición. Eligió **consulta
+  en vivo**, explícitamente, porque además quiere la ficha lateral de
+  detalle al pulsar el proveedor con el dato real del momento. Asumido a
+  propósito: el catálogo de DALI pasa a depender de que Control Pedidos
+  responda a tiempo; si no responde, DALI falla "abierto" (sin
+  restricción, como si el proveedor no tuviera rutómetro) en vez de
+  romper la carga del catálogo — ver el HISTORIAL.md de DALI.
+- **Cambio en este repo**: `GET /api/externo/dali-sap/proveedores`
+  (`app.py`) añade `rutas` a cada proveedor de la respuesta (uno por fila
+  de `proveedor_rutas`: hotel, días de pedido, días de reparto,
+  observaciones), reutilizando `_prov_with_contactos()` tal cual —
+  `rutas: []` significa "sin rutómetro configurado" (Víctor: "si no tiene
+  rutómetro activo, entonces no hay variación"), nunca "cubre cero
+  hoteles". Sin cambios de base de datos ni de permisos aquí.
+- **Cambio en DALI** (repo aparte, `dali-sap-articulos-app` — resumen,
+  ver su propio HISTORIAL.md/CHANGELOG.md para el detalle): la sesión de
+  cada usuario pasa a incluir `hoteles_ids`; el listado principal del
+  catálogo (`GET /articulos`), para usuarios con rol 'hotel' (nunca para
+  admin), excluye los artículos de un proveedor cuando ese proveedor SÍ
+  tiene rutómetro en Control Pedidos pero ninguna de sus rutas cubre los
+  hoteles del usuario — consulta en vivo al puente en cada petición, sin
+  copia propia. Nueva ficha lateral (`ProveedorRutometroDetail.jsx`,
+  consulta en vivo también) al pulsar el nombre de un proveedor, tanto en
+  la tabla principal como en el detalle de artículo.
+- **Revisión norma 5**: no aplica a `GUIA_DESPLIEGUE.md` /
+  `INSTRUCCIONES_RESTAURACION.md` / `PENDIENTES.md` en este repo — el
+  endpoint ya existía, solo se amplía su respuesta.
+- **Verificación**: `python3 -m py_compile app.py` limpio en este repo.
+  Comprobado a mano que `rutas` sale vacío para un proveedor sin ninguna
+  fila en `proveedor_rutas` y con sus filas reales, agrupadas por hotel,
+  para uno que sí tiene rutómetro. Lado DALI: `node --check` en los
+  archivos backend tocados, `vite build` real (con y sin `VITE_API_URL`)
+  y un script aparte verificando la lógica de intersección de hoteles —
+  ver su propio HISTORIAL.md/CHANGELOG.md para el detalle completo.
+- **Ficheros**: en este repo — `app.py`, `templates/index.html`,
+  `README.md`, `CHANGELOG.md`, `docs/HISTORIAL_CAMBIOS.md` (este). En
+  DALI — ver su propio HISTORIAL.md/CHANGELOG.md.
+
+---
+
+## 2026-10-02 — [Control Pedidos] Rutómetro: un hotel puede tener varios repartos distintos la misma semana (v12.32.71)
+
+- **Origen**: corrección de Víctor sobre la v12.32.70 entregada unas horas
+  antes el mismo día, verbatim: "un proveedor puede tener varios repartos
+  en la misma semana y hotel".
+- **Problema**: la v12.32.70 original diseñó el rutómetro como "una fila =
+  el horario completo de un hotel" (`UNIQUE(proveedor_id, hotel_id)`), con
+  un conjunto de días de pedido y otro de días de reparto sin relación
+  entre sí. No permite expresar dos ciclos reales distintos en el mismo
+  hotel la misma semana (p.ej. pedido L → reparto X, y también pedido J →
+  reparto V) sin perder qué pedido corresponde a qué reparto — y el UNIQUE
+  ni siquiera dejaba intentarlo con dos filas.
+- **Corrección**: se quita la restricción de una fila por hotel. Cada fila
+  pasa a ser un ciclo pedido→reparto independiente; el mismo hotel puede
+  repetirse en tantas filas como ciclos reales tenga.
+- **Cambio**: `models.py` (tabla `proveedor_rutas` sin el `UNIQUE` en
+  instalaciones nuevas); `_auto_migrate()` en `app.py` (nuevo bloque
+  protegido, `ALTER TABLE ... DROP CONSTRAINT IF EXISTS
+  proveedor_rutas_proveedor_id_hotel_id_key`, por si alguna base de datos
+  llegó a desplegar la v12.32.70 tal cual); `_guardar_rutas_proveedor()`
+  ya no rechaza hoteles repetidos en el payload; `_prov_with_contactos()`
+  reordena el rutómetro por hotel primero para que las filas de un mismo
+  hotel salgan agrupadas; `templates/index.html` quita la lógica que
+  deshabilitaba hoteles ya elegidos en otras filas (ya no aplica) y
+  actualiza el texto de ayuda del apartado.
+- **Revisión norma 5**: igual que la entrada anterior (v12.32.70) — no
+  aplica a `GUIA_DESPLIEGUE.md`/`INSTRUCCIONES_RESTAURACION.md`/
+  `PENDIENTES.md`.
+- **Verificación**: `python3 -m py_compile app.py models.py init_db.py`
+  limpio. Lógica de guardado reproducida aparte con el caso real de
+  Víctor (mismo hotel, dos ciclos pedido→reparto) — las filas se
+  conservan sin mezclar días entre ciclos. `node --check` limpio sobre
+  los 7 `<script>` reales de `templates/index.html`. Sigue pendiente de
+  probarse contra Postgres real.
+- **Ficheros**: `models.py`, `app.py`, `templates/index.html`, `README.md`,
+  `CHANGELOG.md`, `docs/HISTORIAL_CAMBIOS.md` (este).
+
+---
+
+## 2026-10-02 — [Control Pedidos] Rutómetro en la ficha de proveedor: días de pedido y reparto por hotel (v12.32.70)
+
+- **Origen**: Víctor, verbatim: "Necesito que añadas a la ficha del
+  proveedor un apartado para rutometro, de manera profesional y clara, la
+  idea es que se pueda indicar dias de pedido y reparto correspondiente
+  por hotel", con dos capturas del modal "Editar proveedor" (ficha de
+  EMICELA SA) como referencia del sitio donde debía ir.
+- **Diseño**: una fila por hotel (nunca dos para el mismo hotel — el
+  select del hotel deshabilita en las demás filas el que ya está elegido
+  en una, y el servidor aplica la misma regla por si acaso), con chips de
+  días de la semana (L-M-X-J-V-S-D) independientes para "días de pedido"
+  y "días de reparto", más una observación libre opcional por fila. Mismo
+  patrón visual y de interacción que "Contactos", en la misma ficha, para
+  que resulte familiar. Puramente informativo: no dispara avisos, no
+  bloquea ni modifica ningún pedido, no interviene en "Comparar listado
+  PDF" ni en ninguna otra lógica existente.
+- **Cambio**:
+  - Tabla nueva `proveedor_rutas` (`models.py` para instalaciones desde
+    cero, `_auto_migrate()` en `app.py` para las ya desplegadas, puesta en
+    el bloque protegido con su propio try/except — misma norma que
+    `codigo_dali`/`sujeto_seguimiento`/`total_pedido`, ver esas entradas
+    anteriores). `UNIQUE(proveedor_id, hotel_id)`: un proveedor no puede
+    tener dos horarios distintos para el mismo hotel.
+  - `_normalizar_dias_semana()`, `_guardar_rutas_proveedor()` (`app.py`,
+    nuevas) — normalizan y guardan el rutómetro al crear/editar un
+    proveedor, comprobando ANTES de tocar la base de datos que ningún
+    hotel se repita en el payload (para no dejar la transacción abortada
+    a mitad de guardar el resto de la ficha).
+  - `_prov_with_contactos()` (`app.py`) ahora también adjunta `rutas` a
+    cada proveedor — usada por los 4 endpoints que devuelven fichas
+    completas, así que el rutómetro queda disponible en todos sin tocarlos
+    uno por uno.
+  - Permisos: admin y compras pueden editar el rutómetro (igual que
+    contactos/observaciones), no solo admin — es logística operativa, no
+    un dato de identidad del proveedor como nombre/código SAP/DALI.
+  - `templates/index.html`: apartado nuevo "🚚 Rutómetro" en el modal
+    "Editar proveedor" (entre Contactos y Observaciones), funciones `rt*`.
+- **Revisión norma 5**: `GUIA_DESPLIEGUE.md` e
+  `INSTRUCCIONES_RESTAURACION.md` solo refieren el schema de forma
+  genérica ("ejecuta `models.py`"/`SQL_STATEMENTS`), sin listar tablas
+  concretas — no aplica ningún cambio. `PENDIENTES.md` no aplica (no era
+  una tarea ahí registrada, se implementa directamente en la misma
+  petición).
+- **Verificación**: `python3 -m py_compile app.py models.py init_db.py`
+  limpio. `_normalizar_dias_semana()` y la detección de hotel duplicado
+  extraídas a un script aparte, probadas con 9 casos (orden, mayúsculas/
+  minúsculas, códigos inválidos, vacíos, duplicado real) — todos
+  correctos. Los 7 `<script>` reales de `templates/index.html`
+  (descartando coincidencias falsas de la palabra "script" dentro de
+  comentarios HTML) extraídos y comprobados con `node --check`, limpio.
+  No se ha podido probar contra una base de datos Postgres real — falta
+  que Víctor pruebe en producción (crear/editar un proveedor con 2-3
+  hoteles y días distintos, comprobar que persisten, que un hotel ya
+  elegido no se puede repetir, y que compras puede editarlo).
+- **Ficheros**: `models.py`, `app.py`, `templates/index.html`, `README.md`,
+  `CHANGELOG.md`, `docs/HISTORIAL_CAMBIOS.md` (este).
+
+---
+
+> 📦 **Entradas anteriores** (julio a septiembre de 2026): ver
+> `docs/archivo/HISTORIAL_CAMBIOS_2026-07_a_2026-09.md`.
 
 ---
 

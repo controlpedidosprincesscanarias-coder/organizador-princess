@@ -1,6 +1,8 @@
 # Organizador Princess
 **Central de Compras Princess Canarias – © VAMA 2026**
 
+> **Autoría:** la idea y el desarrollo de la aplicación Organizador Princess, incluidas sus pruebas, son de **Víctor Alejandro Martín Andrade**, para el Departamento de Central de Compras de Princess Hotels en Canarias. Ver `AUTORIA.md`.
+
 Aplicación de escritorio desarrollada en **Python + ttkbootstrap**, que combina una agenda/calendario con avisos programados y un sistema de accesos rápidos a carpetas y aplicaciones internas. Se integra en tiempo real con **Control de Pedidos** (la app web del departamento) a través de un sistema de notificaciones en segundo plano (bridge), mostrando como popup en pantalla los mismos avisos que se envían por Telegram — solo para el usuario y rol correspondiente.
 
 ---

@@ -1,0 +1,659 @@
+✨ Organizador Princess v4.16.8
+================================================================
+
+🔧 CORRECCIÓN
+
+Los mensajes propios en el chat podían salir duplicados: una burbuja
+sin hora (al enviarlo) y otra con hora (al confirmarse). Ahora solo
+aparece una única burbuja por mensaje, tanto en la ventana completa
+del chat como en la burbuja flotante de avisos.
+
+================================================================
+
+✨ Organizador Princess v4.16.6
+================================================================
+
+🔧 CORRECCIÓN
+
+Los avisos con repetición Diaria, Cada hora o Cada 30 min con fecha de
+inicio futura podían volver a aparecer antes de tiempo en el popup de
+bienvenida y en el detalle del día — un fallo similar ya se había
+corregido antes (v4.10.2), pero solo en otra parte de la app. Ahora el
+popup de bienvenida y el detalle del día también respetan la fecha de
+inicio antes de mostrar estos avisos.
+
+================================================================
+
+✨ Organizador Princess v4.16.5
+================================================================
+
+🔧 CORRECCIÓN
+
+El aviso de "Error al comprobar actualizaciones" (GitHub) también
+podía repetirse cada 30 minutos sin parar si no había forma de
+contactar con GitHub. Ahora sigue la misma regla que el aviso de
+Control de Pedidos: si falla, se espera 5 minutos y se vuelve a
+probar en silencio; solo si sigue fallando se muestra el aviso.
+
+================================================================
+
+✨ Organizador Princess v4.16.4
+================================================================
+
+🔧 CORRECCIÓN
+
+El aviso de "Error de conexión con Control de Pedidos" saltaba con el
+primer corte, aunque fuera algo puntual que se arregla solo (un wifi
+que parpadea un segundo, el servidor arrancando). Ahora, si falla la
+conexión, no se avisa enseguida: se espera 5 minutos y se vuelve a
+probar. Si en ese momento ya funciona, no llega a salir ningún aviso.
+Si sigue sin funcionar, entonces sí se muestra el diálogo de error,
+como antes.
+
+================================================================
+
+✨ Organizador Princess v4.16.3
+================================================================
+
+🔧 CORRECCIÓN (en pruebas)
+
+El aviso emergente de un pedido con demora podía repetirse varias
+veces seguidas el mismo día — sobre todo si tenías varios pedidos
+urgentes acumulados o cerrabas y volvías a abrir el Organizador.
+Ahora es Control de Pedidos quien decide si ya te mostró un aviso
+concreto, así que cada uno te llega una sola vez, sin repeticiones ni
+reintentos por hora.
+
+================================================================
+
+✨ Organizador Princess v4.16.2
+================================================================
+
+🔧 CORRECCIÓN
+
+"🧹 Limpiar chat" podía afectar a más de una conversación a la vez:
+si limpiabas una conversación privada recién abierta (sin mensajes
+todavía), esa limpieza también se aplicaba a cualquier OTRA
+conversación privada nueva que abrieras después, en vez de afectar
+solo a la que tenías abierta. Corregido — cada limpieza queda
+correctamente aislada a la conversación en la que la haces.
+
+================================================================
+
+✨ Organizador Princess v4.16.0
+================================================================
+
+🔧 CORRECCIÓN IMPORTANTE
+
+Quien ya se había creado su contraseña momentánea (mientras esperaba
+la aprobación de su solicitud) se quedaba SIN PODER volver a entrar
+al panel de Administración después de cerrar y reabrir el programa —
+volvía a salir el formulario de "Enviar solicitud" en vez del de
+acceso. Corregido: ahora siempre te deja escribir tu contraseña,
+tengas o no tengas ya una creada.
+
+================================================================
+
+✨ Organizador Princess v4.14.8
+================================================================
+
+🔧 CAMBIO DE COMPORTAMIENTO
+
+"🧹 Limpiar chat" ahora sí es persistente: al vaciarlo, esos mensajes
+dejan de verse en este equipo aunque salgas del chat y vuelvas a
+entrar. No se borra nada del servidor — el resto de participantes de
+la conversación sigue viendo el historial completo, y si tú mismo
+accedes desde otro ordenador, también lo verás ahí hasta que limpies
+también en ese equipo.
+
+================================================================
+
+✨ Organizador Princess v4.14.6
+================================================================
+
+🎨 MEJORA DE INTERFAZ
+
+Mejorado el contraste del botón "🧹 Limpiar chat" y de varios textos
+de ayuda en la ventana principal del chat (apenas se leían con el
+tema oscuro de la app). Confirmado también que "Limpiar chat" solo
+vacía tu pantalla — no borra nada del servidor, así que el historial
+completo vuelve a aparecer si sales del chat y vuelves a entrar; eso
+es el comportamiento previsto, ya avisado en el propio botón antes de
+usarlo.
+
+================================================================
+
+✨ Organizador Princess v4.14.4
+================================================================
+
+🔧 CORRECCIÓN
+
+Al reabrir "⚙ Admin" después de haber enviado ya una solicitud de
+acceso (pendiente de aprobación), volvía a salir siempre el
+formulario de "Enviar solicitud" en vez de dejarte escribir tu
+contraseña momentánea. Ahora, si detecta que la solicitud ya está
+enviada, te deja en la pantalla de acceso para que introduzcas (o
+crees) esa contraseña momentánea con normalidad.
+
+================================================================
+
+✨ Organizador Princess v4.14.2
+================================================================
+
+🚀 NOVEDADES PRINCIPALES
+
+Chat: cada mensaje muestra ahora la fecha junto a la hora
+(DD/MM HH:MM), en la ventana principal y en la burbuja flotante.
+
+Botón de adjuntar archivo agrandado en las dos ventanas del chat,
+más fácil de acertar con el clic.
+
+Nuevo botón "🧹 Limpiar chat" en la ventana principal, junto al
+nombre de la conversación — vacía la vista de la pantalla (no borra
+nada del servidor; al volver a abrir el chat, el historial sigue
+ahí).
+
+================================================================
+
+✨ Organizador Princess v4.14.0
+================================================================
+
+🔧 CORRECCIÓN
+
+Los avisos de "Pedido sin avance" mostraban un número interno de base
+de datos ("Pedido #13537") que no coincide con ningún número visible
+en la web — ni el "Nº" de línea ni el número de pedido SAP. Ahora
+muestran el número de pedido SAP si existe, o si no el "Nº" de línea,
+igual que ya hacían los avisos de Telegram — para identificar el
+pedido de un vistazo, sin tener que ir a buscarlo.
+
+================================================================
+
+✨ Organizador Princess v4.12.8
+================================================================
+
+🚀 NOVEDADES PRINCIPALES
+
+Al solicitar acceso a Control de Pedidos ("⚙ Admin" sin cuenta
+todavía), ahora la app deja tu nombre y tu usuario de Windows ya
+precargados en "👤 Mi Usuario". Además, mientras se aprueba tu
+solicitud, podés elegir vos mismo/a una contraseña provisional
+volviendo a pulsar "⚙ Admin" — esa contraseña te da acceso ya al
+panel de este equipo, pero todavía no al chat ni a los avisos de
+Control de Pedidos. Cuando llegue el correo de aprobación, entrá en
+"Mi Usuario" y cambiá esa contraseña provisional por la definitiva
+para desbloquear el resto.
+
+================================================================
+
+✨ Organizador Princess v4.12.6
+================================================================
+
+🚀 NOVEDADES PRINCIPALES
+
+Chat rediseñado — burbujas de verdad (rectángulos redondeados,
+diferenciadas por color según sean tuyas o del otro), con la hora de
+cada mensaje en formato HH:MM. Nuevo en ambas ventanas del chat, la
+principal y la burbuja flotante.
+
+Copiar mensajes: clic derecho sobre cualquier mensaje → "Copiar
+mensaje", para pegarlo donde haga falta.
+
+🔧 CORRECCIÓN
+
+En la burbuja flotante, el orden de los mensajes ahora es siempre
+cronológico — el más reciente queda abajo, justo encima de donde se
+escribe, sin importar el orden en que lleguen del servidor.
+
+================================================================
+
+✨ Organizador Princess v4.12.4
+================================================================
+
+🚀 NOVEDADES PRINCIPALES
+
+Solicitar acceso a Control de Pedidos en un solo paso: si tu usuario
+de Windows todavía no tiene cuenta, ya no hace falta elegir tú mismo
+un usuario y contraseña provisionales. Ahora se piden los mismos
+datos que en la web (nombre, apellidos, correo, móvil de empresa y
+hotel/es), y la solicitud llega directa a los administradores lista
+para aprobar — sin pasos intermedios por email ni descargar nada.
+Cuando la aprueben, recibirás tus credenciales por correo.
+
+================================================================
+
+✨ Organizador Princess v4.12.2
+================================================================
+
+🔧 CORRECCIÓN
+
+Chat: si la sesión dejaba de ser válida (por ejemplo, tras un
+redeploy del servidor que cambia la clave de firma de las sesiones),
+el chat se quedaba "colgado" sin avisar bien — con "Error de
+conexión" hasta cerrar y volver a abrir el Organizador entero. Ahora
+detecta esa situación sola y vuelve a iniciar sesión automáticamente,
+sin que haga falta reiniciar nada.
+
+================================================================
+
+✨ Organizador Princess v4.12.0
+================================================================
+
+🔧 CORRECCIÓN
+
+Ventana de Chat: varios controles (la fila para escribir/adjuntar/
+enviar, el botón "Abrir chat" y "＋ Nueva conversación", los nombres
+de las conversaciones) podían quedar cortados o desaparecer del todo
+según el tamaño de la ventana, el escalado de pantalla de Windows, o
+según lo largos que fueran los nombres de usuarios y grupos. Ahora
+esos anchos se calculan midiendo el texto real cada vez que hace
+falta, en vez de un tamaño fijo adivinado de antemano — así se
+adaptan solos aunque aparezcan nombres más largos en el futuro.
+
+================================================================
+
+✨ Organizador Princess v4.10.8
+================================================================
+
+🔧 CORRECCIÓN
+
+Acceso a Administración sin conexión: si tu equipo ya tenía guardada
+tu contraseña de Control de Pedidos en "Mi Usuario", ahora se
+reconoce directamente aunque no haya conexión con el servidor — antes
+solo funcionaba así si alguna vez habías entrado a Administración
+correctamente online primero. Además, si la contraseña guardada
+coincide, el acceso es inmediato: ya no se espera a comprobar la
+conexión antes.
+
+La ventana de "Acceso Administración" ya se ajusta de alto
+correctamente cuando el mensaje de error o el aviso de "sin conexión"
+ocupa más (o menos) líneas de las previstas — antes podía quedar
+recortado.
+
+Los avisos de error de conexión (con Control de Pedidos o con GitHub)
+se cierran solos a los 2 minutos si nadie los cierra a mano — antes se
+quedaban abiertos indefinidamente.
+
+================================================================
+
+✨ Organizador Princess v4.10.6
+================================================================
+
+🚀 NOVEDADES PRINCIPALES
+
+Acceso a Administración sin usuario y contraseña fijos para todo el
+mundo: ahora se entra con tu propio usuario de Windows (se detecta
+solo, no hay que escribirlo) y tu misma contraseña de Control de
+Pedidos. Si tu usuario todavía no tiene cuenta allí, se te pide un
+nombre a mostrar y una contraseña para darte de alta — quedan
+guardados de forma segura en tu equipo, y se avisa para que te creen
+la cuenta. Tras 3 intentos fallidos, el acceso se bloquea unos minutos
+por seguridad.
+
+🔧 CORRECCIÓN
+
+Festivos y Vacaciones: terminan de quedar igual que la Agenda — ahora
+también se puede ensanchar la ventana tirando del borde (antes tenía
+un tamaño fijo), igual que el resto de ventanas principales.
+
+================================================================
+
+✨ Organizador Princess v4.10.4
+================================================================
+
+🔧 CORRECCIÓN
+
+Ventanas de Festivos y Vacaciones: mismo arreglo que ya se aplicó en
+Agenda — las filas ya ocupan siempre todo el ancho de la ventana (antes
+dependía de si el contenido más ancho ya insertado coincidía por
+casualidad), y la lista se puede desplazar con la rueda del ratón, no
+solo arrastrando la barra de scroll.
+
+================================================================
+
+✨ Organizador Princess v4.10.3
+================================================================
+
+🚀 NOVEDADES PRINCIPALES
+
+La ventana de "Nueva versión disponible" se cierra sola a los 5 minutos
+si no se decide nada — como si se pulsara "Recordar después" (se
+recomprueba a los 30 min por si acaso). Si ya se ha empezado a
+descargar el instalador, no se cierra, para no interrumpir la descarga.
+
+================================================================
+
+✨ Organizador Princess v4.10.2
+================================================================
+
+🔧 CORRECCIÓN
+
+Los avisos con repetición Diaria, Semanal, Mensual o Anual podían
+saltar antes de tiempo: si se guardaban con una fecha de inicio futura
+(por ejemplo, un aviso diario a partir del 15-01-2027), sonaban igual
+el mismo día en que se creaban, en cuanto llegaba la hora configurada,
+en lugar de esperar a la fecha indicada. Ahora respetan la fecha de
+inicio y no empiezan a repetirse hasta que se cumple.
+
+================================================================
+
+✨ Organizador Princess v4.10.1
+================================================================
+
+🚀 NOVEDADES PRINCIPALES
+
+Los popups de avisos enviados desde Control de Pedidos (pedidos con
+demora, notificaciones push) ahora se cierran solos a los 30 minutos si
+nadie los atiende — antes se quedaban abiertos indefinidamente,
+bloqueando el resto de la cola de avisos mientras tanto. Los avisos de
+la Agenda no cambian (siguen con su propia regla, proporcional a la
+repetición de cada uno).
+
+================================================================
+
+✨ Organizador Princess v4.10.0
+================================================================
+
+🚀 NOVEDADES PRINCIPALES
+
+Envío de imágenes y documentos (PDF, Word, Excel...) por el chat interno
+— botón 📎 junto al de enviar, tanto en la ventana completa como en la
+burbuja flotante. Las imágenes se redimensionan y comprimen solas antes
+de enviarse, sin que haya que preocuparse del tamaño. Al recibir un
+adjunto aparece como una línea pulsable — un clic lo descarga a tu
+carpeta de Descargas y lo abre con el programa que corresponda (visor
+de imágenes, Word, Adobe Reader...).
+
+Requiere la versión v1.2.0 (o superior) del servicio de chat, con un
+bucket de Supabase Storage configurado.
+
+================================================================
+
+✨ Organizador Princess v4.9.1
+================================================================
+
+🔧 CORRECCIÓN
+
+La ventana emergente de chat (burbuja flotante) no dejaba escribir una
+respuesta. La caja de mensajes no tenía una altura fija, así que por
+defecto pedía 24 líneas de alto — más que toda la ventana (300×380 px)
+— y no dejaba sitio para la caja de texto de abajo, que se quedaba
+invisible aunque estuviera creada correctamente.
+
+================================================================
+
+✨ Organizador Princess v4.9.0
+================================================================
+
+🚀 NOVEDADES PRINCIPALES
+
+Reorganización del Menú Principal: el botón "📖 Manual" se traslada
+junto a "⚙ Admin", bajo el saludo — antes estaba apilado en la columna
+de la derecha junto a Agenda/Calendario/Chat, ensanchándola de más.
+La columna derecha queda ahora solo con esos tres, de uso diario.
+
+================================================================
+
+✨ Organizador Princess v4.8.17
+================================================================
+
+🚀 NOVEDADES PRINCIPALES
+
+Botón "💬 Chat" en el Menú Principal, junto a Agenda/Calendario/Manual
+de uso — acceso directo sin tener que entrar primero al Calendario.
+Sigue estando también dentro de Calendario, por si ya está ahí.
+
+================================================================
+
+✨ Organizador Princess v4.8.16
+================================================================
+
+🔧 CORRECCIÓN — Burbuja flotante de chat
+
+Se puede escribir en la caja de respuesta desde que se abre la burbuja
+— antes, al ser una ventana sin bordes nativos, Windows no siempre le
+daba el foco de teclado nada más crearse, así que había que hacer clic
+manualmente para poder teclear.
+
+El histórico que carga la burbuja al abrirse pasa de los últimos 20
+mensajes en general a solo los últimos 3 mensajes DE HOY — para una
+vista rápida, no para repasar conversación antigua (para eso está la
+ventana completa, con el botón ⤢ de la burbuja).
+
+================================================================
+
+✨ Organizador Princess v4.8.15
+================================================================
+
+🚀 NOVEDADES PRINCIPALES
+
+El chat muestra ahora el nombre real de cada compañero (p.ej. "Jesús
+Curbelo") en vez de su usuario de acceso ("dcompras") — en la lista de
+conversaciones, en cada mensaje y en el título al abrir un privado o
+una burbuja nueva. El mapa de nombres se descarga solo al arrancar el
+Organizador y cada vez que se abre la ventana de chat, así que las
+altas de compañeros nuevos se recogen sin reiniciar la app.
+
+================================================================
+
+✨ Organizador Princess v4.8.14
+================================================================
+
+🚀 NOVEDADES PRINCIPALES
+
+Burbuja de chat flotante. Cuando llega un mensaje nuevo y no lo estás
+viendo en ningún sitio, ahora se abre sola una ventanita de chat abajo
+a la derecha de la pantalla (como los chats de Messenger) — se puede
+leer y responder ahí mismo, sin abrir la ventana completa. El botón
+"⤢" de su cabecera abre la ventana completa si se necesita más
+espacio; el "✕" la cierra. Se pueden tener varias burbujas de
+conversaciones distintas abiertas a la vez, apiladas.
+
+Chat más visual: los mensajes ahora se ven como burbujas de color de
+verdad (verde los tuyos, gris azulado los de los demás), tanto en la
+ventana completa como en las burbujas nuevas — antes solo era texto de
+color sobre fondo plano.
+
+================================================================
+
+✨ Organizador Princess v4.8.13
+================================================================
+
+🔧 LIMPIEZA INTERNA (sin cambios de cara al usuario)
+
+Se elimina código duplicado en la Agenda de Avisos que ya había dado
+problemas (el tipo "anual" hubo que añadirlo en dos sitios a la vez):
+
+  · La descripción de cada aviso en la lista ahora se genera en un
+    único sitio, no en dos copias que podían desincronizarse.
+  · Las ventanas "Nuevo Aviso" y "Editar Aviso" comparten ahora la
+    misma lista de tipos de repetición y la misma lógica de ajuste de
+    etiquetas, en vez de tener cada una su copia.
+
+No cambia ningún comportamiento visible — es limpieza interna para que
+los próximos cambios en la Agenda no se queden a medias.
+
+================================================================
+
+✨ Organizador Princess v4.8.12
+================================================================
+
+🚀 NOVEDADES PRINCIPALES
+
+Nueva repetición "Anualmente (mismo día y mes)" para los avisos de la
+Agenda — hasta ahora solo había Sin repetición / 30 min / Hora / Diario
+/ Semanal / Mensual. Funciona igual que las demás: admite antelación
+(días/horas/minutos), se auto-cierra si nadie lo ve, y se recupera si
+el Organizador no estaba abierto justo en el minuto de disparo.
+
+================================================================
+
+✨ Organizador Princess v4.8.11
+================================================================
+
+🚀 NOVEDADES PRINCIPALES
+
+Los popups de avisos CON repetición ya no se quedan abiertos para
+siempre si nadie está delante para cerrarlos: se cierran solos pasada
+la mitad del intervalo de repetición, igual que si se hubiera pulsado
+"Entendido" (no cuenta como silenciado, el aviso volverá a saltar en
+su próximo disparo normal).
+
+  · Cada 30 minutos  → se cierra solo a los 15 min
+  · Cada hora        → se cierra solo a los 30 min
+  · Diario           → se cierra solo a las 12 h
+  · Semanal          → se cierra solo a los 3,5 días
+  · Mensual          → se cierra solo a los 15 días
+
+Los avisos de disparo único (sin repetición) se quedan abiertos como
+hasta ahora — no hay una próxima ocurrencia con la que puedan solaparse.
+
+================================================================
+
+✨ Organizador Princess v4.8.10
+================================================================
+
+🔧 CORRECCIÓN
+
+Corrige avisos con antelación (días/horas/minutos) que "no saltaban":
+antes se exigía coincidencia exacta del minuto de disparo, así que si
+el Organizador no estaba abierto justo en ese minuto, el aviso de esa
+ocurrencia (ese día, esa semana o ese mes) se perdía sin remedio. Ahora
+se recupera en cuanto el Organizador vuelva a comprobarlo ese mismo
+día, sin repetirse de más.
+
+Nota de cálculo: con antelación de 3 días sobre una fecha del día 22,
+el disparo cae el día 19 del mes (22 − 3), no el 20. Si esperabas que
+avisara el 20, ajusta la antelación a 2 días en ese aviso.
+
+================================================================
+
+✨ Organizador Princess v4.8.8
+================================================================
+
+🔧 CORRECCIÓN
+
+Ventana "Agenda de Avisos": las filas de cada recordatorio ya ocupan
+siempre todo el ancho de la ventana (antes solo coincidía si el título
+más largo de la lista resultaba tener ese mismo ancho por casualidad).
+También se puede desplazar la lista con la rueda del ratón, no solo
+arrastrando la barra de scroll.
+
+🚀 NOVEDADES PRINCIPALES
+
+Aviso emergente (popup) de mensajes nuevos del chat, aunque la ventana
+de chat esté cerrada — igual que ya pasa con las alertas de pedidos.
+El chat se conecta ahora desde que arranca el Organizador, no solo al
+abrir su ventana. Aplica a General, privados y grupos.
+
+Si la ventana de chat ya está abierta y estás viendo esa conversación
+en concreto, no salta el popup (el mensaje ya aparece ahí mismo) —
+solo suena el aviso, como hasta ahora.
+
+================================================================
+
+✨ Organizador Princess v4.8.6
+================================================================
+
+🚀 NOVEDADES PRINCIPALES
+
+Chats en grupo. La ventana de "Nueva conversación" ahora permite marcar
+varios compañeros a la vez: con uno solo se abre un privado como hasta
+ahora; con dos o más, pide un nombre y crea un grupo nuevo, visible
+para todos los que estén dentro con el mismo mecanismo que ya usaban
+los privados y la conversación general.
+
+Requiere la versión v1.1.0 (o superior) del servicio de chat.
+
+================================================================
+
+✨ Organizador Princess v4.8.4
+================================================================
+
+🔧 CORRECCIÓN
+
+Corrige un 401 ("No autenticado") al abrir "Nueva conversación" o el
+historial del chat, aunque la ventana mostrara "Conectado" en verde.
+
+La causa: la cookie de sesión conseguida al iniciar sesión no se
+reenviaba a las peticiones REST del chat (lista de compañeros,
+canales, historial de mensajes) — solo se reenviaba a la conexión en
+tiempo real (socket), porque son dominios distintos desde la
+separación del chat en su propio servicio (v4.8.2) y `requests` no
+reenvía cookies entre dominios distintos por su cuenta, igual que un
+navegador. Ahora las tres peticiones REST llevan la cookie igual que
+ya hacía el socket.
+
+================================================================
+
+✨ Organizador Princess v4.8.2
+================================================================
+
+🚀 NOVEDADES PRINCIPALES
+
+El chat interno ahora conecta contra un servicio de Render separado
+(CHAT_URL), independiente del servicio principal de pedidos/alertas —
+así un problema de memoria del chat no afecta a pedidos, y viceversa.
+
+Corrige el "Error de conexión" que mostraba la ventana de chat desde
+que se introdujo esta separación: CHAT_URL apuntaba a un valor de
+relleno pendiente de configurar. Ahora apunta al Worker de Cloudflare
+dedicado (proxy-chat), igual que ya hace el resto de la aplicación con
+el servicio principal, para evitar el bloqueo del antivirus ESET a las
+IPs de Render directas.
+
+================================================================
+
+✨ Organizador Princess v4.8.0
+================================================================
+
+🚀 NOVEDADES PRINCIPALES
+
+Nuevo botón "💬 Chat" en la Agenda: chat interno entre compañeros,
+directamente desde Organizador Princess. Reutiliza tu mismo usuario y
+contraseña de Control de Pedidos (el mismo que ya usa el aviso de
+pedidos) — no hay que registrarse ni iniciar sesión aparte.
+
+Parche de compilación para el chat interno (v4.8.0): corrige el error
+"ModuleNotFoundError: No module named 'requests'" que aparecía al abrir
+el .exe recién compilado, aunque la aplicación funcionara sin problema
+ejecutada como script de Python.
+
+Corrige el script de comprobación de dependencias del chat añadido en
+v4.8.0, que fallaba con un error de "AttributeError" al comprobar la
+versión de python-socketio, aunque las dependencias estuvieran
+correctamente instaladas. El chequeo ya no depende de atributos de
+versión, solo de que cada módulo se pueda importar.
+----------------------------------------------------------------
+
+⚡ MEJORAS
+
+  💬 Chat interno entre usuarios
+  -----------------------
+  Se puede escribir en la conversación general (visible para todos
+  los compañeros que usan la app) o abrir una conversación privada
+  1 a 1 con cualquier usuario activo. Los mensajes llegan en tiempo
+  real cuando la conexión lo permite; si en algún momento no es
+  posible, la aplicación sigue entregando los mensajes de forma algo
+  más lenta, sin perder ninguno.
+
+  Requiere que el hotel/departamento tenga desplegada la versión
+  v12.6.0 o superior de Control de Pedidos en el servidor.
+
+🔧 CORRECCIONES
+
+  📦 El .exe no incluía las dependencias del chat
+  -----------------------
+  La causa más probable: el comando "pyinstaller" del equipo de
+  compilación se resolvía a un Python distinto al que tenía instaladas
+  las nuevas dependencias del chat (requests, python-socketio,
+  python-engineio, websocket-client).
+
+  compilar.bat ahora comprueba esas dependencias en el mismo Python que
+  usará para compilar, y utiliza "python -m PyInstaller" en lugar de
+  "pyinstaller" a secas, para asegurar que sea siempre el mismo
+  intérprete. También limpia la caché global de PyInstaller, no solo la
+  del proyecto.
+
+================================================================
+© VAMA 2026 · Central de Compras Princess, Canarias

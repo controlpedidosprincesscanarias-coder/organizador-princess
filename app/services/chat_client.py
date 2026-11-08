@@ -1,0 +1,467 @@
+"""
+services/chat_client.py  ·  v1.2  ·  © VAMA 2026
+=================================================
+Cliente de chat interno en tiempo real entre usuarios de "Control de
+Pedidos", visto desde main_agenda (Organizador Princess).
+
+DISEÑO
+------
+Reutiliza EXACTAMENTE el mismo mecanismo de autenticación que ya usa
+pedidos_agenda_bridge.py: credenciales reales del usuario (BRIDGE_USER /
+BRIDGE_PASSWORD, resueltas por %USERNAME% de Windows vía
+db.sqlite.get_bridge_credentials()) contra POST /api/bridge/login, y el
+mismo User-Agent de navegador para pasar el Worker de Cloudflare que hace
+de proxy delante de Render (bloquea con 403 el User-Agent por defecto de
+las librerías HTTP de Python al considerarlo tráfico de bot).
+
+No hay login nuevo ni credenciales nuevas: es la misma cuenta con la que
+ya se conecta el bridge de alertas.
+
+DOS SERVICIOS DISTINTOS (v1.1, 16 julio 2026)
+----------------------------------------------
+Desde control_pedidos v12.7.0 el chat vive en un Web Service de Render
+SEPARADO del principal (aislamiento de memoria, ver CHANGELOG). Por eso
+ahora hay dos URLs:
+
+- `CONTROL_PEDIDOS_URL`: SOLO para el login (`/api/bridge/login`), que
+  sigue haciéndose contra el servicio principal — ahí vive la tabla
+  `usuarios`.
+- `CHAT_URL`: para todo lo demás del chat (REST `/api/chat/*` y el socket
+  de Socket.IO). Este cliente NO es un navegador, así que no aplican las
+  restricciones de cookies entre dominios distintos: la cookie de sesión
+  que devuelve el login contra `CONTROL_PEDIDOS_URL` se reenvía tal cual
+  a `CHAT_URL`, y ese servicio la valida porque comparte la misma
+  `SECRET_KEY` (ver control_pedidos_chat/GUIA_DESPLIEGUE.md).
+
+TRANSPORTE
+----------
+Se usa python-socketio (transports=["websocket", "polling"]). Si el
+Worker de Cloudflare no reenvía la cabecera Upgrade de WebSocket (no se
+puede confirmar sin revisar su código), la librería cae sola a
+long-polling: el chat sigue funcionando, solo que con más latencia. No
+hace falta ningún cambio en este módulo si eso ocurre.
+
+HILOS
+-----
+python-socketio gestiona su propio hilo de fondo para la conexión. Los
+callbacks (on_nuevo_mensaje, on_conectado, on_error) se ejecutan en ESE
+hilo, nunca en el hilo principal de Tkinter — igual que ocurre con
+pedidos_agenda_bridge.py. Por eso este módulo nunca toca widgets
+directamente: encola cada evento en una queue.Queue thread-safe y quien
+la lee (ui/ventana_chat.py) lo hace desde un app.after() en el hilo
+principal, siguiendo el mismo patrón "ANTI-REGRESION" que
+negocio.alertas.poll_alertas ya usa para los popups.
+"""
+
+import json
+import logging
+import mimetypes
+import os
+import queue
+import subprocess
+import sys
+import threading
+import base64
+from io import BytesIO
+
+import requests
+import socketio
+from PIL import Image
+
+from db.sqlite import get_bridge_credentials
+
+log = logging.getLogger(__name__)
+
+# Servicio PRINCIPAL (pedidos/alertas) — solo se usa aquí para el login.
+# Mismo Worker de Cloudflare que usa pedidos_agenda_bridge.py.
+CONTROL_PEDIDOS_URL = "https://proxy.controlpedidosprincess-canarias.workers.dev"
+
+# Servicio de CHAT independiente (v1.1) — REST /api/chat/* y Socket.IO.
+# Pasa por el Worker de Cloudflare (proxy-chat), igual que CONTROL_PEDIDOS_URL
+# pasa por su propio Worker — así se evita el bloqueo del antivirus ESET a
+# las IPs de Render directas. Desplegado el 20/07/2026.
+CHAT_URL = "https://proxy-chat.controlpedidosprincess-canarias.workers.dev"
+
+_USER_AGENT = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) "
+    "Chrome/124.0.0.0 Safari/537.36"
+)
+
+# Tipos de evento que se encolan para la UI (ver ChatClient.eventos)
+EVT_CONECTADO      = "conectado"
+EVT_DESCONECTADO   = "desconectado"
+EVT_NUEVO_MENSAJE  = "nuevo_mensaje"
+EVT_ERROR          = "error"
+
+
+class ChatClient:
+    """Envoltorio de alto nivel: login + REST de historial + socket.io."""
+
+    def __init__(self):
+        self._http = requests.Session()
+        self._http.headers.update({"User-Agent": _USER_AGENT})
+        self._sio = socketio.Client(
+            reconnection=True,
+            reconnection_attempts=0,   # 0 = reintenta indefinidamente
+            reconnection_delay=2,
+            reconnection_delay_max=30,
+        )
+        self.username = ""
+        self.nombre   = ""
+        self.rol      = ""
+        self._logged_in = False
+
+        # Caché username(lower) → nombre real, para mostrar "Jesús Curbelo"
+        # en vez de "dcompras" en mensajes/títulos/lista de conversaciones.
+        # Se rellena con refrescar_mapa_nombres() (llamar en un hilo de
+        # fondo — hace una petición REST) y se lee con nombre_de().
+        self._mapa_nombres = {}
+        self._mapa_nombres_lock = threading.Lock()
+
+        # Eventos hacia la UI (thread-safe) — ver EVT_* arriba.
+        # Cada item: {"tipo": EVT_..., ...datos}
+        self.eventos: "queue.Queue[dict]" = queue.Queue()
+
+        self._sio.on("connect", self._on_connect)
+        self._sio.on("disconnect", self._on_disconnect)
+        self._sio.on("nuevo_mensaje", self._on_nuevo_mensaje)
+        self._sio.on("error_chat", self._on_error_chat)
+
+    # ── Login (idéntico en espíritu a _Session.login() del bridge) ──────────
+
+    def login(self, username_win=None) -> bool:
+        bridge_user, bridge_password = get_bridge_credentials(username_win)
+        if not bridge_user or not bridge_password:
+            log.warning("ChatClient: sin credenciales guardadas (Admin -> Mi Usuario).")
+            self.eventos.put({"tipo": EVT_ERROR,
+                               "mensaje": "No hay credenciales guardadas. "
+                                          "Configúralas en Admin -> Mi Usuario."})
+            return False
+        try:
+            resp = self._http.post(
+                CONTROL_PEDIDOS_URL.rstrip("/") + "/api/bridge/login",
+                data=json.dumps({"username": bridge_user, "password": bridge_password}),
+                headers={"Content-Type": "application/json"},
+                timeout=20,
+            )
+            data = resp.json()
+        except Exception as exc:
+            log.warning("ChatClient: error de red en login — %s", exc)
+            self.eventos.put({"tipo": EVT_ERROR, "mensaje": f"Sin conexión: {exc}"})
+            return False
+
+        self._logged_in = bool(data.get("ok"))
+        if not self._logged_in:
+            err = data.get("error", "credenciales incorrectas")
+            log.warning("ChatClient: login fallido — %s", err)
+            self.eventos.put({"tipo": EVT_ERROR, "mensaje": err})
+            return False
+
+        self.username = data.get("username", bridge_user)
+        self.nombre   = data.get("nombre", bridge_user)
+        self.rol      = data.get("rol", "")
+        log.info("ChatClient: sesión iniciada como '%s'", self.username)
+        return True
+
+    def _cookie_header(self) -> str:
+        """La cookie de sesión (puesta por /api/bridge/login contra
+        CONTROL_PEDIDOS_URL) no se reenvía sola a CHAT_URL: son dominios
+        distintos y `requests` respeta el dominio de la cookie igual que un
+        navegador. Hay que forzarla a mano en cada petición al chat — tanto
+        en el socket (ya se hacía) como en el REST (antes no, causaba 401
+        en /api/chat/* aunque el login hubiera ido bien)."""
+        return "; ".join(f"{c.name}={c.value}" for c in self._http.cookies)
+
+    # ── Conexión socket.io (usa las cookies ya obtenidas en login()) ────────
+
+    def conectar(self):
+        """No bloquea: lanza la conexión en un hilo de fondo y vuelve al
+        instante. El resultado (éxito o error) llega por self.eventos."""
+        if not self._logged_in:
+            log.warning("ChatClient: conectar() llamado sin login previo.")
+            return
+        if self._sio.connected:
+            return
+
+        def _intentar_conectar():
+            self._sio.connect(
+                CHAT_URL,
+                headers={"User-Agent": _USER_AGENT, "Cookie": self._cookie_header()},
+                transports=["websocket", "polling"],
+                wait_timeout=20,
+            )
+
+        def _run():
+            try:
+                _intentar_conectar()
+            except Exception as exc:
+                # Mismo caso que en _get_rest/_post_rest: si la cookie ya
+                # no es válida (p. ej. SECRET_KEY rotado en un redeploy),
+                # reintentamos una vez con una sesión nueva antes de
+                # rendirnos y avisar al usuario.
+                log.warning("ChatClient: fallo al conectar el socket, reintentando login — %s", exc)
+                if self.login():
+                    try:
+                        _intentar_conectar()
+                        return
+                    except Exception as exc2:
+                        exc = exc2
+                log.warning("ChatClient: no se pudo conectar el socket — %s", exc)
+                self.eventos.put({"tipo": EVT_ERROR, "mensaje": f"Chat sin conexión: {exc}"})
+
+        threading.Thread(target=_run, daemon=True).start()
+
+    def desconectar(self):
+        try:
+            if self._sio.connected:
+                self._sio.disconnect()
+        except Exception:
+            pass
+
+    def iniciar_conexion_en_segundo_plano(self, username_win=None):
+        """No bloquea: arranca login()+conectar() en un hilo de fondo desde
+        que arranca el Organizador, sin esperar a que el usuario abra la
+        ventana de chat — mismo patrón que pedidos_agenda_bridge con las
+        alertas de pedidos (v1.2). Necesario para poder avisar con un popup
+        de un mensaje nuevo aunque la ventana de chat esté cerrada."""
+        def _run():
+            if not self._logged_in:
+                if not self.login(username_win):
+                    return
+            self.conectar()
+            self.refrescar_mapa_nombres()   # para que "quién escribe" ya
+                                             # salga con nombre real desde
+                                             # el primer mensaje que llegue
+        threading.Thread(target=_run, daemon=True, name="ChatClient-Inicio").start()
+
+    @property
+    def conectado(self) -> bool:
+        return self._sio.connected
+
+    # ── Envío ─────────────────────────────────────────────────────────────
+
+    def enviar_mensaje(self, contenido: str, canal_id: str = None, destinatario: str = None):
+        payload = {"contenido": contenido}
+        if canal_id:
+            payload["canal_id"] = canal_id
+        if destinatario:
+            payload["destinatario"] = destinatario
+        if self._sio.connected:
+            self._sio.emit("enviar_mensaje", payload)
+        else:
+            # Sin socket vivo (p.ej. justo tras un cold-start de Render):
+            # se manda igual por REST, que es la misma ruta que usa el
+            # frontend web y nunca depende de que el WebSocket esté arriba.
+            self._post_rest("/api/chat/mensajes", payload)
+
+    def unirse_canal(self, canal_id: str):
+        if self._sio.connected:
+            self._sio.emit("unirse_canal", {"canal_id": canal_id})
+
+    # ── Archivos e imágenes (v1.3 · 2026-07-23) ─────────────────────────────
+    # Las imágenes se redimensionan y comprimen ANTES de enviarlas (no hay
+    # límite fijo de tamaño de cara al usuario) — un documento (PDF/Word/
+    # etc.) no se puede redimensionar, así que ese va tal cual, sujeto al
+    # tope duro del servidor (ADJUNTO_MAX_BYTES, ver control_pedidos_chat).
+    _EXT_IMAGEN = {".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp"}
+    _LADO_MAX_IMAGEN = 1600     # px, el lado más largo tras redimensionar
+    _CALIDAD_JPEG = 85
+    _ADJUNTO_MAX_BYTES_LOCAL = 10 * 1024 * 1024  # debe coincidir con el servidor
+
+    def enviar_archivo(self, ruta_archivo: str, canal_id: str = None,
+                        destinatario: str = None) -> dict:
+        """Envía una imagen (redimensionada) o un documento (PDF/Word/etc.,
+        tal cual). Devuelve el dict de respuesta del servidor
+        ({"ok": True, "mensaje": {...}} o {"error": "..."}). No lanza
+        excepciones de red — las convierte en {"error": "..."} para que la
+        ventana pueda mostrar el motivo sin romperse."""
+        nombre_archivo = os.path.basename(ruta_archivo)
+        ext = os.path.splitext(nombre_archivo)[1].lower()
+        mime_type = mimetypes.guess_type(nombre_archivo)[0] or "application/octet-stream"
+
+        try:
+            if ext in self._EXT_IMAGEN:
+                datos, mime_type = self._preparar_imagen(ruta_archivo)
+            else:
+                with open(ruta_archivo, "rb") as f:
+                    datos = f.read()
+        except Exception as exc:
+            return {"error": f"No se pudo leer el archivo: {exc}"}
+
+        if len(datos) > self._ADJUNTO_MAX_BYTES_LOCAL:
+            return {"error": f"El archivo pesa demasiado (máximo "
+                              f"{self._ADJUNTO_MAX_BYTES_LOCAL // (1024*1024)} MB)."}
+
+        payload = {
+            "nombre_archivo": nombre_archivo,
+            "mime_type": mime_type,
+            "contenido_base64": base64.b64encode(datos).decode("ascii"),
+        }
+        if canal_id:
+            payload["canal_id"] = canal_id
+        if destinatario:
+            payload["destinatario"] = destinatario
+        return self._post_rest("/api/chat/mensajes/archivo", payload)
+
+    def _preparar_imagen(self, ruta_archivo: str):
+        """Redimensiona (lado más largo a _LADO_MAX_IMAGEN) y comprime.
+        PNG con transparencia se mantiene como PNG; el resto se convierte a
+        JPEG, que comprime mucho mejor para fotos. Devuelve (bytes, mime)."""
+        img = Image.open(ruta_archivo)
+        img.thumbnail((self._LADO_MAX_IMAGEN, self._LADO_MAX_IMAGEN), Image.LANCZOS)
+        tiene_alfa = img.mode in ("RGBA", "LA") or (img.mode == "P" and "transparency" in img.info)
+        buf = BytesIO()
+        if tiene_alfa:
+            img.save(buf, format="PNG", optimize=True)
+            mime = "image/png"
+        else:
+            if img.mode != "RGB":
+                img = img.convert("RGB")
+            img.save(buf, format="JPEG", quality=self._CALIDAD_JPEG, optimize=True)
+            mime = "image/jpeg"
+        return buf.getvalue(), mime
+
+    def descargar_adjunto(self, url: str, nombre_archivo: str) -> str:
+        """Descarga un adjunto a la carpeta Descargas del usuario (nombre
+        libre de colisiones) y devuelve la ruta local. Lanza excepción si
+        falla — quien llame decide cómo avisar al usuario."""
+        resp = requests.get(url, timeout=30)
+        resp.raise_for_status()
+        carpeta = os.path.join(os.path.expanduser("~"), "Downloads")
+        os.makedirs(carpeta, exist_ok=True)
+        base, ext = os.path.splitext(nombre_archivo)
+        ruta = os.path.join(carpeta, nombre_archivo)
+        n = 1
+        while os.path.exists(ruta):
+            ruta = os.path.join(carpeta, f"{base} ({n}){ext}")
+            n += 1
+        with open(ruta, "wb") as f:
+            f.write(resp.content)
+        return ruta
+
+    @staticmethod
+    def abrir_archivo(ruta: str):
+        """Abre un archivo ya descargado con la aplicación predeterminada
+        de Windows (visor de imágenes, Word, Adobe Reader, etc.)."""
+        if sys.platform.startswith("win"):
+            os.startfile(ruta)  # noqa: S606 — abrir con la app por defecto es justo lo que se pide
+        elif sys.platform == "darwin":
+            subprocess.Popen(["open", ruta])
+        else:
+            subprocess.Popen(["xdg-open", ruta])
+
+    # ── Historial / listados (REST — funciona con o sin socket conectado) ──
+
+    def obtener_canales(self) -> list:
+        return self._get_rest("/api/chat/canales").get("canales", [])
+
+    def crear_grupo(self, nombre: str, usuarios: list) -> dict:
+        """usuarios: usernames de los compañeros a añadir (sin incluirte a
+        ti — el servidor te añade automáticamente como creador)."""
+        return self._post_rest("/api/chat/grupos", {"nombre": nombre, "usuarios": usuarios})
+
+    def obtener_usuarios(self) -> list:
+        return self._get_rest("/api/chat/usuarios").get("usuarios", [])
+
+    def refrescar_mapa_nombres(self):
+        """Descarga la lista de usuarios y actualiza el caché username→nombre
+        real que usa nombre_de(). Hace una petición REST — llamar SIEMPRE en
+        un hilo de fondo, nunca en el hilo de Tkinter. Si falla (sin red,
+        servicio caído), se queda con lo que ya tuviera en caché — nunca
+        lanza, para que un fallo aquí no rompa el pintado de mensajes."""
+        try:
+            usuarios = self.obtener_usuarios()
+            with self._mapa_nombres_lock:
+                for u in usuarios:
+                    self._mapa_nombres[u["username"].lower()] = u.get("nombre") or u["username"]
+        except Exception as exc:
+            log.warning("ChatClient: no se pudo refrescar el mapa de nombres — %s", exc)
+
+    def nombre_de(self, username: str) -> str:
+        """Nombre real de un username (p.ej. 'dcompras' → 'Jesús Curbelo'),
+        o el propio username tal cual si aún no está en caché (primer
+        arranque, antes de que refrescar_mapa_nombres() haya terminado)."""
+        if not username:
+            return username
+        with self._mapa_nombres_lock:
+            return self._mapa_nombres.get(username.lower(), username)
+
+    def obtener_mensajes(self, canal_id: str = None, destinatario: str = None) -> dict:
+        params = {}
+        if canal_id:
+            params["canal_id"] = canal_id
+        if destinatario:
+            params["destinatario"] = destinatario
+        return self._get_rest("/api/chat/mensajes", params=params)
+
+    def _get_rest(self, path, params=None, _reintentado=False) -> dict:
+        try:
+            resp = self._http.get(
+                CHAT_URL.rstrip("/") + path,
+                params=params,
+                headers={"Cookie": self._cookie_header()},
+                timeout=20,
+            )
+            if resp.status_code == 401 and not _reintentado:
+                # La cookie dejó de ser válida (SECRET_KEY rotado en un
+                # redeploy, sesión caducada, etc.) — mismo patrón que ya
+                # usa pedidos_agenda_bridge.py: reintentar el login una
+                # vez, solo, y repetir la petición con la cookie nueva.
+                # Sin esto, el chat se queda "colgado" con una cookie
+                # muerta hasta que alguien cierra y reabre el Organizador
+                # a mano (visto en producción el 27/07/2026).
+                log.info("ChatClient: 401 en GET %s — reintentando login", path)
+                if self.login():
+                    return self._get_rest(path, params=params, _reintentado=True)
+                return {}
+            return resp.json()
+        except Exception as exc:
+            log.warning("ChatClient: error REST GET %s — %s", path, exc)
+            return {}
+
+    def _post_rest(self, path, body, _reintentado=False) -> dict:
+        try:
+            resp = self._http.post(
+                CHAT_URL.rstrip("/") + path,
+                data=json.dumps(body),
+                headers={"Content-Type": "application/json",
+                         "Cookie": self._cookie_header()},
+                timeout=20,
+            )
+            if resp.status_code == 401 and not _reintentado:
+                log.info("ChatClient: 401 en POST %s — reintentando login", path)
+                if self.login():
+                    return self._post_rest(path, body, _reintentado=True)
+                return {}
+            return resp.json()
+        except Exception as exc:
+            log.warning("ChatClient: error REST POST %s — %s", path, exc)
+            return {}
+
+    # ── Callbacks de socket.io (hilo de fondo — NO tocar Tkinter aquí) ──────
+
+    def _on_connect(self):
+        log.info("ChatClient: socket conectado")
+        self.eventos.put({"tipo": EVT_CONECTADO})
+
+    def _on_disconnect(self):
+        log.info("ChatClient: socket desconectado")
+        self.eventos.put({"tipo": EVT_DESCONECTADO})
+
+    def _on_nuevo_mensaje(self, data):
+        self.eventos.put({"tipo": EVT_NUEVO_MENSAJE, "mensaje": data})
+
+    def _on_error_chat(self, data):
+        self.eventos.put({"tipo": EVT_ERROR, "mensaje": data.get("error", "Error de chat")})
+
+
+# Instancia única compartida por toda la app, igual que hace el bridge
+# con su propia _Session.
+_cliente_global = None
+
+def get_chat_client() -> ChatClient:
+    global _cliente_global
+    if _cliente_global is None:
+        _cliente_global = ChatClient()
+    return _cliente_global

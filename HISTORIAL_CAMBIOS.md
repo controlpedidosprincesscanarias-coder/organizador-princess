@@ -51,6 +51,28 @@
 
 ---
 
+## 2026-11-08 17:59 — [Control Pedidos] Arranque: fuera la corrección retroactiva de v12.32.13 que corría en cada arranque (v12.34.06)
+
+- **Medición** (log de Render de v12.34.04): aplicación creada en 1,8 s, conexión a la BD en 0,2 s, **migraciones 43,4 s** (40,6 s antes del primer mensaje), listo para atender a los 49,0 s.
+- **Causa**: el bloque «Corrección retroactiva: altas automáticas desde SAP con estado mal calculado» (v12.32.13–v12.32.34) de `core/migraciones.py`.
+  - Hacía un `SELECT` de todos los pedidos con la nota de alta automática y, por cada uno, de 5 a 8 consultas: autor, estado según el listado, observaciones antiguas, purga de reclamaciones y departamento.
+  - Los pedidos automáticos nuevos llevan la misma nota, así que el bucle crecía con cada carga.
+- **Errores que también corrige**:
+  - el paso «3) purga de `reclamacion_proveedor_auto` sin enviar» borraba reclamaciones legítimas de pedidos nuevos en cada reinicio;
+  - el paso «2) estado» podía pasar a ENTREGADO o ENTREGA PARCIAL pedidos nuevos, con la nota «Corrección automática (v12.32.13)…».
+- **Cambio**:
+  - retirados el bucle, sus funciones auxiliares (`_parse_importe_es_local`, `_entrega_estado_local`) y la importación de `_resolver_departamento_sap`;
+  - se conservan la creación de `sap_pedidos_listado` y los departamentos nuevos;
+  - estado y departamento siguen completándose en «Cargar listados DALI / SAP» (`servicios/sap_albaranes_compra.py`) y el departamento también al abrir el pedido (`rutas/ocr_pedido.py`);
+  - `CLAUDE.md`: regla nueva (en las migraciones, nada de bucles con consultas por fila, ni correcciones de una vez que queden activas) y excepción de `core` reducida a `servicios/sap_comun.py`.
+- **Pruebas**:
+  - local con 3.000 pedidos automáticos: de 2,2 s a 0,12 s;
+  - `test_migraciones.py`, regresión nueva (verificado que falla con el código anterior);
+  - huellas, flujo (76), hotel de pruebas (21), techo, rotación, referencias y E2E (57): OK.
+- `PENDIENTES.md`: la mejora del arranque se da por resuelta.
+
+---
+
 ## 2026-11-08 17:41 — [Control Pedidos] app.js partido por temas y manuales al día (v12.34.04)
 
 - **Petición**: Víctor aprueba partir `static/js/app.js` (punto 13 de los pendientes).

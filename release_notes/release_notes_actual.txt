@@ -1,0 +1,40 @@
+✨ Organizador Princess v4.18.04
+================================================================
+
+🔔 AVISOS DE CONTROL DE PEDIDOS (4.18.04)
+
+• Lo que Control de Pedidos envía mientras el Organizador está cerrado
+  ya no aparece al abrirlo: se pierde. Al abrir solo se ven tus avisos
+  del calendario, eventos, vacaciones y festivos, y lo que llegue a
+  partir de ese momento.
+• Los popups de Control de Pedidos se cierran solos a los 10 minutos si
+  no se pulsa Cerrar (antes, a los 30).
+
+🛠 CORRECCIÓN (4.18.02)
+
+• Chat: al arrastrar un archivo sobre la ventana del chat se cerraba la
+  aplicación. Arreglado. Si diera problemas, «chat_arrastrar_soltar»:
+  false en config.json desactiva el arrastre (quedan 📎 y Ctrl+V).
+
+🖥 VISTA REDUCIDA DEL MENÚ PRINCIPAL (4.18.00)
+
+• Nuevo botón «Vista» en Admin. Permite elegir entre:
+  - Extendida: el menú de siempre (6 accesos dorados y 30 botones azules).
+  - Reducida: logo y cabecera, los 4 primeros accesos dorados, Agenda /
+    Calendario / Chat y solo los botones azules que elijas (hasta 10, en
+    2 filas de 5). La ventana se hace más pequeña.
+• El cambio se aplica al guardar, sin reiniciar. La elección se
+  recuerda en este equipo.
+
+💬 CHAT
+
+• Se pueden enviar archivos arrastrándolos desde el Explorador sobre la
+  ventana del chat (hasta 5 a la vez).
+• Con Ctrl+V en la caja de mensaje se pega una captura de pantalla o
+  archivos copiados en el Explorador; si es texto, se pega como siempre.
+• Antes de enviar se pregunta, indicando archivo y conversación.
+
+📘 MANUALES
+
+• Nuevo manual de usuario (botón «Manual») y nuevo manual de
+  administrador (menú Inicio → Manual de Administrador).

@@ -1,0 +1,306 @@
+"""
+ui/chat_popup.py  ·  v1.0  ·  © VAMA 2026
+==========================================
+Ventana emergente flotante de chat, anclada abajo a la derecha de la
+pantalla (estilo "cabezas de chat" de Facebook Messenger). Se abre sola
+cuando llega un mensaje nuevo y no hay forma más directa de verlo (la
+ventana principal de ui/ventana_chat.py no está abierta), para poder
+leer y responder sin tener que abrir la ventana completa.
+
+Varias conversaciones pueden tener su propia burbuja abierta a la vez;
+se apilan de derecha a izquierda. Cerrar una no afecta a las demás ni a
+la ventana principal — son independientes, comparten el mismo
+ChatClient (y por tanto la misma conexión de socket) pero cada una
+pinta solo los mensajes de su propio canal_id.
+
+INTEGRACIÓN CON poll_chat (main_agenda.py)
+-------------------------------------------
+Igual que ui/ventana_chat.py expone un único _HANDLER para la ventana
+principal, este módulo expone procesar_evento(ev), que poll_chat llama
+SIEMPRE (haya o no burbujas abiertas) para repartir cada evento a la
+burbuja que corresponda por canal_id. Abrir una burbuja nueva para un
+mensaje que llega sin ninguna burbuja ni ventana principal abierta lo
+decide main_agenda.py, no este módulo — aquí solo se expone
+mostrar_popup_chat() para que lo invoque cuando corresponda.
+"""
+
+import threading
+import logging
+import tkinter as tk
+from tkinter import filedialog
+from datetime import datetime, date
+
+from services.chat_client import get_chat_client, EVT_NUEVO_MENSAJE
+from ui.chat_bubbles import BubbleList, fecha_hora_local
+from db.sqlite import filtrar_mensajes_limpiados
+
+_POPUPS = {}   # canal_id -> {"win", "pintar", "handler"}
+
+_ANCHO, _ALTO = 300, 380
+_MARGEN = 16
+_SEPARACION = 10
+_ALTO_BARRA_TAREAS = 48   # hueco aproximado para no tapar la barra de Windows
+
+# ── Paleta (a juego con el resto del Organizador, pero con más contraste
+#    que el chat de texto plano anterior — burbujas de verdad, no solo
+#    texto de color sobre fondo plano) ────────────────────────────────────
+_COLOR_FONDO  = "#1b2735"
+_COLOR_HEADER = "#134e6f"
+_COLOR_PROPIO = "#1f8f63"
+_COLOR_AJENO  = "#3a4a63"
+_COLOR_TEXTO  = "#e8edf2"
+_COLOR_META   = "#8fa3b8"
+_COLOR_ENTRY  = "#25313f"
+
+
+def _es_de_hoy(m):
+    """True si creado_en de este mensaje cae en el día de hoy (hora local
+    del PC). Si el formato no se puede interpretar, se descarta (False) en
+    vez de arriesgarse a mostrar algo de otro día por error."""
+    try:
+        ts = m.get("creado_en", "")
+        fecha = datetime.fromisoformat(ts.replace("Z", "+00:00")).date()
+    except Exception:
+        return False
+    return fecha == date.today()
+
+
+def _posicion_libre(app):
+    """Esquina inferior derecha, apilando hacia la izquierda si ya hay
+    otras burbujas abiertas (como los chats de Messenger)."""
+    sw = app.winfo_screenwidth()
+    sh = app.winfo_screenheight()
+    x = sw - _ANCHO - _MARGEN
+    y = sh - _ALTO - _MARGEN - _ALTO_BARRA_TAREAS
+    ocupadas = [info["win"].winfo_x() for info in _POPUPS.values()
+                if info["win"].winfo_exists()]
+    for ox in sorted(ocupadas, reverse=True):
+        if abs(ox - x) < _ANCHO:
+            x = ox - _ANCHO - _SEPARACION
+    return x, y
+
+
+def cerrar_todas():
+    """Por si se necesita desde algún flujo de cierre general de la app."""
+    for canal_id in list(_POPUPS.keys()):
+        info = _POPUPS.pop(canal_id, None)
+        if info and info["win"].winfo_exists():
+            info["win"].destroy()
+
+
+def procesar_evento(ev):
+    """Llamado por poll_chat() en main_agenda.py para CADA evento del
+    chat, haya o no burbujas abiertas ahora mismo."""
+    if ev.get("tipo") != EVT_NUEVO_MENSAJE:
+        return
+    m = ev["mensaje"]
+    info = _POPUPS.get(m.get("canal_id"))
+    if info and info["win"].winfo_exists():
+        info["pintar"](m)
+
+
+def mostrar_popup_chat(ctx, canal_id, titulo, mensaje_inicial=None):
+    """Abre una burbuja nueva para `canal_id`, o si ya existe la trae al
+    frente — y en ambos casos pinta `mensaje_inicial` si se da uno."""
+    cliente = get_chat_client()
+
+    if canal_id in _POPUPS and _POPUPS[canal_id]["win"].winfo_exists():
+        info = _POPUPS[canal_id]
+        info["win"].deiconify()
+        info["win"].lift()
+        if mensaje_inicial:
+            info["pintar"](mensaje_inicial)
+        return
+
+    win = tk.Toplevel(ctx.app)
+    win.overrideredirect(True)          # sin marco nativo — burbuja "flotante"
+    win.attributes("-topmost", True)
+    win.configure(bg=_COLOR_FONDO, highlightthickness=1,
+                  highlightbackground="#2f4258")
+    x, y = _posicion_libre(ctx.app)
+    win.geometry(f"{_ANCHO}x{_ALTO}+{x}+{y}")
+
+    # ── Cabecera (arrastrable, con cerrar / abrir ventana completa) ────────
+    header = tk.Frame(win, bg=_COLOR_HEADER, height=36)
+    header.pack(fill="x")
+    header.pack_propagate(False)
+    tk.Label(header, text=f"💬  {titulo}", bg=_COLOR_HEADER, fg="white",
+              font=("Segoe UI", 10, "bold")).pack(side="left", padx=10)
+
+    def _cerrar():
+        _POPUPS.pop(canal_id, None)
+        if win.winfo_exists():
+            win.destroy()
+
+    def _abrir_completa():
+        _cerrar()
+        from ui.ventana_chat import _ventana_chat
+        _ventana_chat(ctx)
+
+    tk.Button(header, text="⤢", bg=_COLOR_HEADER, fg="white", bd=0,
+              activebackground=_COLOR_HEADER, activeforeground="white",
+              relief="flat", cursor="hand2", command=_abrir_completa,
+              font=("Segoe UI", 10)).pack(side="right", padx=(0, 2))
+    tk.Button(header, text="✕", bg=_COLOR_HEADER, fg="white", bd=0,
+              activebackground=_COLOR_HEADER, activeforeground="white",
+              relief="flat", cursor="hand2", command=_cerrar,
+              font=("Segoe UI", 10)).pack(side="right", padx=(0, 6))
+
+    _drag = {"x": 0, "y": 0}
+    def _drag_start(e):
+        _drag["x"], _drag["y"] = e.x, e.y
+    def _drag_move(e):
+        win.geometry(f"+{win.winfo_x() + e.x - _drag['x']}+{win.winfo_y() + e.y - _drag['y']}")
+    header.bind("<ButtonPress-1>", _drag_start)
+    header.bind("<B1-Motion>", _drag_move)
+
+    # ── Entrada de texto — se crea y empaqueta ANTES que la zona de
+    #    mensajes (2026-07-28, mismo criterio que ya se aplicó hoy en
+    #    ventana_chat.py): así reserva siempre su hueco de abajo, en vez
+    #    de depender de un height= fijo adivinado a mano como hacía la
+    #    versión anterior (ver el ANTI-REGRESION de más arriba, que ya
+    #    no hace falta con este orden).
+    frm_envio = tk.Frame(win, bg=_COLOR_FONDO)
+    frm_envio.pack(side="bottom", fill="x", padx=6, pady=(0, 6))
+    entry = tk.Entry(frm_envio, bg=_COLOR_ENTRY, fg="white",
+                      insertbackground="white", bd=0,
+                      font=("Segoe UI", 9))
+    entry.pack(side="left", fill="x", expand=True, ipady=5, padx=(0, 4))
+
+    def _click_adjunto(url, nombre_archivo):
+        def _hilo():
+            try:
+                ruta = cliente.descargar_adjunto(url, nombre_archivo)
+                cliente.abrir_archivo(ruta)
+            except Exception as exc:
+                logging.getLogger("chat").warning("No se pudo descargar/abrir el adjunto: %s", exc)
+        threading.Thread(target=_hilo, daemon=True, name="ChatPopup-DescargarAdjunto").start()
+
+    # ── Mensajes: burbujas de verdad (rectángulos redondeados en Canvas),
+    #    con hora HH:MM y copia por clic derecho — ver ui/chat_bubbles.py.
+    msgs = BubbleList(win, bg=_COLOR_FONDO, color_propio=_COLOR_PROPIO,
+                       color_ajeno=_COLOR_AJENO, color_texto=_COLOR_TEXTO,
+                       color_meta=_COLOR_META, font_texto=("Segoe UI", 9),
+                       font_meta=("Segoe UI", 7), on_click_adjunto=_click_adjunto)
+    msgs.pack(fill="both", expand=True, padx=6, pady=6)
+
+    ids_pintados = set()
+    # Ver comentario equivalente en ui/ventana_chat.py — el eco del propio
+    # mensaje llega sin poder deduplicarse por id (el pintado optimista no
+    # tiene id todavía), así que se reconcilia por contenido+canal.
+    pendientes_propios = []
+
+    def _pintar(m, propio=None):
+        mid = m.get("id")
+        if propio is None:
+            propio = (m.get("remitente") == cliente.username)
+        if mid is not None:
+            if mid in ids_pintados:
+                return
+            if propio:
+                contenido_m = m.get("contenido", "")
+                canal_m = m.get("canal_id", canal_id)
+                for i, pend in enumerate(pendientes_propios):
+                    if pend["canal_id"] == canal_m and pend["contenido"] == contenido_m:
+                        del pendientes_propios[i]
+                        ids_pintados.add(mid)
+                        return  # ya está en pantalla desde el pintado optimista
+            ids_pintados.add(mid)
+        quien = "Tú" if propio else cliente.nombre_de(m.get("remitente", ""))
+        hora = fecha_hora_local(m)
+        adjunto = m.get("adjunto")
+        if adjunto:
+            icono = "📷" if m.get("tipo") == "imagen" else "📎"
+            msgs.agregar_burbuja(f"{icono} {adjunto['nombre_archivo']}", hora, propio,
+                                  meta_nombre=quien, es_adjunto=True,
+                                  adjunto_url=adjunto["url"],
+                                  adjunto_nombre_archivo=adjunto["nombre_archivo"])
+        else:
+            msgs.agregar_burbuja(m.get("contenido", ""), hora, propio, meta_nombre=quien)
+
+    def _enviar(event=None):
+        contenido = entry.get().strip()
+        if not contenido:
+            return
+        cliente.enviar_mensaje(contenido, canal_id=canal_id)
+        entry.delete(0, "end")
+        pendientes_propios.append({"canal_id": canal_id, "contenido": contenido})
+        _pintar({"remitente": cliente.username, "contenido": contenido}, propio=True)
+
+    entry.bind("<Return>", _enviar)
+
+    def _adjuntar():
+        ruta = filedialog.askopenfilename(
+            parent=win,
+            title="Elegir imagen o documento",
+            filetypes=[
+                ("Imágenes y documentos", "*.png *.jpg *.jpeg *.gif *.bmp *.webp "
+                                           "*.pdf *.doc *.docx *.xls *.xlsx"),
+                ("Todos los archivos", "*.*"),
+            ],
+        )
+        if not ruta:
+            return
+
+        def _hilo():
+            resultado = cliente.enviar_archivo(ruta, canal_id=canal_id)
+            if resultado.get("ok"):
+                win.after(0, lambda: _pintar(resultado["mensaje"], propio=True))
+            # Si falla, no hay barra de estado en la burbuja donde avisar —
+            # el mensaje simplemente no aparece; para ver el motivo exacto,
+            # abrir la ventana completa (botón ⤢) y reintentar desde ahí.
+        threading.Thread(target=_hilo, daemon=True, name="ChatPopup-EnviarArchivo").start()
+
+    tk.Button(frm_envio, text="📎", bg=_COLOR_ENTRY, fg="white", bd=0,
+              activebackground="#33415a", activeforeground="white",
+              relief="flat", cursor="hand2", command=_adjuntar,
+              font=("Segoe UI", 13), width=3, pady=4).pack(side="left", padx=(0, 4))
+    tk.Button(frm_envio, text="➤", bg=_COLOR_PROPIO, fg="white", bd=0,
+              activebackground="#25a374", activeforeground="white",
+              relief="flat", cursor="hand2", command=_enviar,
+              font=("Segoe UI", 10, "bold"), width=3).pack(side="left")
+    # ANTI-REGRESION (reportado 2026-07-21): entry.focus_set() nada más
+    # crearla no basta en una ventana overrideredirect+topmost — Windows no
+    # siempre le da el foco de teclado real a una ventana así en el mismo
+    # instante en que se crea. Se fuerza con un pequeño respiro (win.after)
+    # para dar tiempo a que la ventana esté totalmente mapeada, y también
+    # al hacer clic en cualquier parte de la burbuja, por si el usuario
+    # clica antes de que ese respiro termine.
+    def _forzar_foco(event=None):
+        win.lift()
+        win.focus_force()
+        entry.focus_set()
+    win.after(150, _forzar_foco)
+    win.bind("<Button-1>", _forzar_foco)
+    entry.focus_set()
+
+    _POPUPS[canal_id] = {"win": win, "pintar": _pintar}
+    win.protocol("WM_DELETE_WINDOW", _cerrar)
+
+    # ── Historial reciente (últimos mensajes), en segundo plano ─────────
+    def _cargar():
+        data = cliente.obtener_mensajes(canal_id=canal_id)
+        # (2026-08-01) Descartar los que quedaron "limpiados" en este equipo
+        # desde la ventana principal — ver _limpiar_chat() en ventana_chat.py
+        # y db/sqlite.py. Mismo canal_id, misma marca — si se limpió en la
+        # ventana principal, tampoco debe reaparecer aquí.
+        mensajes_canal = filtrar_mensajes_limpiados(canal_id, data.get("mensajes", []))
+        # Solo las últimas 3 de HOY — esto es una vista rápida para
+        # responder al vuelo, no el historial completo (para eso está la
+        # ventana completa, con el botón ⤢). Se ordenan por fecha de
+        # creación antes de recortar y pintar, para no depender de en qué
+        # orden las devuelva la API — la más reciente siempre queda
+        # abajo, justo encima de la caja de escribir.
+        mensajes = sorted(
+            (m for m in mensajes_canal if _es_de_hoy(m)),
+            key=lambda m: m.get("creado_en") or "",
+        )[-3:]
+        def _pintar_todos():
+            if not win.winfo_exists():
+                return
+            for m in mensajes:
+                _pintar(m)
+            if mensaje_inicial:
+                _pintar(mensaje_inicial)
+        win.after(0, _pintar_todos)
+    threading.Thread(target=_cargar, daemon=True, name="ChatPopup-Historial").start()

@@ -51,6 +51,18 @@
 
 ---
 
+## 2026-11-08 21:15 — [Control Pedidos] Pruebas en producción con rol compras; pendientes al día (v12.34.10)
+
+- **Rol compras** («usuario prueba»), producción v12.34.06:
+  - **API, 24 de 24.** Permitido (200): maestros, pedidos, techo, proveedores, pendientes de entrega, cola de correos, pedidos eliminados y Excel de faltantes. Prohibido (403): usuarios, config de alertas, config de avisos, seguimiento en bloque (GET/PUT), silencio total y eliminar pedido.
+  - **Flujo en PR**: alta en cotización con proveedor a mano; crear en ENVIADO → 422; firma, PDF oficial, ENVIADO y ENTREGA PARCIAL; al final, CANCELADO con nota (pedido id 14073, nº 1198).
+  - **Interfaz**: sin errores de JS ni 5xx; sin opciones de administración, ni los botones «Cargar listados DALI / SAP» y «Seguimiento en bloque».
+- `PENDIENTES.md`:
+  - pendiente nuevo: prueba del rol hotel con la versión actual, y limpieza de los pedidos de prueba 1107, 1108, 1109 y 1198 en PR;
+  - cerrado: «Proveedor asignado a mano en cotización».
+
+---
+
 ## 2026-11-08 21:07 — [Control Pedidos] Pruebas en producción como admin y arreglo al eliminar pedidos (v12.34.08)
 
 - **Pruebas en producción** («usuario prueba» con rol admin), v12.34.06:

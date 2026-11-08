@@ -41,9 +41,9 @@ from datetime import datetime
 # CAMBIO: mismo criterio que en pedidos_agenda_bridge.py — el primer fallo
 # no muestra el diálogo, concede _GRACIA_UPDATE_SEGUNDOS y reintenta UNA
 # vez el mismo check. Si el reintento tiene éxito, se descarta en
-# silencio (con log) y sigue el ciclo normal de 30 min. Si el reintento
+# silencio (con log) y sigue el ciclo normal (2 h desde v4.18.06). Si el reintento
 # también falla, entonces sí se muestra el diálogo — con el error de ese
-# segundo intento — y a partir de ahí se retoma el ciclo normal de 30 min
+# segundo intento — y a partir de ahí se retoma el ciclo normal (2 h)
 # (el propio reintento, al ejecutar _check_update_github de nuevo, ya se
 # encarga de reprogramarse).
 _GRACIA_UPDATE_SEGUNDOS = 5 * 60
@@ -60,6 +60,20 @@ _gracia_update_lock     = threading.Lock()
 # firewall), no se gasta el reintento de gracia y se vuelve a mirar cuando
 # GitHub lo permita (X-RateLimit-Reset / Retry-After), con un margen al azar
 # para que los equipos no vuelvan todos a la vez.
+# (v4.18.06, decisión de Víctor) Ciclo normal: al arrancar y después cada 2 h
+# (antes, 30 min), con 0–10 min al azar para que los equipos no consulten a la
+# vez. Una versión publicada llega a todos en unas 2 h como mucho.
+_INTERVALO_CHECK_S = 2 * 60 * 60
+_MARGEN_CHECK_S = 10 * 60
+
+
+def _programar_siguiente_check(app_root):
+    """Programa la siguiente comprobación de actualizaciones del ciclo normal."""
+    import random as _rnd
+    espera = _INTERVALO_CHECK_S + int(_rnd.uniform(0, _MARGEN_CHECK_S))
+    app_root.after(espera * 1000, lambda: _lanzar_check_update(app_root))
+
+
 _ESPERA_LIMITE_MIN_S = 60
 _ESPERA_LIMITE_MAX_S = 2 * 60 * 60
 
@@ -346,7 +360,7 @@ def _check_update_github(app_root, _es_reintento_gracia: bool = False):
         _ulog(f"HTTPError {exc.code}: {exc.reason}")
         if _es_reintento_gracia:
             _mostrar_error_red("Error de actualización — HTTP " + str(exc.code), msg)
-            app_root.after(30 * 60 * 1000, lambda: _lanzar_check_update(app_root))
+            _programar_siguiente_check(app_root)
         else:
             _ulog("Primer fallo — gracia de 5 min antes de avisar")
             _conceder_gracia_update(app_root)
@@ -410,7 +424,7 @@ def _check_update_github(app_root, _es_reintento_gracia: bool = False):
         _ulog(f"URLError: {razon}")
         if _es_reintento_gracia:
             _mostrar_error_red("Error de actualización — Sin conexión", msg)
-            app_root.after(30 * 60 * 1000, lambda: _lanzar_check_update(app_root))
+            _programar_siguiente_check(app_root)
         else:
             _ulog("Primer fallo — gracia de 5 min antes de avisar")
             _conceder_gracia_update(app_root)
@@ -432,7 +446,7 @@ def _check_update_github(app_root, _es_reintento_gracia: bool = False):
         _ulog(f"ERROR inesperado: {type(exc).__name__}: {exc}")
         if _es_reintento_gracia:
             _mostrar_error_red("Error de actualización — Error inesperado", msg)
-            app_root.after(30 * 60 * 1000, lambda: _lanzar_check_update(app_root))
+            _programar_siguiente_check(app_root)
         else:
             _ulog("Primer fallo — gracia de 5 min antes de avisar")
             _conceder_gracia_update(app_root)
@@ -452,8 +466,8 @@ def _check_update_github(app_root, _es_reintento_gracia: bool = False):
         remote_v = _parse_version(tag_remoto)
         _ulog(f"versión local parseada={local_v}  remota={remote_v}")
         if remote_v <= local_v:
-            _ulog("Ya al día — reintento en 30 min")
-            app_root.after(30 * 60 * 1000, lambda: _lanzar_check_update(app_root))
+            _ulog("Ya al día — siguiente comprobación en unas 2 h")
+            _programar_siguiente_check(app_root)
             return
         _ulog(f"Actualización disponible: {APP_VERSION} → {tag_remoto}")
     except Exception as exc:
@@ -712,9 +726,9 @@ def _check_update_github(app_root, _es_reintento_gracia: bool = False):
         # NO grab_set: no bloquear la agenda mientras decide
 
     app_root.after(0, _mostrar_dialogo_update)
-    # Aunque haya actualización pendiente, recomprobar en 30 minutos por si el usuario
+    # Aunque haya actualización pendiente, recomprobar en el ciclo normal por si el usuario
     # pospuso varias veces y hay una versión aún más nueva disponible
-    app_root.after(30 * 60 * 1000, lambda: _lanzar_check_update(app_root))
+    _programar_siguiente_check(app_root)
 
 
 def _lanzar_check_update(app_root):

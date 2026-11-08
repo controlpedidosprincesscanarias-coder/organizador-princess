@@ -1,4 +1,4 @@
-"""Límite de consultas de GitHub en la comprobación de actualizaciones (v4.18.06).
+"""Límite de consultas de GitHub y frecuencia de la comprobación de actualizaciones (v4.18.06).
 
 La idea y el desarrollo de la aplicación Organizador Princess, incluidas sus pruebas, son de
 Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.
@@ -31,7 +31,9 @@ except ImportError:
             pass
     sys.meta_path.insert(0, _Simulado())
 
-from services.update_service import _espera_por_limite_github as espera, _ESPERA_LIMITE_MAX_S  # noqa: E402
+from services.update_service import (  # noqa: E402
+    _espera_por_limite_github as espera, _ESPERA_LIMITE_MAX_S, _programar_siguiente_check,
+)
 
 fallos = []
 def ok(nombre, cond):
@@ -59,6 +61,18 @@ ok("429 sin cabeceras → 15 min", espera(429, {}, AHORA, 0) == 900)
 ok("el margen al azar está entre 0 y 5 min",
    all(600 <= espera(403, {"X-RateLimit-Remaining": "0", "X-RateLimit-Reset": str(AHORA + 600)}, AHORA) <= 900
        for _ in range(200)))
+
+class _RaizFalsa:
+    def __init__(self):
+        self.esperas = []
+    def after(self, ms, fn):
+        self.esperas.append(ms)
+
+raiz = _RaizFalsa()
+for _ in range(200):
+    _programar_siguiente_check(raiz)
+ok("ciclo normal: cada 2 h más 0–10 min al azar (antes, 30 min)",
+   all(2 * 3600 * 1000 <= ms <= (2 * 3600 + 600) * 1000 for ms in raiz.esperas) and len(set(raiz.esperas)) > 1)
 
 print(f"\n{'Todas las comprobaciones OK.' if not fallos else str(len(fallos)) + ' fallo(s)'}")
 sys.exit(1 if fallos else 0)

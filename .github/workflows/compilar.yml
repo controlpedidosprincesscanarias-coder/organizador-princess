@@ -79,6 +79,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit 1 }
           python test_limite_github.py
           if ($LASTEXITCODE -ne 0) { exit 1 }
+          python test_bd_y_acceso.py
+          if ($LASTEXITCODE -ne 0) { exit 1 }
 
       - name: Compilar con PyInstaller
         shell: pwsh

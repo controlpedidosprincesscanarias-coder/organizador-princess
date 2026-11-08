@@ -222,3 +222,6 @@ Thumbs.db
 *.exe
 Output/
 *.zip
+
+# Salida de pruebas_uso/ejecutar.sh (capturas y registros)
+pruebas_uso/salida/

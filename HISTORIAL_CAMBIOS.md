@@ -51,6 +51,28 @@
 
 ---
 
+## 2026-11-08 22:55 — [Organizador] Prueba de uso con Claude en Linux y dos correcciones más (v4.18.06, sin publicar)
+
+- **Petición** (Víctor): probar el uso real del Organizador como se hizo con Control Pedidos. Chat de prueba solo con «comprascan».
+- **Nueva prueba de uso** (`pruebas_uso/`: `conductor.py`, `pasos_uso.py`, `ejecutar.sh`, README):
+  - arranca `main_agenda.py` de verdad con Tkinter y ttkbootstrap en una pantalla virtual (Xvfb); simula lo propio de Windows (instancia única, `winsound`, `os.startfile`; DPAPI no se usa en Linux) y responde solo a los `messagebox`;
+  - maneja la aplicación con «usuario prueba» (rol compras) contra Control de Pedidos y el chat reales, en un perfil temporal que se borra al terminar;
+  - **23 de 23 comprobaciones bien**: primer arranque, saludo, agenda y su aviso a la hora, calendario, vacaciones, festivos, Admin (contraseña mala y buena), botones web y carpeta, vista reducida y extendida, exportar e importar, chat, aviso emergente de Control de Pedidos, aviso de conexión y «Actualización disponible» simulada.
+- **Lo que tocó datos reales**:
+  - **chat**: dos mensajes de prueba a comprascan (dos ejecuciones);
+  - **Control de Pedidos**: pedidos de prueba 1199, 1200 y 1201 en el hotel PR, creados y cancelados.
+  - Las notificaciones de cambio de estado llegaron al Organizador con varios minutos de retraso: la id 101741 se mostró a las 22:42. No es un fallo del Organizador.
+  - Por defecto la prueba no envía mensajes ni crea pedidos (`CHAT_DESTINO`, `CREAR_PEDIDO_PR=1`).
+- **Errores encontrados y corregidos** (commit propio, `test_bd_y_acceso.py`, 6 comprobaciones; 3 fallan con el código anterior):
+  - `admin_auth.existe_en_plataforma`: el usuario de Windows iba sin codificar en la URL. Con un espacio o una «ñ» la petición no salía y la ventana de acceso decía «Sin conexión con Control de Pedidos».
+  - `db.sqlite._init_db_usuarios`: el `ALTER TABLE` se repetía en cada lectura y dejaba «duplicate column name» en el log. Ahora solo añade las columnas que falten.
+- **Precisión sobre el error del aviso de conexión** (entrada de las 21:53): reproducido con la 4.18.04, `from main_agenda import` volvía a ejecutar el arranque del Organizador dentro del propio programa. En Windows congela la interfaz ~1,5 s por la comprobación de instancia única; luego, con el ttkbootstrap actual, se corta al crear la segunda ventana principal y el aviso sale sin icono, y con versiones antiguas de ttkbootstrap podría llegar a abrirla. Notas de la versión corregidas.
+- Visto una vez en Linux en 5 ejecuciones completas, sin repetirse en las siguientes: un fallo de segmentación de Tk. Sin rastro que lo atribuya al Organizador; se sigue vigilando.
+- Observación sin cambios: al pulsar «Editar» en el panel Admin, el panel se cierra y no se reabre al cancelar (comportamiento actual).
+- `test_bd_y_acceso.py`, añadido a la compilación automática; CLAUDE.md, con la prueba de uso. La versión sigue en **4.18.06** porque aún no se ha publicado.
+
+---
+
 ## 2026-11-08 21:53 — [Organizador] Revisión: dos errores corregidos, limpieza y actualizaciones cada 2 horas (v4.18.06)
 
 - **Petición**: punto 2 de la revisión del Organizador (avisos de `pyflakes`, errores reales y frecuencia de las actualizaciones).

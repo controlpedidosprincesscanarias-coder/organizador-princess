@@ -3,9 +3,7 @@ utils/fechas.py
 Conversión y formateo de fechas para la agenda.
 Extraído de main_agenda.py en Fase 2 del sprint de estabilización.
 """
-from datetime import datetime, date, timedelta
-import calendar as _cal_mod
-import re
+from datetime import datetime
 
 def _iso_a_ui(fecha_iso: str) -> str:
     """Convierte 'YYYY-MM-DD' → 'DD-MM-YYYY' para mostrar en la UI."""

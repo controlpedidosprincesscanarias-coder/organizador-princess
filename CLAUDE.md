@@ -14,7 +14,7 @@ Aplicación de escritorio para Windows 10/11 de la Central de Compras Princess C
 ## Estructura
 - `main_agenda.py` — ventana principal, agenda, login de Administración y arranque de los servicios.
 - `pedidos_agenda_bridge.py` — conexión con Control de Pedidos (`/api/bridge/login`, `/api/bridge/alertas`, `/api/bridge/notificaciones`) a través del Worker `proxy.controlpedidosprincess-canarias.workers.dev`.
-- `app/services/` — `update_service.py` (actualizaciones), `chat_client.py` (chat, Worker `proxy-chat.controlpedidosprincess-canarias.workers.dev`), `admin_auth.py` (acceso a Administración).
+- `app/services/` — `update_service.py` (actualizaciones: al arrancar y cada 2 h con margen al azar, `_programar_siguiente_check`; el límite de consultas de GitHub se espera en silencio, `_espera_por_limite_github`), `chat_client.py` (chat, Worker `proxy-chat.controlpedidosprincess-canarias.workers.dev`), `admin_auth.py` (acceso a Administración).
 - `app/negocio/` — `alertas.py` (popups y recordatorios; `_AUTOCIERRE_BRIDGE_MIN`), `correo.py`.
 - `app/ui/` — ventanas (chat, configuración, festivos, vacaciones, saludo…); `dnd_windows.py` (arrastrar y soltar en el chat, desactivable con `"chat_arrastrar_soltar": false` en `config.json`).
 - `app/db/` — `sqlite.py` y `dpapi.py` (cifrado con la API de Windows).
@@ -47,3 +47,5 @@ Todos los equipos se actualizan solos desde las **Releases de este repositorio**
 4. Los errores que se encuentren se reparan aunque ya estuvieran, en un commit propio.
 5. Conservar siempre la línea de autoría en documentos y cabeceras, y añadirla en los nuevos.
 6. Sin Windows no se puede probar la interfaz real: compilar con `python -m py_compile` y probar la lógica aislada (como en `test_filtrado_popups.py`), y decir claramente qué queda por probar en Windows.
+7. Pruebas (se lanzan también en la compilación automática): `python test_filtrado_popups.py`, `python test_estructura.py` y `python test_limite_github.py`. Los dos últimos simulan Tkinter si no está instalado.
+8. **Nunca importar `main_agenda` desde otro módulo**: es el script de arranque (`__main__`) y el import vuelve a ejecutar la aplicación entera (pasó en `pedidos_agenda_bridge.py` hasta v4.18.06). Lo compartido va en `app/`. Lo vigila `test_estructura.py`.

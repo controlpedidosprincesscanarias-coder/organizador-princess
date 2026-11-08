@@ -75,6 +75,10 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit 1 }
           python test_filtrado_popups.py
           if ($LASTEXITCODE -ne 0) { exit 1 }
+          python test_estructura.py
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          python test_limite_github.py
+          if ($LASTEXITCODE -ne 0) { exit 1 }
 
       - name: Compilar con PyInstaller
         shell: pwsh

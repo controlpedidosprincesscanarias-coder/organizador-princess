@@ -34,7 +34,7 @@ _HANDLER        = None  # función que procesa un evento del chat mientras la ve
 
 
 def _ventana_chat(ctx):
-    global _VENTANA_ACTUAL, _CANAL_VISIBLE, _HANDLER
+    global _VENTANA_ACTUAL, _HANDLER
     if _VENTANA_ACTUAL is not None and _VENTANA_ACTUAL.winfo_exists():
         _VENTANA_ACTUAL.lift()
         _VENTANA_ACTUAL.focus_force()
@@ -275,8 +275,12 @@ def _ventana_chat(ctx):
                 cliente.abrir_archivo(ruta)
             except Exception as exc:
                 logging.getLogger("chat").warning("No se pudo descargar/abrir el adjunto: %s", exc)
-                win.after(0, lambda: messagebox.showerror(
-                    "Chat", f"No se pudo descargar «{nombre_archivo}»:\n{exc}", parent=win))
+                # (v4.18.06) `exc` se pasa como argumento por defecto: Python
+                # borra la variable del except al salir del bloque, y la
+                # lambda, que se ejecuta después, daba NameError y el aviso
+                # de error nunca llegaba a mostrarse.
+                win.after(0, lambda e=exc: messagebox.showerror(
+                    "Chat", f"No se pudo descargar «{nombre_archivo}»:\n{e}", parent=win))
         threading.Thread(target=_hilo, daemon=True, name="Chat-DescargarAdjunto").start()
 
     # Burbujas de verdad (rectángulos redondeados en Canvas), con hora

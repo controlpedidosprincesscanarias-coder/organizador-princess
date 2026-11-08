@@ -20,7 +20,6 @@ import argparse
 import json
 import os
 import re
-import sys
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 

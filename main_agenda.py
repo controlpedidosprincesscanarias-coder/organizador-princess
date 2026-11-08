@@ -1,12 +1,7 @@
 import os
 import sys
-import json
-import base64
 import logging
 import threading
-import time
-import sqlite3
-import queue
 from datetime import datetime, date, timedelta
 import calendar as _cal_mod
 import ttkbootstrap as ttk
@@ -14,32 +9,28 @@ import tkinter as tk
 from ttkbootstrap.constants import Wrap, NO, YES  # noqa: F401
 from tkinter import filedialog, StringVar, messagebox
 from PIL import Image, ImageTk
-from io import BytesIO
 from pedidos_agenda_bridge import iniciar_bridge_pedidos, detener_bridge
 
 # ── Módulos extraídos en Fase 2 ───────────────────────────────────────────────
 import sys as _sys; _sys.path.insert(0, "app")  # asegura que app/ es importable
 from db.sqlite import (
-    get_config_path, CONFIG_FILE, AGENDA_FILE, DB_FILE, VERSION_FILE,
-    load_config, save_config, load_agenda, save_agenda,
-    _init_db_usuarios, get_nombre_usuario, update_nombre_usuario_db,
-    tiene_nombre_configurado,
-    get_bridge_credentials, update_bridge_credentials,
+    CONFIG_FILE, load_config, save_config, load_agenda, save_agenda,
+    get_nombre_usuario, update_nombre_usuario_db, tiene_nombre_configurado, get_bridge_credentials,
+    update_bridge_credentials,
 )
-from utils.fechas import _iso_a_ui, _ui_a_iso, _dias_entre
+from utils.fechas import _iso_a_ui, _ui_a_iso
 from utils.sonido import _reproducir_sonido_aviso
 from negocio.correo import (
-    _enriquecer_evento_correo, _generar_texto_correo, _abrir_ventana_correo,
+    _enriquecer_evento_correo, _abrir_ventana_correo,
 )
 import negocio.alertas as _alertas_mod
 from negocio.alertas import (
-    _descripcion_aviso, _debe_disparar, _procesar_cola_popups,
-    monitor_avisos, mostrar_alerta, _construir_popup,
+    _descripcion_aviso, monitor_avisos, mostrar_alerta,
     poll_alertas,   # ANTI-REGRESION: poller thread-safe para console=False de PyInstaller
 )
 from services.update_service import (
-    _check_update_github, _lanzar_check_update, _check_version_reset,
-    _parse_version, _aplicar_solo_actualizacion, _aplicar_instalacion_desde_cero,
+    _lanzar_check_update, _check_version_reset,
+    _aplicar_solo_actualizacion, _aplicar_instalacion_desde_cero,
     # _dialogo_nueva_version and _dialogo_nueva_version_safe remain as nested
     # functions in main_agenda (they use local closure vars)
 )
@@ -48,10 +39,7 @@ import services.admin_auth as admin_auth
 
 # ── Módulos extraídos en Fase 3A ──────────────────────────────────────────────
 from ui.assets import (
-    get_embedded_logo, get_crown_image, get_crown_tk,
-    get_window_icon, _apply_icon, resource_path,
-    LOGO_B64, ICON32_B64, CORONA_B64,
-    _CROWN_CACHE, _SHARED_ICON,
+    get_embedded_logo, get_crown_tk, _apply_icon,
 )
 from ui.saludo import mostrar_saludo_diario
 from ui.agenda_helpers import (_eventos_del_dia, _vacaciones_del_dia,
@@ -60,9 +48,7 @@ from ui.importexport import (exportar_config, importar_config,
                              exportar_agenda, importar_agenda)
 from ui.vacaciones import _ventana_vacaciones
 from ui.festivos import _ventana_festivos
-from ui.ventana_config import (_ventana_config, _ventana_admin_submenu,
-                               _ventana_config_sub, _clear_submenu_ref,
-                               _abrir_submenu, _ejecutar_sub)
+from ui.ventana_config import (_ventana_config, _abrir_submenu)
 from ui.ventana_chat import _ventana_chat
 import ui.ventana_chat as _ventana_chat_mod
 import ui.chat_popup as _chat_popup_mod
@@ -114,7 +100,7 @@ LIGHT = "#D8E8F0"
 NUM_OPCIONES = 30
 NUM_ACCESOS_RAPIDOS = 6
 MARGEN = 44   # px aprox. 2 dedos en cada borde
-APP_VERSION  = "v4.18.04"   # ← actualizar en cada release (debe coincidir con el tag del release en GitHub)
+APP_VERSION  = "v4.18.06"   # ← actualizar en cada release (debe coincidir con el tag del release en GitHub)
 GITHUB_REPO  = "controlpedidosprincesscanarias-coder/organizador-princess"  # repo de releases
 _update_mod.APP_VERSION = APP_VERSION  # propagar a services/update_service.py
 _update_mod.GITHUB_REPO = GITHUB_REPO
@@ -1365,7 +1351,7 @@ def abrir_calendario():
         win.geometry(f"{_cw_cal}x{_ch}+{_x}+{_y}")
         win.deiconify()
         win.focus_force()
-    except Exception as _e_cal:
+    except Exception:
         import traceback as _tb
         print(f"[ERROR abrir_calendario] {_tb.format_exc()}")
         try: win.destroy()
@@ -1765,7 +1751,6 @@ def abrir_manual():
       3. Directorio de trabajo actual.
     Si no lo encuentra en ninguna, muestra un mensaje orientativo.
     """
-    import subprocess
 
     candidatos = [
         # 1) Junto al ejecutable (PyInstaller pone sys.executable en la carpeta de instalación)
@@ -2003,8 +1988,6 @@ def abrir_admin():
             _apply_icon(mu_win)
 
             _muw = 460
-            _msw = mu_win.winfo_screenwidth()
-            _msh = mu_win.winfo_screenheight()
             mu_win.withdraw()
 
             from tkinter import StringVar as _SV2
@@ -3070,7 +3053,6 @@ if _nueva_version_detectada:
         dlg.update_idletasks()
         dlg.update()   # renderizado completo antes de medir
 
-        _sw = app.winfo_screenwidth()
         _sh = app.winfo_screenheight()
 
         _w = max(dlg.winfo_width(), dlg.winfo_reqwidth(), _MIN_W)

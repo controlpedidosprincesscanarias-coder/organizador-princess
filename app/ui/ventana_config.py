@@ -6,7 +6,7 @@ Extraído de main_agenda.py en Fase 3B.
 Recibe AppContext (ctx) — sin globals.
 """
 import ttkbootstrap as ttk
-from tkinter import filedialog, messagebox, StringVar  # ANTI-REGRESION: StringVar era global de main_agenda
+from tkinter import filedialog, StringVar  # ANTI-REGRESION: StringVar era global de main_agenda
 from ui.assets import _apply_icon                      # ANTI-REGRESION: usada en todas las ventanas Toplevel
 from utils.rutas import _lanzar_ruta                   # ANTI-REGRESION: usada en _ejecutar_sub
 
@@ -37,7 +37,6 @@ def _ventana_config(ctx, opcion, idx, nuevo=False, titulo_display=None):
     win = ttk.Toplevel()
     win.title("Configurar acceso" if nuevo else "Editar acceso")
     _cw, _ch = 620, 610          # ancho para "Archivo ejecutable" y alto con sección submenú
-    _sw = win.winfo_screenwidth()
     _sh = win.winfo_screenheight()
     _margen_izq = 60             # separación del borde izquierdo
     _cx = _margen_izq            # siempre a la izquierda, sin solapar admin

@@ -308,7 +308,6 @@ def _mostrar_error_bridge(titulo: str, cuerpo: str):
     de cuántas veces falle la conexión o de si hay éxitos intermedios.
     Los fallos adicionales del mismo día solo van al log.
     """
-    global _errores_mostrados_hoy
 
     _blog(f"ERROR: {titulo}\n{cuerpo}\n{'─'*60}")
 
@@ -340,9 +339,14 @@ def _mostrar_error_bridge(titulo: str, cuerpo: str):
                 dlg.resizable(False, False)
                 dlg.attributes("-topmost", True)
 
-                # Intentar aplicar el mismo icono que la app principal
+                # Intentar aplicar el mismo icono que la app principal.
+                # (v4.18.06) Se toma de ui.assets, que es donde vive: con
+                # «from main_agenda import ...» Python volvía a ejecutar
+                # main_agenda.py entero (es el script de arranque, registrado
+                # como __main__), con una segunda ventana, un segundo bridge
+                # y un mainloop anidado.
                 try:
-                    from main_agenda import _apply_icon
+                    from ui.assets import _apply_icon
                     _apply_icon(dlg)
                 except Exception:
                     pass  # UI — ignorar silenciosamente
@@ -461,7 +465,6 @@ def _mostrar_error_bridge(titulo: str, cuerpo: str):
 def _resetear_contador_errores():
     """Compatibilidad: ya no resetea nada. El límite es 1 diálogo/día por tipo,
     independientemente de los éxitos de conexión intermedios."""
-    pass
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -1069,7 +1072,7 @@ def _sincronizar_alertas(agenda_data, save_agenda_fn, mostrar_alerta_fn):
     servidor manda aparte total_activas/urgentes_activas/normales_activas
     con el recuento SIN filtrar.
     """
-    global _dia_actual, _resumen_alertas
+    global _dia_actual
 
     endpoint = "/api/bridge/alertas"
 
@@ -1141,7 +1144,6 @@ def _procesar_push(agenda_data, save_agenda_fn, mostrar_alerta_fn):
     aviso concreto se pierde (no hay replay al reiniciar) — compromiso
     aceptado a cambio de simplicidad.
     """
-    global _push_procesados
 
     endpoint   = "/api/bridge/notificaciones"
 
@@ -1250,7 +1252,7 @@ def iniciar_bridge_pedidos(agenda_data, save_agenda_fn, app_root_legacy=None, ap
     mostrar_alerta_fn: referencia directa a negocio.alertas.mostrar_alerta,
               inyectada por main_agenda.py. Ver ANTI-REGRESION más abajo.
     """
-    global _estado_popups, _dia_actual, _push_procesados, _app_root
+    global _dia_actual, _app_root
 
     # Compatibilidad con llamada antigua de 3 argumentos
     _app_root = app_root or app_root_legacy
@@ -1274,40 +1276,28 @@ def iniciar_bridge_pedidos(agenda_data, save_agenda_fn, app_root_legacy=None, ap
         return
 
     # ANTI-REGRESION (bug detectado 2026-07-13): antes se intentaba obtener
-    # mostrar_alerta con `import main_agenda as _ma; _ma.mostrar_alerta`. Esto
-    # falla SIEMPRE que main_agenda.py es el script de arranque (ejecutado
-    # directamente o como .exe de PyInstaller), porque en ese caso Python lo
-    # registra en sys.modules como "__main__", no como "main_agenda" — el
-    # import no lo encuentra, salta la excepción, y el bridge caía en un
-    # fallback que SOLO escribía un log.warning("Bridge [popup fallback]...")
-    # sin llamar nunca al mostrar_alerta() real de negocio/alertas.py. Efecto:
-    # las notificaciones se recogían y marcaban como leídas correctamente,
-    # pero el popup jamás llegaba a encolarse en Tkinter — sin ningún error
-    # visible salvo esa línea de log, fácil de pasar por alto.
-    # SOLUCIÓN: main_agenda.py ya importa mostrar_alerta directamente desde
-    # negocio.alertas; se la pasamos aquí como parámetro en vez de intentar
-    # volver a localizarla por nombre de módulo. Se conserva el intento de
-    # `import main_agenda` únicamente como compatibilidad hacia atrás para
-    # quien invoque esta función sin pasar mostrar_alerta_fn (p.ej. pruebas
-    # sueltas), pero la vía normal y fiable es siempre el parámetro.
+    # mostrar_alerta con `import main_agenda as _ma; _ma.mostrar_alerta`.
+    # main_agenda.py es el script de arranque (ejecutado directamente o como
+    # .exe de PyInstaller) y Python lo registra en sys.modules como
+    # "__main__", no como "main_agenda": ese import no reutiliza el módulo en
+    # marcha, sino que vuelve a cargar y EJECUTAR main_agenda.py entero (o
+    # falla), y en ningún caso da el mostrar_alerta() real. SOLUCIÓN:
+    # main_agenda.py pasa mostrar_alerta como parámetro. (v4.18.06) Se quita
+    # también el intento de «import main_agenda» que quedaba como
+    # compatibilidad: no hay ninguna otra llamada y podía re-ejecutar la app.
+    # Nunca importar main_agenda desde otro módulo.
     if mostrar_alerta_fn is not None:
         _mostrar_alerta = mostrar_alerta_fn
         log.info("Bridge: mostrar_alerta inyectada directamente por main_agenda.py")
     else:
-        try:
-            import main_agenda as _ma
-            _mostrar_alerta = _ma.mostrar_alerta
-            log.info("Bridge: mostrar_alerta obtenida via import main_agenda (compatibilidad)")
-        except Exception as exc:
+        log.warning(
+            "Bridge: no se recibió mostrar_alerta_fn — los popups quedarán solo en el log."
+        )
+        def _mostrar_alerta(aviso, **_):
             log.warning(
-                "Bridge: no se pudo importar main_agenda (%s) y no se recibió "
-                "mostrar_alerta_fn — los popups quedarán solo en el log.", exc
+                "Bridge [popup fallback]: %s — %s",
+                aviso.get("titulo", ""), aviso.get("mensaje", ""),
             )
-            def _mostrar_alerta(aviso, **_):
-                log.warning(
-                    "Bridge [popup fallback]: %s — %s",
-                    aviso.get("titulo", ""), aviso.get("mensaje", ""),
-                )
 
     # CAMBIOS v4.4 — arranque no bloqueante
     # ------------------------------------------------------------

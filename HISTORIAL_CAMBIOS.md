@@ -51,6 +51,27 @@
 
 ---
 
+## 2026-11-08 21:53 — [Organizador] Revisión: dos errores corregidos, limpieza y actualizaciones cada 2 horas (v4.18.06)
+
+- **Petición**: punto 2 de la revisión del Organizador (avisos de `pyflakes`, errores reales y frecuencia de las actualizaciones).
+- **Errores corregidos** (commit propio):
+  - `pedidos_agenda_bridge.py`: el diálogo de aviso de conectividad hacía `from main_agenda import _apply_icon`. `main_agenda` es el script de arranque (`__main__`), así que el import volvía a ejecutar la aplicación entera en el mismo proceso: segunda ventana, segundo bridge y `mainloop` anidado, y el aviso no llegaba a verse. Ahora se toma de `ui.assets`. Se quita también el `import main_agenda` de compatibilidad de `iniciar_bridge_pedidos`.
+  - `app/ui/ventana_chat.py`: la lambda del error al descargar un adjunto usaba la variable del `except`, que Python borra al salir del bloque. Daba `NameError` y el aviso no aparecía.
+  - Nuevo `test_estructura.py`: nadie importa `main_agenda` y ninguna lambda usa la variable de un `except`. Falla con el código anterior.
+- **Limpieza** (sin cambios de funcionamiento):
+  - `update_service.py`: ~285 líneas inalcanzables tras el `return` de `_check_version_reset`, una copia antigua de la ventana «Nueva versión». Eran todos los «undefined name» de `pyflakes`.
+  - 52 imports sin uso, `global` innecesarios y variables sin uso.
+  - Los 24 módulos se importan bien con Tkinter simulado.
+- **Actualizaciones** (`update_service.py`):
+  - límite de consultas de GitHub (60/h por IP sin sesión; 403/429 con `X-RateLimit-Remaining: 0` o `Retry-After`): ya no saca el diálogo rojo que pedía abrir el firewall ni gasta el reintento de gracia; se espera hasta el `Reset` + 0–5 min al azar (entre 1 min y 2 h);
+  - frecuencia (decisión de Víctor; menos de 20 equipos): al arrancar y cada 2 h + 0–10 min al azar, antes 30 min. También baja a ~2 h la repetición del aviso de una actualización pospuesta;
+  - `test_limite_github.py`, 11 comprobaciones. Las dos pruebas nuevas se ejecutan en la compilación automática.
+- **Manuales**: el de usuario dice «cada 2 horas aproximadamente»; el de administrador explica la publicación con «Compilar Organizador» y la release en borrador. Portadas a v4.18.06; PDF regenerados con LibreOffice, mismas páginas.
+- Versión **4.18.06** (`APP_VERSION` y `.iss`) y notas en `release_notes`. **No se ha publicado ninguna Release**: Víctor la compilará en borrador desde Actions cuando lo decida.
+- Queda por probar en Windows: el aviso de conectividad con Control de Pedidos caído, el error de descarga de un adjunto del chat y la compilación.
+
+---
+
 ## 2026-11-08 21:38 — [Organizador] Compilación automática del instalador en GitHub, con Release en borrador
 
 - **Petición** (Víctor): compilar automáticamente y dejar el `.exe` de actualización en la Release, pero desactivado, para que no les salte la actualización a los usuarios hasta que se decida.

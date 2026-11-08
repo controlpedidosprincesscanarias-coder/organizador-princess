@@ -52,6 +52,41 @@ _gracia_update_en_curso = False
 _gracia_update_lock     = threading.Lock()
 
 
+# ── (v4.18.06) Límite de consultas de GitHub ────────────────────────────────
+# Sin iniciar sesión, GitHub admite 60 consultas por hora por IP pública. Todos
+# los equipos que salen a Internet por la misma IP de la empresa comparten ese
+# cupo. Al agotarlo responde 403 (o 429) con X-RateLimit-Remaining: 0. No es un
+# fallo de red: no se avisa al usuario (el diálogo rojo pedía abrir el
+# firewall), no se gasta el reintento de gracia y se vuelve a mirar cuando
+# GitHub lo permita (X-RateLimit-Reset / Retry-After), con un margen al azar
+# para que los equipos no vuelvan todos a la vez.
+_ESPERA_LIMITE_MIN_S = 60
+_ESPERA_LIMITE_MAX_S = 2 * 60 * 60
+
+
+def _espera_por_limite_github(codigo, cabeceras, ahora=None, azar=None):
+    """Segundos a esperar si la respuesta es por límite de consultas de GitHub;
+    None si es otro error (que sigue el tratamiento normal)."""
+    import random as _rnd
+    import time as _time
+    if codigo not in (403, 429):
+        return None
+    cab = {str(k).lower(): str(v) for k, v in (cabeceras or {}).items()}
+    retry_after = cab.get("retry-after", "").strip()
+    restantes = cab.get("x-ratelimit-remaining", "").strip()
+    if not retry_after and restantes != "0" and codigo != 429:
+        return None   # 403 por otro motivo (proxy, filtrado...): error normal
+    ahora = _time.time() if ahora is None else ahora
+    margen = (_rnd.uniform(0, 300) if azar is None else azar)
+    if retry_after.isdigit():
+        espera = int(retry_after)
+    elif cab.get("x-ratelimit-reset", "").strip().isdigit():
+        espera = int(cab["x-ratelimit-reset"]) - ahora
+    else:
+        espera = 15 * 60
+    return int(min(max(espera + margen, _ESPERA_LIMITE_MIN_S), _ESPERA_LIMITE_MAX_S))
+
+
 # ── (v4.16.9) Comprobación de integridad del instalador descargado ──────────
 # Si el release publica un fichero «<instalador>.sha256» (o «SHA256SUMS» /
 # «SHA256SUMS.txt»), se compara el SHA-256 de lo descargado con el publicado.
@@ -281,6 +316,12 @@ def _check_update_github(app_root, _es_reintento_gracia: bool = False):
                 _ulog("Reintento de gracia OK — conexión recuperada, aviso suprimido")
 
     except urllib.error.HTTPError as exc:
+        _espera_limite = _espera_por_limite_github(exc.code, dict(exc.headers or {}))
+        if _espera_limite is not None:
+            _ulog(f"HTTP {exc.code}: límite de consultas de GitHub agotado para esta IP — "
+                  f"sin aviso; nuevo intento en {_espera_limite // 60} min")
+            app_root.after(_espera_limite * 1000, lambda: _lanzar_check_update(app_root))
+            return
         msg = (
             f"TIPO DE ERROR : HTTP {exc.code} {exc.reason}\n"
             f"\n"

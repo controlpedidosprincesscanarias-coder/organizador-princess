@@ -564,7 +564,7 @@ event.width - 160)` en las etiquetas de cada fila al ensanchar — mismo
 patrón que ya usa Agenda.
 
 **Sistema de acceso a Administración sin credenciales hardcodeadas.**
-Se elimina `ADMIN_USER = "ADMIN"` / `ADMIN_PASSWORD = "Princess2026"`
+Se elimina `ADMIN_USER = "ADMIN"` / `ADMIN_PASSWORD = "…"` (valor retirado de este documento)
 (constantes fijas en `main_agenda.py`). Nuevo módulo
 `app/services/admin_auth.py`:
 

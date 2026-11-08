@@ -51,6 +51,18 @@
 
 ---
 
+## 2026-11-08 16:53 — [Organizador / Control Pedidos] Retirada de la documentación la antigua contraseña fija de Administración (v12.33.96)
+
+- **Petición**: Víctor: «eliminar la contraseña antigua».
+- **Cambio**: el valor de la antigua contraseña fija del panel de Administración del Organizador (eliminada del código en v4.10.6) se sustituye por «contraseña fija, ya retirada» en:
+  - `docs/archivo/HISTORIAL_CAMBIOS_2026-07_a_2026-09.md` (en los dos repositorios, que siguen idénticos);
+  - `release_notes/release_notes.md` del Organizador.
+- **Revisado sin encontrarla**: todos los archivos actuales de los dos repositorios, los manuales (docx y pdf) y las notas de las 40 Releases del Organizador.
+- **Límite**: sigue en el historial de commits antiguos de git y en los instaladores publicados de versiones anteriores a la v4.10.6. Borrarla de ahí exigiría reescribir el historial del repositorio y afectaría a las Releases. Como ya no da acceso a nada, basta con no reutilizarla en ninguna cuenta.
+- **Organizador**: solo documentación; no cambia `APP_VERSION` ni hace falta una Release nueva.
+
+---
+
 ## 2026-11-08 16:48 — [Organizador / Control Pedidos] Código del Organizador en GitHub e historial unificado (v4.18.04 / v12.33.94)
 
 - **Petición**: Víctor sube el código del Organizador para guardarlo en GitHub y que el historial vuelva a ser el mismo en los dos proyectos.

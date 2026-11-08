@@ -7820,7 +7820,7 @@
 
 ### [Manual] Manual de Usuario actualizado a v4.12.0 — cerrado
 - Reescrita por completo la sección "Acceso al Panel ADMIN": fuera el
-  usuario/contraseña fijo (`ADMIN` / `Princess2026`), documentado el
+  usuario/contraseña fijo (`ADMIN` / contraseña fija, ya retirada), documentado el
   flujo real (usuario de Windows autorrelleno, validación online,
   alta con aviso a un admin, respaldo offline, bloqueo de 5 min).
 - Añadida la subsección "Credenciales de Control de Pedidos (chat y

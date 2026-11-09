@@ -1,3 +1,14 @@
+# ✨ Organizador Princess v4.18.22
+
+> Incluye también todo lo de la 4.18.20, la 4.18.18, la 4.18.16, la 4.18.14 y la 4.18.12, que no llegaron a publicarse.
+
+## 😊 Emoticonos en color
+
+- El panel de emoticonos del chat, las respuestas rápidas y el botón 😊 se ven ahora **en color** (antes, en blanco).
+- Los emoticonos del panel se ven también en color **dentro de los mensajes**, en la ventana del chat y en la burbuja.
+
+---
+
 # ✨ Organizador Princess v4.18.20
 
 > Incluye también todo lo de la 4.18.18, la 4.18.16, la 4.18.14 y la 4.18.12, que no llegaron a publicarse.

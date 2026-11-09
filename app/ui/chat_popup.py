@@ -34,7 +34,7 @@ from datetime import datetime, date
 
 from services.chat_client import get_chat_client, EVT_NUEVO_MENSAJE
 from ui.chat_bubbles import BubbleList, fecha_hora_local
-from ui.emoticonos import abrir_panel
+from ui.emoticonos import abrir_panel, imagen as imagen_emoticono
 from db.sqlite import filtrar_mensajes_limpiados
 
 _POPUPS = {}   # canal_id -> {"win", "pintar", "handler"}
@@ -331,9 +331,11 @@ def mostrar_popup_chat(ctx, canal_id, titulo, mensaje_inicial=None, borrador="")
             _enviar_rutas([ruta])
 
     # (v4.18.18) Emoticonos y respuestas rápidas
-    btn_emo = tk.Button(frm_envio, text="😊", bg=_COLOR_ENTRY, fg="white", bd=0,
+    _img_emo = imagen_emoticono("😊", pequena=True)   # (v4.18.22) en color
+    btn_emo = tk.Button(frm_envio, text="" if _img_emo is not None else "😊", image=_img_emo or "", bg=_COLOR_ENTRY, fg="white", bd=0,
                         activebackground="#33415a", activeforeground="white",
-                        relief="flat", cursor="hand2", font=("Segoe UI", 12), width=2, pady=4)
+                        relief="flat", cursor="hand2", font=("Segoe UI", 12), pady=4,
+                        width=30 if _img_emo is not None else 2)   # con imagen, el ancho va en píxeles
     btn_emo.configure(command=lambda: abrir_panel(btn_emo, entry, encima=True))
     btn_emo.pack(side="left", padx=(0, 4))
     tk.Button(frm_envio, text="📎", bg=_COLOR_ENTRY, fg="white", bd=0,

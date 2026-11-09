@@ -51,6 +51,26 @@
 
 ---
 
+## 2026-11-09 18:49 — [Organizador] Emoticonos del chat en color (v4.18.22, sin publicar)
+
+- Petición de Víctor: en Windows los emoticonos del panel 😊 se veían en blanco y costaba distinguirlos. Tk en Windows dibuja los emoticonos de un solo color.
+- **Solución:** imágenes PNG en color de los 33 emoticonos (los del panel y los de las respuestas rápidas), en dos tamaños, dentro de `app/ui/emoticonos_color/`.
+  - Se generan con `compilacion/generar_emoticonos.py` a partir de la fuente libre Noto Color Emoji (OFL 1.1).
+  - Van en el ejecutable dentro de la carpeta `app/ui`, que `main.spec` ya copia entera.
+- **Dónde se ven en color:**
+  - el panel, las respuestas rápidas y el botón 😊, en la ventana del chat y en la burbuja;
+  - los mensajes (`chat_bubbles.py`): los emoticonos del panel se pintan como imagen entre el texto, incluido el ❤️ que llega del móvil con selector de variante;
+  - el resto de emoticonos sigue como texto.
+- **Sin cambios en lo que se envía:** el mensaje viaja como texto. Lo que se está escribiendo en la caja de texto sigue de un solo color, por la misma limitación de Tk.
+- **Compilación de Chat Princess (Android):** la primera llegó a compilar y firmar la APK (los secretos funcionan). Falló solo la comprobación final con apksigner, porque había varias versiones de build-tools. Se corrige en `chat-movil-princess` (PR #1).
+- **Pruebas:**
+  - `test_emoticonos.py` (nueva, 8 comprobaciones), añadida a la compilación automática;
+  - en Linux, con la app real y el chat simulado, 6 de 6 comprobaciones del panel, y la burbuja con un mensaje con 😊 👍 🙏 ❤️ en color.
+  - Falta verlo en Windows.
+- Incluye la 4.18.20 y las anteriores, sin publicar. Manual de usuario actualizado.
+
+---
+
 ## 2026-11-09 18:29 — [Organizador] Actualizar con un solo clic (v4.18.20, sin publicar)
 
 - Petición de Víctor, viendo la ventana de actualización en un equipo con la 4.18.04: que al pulsar se descargue y se instale sola, sin tener que abrir el instalador después.

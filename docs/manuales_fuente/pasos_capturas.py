@@ -413,16 +413,21 @@ def chat_ver(c):
     foto(c, v, "u_chat", [(buscar(c, v, "Conectado"), 1, "r"), (de_clase(c, v, "Listbox"), 2, "ir"),
                           (buscar(c, v, "Nueva conversación"), 3, "t"), (buscar(c, v, "Limpiar"), 4, "l"),
                           (buscar(c, v, "Oferta_", n=0) or de_clase(c, v, "Canvas"), 5, "l"),
-                          (de_clase(c, v, "TEntry"), 6, "t"), (buscar(c, v, "😊"), 7, "t"), (buscar(c, v, "📎"), 8, "t"),
+                          (de_clase(c, v, "TEntry"), 6, "t"), (boton_emoticonos(c, v), 7, "t"), (buscar(c, v, "📎"), 8, "t"),
                           (buscar(c, v, "Enviar"), 9, "t")])
     guardar_ventanas()
-    c.pulsar(v, "😊")
+    boton_emoticonos(c, v).invoke()
+
+
+def boton_emoticonos(c, v):
+    """El botón 😊 (desde la v4.18.24 es una imagen en color, sin texto)."""
+    return next((w for w in c.widgets(v) if w.winfo_class() == "TButton" and str(w.cget("image"))), None) or buscar(c, v, "😊")
 
 
 def chat_emoticonos(c):
     n = nuevas(c, ESTADO["antes"])
     p = n[-1] if n else None
-    foto(c, p, "u_chat_emoticonos", [(buscar(c, p, "👍"), 1, "l"), (buscar(c, p, "Respuestas rápidas"), 2, "r")] if p else [], barra=False)
+    foto(c, p, "u_chat_emoticonos", [(next((w for w in c.widgets(p) if getattr(w, "emoticono", None) == "👍"), None), 1, "l"), (buscar(c, p, "Respuestas rápidas"), 2, "r")] if p else [], barra=False)
     if p:
         c.cerrar(p)
     v = ESTADO.get("chat")
@@ -460,10 +465,10 @@ def burbuja_ver(c):
 def actualizacion(c):
     import json, urllib.request
     um = sys.modules["services.update_service"]
-    falso = {"tag_name": "v4.18.22", "name": "Organizador Princess v4.18.22",
-             "body": "# ✨ Organizador Princess v4.18.22\n\n## 🛠 Mejoras\n\n- Mejoras en la agenda y el calendario.\n- Correcciones menores.",
-             "assets": [{"name": "OrganizadorPrincess_Setup_4.18.22.exe", "size": 34_400_000, "browser_download_url": "https://example.invalid/x.exe"},
-                        {"name": "OrganizadorPrincess_Setup_4.18.22.exe.sha256", "size": 90, "browser_download_url": "https://example.invalid/x.sha256"}]}
+    falso = {"tag_name": "v4.18.24", "name": "Organizador Princess v4.18.24",
+             "body": "# ✨ Organizador Princess v4.18.24\n\n## 🛠 Mejoras\n\n- Mejoras en la agenda y el calendario.\n- Correcciones menores.",
+             "assets": [{"name": "OrganizadorPrincess_Setup_4.18.24.exe", "size": 34_400_000, "browser_download_url": "https://example.invalid/x.exe"},
+                        {"name": "OrganizadorPrincess_Setup_4.18.24.exe.sha256", "size": 90, "browser_download_url": "https://example.invalid/x.sha256"}]}
 
     class R(io.BytesIO):
         status = 200

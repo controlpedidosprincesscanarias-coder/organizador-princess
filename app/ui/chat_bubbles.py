@@ -17,6 +17,7 @@ cada mensaje ya recibido.
 """
 
 import tkinter as tk
+import ui.emoticonos as _emo
 import tkinter.font as tkfont
 from datetime import datetime
 
@@ -50,6 +51,31 @@ def fecha_hora_local(mensaje: dict) -> str:
         return dt.strftime("%d/%m %H:%M")
     except Exception:  # noqa: BLE001
         return ""
+
+
+# (v4.18.22) Emoticonos en color dentro de los mensajes: Tk en Windows los dibuja de un solo
+# color, así que los del panel 😊 (ui/emoticonos.py) se pintan como imagen. Los demás, como texto.
+_VS16 = "\ufe0f"   # selector de variante: Tk lo pinta como un recuadro
+
+
+def _trocear(linea, conocidos):
+    """Parte una línea en [("t", texto) | ("e", emoticono)], con los emoticonos de `conocidos`."""
+    linea = linea.replace(_VS16, "")
+    trozos, actual, i = [], "", 0
+    while i < len(linea):
+        hallado = next((e for e in conocidos if linea.startswith(e, i)), None)
+        if hallado:
+            if actual:
+                trozos.append(("t", actual))
+                actual = ""
+            trozos.append(("e", hallado))
+            i += len(hallado)
+        else:
+            actual += linea[i]
+            i += 1
+    if actual:
+        trozos.append(("t", actual))
+    return trozos
 
 
 def _puntos_rect_redondeado(x1, y1, x2, y2, r):
@@ -139,7 +165,8 @@ class BubbleList(tk.Frame):
 
         ancho_disponible = self._ancho_max or max(220, int(self.canvas.winfo_width() * 0.68) or 220)
         lineas = self._envolver_texto(texto or "", ancho_disponible - 24)
-        ancho_texto = max((self._font_texto.measure(l) for l in lineas), default=0)
+        trozos_lineas = [self._trozos(l) for l in lineas]
+        ancho_texto = max((self._ancho_trozos(t) for t in trozos_lineas), default=0)
         ancho_hora = self._font_meta.measure(hora) if hora else 0
         ancho_bloque = max(ancho_texto, ancho_hora) + 24
         alto_linea = self._font_texto.metrics("linespace") + 2
@@ -154,13 +181,21 @@ class BubbleList(tk.Frame):
         cv.create_polygon(pts, smooth=True, fill=color, outline=color)
 
         y = 8
-        for linea in lineas:
-            item = cv.create_text(12, y, text=linea, anchor="nw",
-                                   fill=self._color_texto, font=self._font_texto)
-            if es_adjunto:
-                bbox = cv.bbox(item)
-                cv.create_line(bbox[0], bbox[3] + 1, bbox[2], bbox[3] + 1,
-                                fill=self._color_texto)
+        for trozos in trozos_lineas:
+            x = 12
+            for tipo, valor in trozos:
+                if tipo == "e":
+                    img = _emo.imagen(valor, pequena=True)
+                    cv.create_image(x, y + alto_linea // 2 - 1, image=img, anchor="w")
+                    x += img.width() + 1
+                    continue
+                item = cv.create_text(x, y, text=valor, anchor="nw",
+                                       fill=self._color_texto, font=self._font_texto)
+                if es_adjunto:
+                    bbox = cv.bbox(item)
+                    cv.create_line(bbox[0], bbox[3] + 1, bbox[2], bbox[3] + 1,
+                                    fill=self._color_texto)
+                x += self._font_texto.measure(valor)
             y += alto_linea
 
         if hora:
@@ -192,6 +227,15 @@ class BubbleList(tk.Frame):
 
         self._ir_al_final()
         return cv
+
+    def _trozos(self, linea):
+        """Trozos de texto y emoticonos en color (solo los que tienen imagen)."""
+        conocidos = [e for e in _emo.conocidos() if _emo.imagen(e, pequena=True) is not None]
+        return _trocear(linea, conocidos) if conocidos else [("t", linea.replace(_VS16, ""))]
+
+    def _ancho_trozos(self, trozos):
+        return sum(_emo.imagen(v, pequena=True).width() + 1 if t == "e" else self._font_texto.measure(v)
+                   for t, v in trozos)
 
     def _copiar(self, texto):
         self.clipboard_clear()

@@ -1,8 +1,13 @@
-✨ Organizador Princess v4.18.20
+✨ Organizador Princess v4.18.22
 ================================================================
 
-(Incluye también todo lo de la 4.18.18, la 4.18.16, la 4.18.14 y la
-4.18.12, que no llegaron a publicarse.)
+(Incluye también todo lo de la 4.18.20, la 4.18.18, la 4.18.16, la
+4.18.14 y la 4.18.12, que no llegaron a publicarse.)
+
+😊 EMOTICONOS EN COLOR (4.18.22)
+
+• El panel de emoticonos, las respuestas rápidas y los emoticonos de
+  los mensajes del chat se ven en color.
 
 🆙 ACTUALIZAR CON UN SOLO CLIC (4.18.20)
 

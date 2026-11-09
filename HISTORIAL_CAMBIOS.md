@@ -51,6 +51,16 @@
 
 ---
 
+## 2026-11-09 09:15 — [Infra] Anti-letargo de Control Pedidos solo desde cron-job.org; fuera el workflow de GitHub (v12.34.18)
+
+- **Petición** (Víctor): limpiar en GitHub lo que sobra para el ping de Control Pedidos, tras crear en cron-job.org la tarea «Keep-alive Control Pedidos (servicio)».
+  - Llama a `https://control-pedidos-princess-1k69.onrender.com/ping` con `*/10 6-18 * * 1-5`, zona Atlantic/Canary.
+  - Su primera ejecución está prevista a las 9:20; a las 9:14, `/ping` respondía 200 en 0,4 s.
+- Retirado `.github/workflows/keep-alive-princess.yml`. Explicado en `GUIA_DESPLIEGUE.md` (paso 5) y en el comentario de `/ping` (`rutas/sistema.py`). Sin cambios de funcionamiento.
+- Con esto, los servicios de Render se mantienen despiertos solo desde cron-job.org: Control Pedidos, chat (servicio y base de datos), Material Operacional y Catálogo Asignaciones. Ya no queda ningún workflow programado en los repositorios.
+
+---
+
 ## 2026-11-09 09:05 — [Chat] Mantenimiento solo desde cron-job.org; fuera el workflow de GitHub (v1.2.6)
 
 - **Petición** (Víctor): eliminar en GitHub lo que sobra para el ping, ahora que cron-job.org tiene las dos tareas del chat:

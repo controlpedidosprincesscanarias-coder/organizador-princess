@@ -24,6 +24,7 @@ from services.chat_client import get_chat_client, EVT_CONECTADO, EVT_DESCONECTAD
     EVT_NUEVO_MENSAJE, EVT_ERROR
 from ui.chat_bubbles import BubbleList, fecha_hora_local
 from ui.emoticonos import abrir_panel, imagen as imagen_emoticono
+from ui.chat_movil import abrir_chat_movil
 from db.sqlite import set_chat_limpiado, filtrar_mensajes_limpiados
 
 _VENTANA_ACTUAL = None  # evita abrir dos veces (instancia única de la ventana)
@@ -155,6 +156,9 @@ def _ventana_chat(ctx):
 
     ttk.Button(frm_titulo_chat, text="🧹 Limpiar chat", bootstyle="info-outline",
                command=lambda: _limpiar_chat()).pack(side="right")
+    # (v4.18.24) Enlace a la app Android: QR y pasos para instalarla
+    ttk.Button(frm_titulo_chat, text="📱 Chat en el móvil", bootstyle="secondary-outline",
+               command=lambda: abrir_chat_movil(win)).pack(side="right", padx=(0, 6))
 
     # Paleta a juego con ui/chat_popup.py, para que las burbujas se vean
     # igual en la ventana principal y en la ventana emergente flotante.

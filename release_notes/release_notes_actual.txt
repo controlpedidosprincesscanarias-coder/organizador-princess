@@ -1,9 +1,16 @@
-✨ Organizador Princess v4.18.32
+✨ Organizador Princess v4.18.34
 ================================================================
 
-(Incluye también todo lo de la 4.18.30, la 4.18.28, la 4.18.26, la
-4.18.24, la 4.18.22, la 4.18.20, la 4.18.18, la 4.18.16, la 4.18.14 y
-la 4.18.12, que no llegaron a publicarse.)
+(Incluye también todo lo de la 4.18.32, la 4.18.30, la 4.18.28, la
+4.18.26, la 4.18.24, la 4.18.22, la 4.18.20, la 4.18.18, la 4.18.16,
+la 4.18.14 y la 4.18.12, que no llegaron a publicarse.)
+
+📱 INSTALAR LA APP DEL MÓVIL, PASO A PASO (4.18.34)
+
+• La ventana «📱 Chat en el móvil» y el Manual de usuario explican qué
+  hacer con los avisos de Android al instalar la app: «Descargar de
+  todas formas», «Instalar apps desconocidas» y, si sale Google Play
+  Protect, «Más detalles» → «Instalar de todas formas».
 
 🛠 ACTUALIZAR AHORA (4.18.32)
 

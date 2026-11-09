@@ -1,3 +1,14 @@
+# ✨ Organizador Princess v4.18.34
+
+> Incluye también todo lo de la 4.18.32 y anteriores que no llegaron a publicarse (desde la 4.18.12).
+
+## 📱 Instalar la app del móvil, paso a paso
+
+- La ventana **📱 Chat en el móvil** explica qué hacer con cada aviso de Android al instalar la app: «Descargar de todas formas» en el navegador, «Instalar apps desconocidas» y, si aparece **Google Play Protect**, «Más detalles» → **«Instalar de todas formas»**.
+- El **Manual de usuario** lo explica igual, con un recuadro sobre por qué Android avisa de que puede ser peligrosa y de dónde descargarla con seguridad.
+
+---
+
 # ✨ Organizador Princess v4.18.32
 
 > Incluye también todo lo de la 4.18.30 y anteriores que no llegaron a publicarse (desde la 4.18.12).

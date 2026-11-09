@@ -5,7 +5,7 @@
 # Lo ejecuta pruebas_uso/conductor.py dentro del bucle de Tkinter (capturas.sh lo prepara todo).
 # Cada captura es la ventana recortada, al doble de tamaño, con una barra de título como la de
 # Windows y los números de referencia en naranja, como en los manuales de Control de Pedidos.
-import io, os, subprocess, sys, unicodedata, webbrowser
+import io, os, re, subprocess, sys, unicodedata, webbrowser
 from datetime import datetime, timedelta
 from PIL import Image, ImageDraw, ImageFont
 
@@ -441,7 +441,7 @@ def chat_movil_ver(c):
     n = nuevas(c, ESTADO["antes"])
     m = n[-1] if n else None
     qr = next((w for w in c.widgets(m) if w.winfo_class() == "Label" and str(w.cget("image"))), None) if m else None
-    foto(c, m, "u_chat_movil", [(qr, 1, "tl"), (caja_de(c, m, [w for w in c.widgets(m) if c.texto(w)[:3] in ("1. ", "2. ", "3. ", "4. ")]), 2, "tr"),
+    foto(c, m, "u_chat_movil", [(qr, 1, "tl"), (caja_de(c, m, [w for w in c.widgets(m) if re.match(r"\d\. ", c.texto(w) or "")]), 2, "tr"),
                                 (buscar(c, m, "github.com"), 3, "r"), (buscar(c, m, "Actualizaciones"), 4, "l")] if m else [])
     if m:
         c.cerrar(m)

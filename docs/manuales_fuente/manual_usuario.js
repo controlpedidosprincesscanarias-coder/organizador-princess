@@ -1,7 +1,7 @@
 // Manual de usuario del Organizador Princess. Idea y desarrollo de la aplicación: Víctor Alejandro Martín Andrade.
 const L = require("./lib");
 const { p, vineta, pasos, h1, h2, imagen, leyenda, recuadro, tabla, portada, indice } = L;
-const V = process.env.VERSION || "v4.18.30";
+const V = process.env.VERSION || "v4.18.34";
 
 const s = [];
 s.push(portada({ rol: "Uso diario", subtitulo: "Abre tus accesos, apunta avisos, consulta el calendario y chatea con tus compañeros",
@@ -178,16 +178,19 @@ s.push(...imagen("u_chat_movil", 13, "Ventana «Chat en el móvil»."));
 s.push(...leyenda([[1, "**Código QR**: escanéalo con la cámara del móvil. Lleva a la página de descarga de la última versión."],
   [2, "**Los pasos** para instalarla y dejarla lista."], [3, "**El enlace**, por si prefieres abrirlo a mano o enviártelo al móvil."],
   [4, "**Cómo se actualiza** (apartado siguiente)."]]));
-s.push(...pasos(["En la página que se abre, toca el archivo **ChatPrincess_….apk** para descargarlo y ábrelo.",
-  "La primera vez, Android pregunta si permites **«Instalar apps desconocidas»** desde el navegador o la app de archivos: permítelo y pulsa **Instalar**.",
+s.push(...pasos(["En la página que se abre, toca el archivo **ChatPrincess_….apk** para descargarlo. Si el navegador avisa de que el archivo **«puede ser dañino»**, pulsa **Descargar de todas formas**.",
+  "Abre el archivo descargado (desde la notificación de descarga o la app **Archivos**). La primera vez, Android pregunta si permites **«Instalar apps desconocidas»** desde el navegador o la app de archivos: actívalo, vuelve atrás y pulsa **Instalar**.",
+  "Si aparece **Google Play Protect** («App no segura», «App desconocida» o «Bloqueada por Play Protect»), toca **Más detalles** y después **Instalar de todas formas** (en algunos móviles, **Instalar sin analizar**). Si pregunta si quieres **enviar la app para analizarla**, puedes contestar lo que prefieras: no cambia nada en la instalación.",
   "Abre **Chat Dpto. Compras Princess** y entra con tu **usuario y contraseña de Control de Pedidos**, los mismos del Organizador.",
   "Acepta las **notificaciones**.",
   "En **Ajustes** de la app, pulsa **«Quitar el ahorro de batería»**. En algunos móviles (Xiaomi, Huawei, Oppo…) hay que permitir además el «inicio automático»."]));
+s.push(...recuadro("importante", "¿Por qué avisa Android de que puede ser peligrosa?", ["Android y Google Play Protect avisan de **cualquier app que no se instala desde Google Play**, y más si la usa poca gente y pide permisos para funcionar en segundo plano, arrancar con el móvil o instalar sus propias actualizaciones. Chat Dpto. Compras Princess necesita esos permisos para avisarte de los mensajes con la app cerrada y para actualizarse sola.",
+  "Es la app del departamento, publicada en su repositorio oficial, y cada versión va firmada siempre con la misma clave. Descárgala **solo** desde el código QR del Organizador o desde su enlace; si alguien te la pasa por otro medio (WhatsApp, correo…), no la instales."]));
 s.push(...recuadro("nota", "El aviso fijo «Chat conectado»", ["Mientras la app mantiene la conexión verás un aviso fijo «Chat conectado» en la barra de notificaciones. Es lo que permite que te avise de los mensajes con la app cerrada; al encender el móvil se vuelve a conectar solo."]));
 s.push(h2("Cómo se actualiza"));
 s.push(...pasos(["Al abrir la app, si hay una versión nueva, aparece el aviso **«Nueva versión…»** con sus novedades.",
   "Pulsa **Descargar e instalar**: la app la descarga y comprueba que es la publicada (SHA-256).",
-  "Android muestra su pantalla de instalación: pulsa **Actualizar**. La primera vez pedirá permitir que **Chat Dpto. Compras Princess** instale apps.",
+  "Android muestra su pantalla de instalación: pulsa **Actualizar**. La primera vez pedirá permitir que **Chat Dpto. Compras Princess** instale apps. Si vuelve a salir **Play Protect**, igual que al instalarla: **Más detalles → Instalar de todas formas**.",
   "No se pierde nada: la sesión y las conversaciones siguen igual."]));
 s.push(p("También puedes buscarla cuando quieras en **Ajustes → Buscar actualización**. Android no deja instalar sin confirmar, por eso el último paso siempre lo haces tú."));
 s.push(...recuadro("consejo", "Cerrar sesión en el móvil", ["En **Ajustes → Cerrar sesión** se borran del móvil el usuario y la contraseña y deja de avisar. Hazlo si cambias de móvil o si el móvil no es solo tuyo."]));

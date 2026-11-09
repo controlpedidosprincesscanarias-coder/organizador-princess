@@ -46,6 +46,7 @@ Aplicación de escritorio desarrollada en **Python + ttkbootstrap**, que combina
 ├── OrganizadorPrincess_Setup.iss   (script de Inno Setup)
 ├── Manual_Usuario_OrganizadorPrincess.pdf   (el que abre el botón «Manual»)
 ├── docs/                           (manuales de usuario y de administrador, .docx y .pdf)
+│   └── manuales_fuente/            (capturas con datos de ejemplo y maquetación de los manuales — ver su README)
 └── README.md
 ```
 

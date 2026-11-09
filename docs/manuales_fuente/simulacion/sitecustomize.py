@@ -33,7 +33,8 @@ if RAIZ:
 
     USUARIOS = [
         {"username": "compras.demo", "rol": "COMPRAS", "nombre": "Ana Demo"},
-        {"username": "compras2.demo", "rol": "COMPRAS", "nombre": "Compradora Demo 2"},
+        {"username": "compras2.demo", "rol": "COMPRAS", "nombre": "Compradora Demo 2",
+         "avatar": "https://demo.supabase.co/storage/v1/object/public/chat/avatares/compras2.jpg"},
         {"username": "economato.demo", "rol": "HOTEL", "nombre": "Economato Demo"},
         {"username": "hotel.demo", "rol": "HOTEL", "nombre": "Recepción Mercancía Demo"},
         {"username": "admin.demo", "rol": "ADMIN", "nombre": "Administración Demo"},
@@ -67,9 +68,11 @@ if RAIZ:
     }
     CANALES = [
         {"canal_id": "general", "tipo": "general", "no_leidos": 0},
-        {"canal_id": DM, "tipo": "privado", "otro_usuario": "compras2.demo", "no_leidos": 2},
+        {"canal_id": DM, "tipo": "privado", "otro_usuario": "compras2.demo", "no_leidos": 2,
+         "avatar": "https://demo.supabase.co/storage/v1/object/public/chat/avatares/compras2.jpg"},
         {"canal_id": "dm:compras.demo:economato.demo", "tipo": "privado", "otro_usuario": "economato.demo", "no_leidos": 0},
-        {"canal_id": "grp:demo", "tipo": "grupo", "nombre": "Compras Canarias", "no_leidos": 0},
+        {"canal_id": "grp:demo", "tipo": "grupo", "nombre": "Compras Canarias", "no_leidos": 0,
+         "avatar": "https://demo.supabase.co/storage/v1/object/public/chat/avatares/grupo.jpg"},
     ]
 
     try:
@@ -100,11 +103,36 @@ if RAIZ:
         _cc.ChatClient.enviar_archivo = lambda self, ruta, canal_id=None, destinatario=None: {"ok": True}
         _cc.ChatClient.crear_grupo = lambda self, nombre, usuarios: {"canal_id": "grp:demo2", "nombre": nombre}
 
+        def _foto_demo(url):
+            """(v4.18.28) Fotos de perfil de ejemplo, dibujadas aquí (sin red y sin personas reales)."""
+            from io import BytesIO
+            from PIL import Image, ImageDraw
+            img = Image.new("RGB", (256, 256), "#7fb8e0")
+            d = ImageDraw.Draw(img)
+            if url.endswith("grupo.jpg"):           # mar, sol y montaña
+                d.rectangle((0, 160, 256, 256), fill="#1f6fa8")
+                d.ellipse((150, 40, 220, 110), fill="#f6c343")
+                d.polygon([(10, 170), (100, 60), (190, 170)], fill="#5a6b3a")
+            else:                                    # flor
+                d.rectangle((0, 0, 256, 256), fill="#f3d9c8")
+                for dx, dy in ((0, -50), (50, 0), (0, 50), (-50, 0)):
+                    d.ellipse((98 + dx, 98 + dy, 158 + dx, 158 + dy), fill="#d35d6e")
+                d.ellipse((103, 103, 153, 153), fill="#f6c343")
+            buf = BytesIO()
+            img.save(buf, format="JPEG", quality=90)
+            return buf.getvalue()
+
+        _cc.ChatClient.descargar_avatar = lambda self, url: _foto_demo(url)
+        _cc.ChatClient.mi_avatar = lambda self: None
+        _cc.ChatClient.cambiar_avatar = lambda self, ruta=None, canal_id=None: {"ok": True, "avatar": None}
+
         _nombres_originales = _cc.ChatClient.__init__
 
         def _init(self, *a, **k):
             _nombres_originales(self, *a, **k)
             self._mapa_nombres.update({u["username"]: u["nombre"] for u in USUARIOS})
+            self._mapa_avatares.update({"user:" + u["username"]: u.get("avatar") for u in USUARIOS})
+            self._mapa_avatares.update({c["canal_id"]: c.get("avatar") for c in CANALES if c["tipo"] == "grupo"})
         _cc.ChatClient.__init__ = _init
 
         import services.admin_auth as _aa

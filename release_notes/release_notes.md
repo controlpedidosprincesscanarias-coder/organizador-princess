@@ -1,3 +1,16 @@
+# ✨ Organizador Princess v4.18.28
+
+> Incluye también todo lo de la 4.18.26 y anteriores que no llegaron a publicarse (desde la 4.18.12).
+
+## 🖼 Fotos de perfil en el chat
+
+- Cada persona puede poner **su foto**, y cualquier miembro de un grupo **la foto del grupo**, con el botón **🖼 Fotos** de la ventana del chat. La imagen se recorta sola en cuadrado.
+- Las fotos se ven en la lista de conversaciones, en la cabecera de la conversación, junto a los mensajes de los demás en General y en los grupos, y en la burbuja flotante. Quien no tiene foto aparece con sus **iniciales** sobre un círculo de color (el mismo color que en el móvil).
+- Son las mismas fotos que en la app **Chat Dpto. Compras Princess**, y los cambios se ven al momento en todos los equipos y móviles.
+- El Manual de usuario explica cómo cambiarlas.
+
+---
+
 # ✨ Organizador Princess v4.18.26
 
 > Incluye también todo lo de la 4.18.24 y anteriores que no llegaron a publicarse (desde la 4.18.12).

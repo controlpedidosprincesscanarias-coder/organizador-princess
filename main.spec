@@ -65,6 +65,7 @@ hiddenimports += [
     'ui.selector_fecha_hora',  # v4.18.14: calendario 📅 y ruedas de hora en los formularios
     'ui.emoticonos',     # v4.18.18: panel 😊 del chat
     'ui.chat_movil',     # v4.18.24: ventana «Chat en el móvil» (QR de la app Android)
+    'ui.avatares',       # v4.18.28: fotos de perfil del chat
     'ui.agenda_helpers',
     'ui.importexport',
     'ui.vacaciones',

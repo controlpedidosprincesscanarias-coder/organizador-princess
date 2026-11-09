@@ -1,7 +1,7 @@
 // Manual de usuario del Organizador Princess. Idea y desarrollo de la aplicación: Víctor Alejandro Martín Andrade.
 const L = require("./lib");
 const { p, vineta, pasos, h1, h2, imagen, leyenda, recuadro, tabla, portada, indice } = L;
-const V = process.env.VERSION || "v4.18.26";
+const V = process.env.VERSION || "v4.18.28";
 
 const s = [];
 s.push(portada({ rol: "Uso diario", subtitulo: "Abre tus accesos, apunta avisos, consulta el calendario y chatea con tus compañeros",
@@ -131,11 +131,12 @@ s.push(h1("7. Chat"));
 s.push(p("El **Chat** te conecta con los compañeros que tienen cuenta en Control de Pedidos. Para usarlo hace falta haber guardado tu usuario y contraseña en **Admin → Mi Usuario**. Se abre con el botón **Chat** del menú o del calendario."));
 s.push(...imagen("u_chat", 16, "Ventana del chat (datos de ejemplo)."));
 s.push(...leyenda([[1, "**Estado** de la conexión: «Conectado» en verde cuando todo va bien."],
-  [2, "**Conversaciones**: el canal General, los chats privados (👤) y los grupos (👥). El número entre paréntesis son los mensajes sin leer."],
+  [2, "**Conversaciones**: el canal General, los chats privados y los grupos, cada uno con su foto (o sus iniciales sobre un círculo de color si no tiene). El número entre paréntesis son los mensajes sin leer."],
   [3, "**Nueva conversación**."], [4, "**Limpiar chat**: oculta el historial de esa conversación en tu equipo (no se borra para los demás)."],
   [5, "**Mensajes**: los tuyos, a la derecha en verde; los de los demás, a la izquierda. Cada burbuja lleva la fecha y la hora. Un adjunto se abre haciendo clic en él."],
   [6, "Escribe aquí y pulsa **Intro** o **Enviar**."], [7, "😊 **Emoticonos** y respuestas rápidas (siguiente imagen)."],
-  [8, "📎 **Adjuntar** una imagen o un documento."], [9, "**Enviar**."]]));
+  [8, "📎 **Adjuntar** una imagen o un documento."], [9, "**Enviar**."],
+  [10, "🖼 **Fotos**: cambiar o quitar tu foto de perfil y, en un grupo, la foto del grupo (siguiente apartado)."]]));
 s.push(h2("Emoticonos y respuestas rápidas"));
 s.push(...imagen("u_chat_emoticonos", 8, "Panel de emoticonos."));
 s.push(...leyenda([[1, "**Emoticonos**: un clic añade el emoticono a lo que estás escribiendo y cierra el panel. Con **Mayús + clic** el panel se queda abierto para poner varios."],
@@ -144,6 +145,11 @@ s.push(p("El botón 😊 está también en la burbuja flotante. Los emoticonos s
 s.push(h2("Nueva conversación"));
 s.push(...imagen("u_chat_nueva", 9, "Elegir compañeros."));
 s.push(...leyenda([[1, "Elige a quién quieres escribir. **Un compañero** → chat privado. **Dos o más** (con Ctrl) → se crea un grupo y te pide un nombre para él."], [2, "**Abrir chat** para empezar."]]));
+s.push(h2("Fotos de perfil"));
+s.push(p("Cada persona puede poner **su propia foto**, y cualquier miembro de un grupo puede poner **la foto del grupo**. Se ven en la lista de conversaciones, en la cabecera de la conversación, junto a los mensajes de los demás en General y en los grupos, y en la burbuja flotante. Quien no tiene foto aparece con sus **iniciales** sobre un círculo de color (el mismo color en el Organizador y en el móvil)."));
+for (const t of ["**Tu foto**: botón **🖼 Fotos** → «Cambiar mi foto…» y elige una imagen (jpg, png, webp…). Se recorta sola en cuadrado. «Quitar mi foto» vuelve a las iniciales.",
+  "**Foto de un grupo**: abre el grupo y pulsa **🖼 Fotos** → «Cambiar la foto del grupo…» (o «Quitar la foto del grupo»). Solo aparece con un grupo abierto.",
+  "Los cambios se ven al momento en los equipos y móviles de todos. La foto que pongas en el móvil es la misma que en el Organizador, y al revés."]) s.push(vineta(t));
 s.push(h2("Enviar imágenes y documentos"));
 s.push(p("Hay tres formas de adjuntar. En todas, el Organizador pregunta antes «¿Enviar a …?» con la lista de archivos, y solo se envía si contestas **Sí**:"));
 for (const t of ["**📎**: elige el archivo en el Explorador (imágenes png, jpg, gif, bmp, webp y documentos pdf, doc, docx, xls, xlsx).",
@@ -162,6 +168,7 @@ s.push(p("**Chat Dpto. Compras Princess** es el mismo chat en un móvil Android:
 s.push(...tabla(["", "Organizador (Windows)", "Chat Dpto. Compras Princess (Android)"], [
   ["Conversaciones, privados y grupos", "Sí", "Sí"], ["Emoticonos y respuestas rápidas", "Sí", "Sí"],
   ["Enviar fotos y documentos", "📎, arrastrar o Ctrl+V", "Cámara, galería o documento"],
+  ["Foto de perfil (tuya y de los grupos)", "🖼 Fotos, en la ventana del chat", "Ajustes → Mi foto (galería o cámara); la del grupo, en su cabecera"],
   ["Avisos de mensajes nuevos", "Burbuja flotante con sonido", "Notificación del móvil, también con la app cerrada"],
   ["Agenda, calendario, accesos y avisos de pedidos", "Sí", "No: solo el chat"],
   ["Actualizaciones", "Aviso «Actualizar ahora»", "Aviso al abrir la app"]], [3300, 3169, 3169]));

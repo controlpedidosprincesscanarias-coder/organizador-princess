@@ -51,6 +51,20 @@
 
 ---
 
+## 2026-11-09 13:27 — [Organizador] Manuales renovados con el estilo de Control Pedidos y correcciones encontradas al hacerlos (v4.18.12, sin publicar)
+
+- **Manuales:** el de usuario (el que abre el botón «Manual») y el de administrador, rehechos con la maquetación de los de Control Pedidos: portada, índice, capturas con números de referencia en naranja, leyendas, recuadros y tablas.
+  - Capturas reales del Organizador en Linux con pantalla virtual, con un perfil de ejemplo («Ana Demo») y **sin red**: ni Control de Pedidos, ni chat, ni GitHub. El chat y la contraseña de Admin se simulan.
+  - Fuentes en `docs/manuales_fuente/` (`capturas.sh`, `generar.sh usuario|admin`, ver su README). Se conservan los nombres de archivo (el botón «Manual» y el instalador los buscan por nombre).
+  - Usuario: 22 páginas; administrador: 14.
+- **Correcciones** (cada una en su commit):
+  - Calendario: el título del mes o de la semana no salía entre ◀ y ▶ sino a la izquierda de la cuadrícula, quitándole ancho; en la vista Semana no se veía el domingo (venía así desde la 4.16.8). Al pasar de «Mes» a «Semana» se abría la semana del día 1; ahora la de hoy o la del día elegido.
+  - Agenda: «Luness», «Martess»… en los avisos semanales, y minutos imposibles («:45 / :75») en los de cada 30 minutos.
+  - Admin: la ventana de subopciones mostraba una versión fija antigua («v4.4.3B»); los botones sin definir salían como «19 · 19. POR DEFINIR».
+- Pruebas: las cinco del repositorio pasan y `preparar_release.py` da la versión por buena. La interfaz se ha visto en Linux (capturas); falta compilar y probar en Windows antes de publicar.
+
+---
+
 ## 2026-11-09 12:50 — [Organizador] Publicada la v4.18.10 (primera release con la compilación automática)
 
 - Compilada con «Compilar Organizador» (GitHub Actions, destino borrador) tras corregir `test_bd_y_acceso.py` para Windows.

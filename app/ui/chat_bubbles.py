@@ -149,10 +149,18 @@ class BubbleList(tk.Frame):
     # ── burbujas ─────────────────────────────────────────────────────────
     def agregar_burbuja(self, texto, hora, propio, meta_nombre=None,
                          es_adjunto=False, adjunto_url=None,
-                         adjunto_nombre_archivo=None):
+                         adjunto_nombre_archivo=None, foto=None):
+        """`foto` (v4.18.28): PhotoImage redonda de quien escribe, a la izquierda de su
+        burbuja (solo en General y en los grupos, y nunca en los mensajes propios)."""
         fila = tk.Frame(self.inner, bg=self._bg)
         fila.pack(fill="x", pady=(2, 2), padx=6)
         self._bind_rueda(fila)
+
+        if foto is not None and not propio:
+            lbl_foto = tk.Label(fila, image=foto, bg=self._bg, bd=0)
+            lbl_foto.image = foto
+            lbl_foto.pack(side="left", anchor="s", padx=(0, 6), pady=(0, 2))
+            self._bind_rueda(lbl_foto)
 
         contenedor = tk.Frame(fila, bg=self._bg)
         contenedor.pack(side="right" if propio else "left",

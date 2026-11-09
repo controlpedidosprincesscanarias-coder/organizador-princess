@@ -144,6 +144,25 @@ EVT_CONECTADO      = "conectado"
 EVT_DESCONECTADO   = "desconectado"
 EVT_NUEVO_MENSAJE  = "nuevo_mensaje"
 EVT_ERROR          = "error"
+EVT_AVATAR         = "avatar_cambiado"   # (v4.18.28) foto de perfil de una persona o grupo
+
+_LADO_AVATAR = 256            # las fotos de perfil se suben en cuadrado de 256 px (como el móvil)
+_AVATAR_MAX_DESCARGA = 1024 * 1024
+
+
+def preparar_avatar(ruta_archivo: str) -> bytes:
+    """Recorta la imagen al centro en cuadrado, la reduce a 256 px y la pasa a JPEG
+    (lo mismo que hace la app del móvil). Respeta la orientación de las fotos de cámara."""
+    from PIL import ImageOps
+    img = Image.open(ruta_archivo)
+    try:
+        img = ImageOps.exif_transpose(img)
+    except Exception:  # noqa: BLE001 — EXIF roto: se usa tal cual
+        pass
+    img = ImageOps.fit(img.convert("RGB"), (_LADO_AVATAR, _LADO_AVATAR), Image.LANCZOS)
+    buf = BytesIO()
+    img.save(buf, format="JPEG", quality=85, optimize=True)
+    return buf.getvalue()
 
 
 class ChatClient:
@@ -169,6 +188,9 @@ class ChatClient:
         # fondo — hace una petición REST) y se lee con nombre_de().
         self._mapa_nombres = {}
         self._mapa_nombres_lock = threading.Lock()
+        # (v4.18.28) Fotos de perfil: clave ("user:<usuario>" o canal_id de un grupo) → URL.
+        self._mapa_avatares = {}
+        self.mi_foto = None
 
         # Eventos hacia la UI (thread-safe) — ver EVT_* arriba.
         # Cada item: {"tipo": EVT_..., ...datos}
@@ -178,6 +200,7 @@ class ChatClient:
         self._sio.on("disconnect", self._on_disconnect)
         self._sio.on("nuevo_mensaje", self._on_nuevo_mensaje)
         self._sio.on("error_chat", self._on_error_chat)
+        self._sio.on("avatar_cambiado", self._on_avatar_cambiado)
 
     # ── Login (idéntico en espíritu a _Session.login() del bridge) ──────────
 
@@ -430,7 +453,12 @@ class ChatClient:
     # ── Historial / listados (REST — funciona con o sin socket conectado) ──
 
     def obtener_canales(self) -> list:
-        return self._get_rest("/api/chat/canales").get("canales", [])
+        canales = self._get_rest("/api/chat/canales").get("canales", [])
+        with self._mapa_nombres_lock:
+            for c in canales:
+                if c.get("tipo") == "grupo" and c.get("canal_id"):
+                    self._mapa_avatares[c["canal_id"]] = c.get("avatar")
+        return canales
 
     def crear_grupo(self, nombre: str, usuarios: list) -> dict:
         """usuarios: usernames de los compañeros a añadir (sin incluirte a
@@ -451,8 +479,81 @@ class ChatClient:
             with self._mapa_nombres_lock:
                 for u in usuarios:
                     self._mapa_nombres[u["username"].lower()] = u.get("nombre") or u["username"]
+                    self._mapa_avatares["user:" + u["username"].lower()] = u.get("avatar")
+            if self.username:
+                self.mi_foto = self.mi_avatar()
+                self.obtener_canales()          # recoge las fotos de los grupos
         except Exception as exc:
             log.warning("ChatClient: no se pudo refrescar el mapa de nombres — %s", exc)
+
+    # ── Fotos de perfil (v4.18.28; servidor del chat v1.3.0) ─────────────────
+
+    def avatar_de(self, username: str):
+        """URL de la foto de una persona, o None (se pintan sus iniciales)."""
+        if not username:
+            return None
+        if self.username and username.lower() == self.username.lower():
+            return self.mi_foto
+        with self._mapa_nombres_lock:
+            return self._mapa_avatares.get("user:" + username.lower())
+
+    def avatar_canal(self, canal_id: str, otro_usuario: str = None):
+        """Foto de una conversación: la de la otra persona en un privado, la del grupo en
+        un grupo, ninguna en General."""
+        if not canal_id or canal_id == "general":
+            return None if not otro_usuario else self.avatar_de(otro_usuario)
+        if canal_id.startswith("grp:"):
+            with self._mapa_nombres_lock:
+                return self._mapa_avatares.get(canal_id)
+        if not otro_usuario and canal_id.startswith("dm:") and self.username:
+            partes = [p for p in canal_id[3:].split(":") if p.lower() != self.username.lower()]
+            otro_usuario = partes[0] if partes else None
+        return self.avatar_de(otro_usuario)
+
+    def mi_avatar(self):
+        return self._get_rest("/api/chat/avatar").get("avatar")
+
+    def cambiar_avatar(self, ruta_archivo: str = None, canal_id: str = None) -> dict:
+        """Sube la foto (la tuya, o la del grupo si se da `canal_id`) o la quita si
+        `ruta_archivo` es None. Devuelve el JSON del servidor ({"ok", "avatar"} o {"error"})."""
+        if ruta_archivo:
+            try:
+                datos = preparar_avatar(ruta_archivo)
+            except Exception as exc:  # noqa: BLE001
+                return {"error": f"No se pudo leer la imagen: {exc}"}
+            cuerpo = {"contenido_base64": base64.b64encode(datos).decode("ascii")}
+        else:
+            cuerpo = {"borrar": True}
+        if canal_id:
+            cuerpo["canal_id"] = canal_id
+        resultado = self._post_rest("/api/chat/avatar", cuerpo)
+        if resultado.get("ok"):
+            self._aplicar_avatar(canal_id or ("user:" + (self.username or "").lower()),
+                                 resultado.get("avatar"))
+        elif not resultado.get("error"):
+            resultado["error"] = "El servidor del chat no admite todavía fotos de perfil."
+        return resultado
+
+    def _aplicar_avatar(self, clave, url):
+        if not clave:
+            return
+        with self._mapa_nombres_lock:
+            self._mapa_avatares[clave] = url
+        if self.username and clave == "user:" + self.username.lower():
+            self.mi_foto = url
+
+    def descargar_avatar(self, url: str) -> bytes:
+        """Bytes de una foto de perfil (solo del almacén de adjuntos, https y máx. 1 MB)."""
+        if not url_adjunto_permitida(url):
+            raise ValueError("La dirección de la foto no es de confianza.")
+        with requests.get(url, timeout=20, stream=True, allow_redirects=False) as resp:
+            resp.raise_for_status()
+            datos = bytearray()
+            for trozo in resp.iter_content(65536):
+                datos.extend(trozo)
+                if len(datos) > _AVATAR_MAX_DESCARGA:
+                    raise ValueError("La foto es demasiado grande.")
+        return bytes(datos)
 
     def nombre_de(self, username: str) -> str:
         """Nombre real de un username (p.ej. 'dcompras' → 'Jesús Curbelo'),
@@ -530,6 +631,13 @@ class ChatClient:
 
     def _on_error_chat(self, data):
         self.eventos.put({"tipo": EVT_ERROR, "mensaje": data.get("error", "Error de chat")})
+
+    def _on_avatar_cambiado(self, data):
+        clave = str((data or {}).get("clave") or "")
+        if clave.startswith("user:"):
+            clave = "user:" + clave[5:].lower()
+        self._aplicar_avatar(clave, (data or {}).get("avatar"))
+        self.eventos.put({"tipo": EVT_AVATAR, "clave": clave, "avatar": (data or {}).get("avatar")})
 
 
 # Instancia única compartida por toda la app, igual que hace el bridge

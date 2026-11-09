@@ -21,7 +21,8 @@ from datetime import datetime
 from tkinter import messagebox, filedialog
 
 from services.chat_client import get_chat_client, EVT_CONECTADO, EVT_DESCONECTADO, \
-    EVT_NUEVO_MENSAJE, EVT_ERROR
+    EVT_NUEVO_MENSAJE, EVT_ERROR, EVT_AVATAR
+from ui import avatares
 from ui.chat_bubbles import BubbleList, fecha_hora_local
 from ui.emoticonos import abrir_panel, imagen as imagen_emoticono
 from ui.chat_movil import abrir_chat_movil
@@ -34,6 +35,12 @@ _HANDLER        = None  # función que procesa un evento del chat mientras la ve
                          # cliente.eventos desde que arranca el Organizador (v1.2) — así solo hay
                          # UN consumidor de la cola, nunca esta ventana y main_agenda.py a la vez.
 _CERRAR         = None  # (v4.18.16) cierra la ventana y devuelve lo que se estaba escribiendo
+
+# (v4.18.28) Tamaños de las fotos de perfil, en píxeles
+_TAM_FOTO_LISTA    = 28
+_ALTO_FILA         = 36
+_TAM_FOTO_CABECERA = 34
+_TAM_FOTO_BURBUJA  = 26
 
 
 def cerrar_para_seguir_en_burbuja():
@@ -81,9 +88,14 @@ def _ventana_chat(ctx):
 
     ttk.Label(frm_lista, text="Conversaciones", font=("-size", 10, "-weight", "bold")).pack(
         anchor="w")
-    lista = tk.Listbox(frm_lista, activestyle="none", exportselection=False, width=22)
+    # (v4.18.28) Lista con la foto de cada persona o grupo (o sus iniciales en color)
+    _estilo = ttk.Style()
+    _estilo.configure("Conversaciones.Treeview", rowheight=_ALTO_FILA)
+    lista = ttk.Treeview(frm_lista, show="tree", selectmode="browse", style="Conversaciones.Treeview")
+    lista.column("#0", width=200, stretch=True)
     lista.pack(fill="both", expand=True, pady=(4, 6))
     _canales_por_indice = []  # paralelo a las filas de `lista`
+    _imagenes_lista = []      # referencias de las fotos que se ven en la lista
 
     _BTN_NUEVA_TXT = "＋  Nueva conversación"
     ttk.Button(frm_lista, text=_BTN_NUEVA_TXT, bootstyle="info-outline",
@@ -104,16 +116,14 @@ def _ventana_chat(ctx):
     # máximo para que un nombre absurdamente largo no se coma media
     # ventana — a partir de ahí el usuario puede arrastrar el separador a
     # mano si de verdad lo necesita.
-    _fuente_lista = tkfont.Font(font=lista.cget("font"))
+    _fuente_lista = tkfont.nametofont("TkDefaultFont")
     _fuente_boton = tkfont.nametofont("TkDefaultFont")
 
     def _ajustar_ancho_sidebar():
-        etiquetas = [_BTN_NUEVA_TXT] + [lista.get(i) for i in range(lista.size())]
-        if not etiquetas:
-            return
-        ancho_px = max(_fuente_lista.measure(t) for t in etiquetas)
+        etiquetas = [lista.item(i, "text") for i in lista.get_children()]
+        ancho_px = max([_fuente_lista.measure(t) + _TAM_FOTO_LISTA + 14 for t in etiquetas] or [0])
         ancho_px = max(ancho_px, _fuente_boton.measure(_BTN_NUEVA_TXT))
-        ancho_px += 40  # scrollbar/padding/margen interno del Listbox y el Frame
+        ancho_px += 40  # scrollbar/padding/margen interno de la lista y el Frame
         ancho_min = 150
         ancho_max = max(ancho_min, win.winfo_width() - 260)  # deja sitio a los mensajes
         ancho_px = max(ancho_min, min(ancho_px, ancho_max))
@@ -127,9 +137,26 @@ def _ventana_chat(ctx):
     # ── Panel de mensajes ─────────────────────────────────────────────────
     frm_titulo_chat = ttk.Frame(frm_chat)
     frm_titulo_chat.pack(fill="x")
+    lbl_foto_chat = ttk.Label(frm_titulo_chat, image=avatares.imagen_general(win, _TAM_FOTO_CABECERA))
+    lbl_foto_chat.pack(side="left", padx=(0, 8))
     lbl_titulo_chat = ttk.Label(frm_titulo_chat, text="General",
                                  font=("-size", 11, "-weight", "bold"))
     lbl_titulo_chat.pack(side="left", anchor="w")
+
+    def _pintar_foto_cabecera():
+        if not win.winfo_exists():
+            return
+        cid, otro = canal_actual["id"], canal_actual["otro"]
+        titulo = lbl_titulo_chat.cget("text")
+        if (not cid or cid == "general") and not otro:
+            img = avatares.imagen_general(win, _TAM_FOTO_CABECERA)
+        elif str(cid).startswith("grp:"):
+            img = avatares.imagen_grupo(win, cliente.avatar_canal(cid), titulo, _TAM_FOTO_CABECERA,
+                                        canal_id=cid, al_cargar=_pintar_foto_cabecera)
+        else:
+            img = avatares.imagen(win, cliente.avatar_canal(cid, otro), titulo, _TAM_FOTO_CABECERA,
+                                  clave=otro, al_cargar=_pintar_foto_cabecera)
+        lbl_foto_chat.configure(image=img)
 
     def _limpiar_chat():
         # (2026-08-01) A petición del usuario: ahora la limpieza SÍ persiste
@@ -156,6 +183,59 @@ def _ventana_chat(ctx):
 
     ttk.Button(frm_titulo_chat, text="🧹 Limpiar chat", bootstyle="info-outline",
                command=lambda: _limpiar_chat()).pack(side="right")
+
+    # (v4.18.28) Fotos de perfil: la tuya y la del grupo abierto
+    def _elegir_imagen(titulo):
+        return filedialog.askopenfilename(
+            parent=win, title=titulo,
+            filetypes=[("Imágenes", "*.png *.jpg *.jpeg *.webp *.bmp *.gif"), ("Todos los archivos", "*.*")])
+
+    def _cambiar_foto(canal_id=None, quitar=False):
+        if quitar:
+            que = "la foto del grupo" if canal_id else "tu foto"
+            if not messagebox.askyesno("Fotos", f"¿Quitar {que}? Se verán las iniciales.", parent=win):
+                return
+            ruta = None
+        else:
+            ruta = _elegir_imagen("Elegir la foto del grupo" if canal_id else "Elegir tu foto")
+            if not ruta:
+                return
+        lbl_estado.configure(text="⏳ Guardando la foto…", bootstyle="info")
+
+        def _hilo():
+            r = cliente.cambiar_avatar(ruta, canal_id=canal_id)
+            def _fin():
+                if not win.winfo_exists():
+                    return
+                if r.get("ok"):
+                    lbl_estado.configure(text="🟢 Foto guardada" if ruta else "🟢 Foto quitada",
+                                         bootstyle="success")
+                    _pintar_foto_cabecera()
+                    _refrescar_lista_canales()
+                else:
+                    lbl_estado.configure(text=f"🔴 {r.get('error', 'No se pudo guardar la foto')}",
+                                         bootstyle="danger")
+            win.after(0, _fin)
+        threading.Thread(target=_hilo, daemon=True, name="Chat-Foto-Subir").start()
+
+    btn_fotos = ttk.Menubutton(frm_titulo_chat, text="🖼 Fotos", bootstyle="secondary-outline")
+    menu_fotos = tk.Menu(btn_fotos, tearoff=0)
+    btn_fotos.configure(menu=menu_fotos)
+
+    def _preparar_menu_fotos():
+        menu_fotos.delete(0, "end")
+        menu_fotos.add_command(label="Cambiar mi foto…", command=lambda: _cambiar_foto())
+        if cliente.mi_foto:
+            menu_fotos.add_command(label="Quitar mi foto", command=lambda: _cambiar_foto(quitar=True))
+        cid = canal_actual["id"]
+        if str(cid).startswith("grp:"):
+            menu_fotos.add_separator()
+            menu_fotos.add_command(label="Cambiar la foto del grupo…", command=lambda: _cambiar_foto(cid))
+            if cliente.avatar_canal(cid):
+                menu_fotos.add_command(label="Quitar la foto del grupo",
+                                       command=lambda: _cambiar_foto(cid, quitar=True))
+    menu_fotos.configure(postcommand=_preparar_menu_fotos)
+    btn_fotos.pack(side="right", padx=(0, 6))
     # (v4.18.24) Enlace a la app Android: QR y pasos para instalarla
     ttk.Button(frm_titulo_chat, text="📱 Chat en el móvil", bootstyle="secondary-outline",
                command=lambda: abrir_chat_movil(win)).pack(side="right", padx=(0, 6))
@@ -347,15 +427,22 @@ def _ventana_chat(ctx):
             _ids_pintados.add(mid)
         quien = "Tú" if propio else cliente.nombre_de(m.get("remitente", ""))
         hora = fecha_hora_local(m)
+        # (v4.18.28) En General y en los grupos, la foto de quien escribe junto a su burbuja
+        foto = None
+        cid = str(m.get("canal_id") or canal_actual["id"] or "")
+        if not propio and (cid == "general" or cid.startswith("grp:")):
+            remitente = m.get("remitente", "")
+            foto = avatares.imagen(win, cliente.avatar_de(remitente), quien, _TAM_FOTO_BURBUJA,
+                                   clave=remitente)
         adjunto = m.get("adjunto")
         if adjunto:
             icono = "📷" if m.get("tipo") == "imagen" else "📎"
             msgs.agregar_burbuja(f"{icono}  {adjunto['nombre_archivo']}", hora, propio,
                                   meta_nombre=quien, es_adjunto=True,
                                   adjunto_url=adjunto["url"],
-                                  adjunto_nombre_archivo=adjunto["nombre_archivo"])
+                                  adjunto_nombre_archivo=adjunto["nombre_archivo"], foto=foto)
         else:
-            msgs.agregar_burbuja(m.get("contenido", ""), hora, propio, meta_nombre=quien)
+            msgs.agregar_burbuja(m.get("contenido", ""), hora, propio, meta_nombre=quien, foto=foto)
 
     def _cargar_historial(canal_id, destinatario):
         msgs.limpiar()
@@ -386,6 +473,7 @@ def _ventana_chat(ctx):
         canal_actual["otro"] = otro_usuario
         _CANAL_VISIBLE = canal_id
         lbl_titulo_chat.configure(text=titulo or otro_usuario or "General")
+        _pintar_foto_cabecera()
         _cargar_historial(canal_id, otro_usuario)
         _refrescar_lista_canales()
 
@@ -395,35 +483,68 @@ def _ventana_chat(ctx):
             def _pintar():
                 if not win.winfo_exists():   # (v4.18.16) la ventana se cerró mientras se cargaba
                     return
-                lista.delete(0, "end")
+                seleccionado = canal_actual["id"]
+                _pintando["si"] = True
+                lista.delete(*lista.get_children())
                 _canales_por_indice.clear()
+                _imagenes_lista.clear()
                 for c in canales:
                     tipo = c.get("tipo")
+                    otro = c.get("otro_usuario")
                     if tipo == "general":
                         nombre = "General"
+                        img = avatares.imagen_general(win, _TAM_FOTO_LISTA)
                     elif tipo == "grupo":
                         nombre = c.get("nombre") or "Grupo"
+                        img = avatares.imagen_grupo(win, c.get("avatar"), nombre, _TAM_FOTO_LISTA,
+                                                    canal_id=c["canal_id"], al_cargar=_repintar_lista)
                     else:
-                        nombre = cliente.nombre_de(c.get("otro_usuario")) if c.get("otro_usuario") else "?"
+                        nombre = cliente.nombre_de(otro) if otro else "?"
+                        img = avatares.imagen(win, c.get("avatar") or cliente.avatar_de(otro), nombre,
+                                              _TAM_FOTO_LISTA, clave=otro, al_cargar=_repintar_lista)
                     no_leidos = c.get("no_leidos", 0)
-                    icono = {"general": "💬 ", "grupo": "👥 "}.get(tipo, "👤 ")
-                    etiqueta = f"{icono}{nombre}"
+                    etiqueta = f"  {nombre}"
                     if no_leidos:
                         etiqueta += f"  ({no_leidos})"
-                    lista.insert("end", etiqueta)
-                    _canales_por_indice.append((c["canal_id"], c.get("otro_usuario"), nombre))
+                    _imagenes_lista.append(img)
+                    iid = lista.insert("", "end", text=etiqueta, image=img)
+                    _canales_por_indice.append((c["canal_id"], otro, nombre))
+                    if c["canal_id"] == seleccionado:
+                        lista.selection_set(iid)
+                _pintando["si"] = False
                 _ajustar_ancho_sidebar()
             win.after(0, _pintar)
         threading.Thread(target=_fetch, daemon=True).start()
 
+    _pintando = {"si": False}    # al repintar la lista se reselecciona sin cambiar de conversación
+    _repintado_pendiente = {"si": False}
+
+    def _repintar_lista():
+        """Ha llegado una foto: se vuelve a pedir la lista (ya con la foto en memoria)."""
+        if _repintado_pendiente["si"] or not win.winfo_exists():
+            return
+        _repintado_pendiente["si"] = True
+
+        def _ya():
+            _repintado_pendiente["si"] = False
+            _refrescar_lista_canales()
+        win.after(300, _ya)
+
     def _on_seleccion_lista(event=None):
-        sel = lista.curselection()
+        if _pintando["si"]:
+            return
+        sel = lista.selection()
         if not sel:
             return
-        canal_id, otro, nombre = _canales_por_indice[sel[0]]
+        i = lista.index(sel[0])
+        if i >= len(_canales_por_indice):
+            return
+        canal_id, otro, nombre = _canales_por_indice[i]
+        if canal_id == canal_actual["id"] and nombre == lbl_titulo_chat.cget("text"):
+            return
         _cambiar_canal(canal_id, otro, nombre)
 
-    lista.bind("<<ListboxSelect>>", _on_seleccion_lista)
+    lista.bind("<<TreeviewSelect>>", _on_seleccion_lista)
 
     # ── Manejo de eventos del socket mientras la ventana está abierta ──────
     # v1.2: quien de verdad drena cliente.eventos es poll_chat() en
@@ -448,6 +569,9 @@ def _ventana_chat(ctx):
             _refrescar_lista_canales()
         elif tipo == EVT_ERROR:
             lbl_estado.configure(text="🔴 Error de conexión", bootstyle="danger")
+        elif tipo == EVT_AVATAR:
+            _pintar_foto_cabecera()
+            _refrescar_lista_canales()
 
     _HANDLER = _manejar_evento
     # Si el chat ya estaba conectado en segundo plano (arranque del

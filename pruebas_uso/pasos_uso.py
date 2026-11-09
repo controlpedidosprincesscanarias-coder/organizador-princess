@@ -244,13 +244,14 @@ def chat(c):
     c.pulsar(c.app, "Chat")
 def chat_ver(c):
     # La ventana del chat es la que tiene la lista de conversaciones (puede coincidir con un aviso)
-    n = [w for w in nueva_ventana(c, ESTADO["antes"]) if any(x.winfo_class() == "Listbox" for x in c.widgets(w))]
+    n = [w for w in nueva_ventana(c, ESTADO["antes"]) if any(x.winfo_class() == "Treeview" for x in c.widgets(w))]
     v = n[-1] if n else None
     c.ok("6. ventana del chat", v is not None, c.titulos())
     if not v: return
     ESTADO["chat"] = v
-    lb = [w for w in c.widgets(v) if w.winfo_class() == "Listbox"]
-    items = list(lb[0].get(0, "end")) if lb else []
+    lb = [w for w in c.widgets(v) if w.winfo_class() == "Treeview"]   # (v4.18.28) lista con fotos
+    filas = list(lb[0].get_children()) if lb else []
+    items = [lb[0].item(i, "text").strip() for i in filas]
     log(f"conversaciones: {items}")
     c.ok("6. el chat carga la lista de conversaciones", bool(items), items)
     c.arbol(v, "chat"); c.captura("chat")
@@ -264,7 +265,7 @@ def chat_ver(c):
     log(f"destino del chat ({CHAT_DESTINO or 'ninguno'}): {bool(dest)} ({ESTADO['nombre_cc']})")
     for i, t in enumerate(items):
         if CHAT_DESTINO and ESTADO["nombre_cc"].lower() in str(t).lower():
-            lb[0].selection_clear(0, "end"); lb[0].selection_set(i); lb[0].event_generate("<<ListboxSelect>>")
+            lb[0].selection_set(filas[i])
             ESTADO["chat_sel"] = t; break
 def chat_nueva(c):
     v = ESTADO.get("chat")

@@ -32,7 +32,8 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 from datetime import datetime, date
 
-from services.chat_client import get_chat_client, EVT_NUEVO_MENSAJE
+from services.chat_client import get_chat_client, EVT_NUEVO_MENSAJE, EVT_AVATAR
+from ui import avatares
 from ui.chat_bubbles import BubbleList, fecha_hora_local
 from ui.emoticonos import abrir_panel, imagen as imagen_emoticono
 from db.sqlite import filtrar_mensajes_limpiados
@@ -94,6 +95,11 @@ def cerrar_todas():
 def procesar_evento(ev):
     """Llamado por poll_chat() en main_agenda.py para CADA evento del
     chat, haya o no burbujas abiertas ahora mismo."""
+    if ev.get("tipo") == EVT_AVATAR:
+        for info in list(_POPUPS.values()):
+            if info["win"].winfo_exists() and info.get("foto"):
+                info["foto"]()
+        return
     if ev.get("tipo") != EVT_NUEVO_MENSAJE:
         return
     m = ev["mensaje"]
@@ -129,8 +135,30 @@ def mostrar_popup_chat(ctx, canal_id, titulo, mensaje_inicial=None, borrador="")
     header = tk.Frame(win, bg=_COLOR_HEADER, height=36)
     header.pack(fill="x")
     header.pack_propagate(False)
-    tk.Label(header, text=f"💬  {titulo}", bg=_COLOR_HEADER, fg="white",
-              font=("Segoe UI", 10, "bold")).pack(side="left", padx=10)
+    # (v4.18.28) Foto de la persona o del grupo (o sus iniciales) en vez del 💬
+    lbl_foto = tk.Label(header, bg=_COLOR_HEADER, bd=0)
+    lbl_foto.pack(side="left", padx=(8, 0))
+
+    def _pintar_foto():
+        if not win.winfo_exists():
+            return
+        if canal_id == "general":
+            img = avatares.imagen_general(win, 26)
+        elif str(canal_id).startswith("grp:"):
+            img = avatares.imagen_grupo(win, cliente.avatar_canal(canal_id), titulo.replace("  (grupo)", ""),
+                                        26, canal_id=canal_id, al_cargar=_pintar_foto)
+        else:
+            otro = None
+            if str(canal_id).startswith("dm:") and cliente.username:
+                otros = [p for p in canal_id[3:].split(":") if p.lower() != cliente.username.lower()]
+                otro = otros[0] if otros else None
+            img = avatares.imagen(win, cliente.avatar_canal(canal_id), titulo, 26, clave=otro,
+                                  al_cargar=_pintar_foto)
+        lbl_foto.configure(image=img)
+        lbl_foto.image = img
+    _pintar_foto()
+    tk.Label(header, text=titulo, bg=_COLOR_HEADER, fg="white",
+              font=("Segoe UI", 10, "bold")).pack(side="left", padx=(8, 10))
 
     def _cerrar():
         _POPUPS.pop(canal_id, None)
@@ -361,7 +389,7 @@ def mostrar_popup_chat(ctx, canal_id, titulo, mensaje_inicial=None, borrador="")
     win.bind("<Button-1>", _forzar_foco)
     entry.focus_set()
 
-    _POPUPS[canal_id] = {"win": win, "pintar": _pintar}
+    _POPUPS[canal_id] = {"win": win, "pintar": _pintar, "foto": _pintar_foto}
     win.protocol("WM_DELETE_WINDOW", _cerrar)
 
     # Arrastrar archivos desde el Explorador sobre la burbuja (v4.18.16), como en la ventana

@@ -400,18 +400,20 @@ def chat(c):
 
 
 def chat_privado(c):
-    v = [w for w in nuevas(c, ESTADO["antes"]) if any(x.winfo_class() == "Listbox" for x in c.widgets(w))]
+    v = [w for w in nuevas(c, ESTADO["antes"]) if any(x.winfo_class() == "Treeview" for x in c.widgets(w))]
     ESTADO["chat"] = v[-1] if v else None
     if not v:
         return
-    lb = de_clase(c, v[-1], "Listbox")
-    lb.selection_set(1); lb.event_generate("<<ListboxSelect>>")
+    lb = de_clase(c, v[-1], "Treeview")   # (v4.18.28) lista de conversaciones con fotos
+    filas = lb.get_children()
+    if len(filas) > 1:
+        lb.selection_set(filas[1])
 
 
 def chat_ver(c):
     v = ESTADO.get("chat")
-    foto(c, v, "u_chat", [(buscar(c, v, "Conectado"), 1, "r"), (de_clase(c, v, "Listbox"), 2, "ir"),
-                          (buscar(c, v, "Nueva conversación"), 3, "t"), (buscar(c, v, "Limpiar"), 4, "l"),
+    foto(c, v, "u_chat", [(buscar(c, v, "Conectado"), 1, "ir"), (de_clase(c, v, "Treeview"), 2, "ir"),
+                          (buscar(c, v, "Nueva conversación"), 3, "t"), (buscar(c, v, "Limpiar"), 4, "b"), (buscar(c, v, "Fotos"), 10, "b"),
                           (buscar(c, v, "Oferta_", n=0) or de_clase(c, v, "Canvas"), 5, "l"),
                           (de_clase(c, v, "TEntry"), 6, "t"), (boton_emoticonos(c, v), 7, "t"), (buscar(c, v, "📎"), 8, "t"),
                           (buscar(c, v, "Enviar"), 9, "t")])

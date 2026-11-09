@@ -1,10 +1,20 @@
+# ✨ Organizador Princess v4.18.26
+
+> Incluye también todo lo de la 4.18.24 y anteriores que no llegaron a publicarse (desde la 4.18.12).
+
+## 📱 Nombre de la app del móvil
+
+- La app del chat para Android se llama ahora **Chat Dpto. Compras Princess**, con la corona de Princess como icono. La ventana «📱 Chat en el móvil» y el manual ya usan el nombre nuevo.
+
+---
+
 # ✨ Organizador Princess v4.18.24
 
 > Incluye también todo lo de la 4.18.22 y anteriores que no llegaron a publicarse (desde la 4.18.12).
 
 ## 📱 El chat también en el móvil
 
-- Nueva app **Chat Princess para Android**: el mismo chat, con tu cuenta de Control de Pedidos. Puedes estar conectado a la vez en el Organizador y en el móvil.
+- Nueva app **Chat Dpto. Compras Princess para Android**: el mismo chat, con tu cuenta de Control de Pedidos. Puedes estar conectado a la vez en el Organizador y en el móvil.
 - En el chat, el botón **📱 Chat en el móvil** muestra un código QR para descargarla y los pasos para instalarla.
 - El **Manual de usuario** tiene un capítulo nuevo, «El chat en el móvil»: cómo instalar la app y cómo se actualiza.
 

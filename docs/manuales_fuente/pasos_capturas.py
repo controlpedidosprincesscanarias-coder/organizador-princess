@@ -420,7 +420,7 @@ def chat_ver(c):
 
 
 def boton_emoticonos(c, v):
-    """El botón 😊 (desde la v4.18.26 es una imagen en color, sin texto)."""
+    """El botón 😊 (desde la v4.18.28 es una imagen en color, sin texto)."""
     return next((w for w in c.widgets(v) if w.winfo_class() == "TButton" and str(w.cget("image"))), None) or buscar(c, v, "😊")
 
 
@@ -478,10 +478,10 @@ def burbuja_ver(c):
 def actualizacion(c):
     import json, urllib.request
     um = sys.modules["services.update_service"]
-    falso = {"tag_name": "v4.18.26", "name": "Organizador Princess v4.18.26",
-             "body": "# ✨ Organizador Princess v4.18.26\n\n## 🛠 Mejoras\n\n- Mejoras en la agenda y el calendario.\n- Correcciones menores.",
-             "assets": [{"name": "OrganizadorPrincess_Setup_4.18.26.exe", "size": 34_400_000, "browser_download_url": "https://example.invalid/x.exe"},
-                        {"name": "OrganizadorPrincess_Setup_4.18.26.exe.sha256", "size": 90, "browser_download_url": "https://example.invalid/x.sha256"}]}
+    falso = {"tag_name": "v4.18.28", "name": "Organizador Princess v4.18.28",
+             "body": "# ✨ Organizador Princess v4.18.28\n\n## 🛠 Mejoras\n\n- Mejoras en la agenda y el calendario.\n- Correcciones menores.",
+             "assets": [{"name": "OrganizadorPrincess_Setup_4.18.28.exe", "size": 34_400_000, "browser_download_url": "https://example.invalid/x.exe"},
+                        {"name": "OrganizadorPrincess_Setup_4.18.28.exe.sha256", "size": 90, "browser_download_url": "https://example.invalid/x.sha256"}]}
 
     class R(io.BytesIO):
         status = 200

@@ -51,6 +51,15 @@
 
 ---
 
+## 2026-11-09 19:44 — [Chat / Chat móvil / Organizador] Fotos de perfil de personas y grupos (Chat v1.3.0, Chat móvil v1.0.4, Organizador v4.18.28)
+
+Petición de Víctor: poder poner imágenes a cada integrante del chat y a los grupos, en el móvil y en el Organizador.
+
+- **Chat (servidor, v1.3.0):** tabla `chat_avatares` (migración idempotente). `GET /api/chat/avatar` (mi foto) y `POST /api/chat/avatar` (`contenido_base64`, `canal_id` para un grupo, `borrar`): solo JPEG/PNG/WebP de hasta 512 KB, 20 cambios por hora; la foto de un grupo solo la cambia un miembro. Campo `avatar` en `/api/chat/usuarios` y `/api/chat/canales`, y evento `avatar_cambiado {clave, avatar}`. Los clientes antiguos ignoran lo nuevo. `tests/test_chat.py`: 61 OK.
+- **Chat móvil (v1.0.4):** Ajustes → «Mi foto» (galería, cámara o quitar); la foto del grupo, desde su cabecera. Fotos en la lista, la cabecera, las burbujas de General y grupos y «Nueva conversación»; sin foto, iniciales sobre un círculo de color. Coil 2.7.0; las fotos solo se cargan de `*.supabase.co` por https.
+- **Organizador (v4.18.28):** lista de conversaciones con fotos (pasa de `Listbox` a `Treeview`), foto en la cabecera, junto a los mensajes de General y grupos y en la burbuja flotante; botón «🖼 Fotos» para cambiar o quitar la tuya y la del grupo abierto. Las iniciales usan el mismo color que el móvil (hashCode de Java). Prueba nueva `test_avatares.py`; manuales regenerados.
+- **Orden de despliegue:** primero el servidor del chat v1.3.0 en Render; después publicar Chat móvil v1.0.4 y Organizador v4.18.28. Sin el servidor nuevo, los clientes nuevos solo muestran iniciales.
+
 ## 2026-11-09 19:22 — [Chat móvil] Nuevo nombre: «Chat Dpto. Compras Princess» (app v1.0.2 y Organizador v4.18.26, sin publicar)
 
 - Petición de Víctor: la app Android se llama ahora **Chat Dpto. Compras Princess** (antes «Chat Princess»).

@@ -51,6 +51,16 @@
 
 ---
 
+## 2026-11-09 20:03 — [Infra] Cuentas de Render y Supabase de cada aplicación; el chat puede quedar despierto 24 h
+
+- **Confirmado por Víctor:** cada aplicación tiene **su propia cuenta de Render**, también el chat. Viene de la migración de julio de 2026 (ver `docs/archivo/HISTORIAL_CAMBIOS_2026-07_a_2026-09.md`, «Migración de `control_pedidos_chat` a cuenta Render nueva»): entonces Control Pedidos y el chat compartían cuenta, agotaron entre los dos las 750 h gratuitas del mes y Render los suspendió.
+- **Mapa** (sin correos de las cuentas: por la regla de seguridad no se escriben en el repositorio; los tiene Víctor fuera de GitHub):
+  - **Control Pedidos:** su cuenta de Render (servicio `control-pedidos-princess`, Frankfurt), detrás del Worker `proxy`. Su propio proyecto de Supabase: base de datos principal (usuarios, pedidos…) y Storage de adjuntos (`SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY`).
+  - **Chat:** su cuenta de Render (servicio `control-pedidos-chat`, Frankfurt), detrás del Worker `proxy-chat`. Su propio proyecto de Supabase (`CHAT_DATABASE_URL`, y Storage de adjuntos y fotos de perfil con `SUPABASE_SERVICE_KEY`, ⚠️ nombre distinto al de Control Pedidos). Lee los usuarios de la base de Control Pedidos (`DATABASE_URL`) y comparte su `SECRET_KEY`.
+  - **Las demás aplicaciones** (DALI, Material Operacional, Catálogo Asignaciones…): cada una en su propia cuenta de Render.
+  - **Mantener despiertos:** solo desde cron-job.org (cuenta de Víctor).
+- **Consecuencia:** cada cuenta tiene sus 750 h gratuitas al mes. El chat encendido todo el mes son ~744 h y **cabe**, así que «Keep-alive chat (servicio)» se puede pasar a `*/10 * * * *` (cada 10 min, todos los días, 24 h, zona Atlantic/Canary) para que el móvil y el Organizador no pierdan la conexión de noche ni en fin de semana. «Keep-alive chat (base de datos)» sigue igual (`/ping/db` a diario a las 9:17). Si alguna vez se juntaran dos servicios gratuitos en la misma cuenta, volvería a no caber.
+
 ## 2026-11-09 19:56 — [Organizador] Botones del chat más visibles (v4.18.30)
 
 - «📱 Chat en el móvil» y «🖼 Fotos» pasan de gris (`secondary-outline`) al mismo azul que «Limpiar chat» (`info-outline`): con el tema oscuro parecían desactivados y apenas se veían sin pasar el ratón por encima (aviso de Víctor). Manuales regenerados.

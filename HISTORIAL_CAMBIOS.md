@@ -51,6 +51,23 @@
 
 ---
 
+## 2026-11-09 13:48 — [Organizador] Fechas con calendario 📅 y hora con ruedas en avisos, vacaciones y festivos (v4.18.14, sin publicar)
+
+- Petición de Víctor: elegir las fechas en un calendario y poner las horas sin escribir los dos puntos.
+- **Fechas** (aviso nuevo y editar, vacaciones y festivos): junto a cada caja hay un botón **📅** que abre un calendario en español (lunes primero, hoy en dorado, la fecha elegida en azul, botón «Hoy»). Un clic en el día lo elige.
+  - Se puede seguir escribiendo: «15112026», «15/11/26» o «5.1.2027» se convierten solos en DD-MM-AAAA, también al guardar.
+- **Hora** de los avisos: dos ruedas (horas y minutos) que se mueven con las flechas, con la rueda del ratón o escribiendo el número. En «cada hora» y «cada 30 minutos» la rueda de las horas se desactiva.
+- El formato que se guarda en `agenda.json` no cambia (`AAAA-MM-DD` y `HH:MM`): las agendas existentes y las exportadas siguen valiendo.
+- Código: `app/ui/selector_fecha_hora.py` (nuevo, en `main.spec`) y `normalizar_fecha` / `normalizar_hora` en `app/utils/fechas.py`. Prueba nueva, `test_fecha_hora.py` (22 comprobaciones), añadida a la compilación automática. La prueba de uso se ha adaptado a las ruedas.
+- Probado en Linux con la aplicación real y datos de ejemplo:
+  - abrir el calendario, pasar de mes, elegir un día, mover la hora y guardar;
+  - desactivación de las horas en «cada hora»;
+  - fecha escrita con barras;
+  - los dos 📅 de vacaciones (8 de 8 comprobaciones).
+- Falta probarlo en Windows. Los manuales se han regenerado con el calendario y las ruedas.
+
+---
+
 ## 2026-11-09 13:27 — [Organizador] Manuales renovados con el estilo de Control Pedidos y correcciones encontradas al hacerlos (v4.18.12, sin publicar)
 
 - **Manuales:** el de usuario (el que abre el botón «Manual») y el de administrador, rehechos con la maquetación de los de Control Pedidos: portada, índice, capturas con números de referencia en naranja, leyendas, recuadros y tablas.

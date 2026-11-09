@@ -132,6 +132,31 @@ def admin_login(c):
     if v:
         e = [w for w in c.entradas(v) if w.cget("show")][0]
         c.escribir(e, CLAVE); c.pulsar(v, "Entrar")
+def admin_login_mal(c):
+    v = c.ventana("Acceso Admin")
+    c.ok("4. Admin pide la contraseña la primera vez", v is not None, c.titulos())
+    if not v: return
+    e = [w for w in c.entradas(v) if w.cget("show")][0]
+    c.escribir(e, "clave-incorrecta-de-prueba"); c.pulsar(v, "Entrar")
+def admin_login_mal_ver(c):
+    v = c.ventana("Acceso Admin")
+    textos = " ".join(c.texto(w) for w in c.widgets(v)) if v else ""
+    c.ok("4. con una contraseña incorrecta no entra y avisa", v is not None and c.ventana("Accesos y Opciones") is None
+         and ("incorrect" in textos.lower() or "intento" in textos.lower()), textos[-200:])
+    c.captura("admin_clave_incorrecta")
+def mi_usuario_nombre(c):
+    v = c.ventana("Mi Usuario")
+    e = [w for w in c.entradas(v) if not w.cget("show")]
+    ESTADO["nombre_nuevo"] = f"Prueba Claude {SELLO}"
+    c.escribir(e[0], ESTADO["nombre_nuevo"])
+    c.captura("mi_usuario"); c.pulsar(v, "Guardar")
+def mi_usuario_ver(c):
+    from db.sqlite import get_nombre_usuario
+    c.ok("4. «Mi Usuario»: el nombre nuevo se guarda", get_nombre_usuario() == ESTADO["nombre_nuevo"], get_nombre_usuario())
+    c.ok("4. «Mi Usuario»: el saludo y el calendario usan ya el nombre nuevo (sin reiniciar)",
+         c.g["ctx"].nombre_usuario == ESTADO["nombre_nuevo"], c.g["ctx"].nombre_usuario)
+    for v in todas(c):
+        if "Accesos y Opciones" in v.title() or "Mi Usuario" in v.title(): cerrar_con_boton(c, v)
 def pulsar_admin(texto, idx=0):
     def f(c):
         p = c.ventana("Accesos y Opciones")
@@ -400,7 +425,9 @@ PASOS = [
     ("3 calendario", calendario, 2500), ("3 ver", calendario_ver, 1500), ("3 semana", calendario_semana, 2500),
     ("3 vacaciones", vacaciones_ver, 2500), ("3 festivos", festivos_ver, 1500),
     ("3 agendas imprimibles", agendas_imprimibles, 2000), ("3 agendas ver", agendas_imprimibles_ver, 4000), ("3 chat", chat_desde_calendario, 1500),
-    ("4 admin", admin, 3000), ("4 login", admin_login, 4000), ("4 editar acceso 1", pulsar_admin("Editar", 0), 2500), ("4 web", editar_acceso_web, 2500),
+    ("4 admin", admin, 3000), ("4 clave mal", admin_login_mal, 4000), ("4 clave mal ver", admin_login_mal_ver, 500),
+    ("4 login", admin_login, 4000), ("4 mi usuario", pulsar_admin("Mi Usuario"), 3000), ("4 nombre", mi_usuario_nombre, 3000), ("4 nombre ver", mi_usuario_ver, 1500),
+    ("4 admin", admin, 3000), ("4 login", admin_login, 3000), ("4 editar acceso 1", pulsar_admin("Editar", 0), 2500), ("4 web", editar_acceso_web, 2500),
     ("4 admin", admin, 3000), ("4 login", admin_login, 3000), ("4 editar botón 1", pulsar_admin("Editar", 6), 2500), ("4 carpeta", editar_menu_carpeta, 2500),
     ("4 menú", menu_botones, 2500), ("4 menú ver", menu_botones_ver, 500),
     ("4 admin", admin, 3000), ("4 login", admin_login, 3000), ("4 vista", pulsar_admin("Vista"), 2500), ("4 reducida", vista_reducida, 3000), ("4 reducida ver", vista_reducida_ver, 1000),

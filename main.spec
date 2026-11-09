@@ -59,6 +59,8 @@ hiddenimports += [
     'ui.agenda',         # v4.18.08: ventana Agenda de Avisos (antes en main_agenda)
     'ui.colores',        # v4.18.08: colores comunes
     'ui.calendario',     # v4.18.08: ventana Calendario (antes en main_agenda)
+    'ui.admin',          # v4.18.08: Administración (antes en main_agenda)
+    'ui.disposicion',    # v4.18.08: constantes del menú y vista
     'ui.agenda_helpers',
     'ui.importexport',
     'ui.vacaciones',

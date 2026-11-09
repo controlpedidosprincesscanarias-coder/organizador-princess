@@ -51,6 +51,15 @@
 
 ---
 
+## 2026-11-09 10:12 — [Organizador] Prueba test_bd_y_acceso.py compatible con Windows (v4.18.10, sin publicar)
+
+- La primera compilación automática («Compilar Organizador», destino borrador) falló en la fase de pruebas.
+  - `test_bd_y_acceso.py` dejaba abierta su conexión SQLite al consultar columnas y luego borraba el archivo: Windows no deja borrar un archivo abierto (`PermissionError: WinError 32`). En Linux pasaba.
+  - Ahora la prueba cierra siempre sus conexiones (`columnas()`); el módulo `app/db/sqlite.py` ya las cerraba todas.
+  - No cambia la aplicación ni la versión; no se llegó a crear el borrador.
+
+---
+
 ## 2026-11-09 09:15 — [Infra] Anti-letargo de Control Pedidos solo desde cron-job.org; fuera el workflow de GitHub (v12.34.18)
 
 - **Petición** (Víctor): limpiar en GitHub lo que sobra para el ping de Control Pedidos, tras crear en cron-job.org la tarea «Keep-alive Control Pedidos (servicio)».

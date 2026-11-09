@@ -51,6 +51,17 @@
 
 ---
 
+## 2026-11-09 12:52 — [Organizador] Publicada la v4.18.10 (primera release con la compilación automática)
+
+- Compilada con «Compilar Organizador» (GitHub Actions, destino borrador) tras corregir `test_bd_y_acceso.py` para Windows.
+  - Release con `OrganizadorPrincess_Setup_4.18.10.exe` (34,4 MB) y su `.sha256`.
+  - Notas: las de 4.18.10, 4.18.08 y 4.18.06 juntas, porque los equipos venían de la 4.18.04.
+- Víctor la instaló y probó en su Windows: menú, configuración conservada, saludo, Agenda, Calendario, Admin y chat (arrastrar archivos incluido). Todo correcto.
+- **Publicada a las 12:49.** `api.github.com/.../releases/latest` devuelve `v4.18.10`, sin borrador ni pre-release. El SHA-256 del instalador descargado coincide con el publicado.
+- Los equipos la recibirán al arrancar o en la siguiente comprobación (cada 2 h desde esta versión; los que siguen en la 4.18.04 comprueban cada 30 min).
+
+---
+
 ## 2026-11-09 12:27 — [Organizador] Prueba test_bd_y_acceso.py compatible con Windows (v4.18.10, sin publicar)
 
 - La primera compilación automática («Compilar Organizador», destino borrador) falló en la fase de pruebas.

@@ -35,7 +35,18 @@ with contextlib.redirect_stderr(err):
     bd.get_bridge_credentials("usuario prueba")
 ok("sin avisos «duplicate column» al inicializar varias veces", "duplicate column" not in err.getvalue(), err.getvalue()[:200])
 import sqlite3  # noqa: E402
-cols = {f[1] for f in sqlite3.connect(bd.DB_FILE).execute("PRAGMA table_info(config_usuarios)")}
+
+
+def columnas():
+    """Columnas de config_usuarios, cerrando la conexión (en Windows un archivo abierto no se puede borrar)."""
+    con = sqlite3.connect(bd.DB_FILE)
+    try:
+        return {f[1] for f in con.execute("PRAGMA table_info(config_usuarios)")}
+    finally:
+        con.close()
+
+
+cols = columnas()
 ok("la tabla tiene las columnas del bridge", {"bridge_user", "bridge_password"} <= cols, cols)
 
 # Base antigua sin las columnas: se añaden
@@ -45,7 +56,7 @@ con.execute("CREATE TABLE config_usuarios (username_win TEXT PRIMARY KEY, nombre
 con.commit(); con.close()
 with contextlib.redirect_stderr(io.StringIO()):
     bd._init_db_usuarios()
-cols = {f[1] for f in sqlite3.connect(bd.DB_FILE).execute("PRAGMA table_info(config_usuarios)")}
+cols = columnas()
 ok("en una base antigua se añaden las columnas que faltan", {"bridge_user", "bridge_password"} <= cols, cols)
 
 try:

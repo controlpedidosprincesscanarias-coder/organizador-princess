@@ -56,6 +56,8 @@ hiddenimports += [
     'services.admin_auth',   # ANTI-REGRESION: nuevo — sistema de login Admin sin hardcode
     'ui.assets',
     'ui.saludo',
+    'ui.agenda',         # v4.18.08: ventana Agenda de Avisos (antes en main_agenda)
+    'ui.colores',        # v4.18.08: colores comunes
     'ui.agenda_helpers',
     'ui.importexport',
     'ui.vacaciones',

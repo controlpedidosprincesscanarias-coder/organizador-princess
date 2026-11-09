@@ -5,7 +5,7 @@
 ; ================================================================
 
 #define MyAppName    "Organizador Princess"
-#define MyAppVersion "4.18.18"
+#define MyAppVersion "4.18.20"
 #define MyAppExe     "OrganizadorPrincess.exe"
 #define MyAppID      "OrganizadorPrincess"
 #define MyAssets     SourcePath + "assets"
@@ -129,6 +129,10 @@ Name: "desktopicon"; Description: "Crear acceso directo en el escritorio"; Flags
 Filename: "{app}\{#MyAppExe}"; \
   Description: "Iniciar {#MyAppName}"; \
   Flags: nowait postinstall skipifsilent
+;  (v4.18.20) Instalación de un clic desde «Actualizar ahora» (/SILENT): al terminar se vuelve
+;  a abrir el Organizador solo, con el usuario normal y no como administrador.
+Filename: "{app}\{#MyAppExe}"; \
+  Flags: nowait runasoriginaluser; Check: WizardSilent
 
 ; ----------------------------------------------------------------
 ;  Limpieza al desinstalar

@@ -460,10 +460,10 @@ def burbuja_ver(c):
 def actualizacion(c):
     import json, urllib.request
     um = sys.modules["services.update_service"]
-    falso = {"tag_name": "v4.18.20", "name": "Organizador Princess v4.18.20",
-             "body": "# ✨ Organizador Princess v4.18.20\n\n## 🛠 Mejoras\n\n- Mejoras en la agenda y el calendario.\n- Correcciones menores.",
-             "assets": [{"name": "OrganizadorPrincess_Setup_4.18.20.exe", "size": 34_400_000, "browser_download_url": "https://example.invalid/x.exe"},
-                        {"name": "OrganizadorPrincess_Setup_4.18.20.exe.sha256", "size": 90, "browser_download_url": "https://example.invalid/x.sha256"}]}
+    falso = {"tag_name": "v4.18.22", "name": "Organizador Princess v4.18.22",
+             "body": "# ✨ Organizador Princess v4.18.22\n\n## 🛠 Mejoras\n\n- Mejoras en la agenda y el calendario.\n- Correcciones menores.",
+             "assets": [{"name": "OrganizadorPrincess_Setup_4.18.22.exe", "size": 34_400_000, "browser_download_url": "https://example.invalid/x.exe"},
+                        {"name": "OrganizadorPrincess_Setup_4.18.22.exe.sha256", "size": 90, "browser_download_url": "https://example.invalid/x.sha256"}]}
 
     class R(io.BytesIO):
         status = 200
@@ -479,7 +479,7 @@ def actualizacion(c):
 def actualizacion_ver(c):
     n = nuevas(c, ESTADO["antes"])
     v = n[-1] if n else None
-    foto(c, v, "u_actualizacion", [(de_clase(c, v, "Text"), 1, "ir"), (buscar(c, v, "Descargar"), 2, "t"),
+    foto(c, v, "u_actualizacion", [(de_clase(c, v, "Text"), 1, "ir"), (buscar(c, v, "Actualizar ahora"), 2, "t"),
                                     (buscar(c, v, "Recordar"), 3, "t")] if v else [])
     for v in n:
         c.cerrar(v)

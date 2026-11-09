@@ -51,6 +51,23 @@
 
 ---
 
+## 2026-11-09 18:29 — [Organizador] Actualizar con un solo clic (v4.18.20, sin publicar)
+
+- Petición de Víctor, viendo la ventana de actualización en un equipo con la 4.18.04: que al pulsar se descargue y se instale sola, sin tener que abrir el instalador después.
+- **«Actualizar ahora»** (antes «Descargar actualización»):
+  - descarga a una carpeta temporal propia, sin preguntar dónde guardar;
+  - comprueba el SHA-256 y, si la Release no publica hash, pregunta antes de seguir;
+  - lanza el instalador con `/SILENT /SUPPRESSMSGBOXES /NORESTART /SP-` mediante ShellExecute, para que Windows pida el permiso de administrador.
+- El instalador ya cerraba el Organizador. Ahora el `.iss` lo vuelve a abrir al terminar (`[Run]` con `Check: WizardSilent` y `runasoriginaluser`, con el usuario normal).
+- Al arrancar la versión nueva no aparece «Nueva versión detectada»: se aplica «Solo actualizar versión» y sale el aviso «Organizador actualizado». Lo controla una marca `actualizacion_automatica.json`, válida solo para esa versión y durante un día.
+- Si el permiso de Windows se cancela, la ventana ofrece «Instalar» (reintentar) y «Abrir carpeta».
+- **Importante:** la ventana de actualización la muestra la versión **instalada**. Por eso el clic único funciona a partir de la actualización que venga después de la 4.18.20. Lo mismo explica lo que vio Víctor: la 4.18.04 todavía no tenía el formato de las novedades (llegó en la 4.18.10) y muestra los `#` y `**` tal cual. Los equipos con 4.18.10 o posterior las ven con formato.
+- Prueba nueva, `test_actualizacion.py` (13 comprobaciones), añadida a la compilación automática. En Linux, con la app real, GitHub y la descarga simulados: botón, descarga a la carpeta temporal, hash, lanzamiento del instalador y marca (5 de 5).
+- **Falta probar en Windows:** el permiso de Windows, la instalación silenciosa y la reapertura.
+- Incluye la 4.18.18, la 4.18.16, la 4.18.14 y la 4.18.12, sin publicar. Manuales actualizados (capítulo 8).
+
+---
+
 ## 2026-11-09 18:02 — [Chat móvil] Nueva app Android «Chat Princess» (v1.0.0, sin publicar)
 
 - Petición de Víctor: el chat de Control de Pedidos en el móvil, con usuario y contraseña de Control de Pedidos como el Organizador, y conectado a la vez en escritorio y móvil.

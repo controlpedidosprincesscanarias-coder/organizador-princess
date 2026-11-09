@@ -31,10 +31,24 @@ _HANDLER        = None  # función que procesa un evento del chat mientras la ve
                          # la rellena poll_chat() en main_agenda.py, que es quien de verdad drena
                          # cliente.eventos desde que arranca el Organizador (v1.2) — así solo hay
                          # UN consumidor de la cola, nunca esta ventana y main_agenda.py a la vez.
+_CERRAR         = None  # (v4.18.16) cierra la ventana y devuelve lo que se estaba escribiendo
+
+
+def cerrar_para_seguir_en_burbuja():
+    """(v4.18.16, petición de Víctor) Cuando el otro contesta en la conversación que se está
+    viendo, la conversación sigue en la burbuja flotante: se cierra esta ventana y se devuelve
+    el texto que hubiera a medio escribir, para no perderlo. Devuelve None si no estaba abierta."""
+    if _CERRAR is None:
+        return None
+    try:
+        return _CERRAR()
+    except Exception:  # noqa: BLE001
+        logging.getLogger("chat").exception("No se pudo cerrar la ventana del chat")
+        return None
 
 
 def _ventana_chat(ctx):
-    global _VENTANA_ACTUAL, _HANDLER
+    global _VENTANA_ACTUAL, _HANDLER, _CERRAR
     if _VENTANA_ACTUAL is not None and _VENTANA_ACTUAL.winfo_exists():
         _VENTANA_ACTUAL.lift()
         _VENTANA_ACTUAL.focus_force()
@@ -446,12 +460,19 @@ def _ventana_chat(ctx):
     _cargar_historial("general", None)
 
     def _on_cerrar():
-        global _VENTANA_ACTUAL, _CANAL_VISIBLE, _HANDLER
+        global _VENTANA_ACTUAL, _CANAL_VISIBLE, _HANDLER, _CERRAR
         _VENTANA_ACTUAL = None
         _CANAL_VISIBLE = None
         _HANDLER = None
+        _CERRAR = None
         win.destroy()
     win.protocol("WM_DELETE_WINDOW", _on_cerrar)
+
+    def _cerrar_devolviendo_borrador():
+        borrador = entry_msg.get() if entry_msg.winfo_exists() else ""
+        _on_cerrar()
+        return borrador
+    _CERRAR = _cerrar_devolviendo_borrador
 
     # Arrastrar archivos desde el Explorador sobre la ventana (v4.18.00).
     # Si no se puede activar (no es Windows, error de la API) queda el botón 📎 y Ctrl+V.

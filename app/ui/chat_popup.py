@@ -24,10 +24,12 @@ decide main_agenda.py, no este módulo — aquí solo se expone
 mostrar_popup_chat() para que lo invoque cuando corresponda.
 """
 
+import os
+import tempfile
 import threading
 import logging
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 from datetime import datetime, date
 
 from services.chat_client import get_chat_client, EVT_NUEVO_MENSAJE
@@ -99,9 +101,11 @@ def procesar_evento(ev):
         info["pintar"](m)
 
 
-def mostrar_popup_chat(ctx, canal_id, titulo, mensaje_inicial=None):
+def mostrar_popup_chat(ctx, canal_id, titulo, mensaje_inicial=None, borrador=""):
     """Abre una burbuja nueva para `canal_id`, o si ya existe la trae al
-    frente — y en ambos casos pinta `mensaje_inicial` si se da uno."""
+    frente — y en ambos casos pinta `mensaje_inicial` si se da uno.
+    `borrador` (v4.18.16): texto a medio escribir en la ventana grande, que
+    se cerró para seguir la conversación aquí."""
     cliente = get_chat_client()
 
     if canal_id in _POPUPS and _POPUPS[canal_id]["win"].winfo_exists():
@@ -166,6 +170,8 @@ def mostrar_popup_chat(ctx, canal_id, titulo, mensaje_inicial=None):
                       insertbackground="white", bd=0,
                       font=("Segoe UI", 9))
     entry.pack(side="left", fill="x", expand=True, ipady=5, padx=(0, 4))
+    if borrador:
+        entry.insert(0, borrador)
 
     def _click_adjunto(url, nombre_archivo):
         def _hilo():
@@ -229,27 +235,99 @@ def mostrar_popup_chat(ctx, canal_id, titulo, mensaje_inicial=None):
 
     entry.bind("<Return>", _enviar)
 
-    def _adjuntar():
-        ruta = filedialog.askopenfilename(
-            parent=win,
-            title="Elegir imagen o documento",
-            filetypes=[
-                ("Imágenes y documentos", "*.png *.jpg *.jpeg *.gif *.bmp *.webp "
-                                           "*.pdf *.doc *.docx *.xls *.xlsx"),
-                ("Todos los archivos", "*.*"),
-            ],
-        )
-        if not ruta:
-            return
+    def _dialogo(fn, *args, **kw):
+        """Los avisos y preguntas, por encima de la burbuja (que está siempre encima)."""
+        win.attributes("-topmost", False)
+        try:
+            return fn(*args, parent=win, **kw)
+        finally:
+            if win.winfo_exists():
+                win.attributes("-topmost", True)
+                _forzar_foco()
 
-        def _hilo():
-            resultado = cliente.enviar_archivo(ruta, canal_id=canal_id)
-            if resultado.get("ok"):
-                win.after(0, lambda: _pintar(resultado["mensaje"], propio=True))
-            # Si falla, no hay barra de estado en la burbuja donde avisar —
-            # el mensaje simplemente no aparece; para ver el motivo exacto,
-            # abrir la ventana completa (botón ⤢) y reintentar desde ahí.
-        threading.Thread(target=_hilo, daemon=True, name="ChatPopup-EnviarArchivo").start()
+    def _enviar_rutas(rutas):
+        for ruta in rutas:
+            def _hilo(ruta=ruta):
+                resultado = cliente.enviar_archivo(ruta, canal_id=canal_id)
+                if "captura_chat_" in ruta and ruta.startswith(tempfile.gettempdir()):
+                    try:
+                        os.remove(ruta)       # temporal de una captura pegada
+                    except OSError:
+                        pass
+                if not win.winfo_exists():
+                    return
+                if resultado.get("ok"):
+                    win.after(0, lambda r=resultado: _pintar(r["mensaje"], propio=True))
+                else:
+                    error = resultado.get("error", "No se pudo enviar el archivo")
+                    win.after(0, lambda e=error: _dialogo(messagebox.showwarning, "Chat", f"{os.path.basename(ruta)}: {e}"))
+            threading.Thread(target=_hilo, daemon=True, name="ChatPopup-EnviarArchivo").start()
+
+    def _confirmar_y_enviar(rutas, etiquetas=None):
+        """(v4.18.16) Arrastrar y soltar y Ctrl+V, como en la ventana grande: se pregunta
+        antes de enviar, porque un archivo soltado por error no se puede deshacer."""
+        rutas = [r for r in rutas if os.path.isfile(r)]
+        if not rutas:
+            _dialogo(messagebox.showwarning, "Chat", "Solo se pueden enviar archivos, no carpetas.")
+            return
+        if len(rutas) > 5:
+            _dialogo(messagebox.showwarning, "Chat", "Se pueden enviar como máximo 5 archivos a la vez.")
+            return
+        nombres = etiquetas or [os.path.basename(r) for r in rutas]
+        lista = "\n".join(f"  • {n}" for n in nombres)
+        if _dialogo(messagebox.askyesno, "Chat", f"¿Enviar a «{titulo}»?\n\n{lista}"):
+            _enviar_rutas(rutas)
+        else:
+            for r in rutas:
+                if r.startswith(tempfile.gettempdir()) and "captura_chat_" in r:
+                    try:
+                        os.remove(r)
+                    except OSError:
+                        pass
+
+    def _pegar(event=None):
+        """Ctrl+V: una captura de pantalla o archivos copiados se ofrecen para enviar;
+        el texto se pega como siempre (igual que en la ventana grande)."""
+        try:
+            from PIL import ImageGrab
+            contenido = ImageGrab.grabclipboard()
+        except Exception:
+            return None
+        if contenido is None:
+            return None
+        if isinstance(contenido, (list, tuple)):
+            _confirmar_y_enviar([str(r) for r in contenido])
+            return "break"
+        try:
+            nombre = "captura_chat_" + datetime.now().strftime("%Y%m%d_%H%M%S") + ".png"
+            ruta = os.path.join(tempfile.gettempdir(), nombre)
+            contenido.save(ruta, format="PNG")
+            _confirmar_y_enviar([ruta], etiquetas=["Imagen del portapapeles"])
+            return "break"
+        except Exception as exc:
+            logging.getLogger("chat").warning("No se pudo pegar la imagen del portapapeles: %s", exc)
+            return None
+
+    entry.bind("<Control-v>", _pegar)
+    entry.bind("<Control-V>", _pegar)
+
+    def _adjuntar():
+        win.attributes("-topmost", False)
+        try:
+            ruta = filedialog.askopenfilename(
+                parent=win,
+                title="Elegir imagen o documento",
+                filetypes=[
+                    ("Imágenes y documentos", "*.png *.jpg *.jpeg *.gif *.bmp *.webp "
+                                               "*.pdf *.doc *.docx *.xls *.xlsx"),
+                    ("Todos los archivos", "*.*"),
+                ],
+            )
+        finally:
+            if win.winfo_exists():
+                win.attributes("-topmost", True)
+        if ruta:
+            _enviar_rutas([ruta])
 
     tk.Button(frm_envio, text="📎", bg=_COLOR_ENTRY, fg="white", bd=0,
               activebackground="#33415a", activeforeground="white",
@@ -276,6 +354,15 @@ def mostrar_popup_chat(ctx, canal_id, titulo, mensaje_inicial=None):
 
     _POPUPS[canal_id] = {"win": win, "pintar": _pintar}
     win.protocol("WM_DELETE_WINDOW", _cerrar)
+
+    # Arrastrar archivos desde el Explorador sobre la burbuja (v4.18.16), como en la ventana
+    # grande y con el mismo interruptor: "chat_arrastrar_soltar": false en config.json.
+    try:
+        if ctx.config.get("chat_arrastrar_soltar", True):
+            from ui.dnd_windows import hook_dropfiles
+            hook_dropfiles(win, _confirmar_y_enviar)
+    except Exception as exc:
+        logging.getLogger("chat").warning("Arrastrar y soltar no disponible en la burbuja: %s", exc)
 
     # ── Historial reciente (últimos mensajes), en segundo plano ─────────
     def _cargar():

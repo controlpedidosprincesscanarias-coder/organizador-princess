@@ -89,7 +89,7 @@ NOMBRE_USUARIO_ACTUAL = get_nombre_usuario()
 
 GOLD  = "#C9A84C"
 LIGHT = "#D8E8F0"
-APP_VERSION  = "v4.18.14"   # ← actualizar en cada release (debe coincidir con el tag del release en GitHub)
+APP_VERSION  = "v4.18.16"   # ← actualizar en cada release (debe coincidir con el tag del release en GitHub)
 GITHUB_REPO  = "controlpedidosprincesscanarias-coder/organizador-princess"  # repo de releases
 _update_mod.APP_VERSION = APP_VERSION  # propagar a services/update_service.py
 _update_mod.GITHUB_REPO = GITHUB_REPO
@@ -1088,10 +1088,14 @@ def poll_chat():
                     # en ese canal, o ya hay una burbuja abierta para él), el
                     # mensaje ya es visible ahí mismo — no hace falta nada más
                     # que el sonido, para no duplicar avisos sobre lo mismo.
-                    ya_visible = (
-                        _ventana_chat_mod._CANAL_VISIBLE == canal_id
-                        or canal_id in _chat_popup_mod._POPUPS
-                    )
+                    # (v4.18.16, petición de Víctor) Si es la conversación que se ve en la
+                    # ventana grande, esa ventana se cierra y la conversación sigue en la
+                    # burbuja, con lo que se estuviera escribiendo.
+                    borrador = None
+                    if (_ventana_chat_mod._CANAL_VISIBLE == canal_id
+                            and canal_id not in _chat_popup_mod._POPUPS):
+                        borrador = _ventana_chat_mod.cerrar_para_seguir_en_burbuja()
+                    ya_visible = canal_id in _chat_popup_mod._POPUPS
                     if not ya_visible:
                         nombre_remitente = _chat_cliente.nombre_de(remitente)
                         if canal_id == "general":
@@ -1100,7 +1104,8 @@ def poll_chat():
                             titulo = f"{nombre_remitente}  (grupo)"
                         else:
                             titulo = nombre_remitente
-                        _chat_popup_mod.mostrar_popup_chat(ctx, canal_id, titulo, mensaje_inicial=m)
+                        _chat_popup_mod.mostrar_popup_chat(ctx, canal_id, titulo, mensaje_inicial=m,
+                                                           borrador=borrador or "")
     except Exception:
         pass  # queue.Empty — nada pendiente
     app.after(700, poll_chat)

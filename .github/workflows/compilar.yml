@@ -87,6 +87,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit 1 }
           python test_actualizacion.py
           if ($LASTEXITCODE -ne 0) { exit 1 }
+          python test_emoticonos.py
+          if ($LASTEXITCODE -ne 0) { exit 1 }
 
       - name: Compilar con PyInstaller
         shell: pwsh

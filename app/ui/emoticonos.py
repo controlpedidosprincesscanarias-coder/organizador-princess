@@ -10,6 +10,7 @@ Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de
 Los emoticonos son texto normal: viajan dentro del mensaje, el servidor del chat no cambia y
 se ven también en las versiones anteriores del Organizador.
 """
+import os
 import tkinter as tk
 
 # Sin el selector de variante U+FE0F (❤️ → ❤): Tk lo pintaría como un recuadro.
@@ -20,6 +21,35 @@ EMOTICONOS = [
     "📦", "🚚", "📄", "📅", "⏰", "⚠", "❌", "✔",
 ]
 RESPUESTAS = ["👍 Ok", "👌 Perfecto", "👍 Me gusta", "🙏 Gracias", "✅ Hecho", "👀 Lo miro", "⏰ Ahora voy", "📞 Te llamo"]
+
+_CARPETA_COLOR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "emoticonos_color")
+_IMAGENES = {}   # caché: Tk necesita que las PhotoImage sigan vivas mientras se ven
+
+
+def nombre_imagen(emoji, sufijo=""):
+    """Nombre del PNG en color de un emoticono: sus códigos Unicode en hexadecimal (1f44d.png)."""
+    return "-".join(f"{ord(c):x}" for c in emoji if ord(c) != 0xFE0F) + sufijo + ".png"
+
+
+def conocidos():
+    """Emoticonos con imagen en color, del más largo al más corto (para buscarlos en un texto)."""
+    todos = set(EMOTICONOS) | {r.split(" ", 1)[0] for r in RESPUESTAS}
+    return sorted(todos, key=len, reverse=True)
+
+
+def imagen(emoji, pequena=False):
+    """(v4.18.22) Imagen en color del emoticono, o None si no está (se usa entonces el texto).
+    Tkinter en Windows dibuja los emoticonos de un solo color; estas imágenes se generan con
+    compilacion/generar_emoticonos.py a partir de la fuente libre Noto Color Emoji."""
+    clave = (emoji, pequena)
+    if clave not in _IMAGENES:
+        ruta = os.path.join(_CARPETA_COLOR, nombre_imagen(emoji, "_p" if pequena else ""))
+        try:
+            _IMAGENES[clave] = tk.PhotoImage(file=ruta) if os.path.exists(ruta) else None
+        except tk.TclError:
+            _IMAGENES[clave] = None
+    return _IMAGENES[clave]
+
 
 _COLUMNAS = 8
 _FONDO, _BOTON, _BOTON_ACTIVO, _TEXTO = "#1b2735", "#25313f", "#33415a", "#e8edf2"
@@ -78,8 +108,13 @@ def abrir_panel(boton, entry, encima=False):
     rejilla = tk.Frame(pan, bg=_FONDO)
     rejilla.pack(padx=6, pady=(6, 2))
     for i, e in enumerate(EMOTICONOS):
-        b = tk.Label(rejilla, text=e, font=_FUENTE_EMOJI, bg=_BOTON, fg=_TEXTO, width=2, cursor="hand2")
+        img = imagen(e)
+        if img is not None:   # en color
+            b = tk.Label(rejilla, image=img, bg=_BOTON, cursor="hand2", width=36, height=34)
+        else:
+            b = tk.Label(rejilla, text=e, font=_FUENTE_EMOJI, bg=_BOTON, fg=_TEXTO, width=2, cursor="hand2")
         b.grid(row=i // _COLUMNAS, column=i % _COLUMNAS, padx=1, pady=1, ipadx=2)
+        b.emoticono = e   # lo que añade (para las pruebas de uso)
         b.bind("<Button-1>", lambda ev, e=e: elegir(e, ev))
         b.bind("<Enter>", lambda ev, b=b: b.configure(bg=_BOTON_ACTIVO))
         b.bind("<Leave>", lambda ev, b=b: b.configure(bg=_BOTON))
@@ -88,8 +123,15 @@ def abrir_panel(boton, entry, encima=False):
     rapidas = tk.Frame(pan, bg=_FONDO)
     rapidas.pack(padx=6, pady=(2, 6), fill="x")
     for i, r in enumerate(RESPUESTAS):
-        b = tk.Label(rapidas, text=r, font=_FUENTE_TEXTO, bg=_BOTON, fg=_TEXTO, cursor="hand2", padx=6, pady=3)
+        emo, texto = r.split(" ", 1)
+        img = imagen(emo, pequena=True)
+        if img is not None:   # emoticono en color + texto
+            b = tk.Label(rapidas, image=img, text=" " + texto, compound="left", font=_FUENTE_TEXTO,
+                         bg=_BOTON, fg=_TEXTO, cursor="hand2", padx=6, pady=3)
+        else:
+            b = tk.Label(rapidas, text=r, font=_FUENTE_TEXTO, bg=_BOTON, fg=_TEXTO, cursor="hand2", padx=6, pady=3)
         b.grid(row=i // 4, column=i % 4, padx=1, pady=1, sticky="ew")
+        b.emoticono = r
         b.bind("<Button-1>", lambda ev, r=r: elegir(r, ev))
         b.bind("<Enter>", lambda ev, b=b: b.configure(bg=_BOTON_ACTIVO))
         b.bind("<Leave>", lambda ev, b=b: b.configure(bg=_BOTON))

@@ -1,7 +1,7 @@
 // Manual de administrador del Organizador Princess. Idea y desarrollo de la aplicación: Víctor Alejandro Martín Andrade.
 const L = require("./lib");
 const { p, vineta, pasos, h1, h2, imagen, leyenda, recuadro, tabla, portada, indice } = L;
-const V = process.env.VERSION || "v4.18.20";
+const V = process.env.VERSION || "v4.18.22";
 
 const s = [];
 s.push(portada({ rol: "Administración", subtitulo: "Configura los botones y la vista del menú, el usuario y las copias, e instala y publica versiones",
@@ -127,7 +127,7 @@ s.push(...pasos(["Sube el número en **APP_VERSION** (main_agenda.py) y en **MyA
   "Cuando quieras que se actualicen todos, abre el borrador y pulsa **Publish release**.",
   "Los equipos la detectan al arrancar o en unas 2 horas como máximo. Con **Actualizar ahora** (desde la 4.18.20) se descarga, se comprueba el hash, se instala en silencio y el Organizador se vuelve a abrir solo; solo hay que aceptar el permiso de Windows."]));
 s.push(p("Si compilas a mano (compilar.bat e Inno Setup), crea tú la release con la etiqueta v<versión>, el instalador y su .sha256, que se obtiene con este comando de PowerShell:"));
-s.push(p("(Get-FileHash .\\OrganizadorPrincess_Setup_4.18.20.exe -Algorithm SHA256).Hash.ToLower() + \"  OrganizadorPrincess_Setup_4.18.20.exe\" | Out-File -Encoding ascii OrganizadorPrincess_Setup_4.18.20.exe.sha256", { color: "374151" }));
+s.push(p("(Get-FileHash .\\OrganizadorPrincess_Setup_4.18.22.exe -Algorithm SHA256).Hash.ToLower() + \"  OrganizadorPrincess_Setup_4.18.22.exe\" | Out-File -Encoding ascii OrganizadorPrincess_Setup_4.18.22.exe.sha256", { color: "374151" }));
 s.push(...recuadro("importante", "Sube siempre el .sha256", ["Sin él, los equipos pueden descargar igualmente pero verán «Esta versión no publica hash: integridad sin verificar»."]));
 
 // 9

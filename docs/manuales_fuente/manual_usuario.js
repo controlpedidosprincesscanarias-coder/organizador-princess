@@ -1,7 +1,7 @@
 // Manual de usuario del Organizador Princess. Idea y desarrollo de la aplicación: Víctor Alejandro Martín Andrade.
 const L = require("./lib");
 const { p, vineta, pasos, h1, h2, imagen, leyenda, recuadro, tabla, portada, indice } = L;
-const V = process.env.VERSION || "v4.18.20";
+const V = process.env.VERSION || "v4.18.22";
 
 const s = [];
 s.push(portada({ rol: "Uso diario", subtitulo: "Abre tus accesos, apunta avisos, consulta el calendario y chatea con tus compañeros",
@@ -140,7 +140,7 @@ s.push(h2("Emoticonos y respuestas rápidas"));
 s.push(...imagen("u_chat_emoticonos", 8, "Panel de emoticonos."));
 s.push(...leyenda([[1, "**Emoticonos**: un clic añade el emoticono a lo que estás escribiendo y cierra el panel. Con **Mayús + clic** el panel se queda abierto para poner varios."],
   [2, "**Respuestas rápidas** («👍 Ok», «👌 Perfecto», «🙏 Gracias», «✅ Hecho»…): se añaden igual; luego pulsa Enviar. **Esc** o hacer clic fuera cierran el panel."]]));
-s.push(p("El botón 😊 está también en la burbuja flotante. Los emoticonos son texto normal: los ven todos los compañeros, aunque tengan una versión anterior del Organizador."));
+s.push(p("El botón 😊 está también en la burbuja flotante. Los emoticonos se ven en color en el panel y en los mensajes. Viajan como texto normal: los ven todos los compañeros, también en el móvil o con una versión anterior del Organizador (en ese caso, de un solo color)."));
 s.push(h2("Nueva conversación"));
 s.push(...imagen("u_chat_nueva", 9, "Elegir compañeros."));
 s.push(...leyenda([[1, "Elige a quién quieres escribir. **Un compañero** → chat privado. **Dos o más** (con Ctrl) → se crea un grupo y te pide un nombre para él."], [2, "**Abrir chat** para empezar."]]));

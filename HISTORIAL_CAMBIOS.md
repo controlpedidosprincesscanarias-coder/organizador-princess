@@ -51,6 +51,18 @@
 
 ---
 
+## 2026-11-09 07:23 — [Control Pedidos] Migración de expediente_exceso que podía cortar todas las demás; arranque medido (v12.34.14)
+
+- **Origen**: log de arranque en Render tras v12.34.12 (commit 3edc96f).
+  - Arranque: 12,9 s en total, 8,5 s de migraciones. Antes eran ~49 s y 43,4 s, por el bucle retirado en v12.34.06. Confirmado; anotado en CLAUDE.md.
+- **Error corregido** (`core/migraciones.py`, commit propio): la creación de `expediente_exceso` tenía un `try/except` de depuración de v12.29.35.
+  - Registraba «CREATE TABLE ejecutado» en cada arranque, aunque es `IF NOT EXISTS` y la tabla ya existía.
+  - Si fallaba, hacía `raise` y se saltaban los ~70 pasos siguientes: era el único paso que no seguía la regla de v12.33.60.
+  - Ahora es el paso 55b con `_aviso_paso`. Sin cambios de datos.
+- `tests/test_migraciones.py`: inyecta también un fallo en ese paso. Con el código anterior la migración se cortaba; ahora pasa. La huella de la app no cambia.
+
+---
+
 ## 2026-11-09 06:26 — [Chat] Revisión: mensajes duplicados, lista de conversaciones en una consulta y código ordenado (v1.2.4)
 
 - **Petición** (Víctor): revisar y ordenar la aplicación del chat (repo `control-pedidos-chat`).

@@ -1,3 +1,14 @@
+# ✨ Organizador Princess v4.18.18
+
+> Incluye también todo lo de la 4.18.16, la 4.18.14 y la 4.18.12, que no llegaron a publicarse.
+
+## 😊 Emoticonos en el chat
+
+- Botón **😊** en la ventana del chat y en la burbuja. Abre un panel con **emoticonos** (👍 👌 ✅ 🙏 😊 😂…) y **respuestas rápidas** («👍 Ok», «👌 Perfecto», «👍 Me gusta», «🙏 Gracias», «✅ Hecho»…). Un clic lo añade a lo que estás escribiendo; con Mayús + clic el panel se queda abierto para poner varios.
+- Los emoticonos son texto normal: los ven todos, aunque tengan una versión anterior.
+
+---
+
 # ✨ Organizador Princess v4.18.16
 
 > Incluye también todo lo de la 4.18.14 y la 4.18.12, que no llegaron a publicarse.

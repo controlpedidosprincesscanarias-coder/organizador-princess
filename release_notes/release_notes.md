@@ -1,3 +1,18 @@
+# ✨ Organizador Princess v4.18.12
+
+## 📘 Manuales nuevos
+
+- El **Manual de usuario** (el que abre el botón «Manual») y el **Manual de administrador** están renovados, con el mismo estilo que los de Control de Pedidos: capturas reales de todas las pantallas con números de referencia, índice, recuadros de consejos y tablas de consulta rápida.
+
+## 🛠 Correcciones
+
+- **Calendario:** el mes o la semana que se está viendo sale ahora entre las flechas ◀ ▶. Antes quedaba a la izquierda del calendario y le quitaba sitio: en la vista Semana no se veía el domingo.
+- **Calendario:** al pasar de «Mes» a «Semana» se abre la semana de hoy (o la del día elegido), no la del día 1 del mes.
+- **Agenda:** los avisos semanales decían «Luness», «Martess»…; ahora «Lunes», «Martes»… Y los de cada 30 minutos con una hora a partir de y media mostraban minutos imposibles (por ejemplo «:45 / :75»).
+- **Admin:** la ventana de subopciones mostraba una versión antigua («v4.4.3B») y los botones sin definir salían como «19 · 19. POR DEFINIR».
+
+---
+
 # ✨ Organizador Princess v4.18.10
 
 > Incluye también todo lo de la 4.18.06 y la 4.18.08, que no llegaron a publicarse.

@@ -250,8 +250,13 @@ def abrir_calendario(ctx):
 
 
     # ── Área y label creados antes de las funciones que los usan ─────────────
+    # (v4.18.12) La cabecera se crea antes que el título del periodo para que este sea hijo
+    # suyo y quede entre ◀ y ▶. Antes era hijo de frm_cal y se colocaba a la izquierda del
+    # calendario, quitándole ancho (en la vista Semana no se veía el domingo).
+    top = ttk.Frame(frm_cal, padding=(16, 12, 16, 6))
+    top.pack(fill="x")
     cal_frame   = ttk.Frame(frm_cal, padding=(10, 8, 10, 8))
-    lbl_periodo = ttk.Label(frm_cal, text="", font=("Segoe UI", 13, "bold"))
+    lbl_periodo = ttk.Label(top, text="", font=("Segoe UI", 13, "bold"))
 
     def renderizar():
         for w in cal_frame.winfo_children():
@@ -273,9 +278,7 @@ def abrir_calendario(ctx):
             nav_fecha[0] = d + timedelta(weeks=delta)
         renderizar()
 
-    # ── Cabecera de navegación ────────────────────────────
-    top = ttk.Frame(frm_cal, padding=(16, 12, 16, 6))
-    top.pack(fill="x")
+    # ── Cabecera de navegación (el marco «top» se crea más arriba) ──
 
     ttk.Button(top, text="◀", width=3, bootstyle="secondary-outline",
                command=lambda: _navegar(-1)).pack(side="left")
@@ -290,9 +293,19 @@ def abrir_calendario(ctx):
     ttk.Radiobutton(frm_toggle, text="  Mes  ", variable=vista_var, value="mes",
                     bootstyle="toolbutton-info",
                     command=renderizar).pack(side="left")
+    def _a_semana():
+        # (v4.18.12) Al pasar de Mes a Semana se abre la semana del día elegido o la de hoy
+        # si está en el mes que se veía; antes salía siempre la semana del día 1.
+        d = nav_fecha[0]
+        for candidato in (dia_sel[0], hoy):
+            if candidato and (candidato.year, candidato.month) == (d.year, d.month):
+                nav_fecha[0] = candidato
+                break
+        renderizar()
+
     ttk.Radiobutton(frm_toggle, text=" Semana ", variable=vista_var, value="semana",
                     bootstyle="toolbutton-info",
-                    command=renderizar).pack(side="left")
+                    command=_a_semana).pack(side="left")
 
     ttk.Button(top, text="  🏖  Vacaciones  ", bootstyle="warning-outline",
                command=lambda: _ventana_vacaciones(ctx)).pack(side="right")

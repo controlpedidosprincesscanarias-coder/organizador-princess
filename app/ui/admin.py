@@ -403,6 +403,13 @@ def _ventana_login_admin(ctx, on_success):
     dlg.wait_window()
 
 
+def _nombre_sin_numero(ctx, opcion, idx):
+    """Nombre del botón para las listas de Admin, que ya ponen el número delante
+    (v4.18.12: antes salía «19 · 19. POR DEFINIR»)."""
+    nombre = get_nombre(ctx, opcion, idx)
+    return "POR DEFINIR" if nombre == f"{idx}. POR DEFINIR" else nombre
+
+
 def _ventana_vista_menu(ctx, parent):
     """Ventana de Admin para elegir vista extendida/reducida y qué botones azules
     se ven en la reducida. Al guardar se aplica al momento."""
@@ -466,7 +473,7 @@ def _ventana_vista_menu(ctx, parent):
 
     por_columna = (NUM_OPCIONES + 2) // 3
     for i in range(1, NUM_OPCIONES + 1):
-        nombre = get_nombre(ctx, f"opcion_{i:02d}", i)
+        nombre = _nombre_sin_numero(ctx, f"opcion_{i:02d}", i)
         if len(nombre) > 30:
             nombre = nombre[:29] + "…"
         vars_sel[i] = tk.BooleanVar(value=(i in sel_ini))
@@ -909,7 +916,7 @@ def abrir_admin(ctx):
 
         for i in range(1, NUM_OPCIONES + 1):
             opcion = f"opcion_{i:02d}"
-            nombre = get_nombre(ctx, opcion, i)
+            nombre = _nombre_sin_numero(ctx, opcion, i)
             r = (i - 1) // COLS
             c = (i - 1) % COLS
             grid.rowconfigure(r, weight=1)

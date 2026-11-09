@@ -101,7 +101,7 @@ def _descripcion_aviso(aviso):
         return f"🕐 {fecha_ui}  {hora}{ant_badge}   —   {aviso['titulo']}"
     if rep == "cada_30min":
         mm = hora.split(":")[1]
-        return f"🕐 :{mm} / :{int(mm)+30:02d} cada hora   —   {aviso['titulo']}"
+        return f"🕐 :{mm} / :{(int(mm) + 30) % 60:02d} cada hora   —   {aviso['titulo']}"
     if rep == "cada_hora":
         mm = hora.split(":")[1]
         return f"🕐 :{mm} de cada hora   —   {aviso['titulo']}"
@@ -110,10 +110,11 @@ def _descripcion_aviso(aviso):
     if rep == "semanal":
         try:
             dow = datetime.strptime(aviso["fecha"], "%Y-%m-%d").weekday()
-            dia = _DIAS_ES[dow]
+            # (v4.18.12) «Lunes» a «Viernes» no cambian en plural: antes salía «Luness»
+            dia = _DIAS_ES[dow] + ("s" if dow >= 5 else "")
         except Exception:
             dia = "?"
-        return f"🕐 {dia}s  {hora}{ant_badge}   —   {aviso['titulo']}"
+        return f"🕐 {dia}  {hora}{ant_badge}   —   {aviso['titulo']}"
     if rep == "mensual":
         try:
             dia = datetime.strptime(aviso["fecha"], "%Y-%m-%d").day

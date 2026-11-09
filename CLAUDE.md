@@ -19,7 +19,7 @@ Aplicación de escritorio para Windows 10/11 de la Central de Compras Princess C
 - `app/ui/` — ventanas (chat, configuración, festivos, vacaciones, saludo…); `dnd_windows.py` (arrastrar y soltar en el chat, desactivable con `"chat_arrastrar_soltar": false` en `config.json`).
 - `app/db/` — `sqlite.py` y `dpapi.py` (cifrado con la API de Windows).
 - `release_notes/` — `release_notes.md` (todas las versiones) y `release_notes_actual.txt` (la actual; la muestra el instalador).
-- `docs/` y `Manual_Usuario_OrganizadorPrincess.pdf` — manuales (el PDF de la raíz es el que abre el botón «Manual»).
+- `docs/` y `Manual_Usuario_OrganizadorPrincess.pdf` — manuales (el PDF de la raíz es el que abre el botón «Manual»). Se regeneran con `docs/manuales_fuente/` (v4.18.12): capturas reales del Organizador en Linux con datos inventados y sin red (`capturas.sh`), y maquetación con `docx` de Node en el estilo de los manuales de Control Pedidos (`generar.sh usuario|admin`); ver su README. Si un cambio altera una pantalla que sale en un manual, avisar de que conviene regenerarlo.
 
 ## Actualización automática — LO MÁS DELICADO
 Todos los equipos se actualizan solos desde las **Releases de este repositorio**:

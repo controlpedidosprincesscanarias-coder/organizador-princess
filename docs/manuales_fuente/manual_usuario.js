@@ -1,7 +1,7 @@
 // Manual de usuario del Organizador Princess. Idea y desarrollo de la aplicación: Víctor Alejandro Martín Andrade.
 const L = require("./lib");
 const { p, vineta, pasos, h1, h2, imagen, leyenda, recuadro, tabla, portada, indice } = L;
-const V = process.env.VERSION || "v4.18.18";
+const V = process.env.VERSION || "v4.18.20";
 
 const s = [];
 s.push(portada({ rol: "Uso diario", subtitulo: "Abre tus accesos, apunta avisos, consulta el calendario y chatea con tus compañeros",
@@ -160,12 +160,13 @@ s.push(...recuadro("consejo", "La conversación sigue en la burbuja", ["Si tiene
 s.push(h1("8. Actualizar la aplicación"));
 s.push(p("Al arrancar, y después cada 2 horas aproximadamente, el Organizador comprueba si hay una **versión nueva** publicada. Si la hay, se abre la ventana «Actualización disponible»."));
 s.push(...imagen("u_actualizacion", 11, "Actualización disponible (ejemplo)."));
-s.push(...leyenda([[1, "**Novedades** de la versión nueva."], [2, "**Descargar actualización**: descarga el instalador (te pregunta dónde guardarlo; por defecto, Descargas)."], [3, "**Recordar después**, si prefieres hacerlo más tarde."]]));
-s.push(...pasos(["Pulsa **Descargar actualización** y espera a que termine. El Organizador comprueba que el archivo está completo (SHA-256); si no coincide, lo borra y te pide reintentar.",
-  "Abre el instalador descargado y sigue los pasos. El propio instalador cierra el Organizador antes de instalar.",
-  "Vuelve a abrir el Organizador."]));
+s.push(...leyenda([[1, "**Novedades** de la versión nueva."], [2, "**Actualizar ahora**: lo hace todo solo (pasos siguientes)."], [3, "**Recordar después**, si prefieres hacerlo más tarde."]]));
+s.push(...pasos(["Pulsa **Actualizar ahora**. El Organizador descarga la versión nueva y comprueba que el archivo es el publicado (SHA-256); si no coincide, lo borra y te pide reintentar.",
+  "Windows pregunta si permites que el instalador haga cambios: contesta **Sí**.",
+  "El Organizador se cierra, se instala la versión nueva (solo verás una barra de progreso) y **vuelve a abrirse solo**, con un mensaje «Organizador actualizado». Tu configuración y tu agenda se mantienen."]));
+s.push(...recuadro("nota", "Si algo no va", ["Si contestas **No** a la pregunta de Windows, la ventana ofrece **Instalar** para volver a intentarlo y **Abrir carpeta** para ver el instalador descargado y abrirlo a mano."]));
 s.push(h2("Nueva versión detectada"));
-s.push(p("La primera vez que abres una versión nueva aparece esta ventana, que pregunta cómo continuar:"));
+s.push(p("Si la versión nueva se instaló con **Actualizar ahora**, no aparece nada más: se mantienen tu configuración y tu agenda. Si el instalador se abrió a mano, la primera vez que abres la versión nueva aparece esta ventana, que pregunta cómo continuar:"));
 s.push(...imagen("u_nueva_version", 10, "Nueva versión detectada."));
 s.push(...leyenda([[1, "**Solo actualizar versión**: mantiene tu configuración y tu agenda. Es la opción normal."],
   [2, "**Instalación desde cero**: borra la configuración y la agenda."], [3, "Con «desde cero», puedes hacer antes una **copia de seguridad** de la agenda (vacaciones y festivos incluidos) en la carpeta que elijas."],

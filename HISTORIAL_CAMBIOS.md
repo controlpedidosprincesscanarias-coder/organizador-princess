@@ -51,6 +51,26 @@
 
 ---
 
+## 2026-11-09 07:40 — [Control Pedidos] Rol hotel probado en producción; solo registra entregas en pedidos enviados (v12.34.16)
+
+- **Prueba en producción** con «usuario prueba» en rol hotel, v12.34.14, sin modificar datos: **26 de 26**.
+  - **API**:
+    - solo ve el hotel PR (4 pedidos, todos cancelados);
+    - crear o eliminar pedidos y cambiarlos a ENVIADO, cotización o firma → 403, y el pedido no cambia;
+    - usuarios, configuración de alertas y avisos, seguimiento, silencio total, techo, cola de correos y eliminados → 401/403.
+  - **Interfaz**:
+    - menú con Dashboard, Pedidos, Buscar artículo, Alertas y Proveedores, y el resto bloqueado;
+    - sin «Nuevo pedido»; en la ficha, solo ENTREGA PARCIAL y ENTREGADO;
+    - sin errores de JS ni 5xx.
+  - **Excel de faltantes**, por la API y desde el botón: se descarga.
+- **Encontrado y corregido** (decisión de Víctor, commit propio): la rama de hotel de `update_pedido()` solo miraba el estado de destino.
+  - Un pedido CANCELADO, DENEGADO, en cotización o pendiente de firma se podía pasar a ENTREGADO o ENTREGA PARCIAL, o anotarle albaranes, sin validaciones.
+  - Ahora `ESTADOS_ORIGEN_HOTEL` (ENVIADO AL PROVEEDOR, ENTREGA PARCIAL, ENTREGADO): fuera de ellos, 403 y la ficha en solo lectura. Se sigue pudiendo corregir ENTREGADO → ENTREGA PARCIAL.
+- **Pruebas**: `test_flujo.py`, 86 comprobaciones; las 5 nuevas fallan con el código anterior, que convertía en ENTREGADO un pedido en cotización y otro cancelado. `e2e_navegador.py`, 57 pasos. Huellas, idénticas.
+- `PENDIENTES.md`: cerrada la prueba del rol hotel. Queda la limpieza de los pedidos de prueba de PR (1107–1109, 1198–1201). El manual de hotel ya decía que las entregas se registran en pedidos enviados: no cambia.
+
+---
+
 ## 2026-11-09 07:23 — [Control Pedidos] Migración de expediente_exceso que podía cortar todas las demás; arranque medido (v12.34.14)
 
 - **Origen**: log de arranque en Render tras v12.34.12 (commit 3edc96f).

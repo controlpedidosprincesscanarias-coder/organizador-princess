@@ -17,6 +17,7 @@ import negocio.alertas as _alertas_mod
 from negocio.alertas import _descripcion_aviso
 from ui.assets import _apply_icon
 from ui.colores import LIGHT
+from ui.selector_fecha_hora import campo_fecha, campo_hora
 from utils.fechas import _iso_a_ui, _ui_a_iso
 
 
@@ -42,15 +43,21 @@ def abrir_agenda(ctx):
         ("anual",      "Anualmente  (mismo día y mes)"),
     ]
 
-    def _aplicar_rep_ui(rep, lbl_hora_var, lbl_fecha):
+    def _aplicar_rep_ui(rep, lbl_hora_var, lbl_fecha, campo_h=None):
         """Ajusta la etiqueta de hora y el color de la etiqueta de fecha
-        según el tipo de repetición elegido. Común a ambas ventanas."""
+        según el tipo de repetición elegido. Común a ambas ventanas.
+        (v4.18.14) En «cada 30 minutos» y «cada hora» solo cuenta el minuto:
+        la rueda de las horas se desactiva."""
         if rep in ("cada_30min", "cada_hora"):
-            lbl_hora_var.set("Minuto de disparo (:MM)  — p.ej. 09:00 → dispara a :00")
+            lbl_hora_var.set("Minuto de disparo (la hora no se usa):")
             lbl_fecha.configure(foreground="gray")
+            if campo_h is not None:
+                campo_h.horas.configure(state="disabled")
         else:
-            lbl_hora_var.set("Hora (HH:MM):")
+            lbl_hora_var.set("Hora:")
             lbl_fecha.configure(foreground="")
+            if campo_h is not None:
+                campo_h.horas.configure(state="normal")
 
     _aw = 860                    # ancho inicial ampliado
     _aw_min = 720                # mínimo para que quepan siempre los botones
@@ -243,19 +250,18 @@ def abrir_agenda(ctx):
                             ).pack(anchor="w", pady=1)
 
         # ── Fecha ─────────────────────────────────────────────
-        lbl_fecha = ttk.Label(body, text="Fecha de inicio (DD-MM-AAAA):",
+        lbl_fecha = ttk.Label(body, text="Fecha de inicio:",
                               font=("Segoe UI", 9))
         lbl_fecha.pack(anchor="w")
         v_fec = StringVar(value=_iso_a_ui(aviso_actual.get("fecha", datetime.now().strftime("%Y-%m-%d"))))
-        entry_fec = ttk.Entry(body, textvariable=v_fec, font=("Segoe UI", 10))
-        entry_fec.pack(fill="x", pady=(3, 12))
+        campo_fecha(body, v_fec)   # (v4.18.14) con calendario 📅
 
         # ── Hora ──────────────────────────────────────────────
-        lbl_hora_var = StringVar(value="Hora (HH:MM):")
+        lbl_hora_var = StringVar(value="Hora:")
         ttk.Label(body, textvariable=lbl_hora_var,
                   font=("Segoe UI", 9)).pack(anchor="w")
         v_hor = StringVar(value=aviso_actual.get("hora", datetime.now().strftime("%H:%M")))
-        ttk.Entry(body, textvariable=v_hor, font=("Segoe UI", 10)).pack(fill="x", pady=(3, 12))
+        campo_h = campo_hora(body, v_hor)   # (v4.18.14) ruedas de horas y minutos, sin escribir «:»
 
         # ── Mensaje ───────────────────────────────────────────
         ttk.Label(body, text="Mensaje (opcional):", font=("Segoe UI", 9)).pack(anchor="w")
@@ -290,7 +296,7 @@ def abrir_agenda(ctx):
 
         # Actualizar etiqueta de hora según repetición
         def _on_rep_change(*_):
-            _aplicar_rep_ui(v_rep.get(), lbl_hora_var, lbl_fecha)
+            _aplicar_rep_ui(v_rep.get(), lbl_hora_var, lbl_fecha, campo_h)
 
         v_rep.trace_add("write", _on_rep_change)
         _on_rep_change()  # Aplicar estado inicial
@@ -301,7 +307,7 @@ def abrir_agenda(ctx):
             try:
                 datetime.strptime(f"{fecha_iso} {v_hor.get()}", "%Y-%m-%d %H:%M")
             except ValueError:
-                var_err.set("⚠ Formato incorrecto. Use DD-MM-AAAA y HH:MM.")
+                var_err.set("⚠ Revisa la fecha (DD-MM-AAAA o el calendario 📅) y la hora.")
                 return
             try:
                 ant_d = int(v_ant_dias.get())
@@ -364,19 +370,18 @@ def abrir_agenda(ctx):
                             ).pack(anchor="w", pady=1)
 
         # ── Fecha ─────────────────────────────────────────────
-        lbl_fecha = ttk.Label(body, text="Fecha de inicio (DD-MM-AAAA):",
+        lbl_fecha = ttk.Label(body, text="Fecha de inicio:",
                               font=("Segoe UI", 9))
         lbl_fecha.pack(anchor="w")
         v_fec = StringVar(value=datetime.now().strftime("%d-%m-%Y"))
-        entry_fec = ttk.Entry(body, textvariable=v_fec, font=("Segoe UI", 10))
-        entry_fec.pack(fill="x", pady=(3, 12))
+        campo_fecha(body, v_fec)   # (v4.18.14) con calendario 📅
 
         # ── Hora ──────────────────────────────────────────────
-        lbl_hora_var = StringVar(value="Hora (HH:MM):")
+        lbl_hora_var = StringVar(value="Hora:")
         ttk.Label(body, textvariable=lbl_hora_var,
                   font=("Segoe UI", 9)).pack(anchor="w")
         v_hor = StringVar(value=datetime.now().strftime("%H:%M"))
-        ttk.Entry(body, textvariable=v_hor, font=("Segoe UI", 10)).pack(fill="x", pady=(3, 12))
+        campo_h = campo_hora(body, v_hor)   # (v4.18.14) ruedas de horas y minutos, sin escribir «:»
 
         # ── Mensaje ───────────────────────────────────────────
         ttk.Label(body, text="Mensaje (opcional):", font=("Segoe UI", 9)).pack(anchor="w")
@@ -408,7 +413,7 @@ def abrir_agenda(ctx):
 
         # Actualizar etiqueta de hora y visibilidad de fecha según repetición
         def _on_rep_change(*_):
-            _aplicar_rep_ui(v_rep.get(), lbl_hora_var, lbl_fecha)
+            _aplicar_rep_ui(v_rep.get(), lbl_hora_var, lbl_fecha, campo_h)
 
         v_rep.trace_add("write", _on_rep_change)
 
@@ -418,7 +423,7 @@ def abrir_agenda(ctx):
             try:
                 datetime.strptime(f"{fecha_iso} {v_hor.get()}", "%Y-%m-%d %H:%M")
             except ValueError:
-                var_err.set("⚠ Formato incorrecto. Use DD-MM-AAAA y HH:MM.")
+                var_err.set("⚠ Revisa la fecha (DD-MM-AAAA o el calendario 📅) y la hora.")
                 return
             try:
                 ant_d = int(v_ant_dias.get())

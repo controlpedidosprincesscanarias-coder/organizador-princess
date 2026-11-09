@@ -8,6 +8,7 @@ Recibe AppContext (ctx) — sin globals.
 from datetime import datetime, date
 import ttkbootstrap as ttk
 from tkinter import messagebox, StringVar    # ANTI-REGRESION: StringVar era global de main_agenda
+from ui.selector_fecha_hora import campo_fecha
 from utils.fechas import _iso_a_ui, _ui_a_iso
 
 # Constantes de color — ANTI-REGRESION: eran globals de main_agenda
@@ -144,11 +145,10 @@ def _ventana_festivos(ctx):   # ANTI-REGRESIÓN: firma corregida — antes era (
         ttk.Entry(body, textvariable=v_tit,
                   font=("Segoe UI", 10)).pack(fill="x", pady=(3, 12))
 
-        ttk.Label(body, text="Fecha (DD-MM-AAAA):",
+        ttk.Label(body, text="Fecha:",
                   font=("Segoe UI", 9)).pack(anchor="w")
         v_fecha = StringVar(value=_iso_a_ui(fest_actual.get("fecha", date.today().strftime("%Y-%m-%d"))))
-        ttk.Entry(body, textvariable=v_fecha,
-                  font=("Segoe UI", 10)).pack(fill="x", pady=(3, 12))
+        campo_fecha(body, v_fecha, pady=(3, 12))   # (v4.18.14) con calendario 📅
 
         # ── Antelación ────────────────────────────────────────
         ttk.Label(body, text="⏰  Avisar con antelación (antes del día):",
@@ -178,7 +178,7 @@ def _ventana_festivos(ctx):   # ANTI-REGRESIÓN: firma corregida — antes era (
             try:
                 d0 = datetime.strptime(_ui_a_iso(v_fecha.get()), "%Y-%m-%d").date()
             except ValueError:
-                var_err.set("⚠ Formato incorrecto. Use DD-MM-AAAA.")
+                var_err.set("⚠ Revisa la fecha (DD-MM-AAAA o el calendario 📅).")
                 return
             try:
                 ant_d = int(v_ant_dias.get())
@@ -226,11 +226,10 @@ def _ventana_festivos(ctx):   # ANTI-REGRESIÓN: firma corregida — antes era (
         ttk.Entry(body, textvariable=v_tit,
                   font=("Segoe UI", 10)).pack(fill="x", pady=(3, 12))
 
-        ttk.Label(body, text="Fecha (DD-MM-AAAA):",
+        ttk.Label(body, text="Fecha:",
                   font=("Segoe UI", 9)).pack(anchor="w")
         v_fecha = StringVar(value=date.today().strftime("%d-%m-%Y"))
-        ttk.Entry(body, textvariable=v_fecha,
-                  font=("Segoe UI", 10)).pack(fill="x", pady=(3, 12))
+        campo_fecha(body, v_fecha, pady=(3, 12))   # (v4.18.14) con calendario 📅
 
         ttk.Label(body, text="⏰  Avisar con antelación (antes del día):",
                   font=("Segoe UI", 9, "bold")).pack(anchor="w", pady=(6, 0))
@@ -258,7 +257,7 @@ def _ventana_festivos(ctx):   # ANTI-REGRESIÓN: firma corregida — antes era (
             try:
                 d0 = datetime.strptime(_ui_a_iso(v_fecha.get()), "%Y-%m-%d").date()
             except ValueError:
-                var_err.set("⚠ Formato incorrecto. Use DD-MM-AAAA.")
+                var_err.set("⚠ Revisa la fecha (DD-MM-AAAA o el calendario 📅).")
                 return
             try:
                 ant_d = int(v_ant_dias.get())

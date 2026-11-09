@@ -17,10 +17,6 @@ LIGHT = "#D8E8F0"
 # Geometría — ANTI-REGRESION: idem
 MARGEN = 44   # px aprox. 2 dedos en cada borde
 
-# Versión de la app mostrada en la ventana Admin — ANTI-REGRESION: idem
-# Debe mantenerse sincronizada con APP_VERSION en main_agenda.py
-APP_VERSION = "v4.4.3B"
-
 # Tipos de acceso disponibles en el selector de la ventana de config — ANTI-REGRESION: idem
 # icono · etiqueta · valor · placeholder · usa explorar
 _TIPOS = [
@@ -317,7 +313,7 @@ def _ventana_admin_submenu(ctx, opcion, idx, count, nombre_padre):
     ttk.Label(footer,
               text="\u00a9 VAMA 2026  \u2022  Princess Hotels & Resorts  \u2022  Central Compras Canarias",
               font=("Segoe UI", 8), foreground=LIGHT, anchor="w").pack(side="left")
-    ttk.Label(footer, text=APP_VERSION,
+    ttk.Label(footer, text=ctx.app_version,   # (v4.18.12) antes, una versión fija «v4.4.3B»
               font=("Segoe UI", 8, "bold"), foreground=GOLD, anchor="e").pack(side="right")
 
 

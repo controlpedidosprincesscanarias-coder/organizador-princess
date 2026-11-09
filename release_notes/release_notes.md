@@ -1,3 +1,13 @@
+# ✨ Organizador Princess v4.18.32
+
+> Incluye también todo lo de la 4.18.30 y anteriores que no llegaron a publicarse (desde la 4.18.12).
+
+## 🛠 Corrección de «Actualizar ahora»
+
+- Con **Actualizar ahora**, el Organizador se cerraba pero la versión nueva no se instalaba ni se volvía a abrir. El instalador, al cerrar el Organizador, se cerraba también a sí mismo. Corregido: a partir de esta versión se instala y se vuelve a abrir solo.
+
+---
+
 # ✨ Organizador Princess v4.18.30
 
 > Incluye también todo lo de la 4.18.28 y anteriores que no llegaron a publicarse (desde la 4.18.12).

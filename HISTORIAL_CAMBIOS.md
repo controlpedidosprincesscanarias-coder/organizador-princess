@@ -51,6 +51,14 @@
 
 ---
 
+## 2026-11-09 20:20 — [Organizador] «Actualizar ahora» cerraba el Organizador sin instalar la versión nueva (v4.18.32)
+
+- **Síntoma** (Víctor, probando la 4.18.30 en Windows): se descargaba la actualización, se cerraba el Organizador y no se instalaba ni se abría la versión nueva.
+- **Causa:** `KillOrganizador()` del instalador (`OrganizadorPrincess_Setup.iss`) usaba `taskkill /F /IM OrganizadorPrincess.exe /T`. Con «Actualizar ahora» (v4.18.20) el instalador lo abre el propio Organizador, y Windows lo cuenta como proceso hijo suyo: `/T` (cerrar también los hijos) cerraba el instalador junto con el Organizador. Al instalar a mano desde el Explorador no pasaba, porque entonces el instalador no es hijo del Organizador.
+- **Corrección:** sin `/T`; `/IM` ya cierra todos los `OrganizadorPrincess.exe`. Prueba de regresión en `test_actualizacion.py`.
+- **Ojo:** el arreglo está en el instalador **nuevo**, así que vale ya desde la propia actualización a la 4.18.32 (no hace falta una versión intermedia). Los equipos en los que falló siguen con su versión anterior instalada: basta con volver a abrir el Organizador y repetir «Actualizar ahora» cuando esté publicada la 4.18.32.
+- **Aparte:** el aviso «Windows protegió su PC» (SmartScreen) sale al abrir a mano un instalador descargado con el navegador, porque no está firmado con un certificado de editor; «Más información → Ejecutar de todas formas». «Actualizar ahora» descarga sin la marca de Internet del navegador y no lo muestra.
+
 ## 2026-11-09 20:03 — [Infra] Cuentas de Render y Supabase de cada aplicación; el chat puede quedar despierto 24 h
 
 - **Confirmado por Víctor:** cada aplicación tiene **su propia cuenta de Render**, también el chat. Viene de la migración de julio de 2026 (ver `docs/archivo/HISTORIAL_CAMBIOS_2026-07_a_2026-09.md`, «Migración de `control_pedidos_chat` a cuenta Render nueva»): entonces Control Pedidos y el chat compartían cuenta, agotaron entre los dos las 750 h gratuitas del mes y Render los suspendió.

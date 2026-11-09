@@ -51,7 +51,7 @@
 
 ---
 
-## 2026-11-09 12:52 — [Organizador] Publicada la v4.18.10 (primera release con la compilación automática)
+## 2026-11-09 12:50 — [Organizador] Publicada la v4.18.10 (primera release con la compilación automática)
 
 - Compilada con «Compilar Organizador» (GitHub Actions, destino borrador) tras corregir `test_bd_y_acceso.py` para Windows.
   - Release con `OrganizadorPrincess_Setup_4.18.10.exe` (34,4 MB) y su `.sha256`.

@@ -51,6 +51,24 @@
 
 ---
 
+## 2026-11-09 02:02 — [Organizador] Reorganización: Agenda, Calendario y Administración salen de main_agenda.py (v4.18.08)
+
+- **Petición**: punto 3 de la revisión del Organizador (Víctor: «Sigue»).
+- **Cambio**, por etapas y con la prueba de uso tras cada una:
+  - `abrir_agenda` (~470 líneas) → `app/ui/agenda.py`;
+  - `abrir_calendario` (~620) → `app/ui/calendario.py`;
+  - `_ventana_login_admin`, `_ventana_vista_menu` y `abrir_admin` (~900) → `app/ui/admin.py`.
+  - Reciben el `AppContext`, y `main_agenda` deja envoltorios con los mismos nombres. `main_agenda.py` pasa de 2.780 a 1.172 líneas.
+  - El código se movió con un script que usa `symtable`: solo renombra referencias globales (`agenda_data` → `ctx.agenda_data`…), nunca locales ni atributos.
+- **Nuevos**: `app/ui/disposicion.py` (constantes del menú y `vista_actual`) y `app/ui/colores.py` (GOLD y LIGHT). `AppContext` gana `app_version` y `aplicar_vista`. `main.spec` lleva los módulos nuevos en `hiddenimports`.
+- `abrir_manual` se queda en `main_agenda.py` porque busca el PDF a partir de `__file__`.
+- **Error corregido**: «Mi Usuario» solo actualizaba la variable global `NOMBRE_USUARIO_ACTUAL` y no `ctx.nombre_usuario`, así que el saludo diario seguía con el nombre antiguo hasta reiniciar.
+- **Prueba de uso ampliada** a 30 comprobaciones: agendas imprimibles, botón Chat del calendario, contraseña incorrecta y cambio de nombre. Las ventanas se cierran como con el botón ✕. 30 de 30 bien tras la última etapa; las pruebas unitarias, bien.
+- Versión **4.18.08** (incluye la 4.18.06, que no se publicó); notas, README y CLAUDE.md actualizados. No se ha publicado ninguna Release.
+- Queda por probar en Windows, con el borrador de «Compilar Organizador»: que el `.exe` encuentre los módulos nuevos.
+
+---
+
 ## 2026-11-08 22:55 — [Organizador] Prueba de uso con Claude en Linux y dos correcciones más (v4.18.06, sin publicar)
 
 - **Petición** (Víctor): probar el uso real del Organizador como se hizo con Control Pedidos. Chat de prueba solo con «comprascan».

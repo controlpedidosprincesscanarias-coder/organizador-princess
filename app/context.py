@@ -34,6 +34,8 @@ class AppContext:
         'btn_widgets',       # dict — widgets de botones del grid
         'ar_labels',         # dict — StringVar de accesos rápidos
         'ar_widgets',        # dict — widgets de accesos rápidos
+        'app_version',       # str — versión de la aplicación (v4.18.08)
+        'aplicar_vista',     # callable() — recoloca el menú tras cambiar la vista (v4.18.08)
     )
 
     def __init__(self,
@@ -48,7 +50,9 @@ class AppContext:
                  btn_labels=None,
                  btn_widgets=None,
                  ar_labels=None,
-                 ar_widgets=None):
+                 ar_widgets=None,
+                 app_version="",
+                 aplicar_vista=None):
         self.app           = app
         self.config        = config
         self.agenda_data   = agenda_data
@@ -61,6 +65,8 @@ class AppContext:
         self.btn_widgets   = btn_widgets   if btn_widgets   is not None else {}  # ANTI-REGRESIÓN: idem
         self.ar_labels     = ar_labels     if ar_labels     is not None else {}  # ANTI-REGRESIÓN: idem
         self.ar_widgets    = ar_widgets    if ar_widgets    is not None else {}  # ANTI-REGRESIÓN: idem
+        self.app_version   = app_version
+        self.aplicar_vista = aplicar_vista or (lambda: None)   # main_agenda la fija al definirla
 
     def refresh_agenda(self):
         """Recarga agenda desde disco y actualiza el contexto en memoria."""

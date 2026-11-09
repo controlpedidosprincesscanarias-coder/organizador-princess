@@ -6,7 +6,7 @@ Arranca el Organizador **de verdad** (`main_agenda.py`, Tkinter + ttkbootstrap) 
 
 Lo propio de Windows se simula: el bloqueo de instancia única (`ctypes.windll`), los sonidos (`winsound`), `os.startfile` y el cifrado DPAPI (en Linux la contraseña se guarda sin cifrar, pero en un perfil temporal que se borra al terminar). Los mensajes de `messagebox` se anotan en el registro y se responden solos con «Aceptar» o «Sí».
 
-## Qué comprueba (30 comprobaciones)
+## Qué comprueba (31 comprobaciones)
 1. Primer arranque: ventana «Nueva versión», aviso «Versión actualizada» y saludo diario.
 2. Agenda: crear un aviso, verlo en «Mis Recordatorios» y en `agenda.json`.
 3. Calendario (mes y semana), vacaciones, festivos, agendas imprimibles del día, la semana y el mes, y el botón «Chat» del calendario.
@@ -15,7 +15,7 @@ Lo propio de Windows se simula: el bloqueo de instancia única (`ctypes.windll`)
 6. Chat: abre la ventana y carga las conversaciones. Solo envía un mensaje si se indica `CHAT_DESTINO`.
 7. Control de Pedidos: con `CREAR_PEDIDO_PR=1` crea un pedido en el hotel PR y lo cancela (el aviso real puede tardar unos minutos en llegar); siempre comprueba con una notificación simulada que el Organizador la muestra como aviso emergente.
 8. Aviso de conexión con Control de Pedidos (error corregido en 4.18.06: no vuelve a cargar `main_agenda`).
-9. «Actualización disponible» con una versión simulada en GitHub (no se descarga nada).
+9. «Actualización disponible» con una versión simulada en GitHub, con las novedades con formato (no se descarga nada).
 
 ## Cómo lanzarla
 Requisitos: `python3` con `tkinter`, `xvfb-run`, ImageMagick (`import`) y los paquetes de `compilacion/requisitos.txt` (PyInstaller no hace falta).

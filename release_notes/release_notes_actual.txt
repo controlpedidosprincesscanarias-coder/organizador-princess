@@ -1,83 +1,26 @@
-✨ Organizador Princess v4.18.10
+✨ Organizador Princess v4.18.12
 ================================================================
 
-(Incluye también todo lo de la 4.18.06 y la 4.18.08, que no llegaron
-a publicarse.)
+📘 MANUALES NUEVOS
 
-🆙 ACTUALIZACIONES (4.18.10)
+• El Manual de usuario (el que abre el botón «Manual») y el Manual de
+  administrador están renovados, con capturas reales de todas las
+  pantallas, números de referencia, índice y tablas de consulta rápida.
 
-• En la ventana «Nueva versión disponible» las novedades se ven con
-  formato (títulos, viñetas, negritas), sin los símbolos «#» y «**».
+🛠 CORRECCIONES
 
-🛠 CORRECCIÓN (4.18.08)
+• Calendario: el mes o la semana que se ve sale entre las flechas ◀ ▶.
+  Antes le quitaba sitio al calendario y en la vista Semana no se veía
+  el domingo.
+• Calendario: al pasar de «Mes» a «Semana» se abre la semana de hoy
+  (o la del día elegido), no la del día 1 del mes.
+• Agenda: los avisos semanales decían «Luness», «Martess»…; ahora
+  «Lunes», «Martes»… Los de cada 30 minutos ya no muestran minutos
+  imposibles (como «:45 / :75»).
+• Admin: la ventana de subopciones mostraba una versión antigua y los
+  botones sin definir salían como «19 · 19. POR DEFINIR».
 
-• Mi Usuario: al cambiar el nombre a mostrar, el saludo diario seguía
-  usando el nombre anterior hasta reiniciar. Ahora se ve al momento.
-
-🧹 POR DENTRO (4.18.08)
-
-• El código de las ventanas Agenda, Calendario y Administración está
-  ordenado en archivos propios. No cambia nada de lo que ves.
-
-🛠 CORRECCIONES (4.18.06)
-
-• Cuando Control de Pedidos no respondía, el aviso de conexión volvía a
-  ejecutar el arranque del Organizador por dentro: la ventana se quedaba
-  congelada un momento y el aviso salía sin icono (o, según la versión,
-  podía abrirse una segunda ventana principal). Arreglado.
-• Admin: si el usuario de Windows tenía un espacio o una «ñ», la ventana
-  de acceso decía «Sin conexión con Control de Pedidos» aunque la
-  hubiera. Arreglado.
-• Chat: si un archivo adjunto no se podía descargar, ahora sí aparece el
-  aviso de error (antes no salía nada).
-
-🔄 ACTUALIZACIONES (4.18.06)
-
-• El Organizador busca versiones nuevas al arrancar y después cada 2
-  horas (antes, cada 30 minutos).
-• Si GitHub limita las consultas de la oficina, ya no sale la ventana
-  roja de «Error al comprobar actualizaciones»: espera y vuelve a mirar
-  más tarde, sin avisar.
-
-📘 MANUALES (4.18.06)
-
-• Puestos al día: frecuencia de las actualizaciones y, en el manual de
-  administrador, la nueva forma de publicar versiones.
-
-🔔 AVISOS DE CONTROL DE PEDIDOS (4.18.04)
-
-• Lo que Control de Pedidos envía mientras el Organizador está cerrado
-  ya no aparece al abrirlo: se pierde. Al abrir solo se ven tus avisos
-  del calendario, eventos, vacaciones y festivos, y lo que llegue a
-  partir de ese momento.
-• Los popups de Control de Pedidos se cierran solos a los 10 minutos si
-  no se pulsa Cerrar (antes, a los 30).
-
-🛠 CORRECCIÓN (4.18.02)
-
-• Chat: al arrastrar un archivo sobre la ventana del chat se cerraba la
-  aplicación. Arreglado. Si diera problemas, «chat_arrastrar_soltar»:
-  false en config.json desactiva el arrastre (quedan 📎 y Ctrl+V).
-
-🖥 VISTA REDUCIDA DEL MENÚ PRINCIPAL (4.18.00)
-
-• Nuevo botón «Vista» en Admin. Permite elegir entre:
-  - Extendida: el menú de siempre (6 accesos dorados y 30 botones azules).
-  - Reducida: logo y cabecera, los 4 primeros accesos dorados, Agenda /
-    Calendario / Chat y solo los botones azules que elijas (hasta 10, en
-    2 filas de 5). La ventana se hace más pequeña.
-• El cambio se aplica al guardar, sin reiniciar. La elección se
-  recuerda en este equipo.
-
-💬 CHAT
-
-• Se pueden enviar archivos arrastrándolos desde el Explorador sobre la
-  ventana del chat (hasta 5 a la vez).
-• Con Ctrl+V en la caja de mensaje se pega una captura de pantalla o
-  archivos copiados en el Explorador; si es texto, se pega como siempre.
-• Antes de enviar se pregunta, indicando archivo y conversación.
-
-📘 MANUALES
-
-• Nuevo manual de usuario (botón «Manual») y nuevo manual de
-  administrador (menú Inicio → Manual de Administrador).
+================================================================
+La idea y el desarrollo de la aplicación Organizador Princess son de
+Víctor Alejandro Martín Andrade, para el Departamento de Central de
+Compras de Princess Hotels en Canarias.

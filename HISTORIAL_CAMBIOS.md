@@ -51,6 +51,20 @@
 
 ---
 
+## 2026-11-09 06:26 — [Chat] Revisión: mensajes duplicados, lista de conversaciones en una consulta y código ordenado (v1.2.4)
+
+- **Petición** (Víctor): revisar y ordenar la aplicación del chat (repo `control-pedidos-chat`).
+- **Error corregido** (commit propio): con una conversación privada o de grupo abierta en el Organizador, cada mensaje llegaba **dos veces** por Socket.IO y sonaba dos veces. Se emitía a la sala del canal y, por separado, a la sala personal de cada participante. Ahora `_difundir_mensaje()` hace una sola emisión a la lista de salas. Lo reproduce la prueba nueva, que falla con el código anterior.
+- **`/api/chat/canales` en una sola consulta**, con `LEFT JOIN LATERAL`; antes eran 3-4 por conversación. El Organizador la pide con cada mensaje que llega con la ventana abierta. Respuesta idéntica, comprobada A/B contra la versión anterior: 7 usuarios, 57 canales.
+- **Reorganización**: `app.py` queda como punto de entrada (62 líneas). El código pasa al paquete `chat/`: config, aplicacion, db, auth, adjuntos, mensajes, rutas y sockets. El Start command de Render no cambia.
+- **Pruebas**: nuevo `tests/test_chat.py`, 43 comprobaciones. Arranca el chat con gunicorn y eventlet contra una PostgreSQL local, con Supabase Storage simulado y cookies firmadas como las de Control de Pedidos. Cubre autenticación, privados, grupos, adjuntos, tiempo real sin duplicados, límites y pings.
+- **Comprobado y descartado**: que esperar a la base de datos congele el chat para todos (con eventlet 0.41 y psycopg2 no ocurre).
+- **Anotado**: eventlet está obsoleto; conviene planear el paso a otro modo.
+- **Documentación nueva**: `README.md`, `CLAUDE.md` y `AUTORIA.md`. CHANGELOG v1.2.4; la guía de despliegue explica el mantenimiento.
+- **Pendiente de decidir (Víctor)**: desde el 23 oct el workflow `keep-alive-chat.yml` solo llama a `/ping/db` una vez al día y ya no a `/ping` cada 10 minutos en horario de trabajo. Si Render está en el plan gratuito, que el servicio no se duerma depende de UptimeRobot.
+
+---
+
 ## 2026-11-09 06:14 — [Organizador] Novedades con formato en «Nueva versión disponible» (v4.18.10)
 
 - **Petición**: última mejora anotada en la revisión del Organizador (Víctor: «seguir»).

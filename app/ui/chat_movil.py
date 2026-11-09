@@ -1,5 +1,5 @@
 """
-app/ui/chat_movil.py  ·  v4.18.24
+app/ui/chat_movil.py  ·  v4.18.34
 Ventana «Chat en el móvil»: cómo instalar Chat Dpto. Compras Princess para Android, con un código QR.
 
 La idea y el desarrollo de la aplicación Organizador Princess, incluidas sus pruebas, son de
@@ -22,7 +22,12 @@ _ABIERTA = [None]
 
 PASOS = [
     "Escanea el código con la cámara del móvil (o abre el enlace en el móvil).",
-    "Descarga el archivo «ChatPrincess_….apk» y ábrelo. La primera vez, Android pide permitir «Instalar apps desconocidas».",
+    "Toca «ChatPrincess_….apk» para descargarlo. Si el navegador avisa de que «puede ser dañino», "
+    "pulsa «Descargar de todas formas».",
+    "Abre el archivo descargado. La primera vez, Android pide permitir «Instalar apps desconocidas»: "
+    "actívalo, vuelve atrás y pulsa «Instalar».",
+    "Si aparece Google Play Protect («App no segura» o «App desconocida»), toca «Más detalles» → "
+    "«Instalar de todas formas». Es normal: la app no viene de Google Play.",
     "Entra con tu usuario y tu contraseña de Control de Pedidos y acepta las notificaciones.",
     "En Ajustes de la app, pulsa «Quitar el ahorro de batería» para recibir los avisos con la app cerrada.",
 ]
@@ -57,13 +62,14 @@ def abrir_chat_movil(parent):
     pasos = ttk.Frame(fila)
     pasos.pack(side="left", fill="both", expand=True)
     for i, t in enumerate(PASOS, 1):
-        ttk.Label(pasos, text=f"{i}.  {t}", wraplength=300, justify="left", font=("Segoe UI", 9)).pack(anchor="w", pady=3)
+        ttk.Label(pasos, text=f"{i}.  {t}", wraplength=340, justify="left", font=("Segoe UI", 9)).pack(anchor="w", pady=3)
 
     enlace = ttk.Label(cuerpo, text=URL_DESCARGA, foreground="#5bc0de", cursor="hand2", font=("Segoe UI", 8, "underline"))
     enlace.pack(anchor="w", pady=(12, 2))
     enlace.bind("<Button-1>", lambda e: webbrowser.open(URL_DESCARGA))
     ttk.Label(cuerpo, text="Actualizaciones: la app avisa sola al abrirse cuando hay una versión nueva; se descarga\n"
-                           "desde la propia app y Android pide confirmar «Actualizar».",
+                           "desde la propia app y Android pide confirmar «Actualizar» (si sale Play Protect: «Más detalles» →\n"
+                           "«Instalar de todas formas»).",
               font=("Segoe UI", 8), foreground="#adb5bd", justify="left").pack(anchor="w", pady=(6, 0))
 
     ttk.Separator(win).pack(fill="x")

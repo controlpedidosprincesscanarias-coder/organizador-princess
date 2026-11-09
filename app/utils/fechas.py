@@ -3,7 +3,49 @@ utils/fechas.py
 Conversión y formateo de fechas para la agenda.
 Extraído de main_agenda.py en Fase 2 del sprint de estabilización.
 """
-from datetime import datetime
+import re
+from datetime import date, datetime
+
+
+# (v4.18.14) Lo que escribe el usuario en las cajas de fecha y hora (ui/selector_fecha_hora.py;
+# lo prueba test_fecha_hora.py)
+def normalizar_fecha(texto: str) -> str:
+    """Convierte lo que haya escrito el usuario en «DD-MM-AAAA» si es una fecha válida.
+    Acepta separadores - / . o espacio, o los números seguidos (DDMMAAAA o DDMMAA), y años
+    de dos cifras (26 → 2026). Si no es una fecha válida, devuelve el texto tal cual."""
+    t = (texto or "").strip()
+    if re.fullmatch(r"\d{8}", t):
+        d, m, a = t[:2], t[2:4], t[4:]
+    elif re.fullmatch(r"\d{6}", t):
+        d, m, a = t[:2], t[2:4], t[4:]
+    else:
+        partes = re.split(r"[-/. ]+", t)
+        if len(partes) != 3 or not all(p.isdigit() for p in partes):
+            return texto
+        d, m, a = partes
+    if len(a) == 2:
+        a = "20" + a
+    try:
+        return date(int(a), int(m), int(d)).strftime("%d-%m-%Y")
+    except ValueError:
+        return texto
+
+
+def normalizar_hora(texto: str) -> str:
+    """«9» → 09:00, «930» → 09:30, «0930» → 09:30, «9.30» / «9:30» / «9 30» → 09:30.
+    Si no es una hora válida, devuelve el texto tal cual."""
+    t = (texto or "").strip()
+    m = re.fullmatch(r"(\d{1,2})(?:[:.,h ]+(\d{1,2}))?", t)
+    if m:
+        h, mi = int(m.group(1)), int(m.group(2) or 0)
+    elif re.fullmatch(r"\d{3,4}", t):
+        h, mi = int(t[:-2]), int(t[-2:])
+    else:
+        return texto
+    if 0 <= h <= 23 and 0 <= mi <= 59:
+        return f"{h:02d}:{mi:02d}"
+    return texto
+
 
 def _iso_a_ui(fecha_iso: str) -> str:
     """Convierte 'YYYY-MM-DD' → 'DD-MM-YYYY' para mostrar en la UI."""
@@ -16,7 +58,8 @@ def _iso_a_ui(fecha_iso: str) -> str:
 def _ui_a_iso(fecha_ui: str) -> str:
     """Convierte 'DD-MM-YYYY' → 'YYYY-MM-DD' para guardar internamente."""
     try:
-        return datetime.strptime(fecha_ui, "%d-%m-%Y").strftime("%Y-%m-%d")
+        # (v4.18.14) acepta también lo que normalizar_fecha() sabe leer: 15112026, 15/11/26…
+        return datetime.strptime(normalizar_fecha(fecha_ui), "%d-%m-%Y").strftime("%Y-%m-%d")
     except Exception:
         return fecha_ui
 

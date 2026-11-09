@@ -56,13 +56,13 @@ def aviso_nuevo(c):
     c.pulsar(c.ventana("Agenda"), "Añadir Aviso")
 def aviso_rellenar(c):
     v = c.ventana("Nuevo Aviso")
-    e = c.entradas(v)   # título, fecha, hora, mensaje, antelación d/h/m
+    e = c.entradas(v)   # título, fecha, horas, minutos (v4.18.14: dos ruedas), mensaje, antelación d/h/m
     disparo = datetime.now() + timedelta(minutes=2)
     ESTADO["hora_aviso"] = disparo.strftime("%H:%M")
     c.escribir(e[0], f"PRUEBA CLAUDE {SELLO}")
     c.escribir(e[1], disparo.strftime("%d-%m-%Y"))
-    c.escribir(e[2], ESTADO["hora_aviso"])
-    c.escribir(e[3], "Aviso de prueba automática del Organizador")
+    e[2].set(disparo.strftime("%H")); e[3].set(disparo.strftime("%M"))
+    c.escribir(e[4], "Aviso de prueba automática del Organizador")
     c.captura("aviso_nuevo_relleno")
     c.pulsar(v, "Guardar")
 def aviso_lista(c):

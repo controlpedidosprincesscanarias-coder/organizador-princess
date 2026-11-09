@@ -83,6 +83,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit 1 }
           python test_markdown_texto.py
           if ($LASTEXITCODE -ne 0) { exit 1 }
+          python test_fecha_hora.py
+          if ($LASTEXITCODE -ne 0) { exit 1 }
 
       - name: Compilar con PyInstaller
         shell: pwsh

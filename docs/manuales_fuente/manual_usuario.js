@@ -1,7 +1,7 @@
 // Manual de usuario del Organizador Princess. Idea y desarrollo de la aplicación: Víctor Alejandro Martín Andrade.
 const L = require("./lib");
 const { p, vineta, pasos, h1, h2, imagen, leyenda, recuadro, tabla, portada, indice } = L;
-const V = process.env.VERSION || "v4.18.12";
+const V = process.env.VERSION || "v4.18.14";
 
 const s = [];
 s.push(portada({ rol: "Uso diario", subtitulo: "Abre tus accesos, apunta avisos, consulta el calendario y chatea con tus compañeros",
@@ -67,10 +67,17 @@ s.push(p("Se hace desde la propia ventana emergente del aviso, con **Desactivar 
 s.push(h2("Crear un aviso"));
 s.push(...imagen("u_aviso_nuevo", 9, "Formulario «Nuevo Aviso»."));
 s.push(...leyenda([[1, "**Título** del aviso: es lo que verás en la ventana emergente."], [2, "**Repetición**: cuándo se repite (tabla siguiente)."],
-  [3, "**Fecha de inicio** (DD-MM-AAAA). Por defecto, hoy."], [4, "**Hora** (HH:MM)."], [5, "**Mensaje** (opcional): un texto de apoyo que sale en el aviso."],
-  [6, "**Avisar con antelación**: días, horas y minutos antes de la hora del aviso."], [7, "**Guardar** crea el aviso; **Cancelar** descarta los cambios."]]));
+  [3, "**Fecha de inicio**. Por defecto, hoy. Se puede escribir (DD-MM-AAAA; también vale 15112026 o 15/11/26)…"],
+  [4, "…o elegir en el **calendario 📅** (siguiente imagen)."],
+  [5, "**Hora**: dos ruedas, horas y minutos, sin escribir los dos puntos. Se cambian con las flechas, con la rueda del ratón o escribiendo el número. Las flechas de los minutos van de 5 en 5, pero se puede escribir cualquier minuto."],
+  [6, "**Mensaje** (opcional): un texto de apoyo que sale en el aviso."],
+  [7, "**Avisar con antelación**: días, horas y minutos antes de la hora del aviso."], [8, "**Guardar** crea el aviso; **Cancelar** descarta los cambios."]]));
+s.push(...imagen("u_selector_fecha", 6, "Calendario para elegir la fecha."));
+s.push(...leyenda([[1, "**◀** mes anterior."], [2, "**▶** mes siguiente (también con Re Pág / Av Pág)."],
+  [3, "**Hoy**, en dorado; la fecha que ya estaba elegida, en azul. Un clic en un día lo elige y cierra el calendario."],
+  [4, "**Hoy** elige la fecha de hoy. **Cancelar** (o Esc) cierra sin cambiar nada."]]));
 s.push(...tabla(["Repetición", "Cuándo salta"], [["Sin repetición", "Una sola vez, en la fecha y hora indicadas."],
-  ["Cada 30 minutos / Cada hora", "Desde la fecha de inicio, en los minutos de la hora indicada: con 09:15, a las :15 y a las :45, o a las :15 de cada hora."],
+  ["Cada 30 minutos / Cada hora", "Desde la fecha de inicio, en el minuto indicado: con :15, a las :15 y a las :45, o a las :15 de cada hora (la rueda de las horas se desactiva)."],
   ["Diariamente", "Todos los días a esa hora, desde la fecha de inicio."], ["Semanalmente", "El mismo día de la semana que la fecha de inicio."],
   ["Mensualmente", "El mismo día del mes."], ["Anualmente", "El mismo día y mes cada año."]], [2800, 6838]));
 s.push(...recuadro("consejo", "Ejemplo de antelación", ["Un aviso «Llamar a Suministros Atlántico» el 11-11-2026 a las 11:30 con 1 hora de antelación te avisa ese día a las 10:30. En la lista se ve como «⏰-1h»."]));
@@ -94,9 +101,9 @@ s.push(p("Al pulsar un día se abre un panel con todo lo de esa fecha: primero l
 s.push(h2("Vacaciones y festivos"));
 s.push(p("Desde los botones **Vacaciones** y **Festivos** del calendario se gestionan las dos listas. Se agrupan por año y al final muestran el total de días programados."));
 s.push(...imagen("u_vacaciones", 12, "Periodos de vacaciones."));
-s.push(...leyenda([[1, "✏ **Editar** el periodo."], [2, "🗑 **Borrar** el periodo."], [3, "**+ Nuevo Periodo**: título (por ejemplo «Vacaciones de verano»), fechas de inicio y fin y, si quieres, con cuánta antelación te avisa el Organizador."]]));
+s.push(...leyenda([[1, "✏ **Editar** el periodo."], [2, "🗑 **Borrar** el periodo."], [3, "**+ Nuevo Periodo**: título (por ejemplo «Vacaciones de verano»), fechas de inicio y fin (escritas o con el calendario 📅) y, si quieres, con cuánta antelación te avisa el Organizador."]]));
 s.push(...imagen("u_festivos", 12, "Días festivos."));
-s.push(...leyenda([[1, "**+ Nuevo Festivo**: título, fecha y antelación del aviso. Cada fila tiene también ✏ editar y 🗑 borrar."]]));
+s.push(...leyenda([[1, "**+ Nuevo Festivo**: título, fecha (escrita o con el calendario 📅) y antelación del aviso. Cada fila tiene también ✏ editar y 🗑 borrar."]]));
 
 // 6
 s.push(h1("6. Avisos emergentes"));

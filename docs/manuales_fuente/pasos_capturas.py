@@ -239,16 +239,26 @@ def agenda_ver(c):
 
 def aviso_nuevo(c):
     v = c.ventana("Nuevo Aviso")
-    e = c.entradas(v)
+    e = c.entradas(v)   # título, fecha, horas, minutos, mensaje, antelación
     c.escribir(e[0], "Enviar el resumen de pedidos a Dirección")
     c.escribir(e[1], (datetime.now() + timedelta(days=3)).strftime("%d-%m-%Y"))
-    c.escribir(e[2], "13:00")
-    c.escribir(e[3], "Adjuntar el Excel de faltantes")
+    e[2].set("13"); e[3].set("00")
+    c.escribir(e[4], "Adjuntar el Excel de faltantes")
     foto(c, v, "u_aviso_nuevo", [(e[0], 1, "ir"), (caja_de(c, v, [w for w in c.widgets(v) if w.winfo_class() == "TRadiobutton"]), 2, "ir"),
-                                  (e[1], 3, "ir"), (e[2], 4, "ir"), (e[3], 5, "ir"),
-                                  (caja_de(c, v, [w for w in c.widgets(v) if w.winfo_class() == "TSpinbox"]), 6, "r"),
-                                  (buscar(c, v, "Guardar"), 7, "t")])
-    c.cerrar(v)
+                                  (e[1], 3, "ir"), (buscar(c, v, "📅"), 4, "r"), (caja_de(c, v, [e[2], e[3]]), 5, "tr"),
+                                  (e[4], 6, "ir"), (caja_de(c, v, e[5:8]), 7, "r"), (buscar(c, v, "Guardar"), 8, "tr")])
+    guardar_ventanas()
+    c.pulsar(v, "📅")
+
+
+def selector_fecha(c):
+    p = c.ventana("Elegir fecha")
+    hoy = [w for w in c.widgets(p) if w.winfo_class() == "TButton" and c.texto(w).strip() == str(datetime.now().day)] if p else []
+    foto(c, p, "u_selector_fecha", [(buscar(c, p, "◀"), 1, "r"), (buscar(c, p, "▶"), 2, "l"), (hoy[0] if hoy else None, 3, "tr"),
+                                     (buscar(c, p, "Hoy", "TButton"), 4, "r")] if p else [])
+    if p:
+        c.cerrar(p)
+    c.cerrar(c.ventana("Nuevo Aviso"))
 
 
 # ── 4. Calendario ────────────────────────────────────────────────────────────
@@ -438,10 +448,10 @@ def burbuja_ver(c):
 def actualizacion(c):
     import json, urllib.request
     um = sys.modules["services.update_service"]
-    falso = {"tag_name": "v4.18.14", "name": "Organizador Princess v4.18.14",
-             "body": "# ✨ Organizador Princess v4.18.14\n\n## 🛠 Mejoras\n\n- Mejoras en la agenda y el calendario.\n- Correcciones menores.",
-             "assets": [{"name": "OrganizadorPrincess_Setup_4.18.14.exe", "size": 34_400_000, "browser_download_url": "https://example.invalid/x.exe"},
-                        {"name": "OrganizadorPrincess_Setup_4.18.14.exe.sha256", "size": 90, "browser_download_url": "https://example.invalid/x.sha256"}]}
+    falso = {"tag_name": "v4.18.16", "name": "Organizador Princess v4.18.16",
+             "body": "# ✨ Organizador Princess v4.18.16\n\n## 🛠 Mejoras\n\n- Mejoras en la agenda y el calendario.\n- Correcciones menores.",
+             "assets": [{"name": "OrganizadorPrincess_Setup_4.18.16.exe", "size": 34_400_000, "browser_download_url": "https://example.invalid/x.exe"},
+                        {"name": "OrganizadorPrincess_Setup_4.18.16.exe.sha256", "size": 90, "browser_download_url": "https://example.invalid/x.sha256"}]}
 
     class R(io.BytesIO):
         status = 200
@@ -586,7 +596,7 @@ def final(c):
 PASOS = [
     ("arranque", arranque, 4000), ("saludo", saludo, 1500), ("menú", menu, 800),
     ("submenú", submenu, 1500), ("submenú ver", submenu_ver, 800),
-    ("agenda", agenda, 2000), ("agenda ver", agenda_ver, 1500), ("aviso nuevo", aviso_nuevo, 1000),
+    ("agenda", agenda, 2000), ("agenda ver", agenda_ver, 1500), ("aviso nuevo", aviso_nuevo, 1500), ("selector de fecha", selector_fecha, 800),
     ("calendario", calendario, 2500), ("calendario ver", calendario_ver, 2000), ("semana", calendario_semana, 2000),
     ("día", calendario_dia, 2000), ("día ver", calendario_dia_ver, 2000), ("vacaciones", vacaciones_ver, 2000), ("festivos", festivos_ver, 1500),
     ("popup agenda", popup(AVISO_AGENDA, "HOY:demo"), 2500), ("popup agenda ver", popup_ver("u_popup_aviso", [("Silenciar", 1, "b"), ("Desactivar", 2, "tr"), ("Entendido", 3, "l")]), 1500),

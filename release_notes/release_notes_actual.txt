@@ -1,13 +1,24 @@
-✨ Organizador Princess v4.18.12
+✨ Organizador Princess v4.18.14
 ================================================================
 
-📘 MANUALES NUEVOS
+(Incluye también todo lo de la 4.18.12, que no llegó a publicarse.)
+
+📅 FECHAS Y HORAS MÁS FÁCILES (4.18.14)
+
+• Al crear o editar un aviso, unas vacaciones o un festivo, cada fecha
+  tiene un botón 📅 que abre un calendario: un clic en el día y listo.
+  Se puede seguir escribiendo, también sin guiones (15112026) o con
+  barras (15/11/26).
+• La hora de los avisos se elige con dos ruedas, horas y minutos, sin
+  escribir los dos puntos (flechas, rueda del ratón o escribiendo).
+
+📘 MANUALES NUEVOS (4.18.12)
 
 • El Manual de usuario (el que abre el botón «Manual») y el Manual de
   administrador están renovados, con capturas reales de todas las
   pantallas, números de referencia, índice y tablas de consulta rápida.
 
-🛠 CORRECCIONES
+🛠 CORRECCIONES (4.18.12)
 
 • Calendario: el mes o la semana que se ve sale entre las flechas ◀ ▶.
   Antes le quitaba sitio al calendario y en la vista Semana no se veía

@@ -8,6 +8,7 @@ Recibe AppContext (ctx) — sin globals.
 from datetime import datetime, date
 import ttkbootstrap as ttk
 from tkinter import messagebox, StringVar    # ANTI-REGRESION: StringVar era global de main_agenda
+from ui.selector_fecha_hora import campo_fecha
 from utils.fechas import _iso_a_ui, _ui_a_iso, _dias_entre
 
 # Constantes de color — ANTI-REGRESION: eran globals de main_agenda
@@ -147,17 +148,15 @@ def _ventana_vacaciones(ctx):   # ANTI-REGRESIÓN: firma corregida — antes era
         ttk.Entry(body, textvariable=v_tit,
                   font=("Segoe UI", 10)).pack(fill="x", pady=(3, 12))
 
-        ttk.Label(body, text="Fecha inicio (DD-MM-AAAA):",
+        ttk.Label(body, text="Fecha inicio:",
                   font=("Segoe UI", 9)).pack(anchor="w")
         v_ini = StringVar(value=_iso_a_ui(vac_actual.get("fecha_inicio", date.today().strftime("%Y-%m-%d"))))
-        ttk.Entry(body, textvariable=v_ini,
-                  font=("Segoe UI", 10)).pack(fill="x", pady=(3, 12))
+        campo_fecha(body, v_ini, pady=(3, 12))   # (v4.18.14) con calendario 📅
 
-        ttk.Label(body, text="Fecha fin (DD-MM-AAAA):",
+        ttk.Label(body, text="Fecha fin:",
                   font=("Segoe UI", 9)).pack(anchor="w")
         v_fin = StringVar(value=_iso_a_ui(vac_actual.get("fecha_fin", date.today().strftime("%Y-%m-%d"))))
-        ttk.Entry(body, textvariable=v_fin,
-                  font=("Segoe UI", 10)).pack(fill="x", pady=(3, 0))
+        campo_fecha(body, v_fin, pady=(3, 0))   # (v4.18.14) con calendario 📅
 
         # Contador de días en tiempo real
         v_dias = StringVar()
@@ -201,7 +200,7 @@ def _ventana_vacaciones(ctx):   # ANTI-REGRESIÓN: firma corregida — antes era
                 d0 = datetime.strptime(_ui_a_iso(v_ini.get()), "%Y-%m-%d").date()
                 d1 = datetime.strptime(_ui_a_iso(v_fin.get()), "%Y-%m-%d").date()
             except ValueError:
-                var_err.set("⚠ Formato incorrecto. Use DD-MM-AAAA.")
+                var_err.set("⚠ Revisa la fecha (DD-MM-AAAA o el calendario 📅).")
                 return
             if d1 < d0:
                 var_err.set("⚠ La fecha fin debe ser igual o posterior al inicio.")
@@ -253,17 +252,15 @@ def _ventana_vacaciones(ctx):   # ANTI-REGRESIÓN: firma corregida — antes era
         ttk.Entry(body, textvariable=v_tit,
                   font=("Segoe UI", 10)).pack(fill="x", pady=(3, 12))
 
-        ttk.Label(body, text="Fecha inicio (DD-MM-AAAA):",
+        ttk.Label(body, text="Fecha inicio:",
                   font=("Segoe UI", 9)).pack(anchor="w")
         v_ini = StringVar(value=date.today().strftime("%d-%m-%Y"))
-        ttk.Entry(body, textvariable=v_ini,
-                  font=("Segoe UI", 10)).pack(fill="x", pady=(3, 12))
+        campo_fecha(body, v_ini, pady=(3, 12))   # (v4.18.14) con calendario 📅
 
-        ttk.Label(body, text="Fecha fin (DD-MM-AAAA):",
+        ttk.Label(body, text="Fecha fin:",
                   font=("Segoe UI", 9)).pack(anchor="w")
         v_fin = StringVar(value=date.today().strftime("%d-%m-%Y"))
-        ttk.Entry(body, textvariable=v_fin,
-                  font=("Segoe UI", 10)).pack(fill="x", pady=(3, 0))
+        campo_fecha(body, v_fin, pady=(3, 0))   # (v4.18.14) con calendario 📅
 
         # Contador de días en tiempo real
         v_dias = StringVar()
@@ -306,7 +303,7 @@ def _ventana_vacaciones(ctx):   # ANTI-REGRESIÓN: firma corregida — antes era
                 d0 = datetime.strptime(_ui_a_iso(v_ini.get()), "%Y-%m-%d").date()
                 d1 = datetime.strptime(_ui_a_iso(v_fin.get()), "%Y-%m-%d").date()
             except ValueError:
-                var_err.set("⚠ Formato incorrecto. Use DD-MM-AAAA.")
+                var_err.set("⚠ Revisa la fecha (DD-MM-AAAA o el calendario 📅).")
                 return
             if d1 < d0:
                 var_err.set("⚠ La fecha fin debe ser igual o posterior al inicio.")

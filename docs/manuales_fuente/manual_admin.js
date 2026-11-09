@@ -1,7 +1,7 @@
 // Manual de administrador del Organizador Princess. Idea y desarrollo de la aplicación: Víctor Alejandro Martín Andrade.
 const L = require("./lib");
 const { p, vineta, pasos, h1, h2, imagen, leyenda, recuadro, tabla, portada, indice } = L;
-const V = process.env.VERSION || "v4.18.22";
+const V = process.env.VERSION || "v4.18.24";
 
 const s = [];
 s.push(portada({ rol: "Administración", subtitulo: "Configura los botones y la vista del menú, el usuario y las copias, e instala y publica versiones",
@@ -118,7 +118,7 @@ s.push(...pasos(["Ejecuta **OrganizadorPrincess_Setup_<versión>.exe** con permi
   "Al terminar puedes iniciar el Organizador. En el menú Inicio quedan el programa, el **Manual de Usuario**, el **Manual de Administrador** y el desinstalador."]));
 s.push(p("Si ya había una versión instalada, el instalador cierra el Organizador antes de sustituirla; la configuración y la agenda se conservan. El botón **Manual** del menú abre el manual de usuario instalado junto al programa."));
 s.push(h2("Cuando el usuario actualiza"));
-s.push(p("Los equipos reciben el aviso «Actualización disponible» al arrancar y cada 2 horas aproximadamente (Manual de usuario, capítulo 8). En el primer arranque tras instalar, «Nueva versión detectada» ofrece **Solo actualizar versión** (mantiene configuración y agenda) o **Instalación desde cero** (borra ambas, con copia opcional de la agenda). Recomienda siempre la primera."));
+s.push(p("Los equipos reciben el aviso «Actualización disponible» al arrancar y cada 2 horas aproximadamente (Manual de usuario, capítulo 9). En el primer arranque tras instalar, «Nueva versión detectada» ofrece **Solo actualizar versión** (mantiene configuración y agenda) o **Instalación desde cero** (borra ambas, con copia opcional de la agenda). Recomienda siempre la primera."));
 s.push(h2("Publicar una versión nueva"));
 s.push(p("El Organizador busca la **última release** del repositorio de GitHub controlpedidosprincesscanarias-coder/organizador-princess. Ese repositorio tiene que seguir siendo **público** (los equipos consultan sin iniciar sesión) y no se borran ni se renombran releases ni etiquetas antiguas."));
 s.push(...pasos(["Sube el número en **APP_VERSION** (main_agenda.py) y en **MyAppVersion** del instalador (OrganizadorPrincess_Setup.iss): deben coincidir y terminar en número par. Añade arriba las novedades en release_notes/release_notes.md y release_notes_actual.txt, y sube los cambios a main.",
@@ -127,8 +127,13 @@ s.push(...pasos(["Sube el número en **APP_VERSION** (main_agenda.py) y en **MyA
   "Cuando quieras que se actualicen todos, abre el borrador y pulsa **Publish release**.",
   "Los equipos la detectan al arrancar o en unas 2 horas como máximo. Con **Actualizar ahora** (desde la 4.18.20) se descarga, se comprueba el hash, se instala en silencio y el Organizador se vuelve a abrir solo; solo hay que aceptar el permiso de Windows."]));
 s.push(p("Si compilas a mano (compilar.bat e Inno Setup), crea tú la release con la etiqueta v<versión>, el instalador y su .sha256, que se obtiene con este comando de PowerShell:"));
-s.push(p("(Get-FileHash .\\OrganizadorPrincess_Setup_4.18.22.exe -Algorithm SHA256).Hash.ToLower() + \"  OrganizadorPrincess_Setup_4.18.22.exe\" | Out-File -Encoding ascii OrganizadorPrincess_Setup_4.18.22.exe.sha256", { color: "374151" }));
+s.push(p("(Get-FileHash .\\OrganizadorPrincess_Setup_4.18.24.exe -Algorithm SHA256).Hash.ToLower() + \"  OrganizadorPrincess_Setup_4.18.24.exe\" | Out-File -Encoding ascii OrganizadorPrincess_Setup_4.18.24.exe.sha256", { color: "374151" }));
 s.push(...recuadro("importante", "Sube siempre el .sha256", ["Sin él, los equipos pueden descargar igualmente pero verán «Esta versión no publica hash: integridad sin verificar»."]));
+s.push(h2("El chat para Android (Chat Princess)"));
+s.push(p("La app del chat para móviles Android está en otro repositorio público, **chat-movil-princess**, y se publica igual que el Organizador: **Actions → «Compilar Chat Princess» → Run workflow** con destino **borrador**, se prueba la .apk del borrador y se pulsa **Publish release**. Los móviles avisan al abrir la app."));
+for (const t of ["En cada versión: **versionName** (terminado en número par) y **versionCode** en app/build.gradle.kts y la entrada en CHANGELOG.md.",
+  "Todas las versiones se firman con **la misma clave**, guardada en los secretos FIRMA_* del repositorio. Guarda la copia de seguridad (firma_chat_princess.jks y sus claves) fuera de GitHub: sin ella, las versiones nuevas no se podrían instalar encima de las anteriores.",
+  "Para instalarla por primera vez, cada persona usa el botón **📱 Chat en el móvil** del chat del Organizador (código QR) o el capítulo 8 del Manual de usuario."]) s.push(vineta(t));
 
 // 9
 s.push(h1("9. Incidencias y comprobaciones"));

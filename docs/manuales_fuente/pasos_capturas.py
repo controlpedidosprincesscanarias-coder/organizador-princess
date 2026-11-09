@@ -420,7 +420,7 @@ def chat_ver(c):
 
 
 def boton_emoticonos(c, v):
-    """El botón 😊 (desde la v4.18.24 es una imagen en color, sin texto)."""
+    """El botón 😊 (desde la v4.18.26 es una imagen en color, sin texto)."""
     return next((w for w in c.widgets(v) if w.winfo_class() == "TButton" and str(w.cget("image"))), None) or buscar(c, v, "😊")
 
 
@@ -430,6 +430,19 @@ def chat_emoticonos(c):
     foto(c, p, "u_chat_emoticonos", [(next((w for w in c.widgets(p) if getattr(w, "emoticono", None) == "👍"), None), 1, "l"), (buscar(c, p, "Respuestas rápidas"), 2, "r")] if p else [], barra=False)
     if p:
         c.cerrar(p)
+    v = ESTADO.get("chat")
+    guardar_ventanas()
+    c.pulsar(v, "Chat en el móvil")
+
+
+def chat_movil_ver(c):
+    n = nuevas(c, ESTADO["antes"])
+    m = n[-1] if n else None
+    qr = next((w for w in c.widgets(m) if w.winfo_class() == "Label" and str(w.cget("image"))), None) if m else None
+    foto(c, m, "u_chat_movil", [(qr, 1, "tl"), (caja_de(c, m, [w for w in c.widgets(m) if c.texto(w)[:3] in ("1. ", "2. ", "3. ", "4. ")]), 2, "tr"),
+                                (buscar(c, m, "github.com"), 3, "r"), (buscar(c, m, "Actualizaciones"), 4, "l")] if m else [])
+    if m:
+        c.cerrar(m)
     v = ESTADO.get("chat")
     guardar_ventanas()
     c.pulsar(v, "Nueva conversación")
@@ -465,10 +478,10 @@ def burbuja_ver(c):
 def actualizacion(c):
     import json, urllib.request
     um = sys.modules["services.update_service"]
-    falso = {"tag_name": "v4.18.24", "name": "Organizador Princess v4.18.24",
-             "body": "# ✨ Organizador Princess v4.18.24\n\n## 🛠 Mejoras\n\n- Mejoras en la agenda y el calendario.\n- Correcciones menores.",
-             "assets": [{"name": "OrganizadorPrincess_Setup_4.18.24.exe", "size": 34_400_000, "browser_download_url": "https://example.invalid/x.exe"},
-                        {"name": "OrganizadorPrincess_Setup_4.18.24.exe.sha256", "size": 90, "browser_download_url": "https://example.invalid/x.sha256"}]}
+    falso = {"tag_name": "v4.18.26", "name": "Organizador Princess v4.18.26",
+             "body": "# ✨ Organizador Princess v4.18.26\n\n## 🛠 Mejoras\n\n- Mejoras en la agenda y el calendario.\n- Correcciones menores.",
+             "assets": [{"name": "OrganizadorPrincess_Setup_4.18.26.exe", "size": 34_400_000, "browser_download_url": "https://example.invalid/x.exe"},
+                        {"name": "OrganizadorPrincess_Setup_4.18.26.exe.sha256", "size": 90, "browser_download_url": "https://example.invalid/x.sha256"}]}
 
     class R(io.BytesIO):
         status = 200
@@ -619,7 +632,7 @@ PASOS = [
     ("popup agenda", popup(AVISO_AGENDA, "HOY:demo"), 2500), ("popup agenda ver", popup_ver("u_popup_aviso", [("Silenciar", 1, "b"), ("Desactivar", 2, "tr"), ("Entendido", 3, "l")]), 1500),
     ("popup vacaciones", popup_vacaciones, 2500), ("popup vacaciones ver", popup_vacaciones_ver, 2500), ("correo ver", correo_ver, 1000),
     ("popup pedidos", aviso_pedidos, 2500), ("popup pedidos ver", popup_ver("u_popup_pedidos"), 1500),
-    ("chat", chat, 2500), ("chat privado", chat_privado, 2500), ("chat ver", chat_ver, 1500), ("chat emoticonos", chat_emoticonos, 2000), ("chat nueva", chat_nueva_ver, 1500),
+    ("chat", chat, 2500), ("chat privado", chat_privado, 2500), ("chat ver", chat_ver, 1500), ("chat emoticonos", chat_emoticonos, 2000), ("chat móvil", chat_movil_ver, 2000), ("chat nueva", chat_nueva_ver, 1500),
     ("burbuja", burbuja, 2500), ("burbuja ver", burbuja_ver, 1000),
     ("actualización", actualizacion, 5000), ("actualización ver", actualizacion_ver, 1000),
     ("admin", admin, 2500), ("admin login", admin_login, 3000), ("panel", admin_panel, 500),

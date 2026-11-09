@@ -1,7 +1,7 @@
 // Manual de usuario del Organizador Princess. Idea y desarrollo de la aplicación: Víctor Alejandro Martín Andrade.
 const L = require("./lib");
 const { p, vineta, pasos, h1, h2, imagen, leyenda, recuadro, tabla, portada, indice } = L;
-const V = process.env.VERSION || "v4.18.22";
+const V = process.env.VERSION || "v4.18.24";
 
 const s = [];
 s.push(portada({ rol: "Uso diario", subtitulo: "Abre tus accesos, apunta avisos, consulta el calendario y chatea con tus compañeros",
@@ -9,8 +9,8 @@ s.push(portada({ rol: "Uso diario", subtitulo: "Abre tus accesos, apunta avisos,
 s.push(indice([["1. El Organizador de un vistazo", "Qué puedes hacer y qué no"], ["2. Conoce la pantalla", "Menú principal, accesos y submenús"],
   ["3. Vista extendida y reducida", ""], ["4. Agenda de avisos", "Crear, editar, pausar y borrar avisos"],
   ["5. Calendario, vacaciones y festivos", "Mes, semana, detalle del día e impresión"], ["6. Avisos emergentes", "Agenda, vacaciones y festivos, pedidos y saludo del día"],
-  ["7. Chat", "Conversaciones, grupos, adjuntos y burbuja flotante"], ["8. Actualizar la aplicación", ""],
-  ["9. Problemas frecuentes", "Y referencia rápida"]]));
+  ["7. Chat", "Conversaciones, grupos, adjuntos y burbuja flotante"], ["8. El chat en el móvil", "Chat Princess para Android: instalarla y actualizarla"],
+  ["9. Actualizar la aplicación", ""], ["10. Problemas frecuentes", "Y referencia rápida"]]));
 
 // 1
 s.push(h1("1. El Organizador de un vistazo"));
@@ -22,7 +22,7 @@ for (const t of ["Abrir con un clic **carpetas de red, páginas web, programas y
   "Consultar el **calendario** con tus avisos, vacaciones y festivos, e **imprimir** la agenda del día, la semana o el mes.",
   "Preparar el **correo de aviso** de vacaciones o de cierre por festivo.",
   "Recibir los **avisos de tus pedidos** de Control de Pedidos.",
-  "**Chatear** con compañeros, crear grupos y enviar imágenes y documentos."]) s.push(vineta(t));
+  "**Chatear** con compañeros, crear grupos y enviar imágenes y documentos, también desde el **móvil** con Chat Princess (capítulo 8)."]) s.push(vineta(t));
 s.push(h2("Qué no se hace aquí"));
 for (const t of ["Cambiar los botones, su orden o la vista del menú: se hace en el panel **Admin** (Manual de administrador).",
   "Ver la agenda de otro compañero: cada agenda es local de su PC.",
@@ -157,7 +157,35 @@ s.push(p("Cuando te escriben aparece una **burbuja** pequeña abajo a la derecha
 s.push(...recuadro("consejo", "La conversación sigue en la burbuja", ["Si tienes abierta la ventana grande del chat en una conversación y la otra persona contesta, la ventana grande se cierra y la conversación sigue en la burbuja. Lo que estuvieras escribiendo pasa a la burbuja, no se pierde. Para volver a la ventana grande, pulsa ⤢."]));
 
 // 8
-s.push(h1("8. Actualizar la aplicación"));
+s.push(h1("8. El chat en el móvil"));
+s.push(p("**Chat Princess** es el mismo chat en un móvil Android: las mismas conversaciones, la misma cuenta de Control de Pedidos y los mismos emoticonos. Puedes estar conectado **a la vez** en el Organizador y en el móvil: los mensajes llegan a los dos, también los que escribes tú desde el otro."));
+s.push(...tabla(["", "Organizador (Windows)", "Chat Princess (Android)"], [
+  ["Conversaciones, privados y grupos", "Sí", "Sí"], ["Emoticonos y respuestas rápidas", "Sí", "Sí"],
+  ["Enviar fotos y documentos", "📎, arrastrar o Ctrl+V", "Cámara, galería o documento"],
+  ["Avisos de mensajes nuevos", "Burbuja flotante con sonido", "Notificación del móvil, también con la app cerrada"],
+  ["Agenda, calendario, accesos y avisos de pedidos", "Sí", "No: solo el chat"],
+  ["Actualizaciones", "Aviso «Actualizar ahora»", "Aviso al abrir la app"]], [3300, 3169, 3169]));
+s.push(h2("Instalarla la primera vez"));
+s.push(p("En el Organizador, abre el **Chat** y pulsa **📱 Chat en el móvil**: se abre esta ventana con un código QR."));
+s.push(...imagen("u_chat_movil", 13, "Ventana «Chat en el móvil»."));
+s.push(...leyenda([[1, "**Código QR**: escanéalo con la cámara del móvil. Lleva a la página de descarga de la última versión."],
+  [2, "**Los pasos** para instalarla y dejarla lista."], [3, "**El enlace**, por si prefieres abrirlo a mano o enviártelo al móvil."],
+  [4, "**Cómo se actualiza** (apartado siguiente)."]]));
+s.push(...pasos(["En la página que se abre, toca el archivo **ChatPrincess_….apk** para descargarlo y ábrelo.",
+  "La primera vez, Android pregunta si permites **«Instalar apps desconocidas»** desde el navegador o la app de archivos: permítelo y pulsa **Instalar**.",
+  "Abre **Chat Princess** y entra con tu **usuario y contraseña de Control de Pedidos**, los mismos del Organizador.",
+  "Acepta las **notificaciones**.",
+  "En **Ajustes** de la app, pulsa **«Quitar el ahorro de batería»**. En algunos móviles (Xiaomi, Huawei, Oppo…) hay que permitir además el «inicio automático»."]));
+s.push(...recuadro("nota", "El aviso fijo «Chat conectado»", ["Mientras la app mantiene la conexión verás un aviso fijo «Chat conectado» en la barra de notificaciones. Es lo que permite que te avise de los mensajes con la app cerrada; al encender el móvil se vuelve a conectar solo."]));
+s.push(h2("Cómo se actualiza"));
+s.push(...pasos(["Al abrir la app, si hay una versión nueva, aparece el aviso **«Nueva versión…»** con sus novedades.",
+  "Pulsa **Descargar e instalar**: la app la descarga y comprueba que es la publicada (SHA-256).",
+  "Android muestra su pantalla de instalación: pulsa **Actualizar**. La primera vez pedirá permitir que **Chat Princess** instale apps.",
+  "No se pierde nada: la sesión y las conversaciones siguen igual."]));
+s.push(p("También puedes buscarla cuando quieras en **Ajustes → Buscar actualización**. Android no deja instalar sin confirmar, por eso el último paso siempre lo haces tú."));
+s.push(...recuadro("consejo", "Cerrar sesión en el móvil", ["En **Ajustes → Cerrar sesión** se borran del móvil el usuario y la contraseña y deja de avisar. Hazlo si cambias de móvil o si el móvil no es solo tuyo."]));
+
+s.push(h1("9. Actualizar la aplicación"));
 s.push(p("Al arrancar, y después cada 2 horas aproximadamente, el Organizador comprueba si hay una **versión nueva** publicada. Si la hay, se abre la ventana «Actualización disponible»."));
 s.push(...imagen("u_actualizacion", 11, "Actualización disponible (ejemplo)."));
 s.push(...leyenda([[1, "**Novedades** de la versión nueva."], [2, "**Actualizar ahora**: lo hace todo solo (pasos siguientes)."], [3, "**Recordar después**, si prefieres hacerlo más tarde."]]));
@@ -175,7 +203,7 @@ s.push(...recuadro("importante", "Elige «Solo actualizar versión»", ["La inst
 s.push(...recuadro("nota", "Una sola ventana a la vez", ["Solo puede haber un Organizador abierto. Si lo arrancas por segunda vez, se cierra el anterior y continúa el nuevo, para evitar avisos duplicados."]));
 
 // 9
-s.push(h1("9. Problemas frecuentes"));
+s.push(h1("10. Problemas frecuentes"));
 s.push(...tabla(["Problema", "Qué hacer"], [
   ["Un botón no abre nada o da error", "Comprueba que tienes acceso a la red (carpetas) o a Internet (webs). Si sigue igual, la ruta puede estar mal: díselo a quien administra el Organizador."],
   ["Un botón dice «POR DEFINIR»", "Está sin configurar. Púlsalo para configurarlo (o pide que lo configuren)."],
@@ -183,6 +211,7 @@ s.push(...tabla(["Problema", "Qué hacer"], [
   ["No me sale el saludo", "Solo aparece la primera vez que abres el Organizador cada día."],
   ["No me llegan avisos de pedidos", "Revisa Admin → Mi Usuario: tu usuario y contraseña de Control de Pedidos deben estar guardados y ser los que usas allí."],
   ["El chat dice que no hay credenciales", "Guarda tus credenciales en Admin → Mi Usuario y reinicia el Organizador."],
+  ["El móvil no avisa de los mensajes", "Comprueba que la app tiene permiso de notificaciones, que se ve el aviso «Chat conectado» y quita el ahorro de batería (Ajustes de la app)."],
   ["«Admin» me pide una contraseña", "Es la de tu cuenta de Control de Pedidos. Tras 3 fallos se bloquea 5 minutos. Si no tienes cuenta, pulsa «Crear acceso» (Manual de administrador)."],
   ["Error al comprobar actualizaciones", "Pulsa «Copiar texto» en la ventana de error y envíaselo a informática. No impide trabajar."]], [3300, 6338]));
 s.push(h2("Referencia rápida"));
@@ -190,6 +219,7 @@ s.push(...tabla(["Quiero…", "Cómo"], [["Abrir una carpeta, web o programa", "
   ["Pausar un aviso", "En su ventana emergente, «Desactivar evento»"], ["Ver vacaciones y festivos", "Calendario → Vacaciones / Festivos"],
   ["Imprimir la agenda", "Calendario → Agenda del Día / Semanal / Mensual"], ["Escribir a un compañero", "Chat → Nueva conversación"],
   ["Enviar un archivo por el chat", "📎, arrastrarlo a la ventana o Ctrl+V"], ["Cambiar mi nombre o mis credenciales", "Admin → Mi Usuario"],
+  ["Tener el chat en el móvil", "Chat → 📱 Chat en el móvil (código QR)"],
   ["Abrir este manual", "Botón Manual del menú, o «Manual de Usuario» en el menú Inicio de Windows"]], [4000, 5638]));
 
 L.generar(process.argv[2] || "salida/Manual_Usuario_OrganizadorPrincess.docx", "Manual de usuario — Organizador Princess", "de usuario", s);

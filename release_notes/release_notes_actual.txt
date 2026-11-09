@@ -1,7 +1,16 @@
-✨ Organizador Princess v4.18.14
+✨ Organizador Princess v4.18.16
 ================================================================
 
-(Incluye también todo lo de la 4.18.12, que no llegó a publicarse.)
+(Incluye también todo lo de la 4.18.14 y la 4.18.12, que no llegaron
+a publicarse.)
+
+💬 CHAT (4.18.16)
+
+• Si tienes abierta la ventana grande del chat en una conversación y
+  la otra persona contesta, la ventana grande se cierra y la
+  conversación sigue en la burbuja, con lo que estuvieras escribiendo.
+• En la burbuja también se pueden arrastrar archivos y pegarlos con
+  Ctrl+V, como en la ventana grande.
 
 📅 FECHAS Y HORAS MÁS FÁCILES (4.18.14)
 

@@ -1,3 +1,18 @@
+# ✨ Organizador Princess v4.18.16
+
+> Incluye también todo lo de la 4.18.14 y la 4.18.12, que no llegaron a publicarse.
+
+## 💬 Chat
+
+- Si tienes abierta la **ventana grande del chat** en una conversación y la otra persona contesta, la ventana grande se cierra y la conversación **sigue en la burbuja**. Lo que estuvieras escribiendo pasa a la burbuja.
+- En la **burbuja** ahora también se pueden **arrastrar y soltar archivos** desde el Explorador y pegarlos con **Ctrl+V**, como en la ventana grande. Antes de enviar se pregunta, y si un archivo no se puede enviar sale un aviso (antes no salía nada).
+
+## 🛠 Corrección
+
+- Chat: cerrar la ventana grande justo mientras se cargaban las conversaciones daba un error interno. Arreglado.
+
+---
+
 # ✨ Organizador Princess v4.18.14
 
 > Incluye también todo lo de la 4.18.12, que no llegó a publicarse.

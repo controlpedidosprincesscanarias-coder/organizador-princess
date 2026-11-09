@@ -51,6 +51,19 @@
 
 ---
 
+## 2026-11-09 14:23 — [Organizador] Chat: la conversación sigue en la burbuja, y la burbuja admite arrastrar archivos y Ctrl+V (v4.18.16, sin publicar)
+
+- Petición de Víctor, probando el borrador de la 4.18.14:
+  - Si la ventana grande del chat está abierta en una conversación y la otra persona contesta, la ventana grande se cierra y la conversación sigue en la burbuja flotante. Lo que se estuviera escribiendo pasa a la burbuja (`cerrar_para_seguir_en_burbuja()` en `ui/ventana_chat.py`, llamado desde `poll_chat` de `main_agenda.py`).
+  - La burbuja (`ui/chat_popup.py`) admite arrastrar y soltar archivos y pegar con Ctrl+V, como la ventana grande. Usa el mismo interruptor (`"chat_arrastrar_soltar"`), pregunta antes de enviar y avisa si un archivo no se puede enviar (antes fallaba en silencio). Los avisos se muestran por encima de la burbuja.
+- Corrección (commit propio): al cerrar la ventana grande mientras se cargaban la lista o el historial salía un error interno (`TclError … listbox`).
+- La 4.18.14 se queda en borrador sin publicar; esta versión la incluye, junto con la 4.18.12.
+- Probado en Linux con la aplicación real y un chat simulado (5 de 5 comprobaciones): la ventana grande se cierra, se abre la burbuja de esa conversación con el texto a medias, y un mensaje de otra conversación abre su propia burbuja.
+- **Falta probar en Windows** arrastrar a la burbuja: el arrastre usa la API de Windows y no se puede probar en Linux.
+- Manual de usuario actualizado (chat).
+
+---
+
 ## 2026-11-09 13:48 — [Organizador] Fechas con calendario 📅 y hora con ruedas en avisos, vacaciones y festivos (v4.18.14, sin publicar)
 
 - Petición de Víctor: elegir las fechas en un calendario y poner las horas sin escribir los dos puntos.

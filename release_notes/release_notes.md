@@ -1,3 +1,15 @@
+# ✨ Organizador Princess v4.18.20
+
+> Incluye también todo lo de la 4.18.18, la 4.18.16, la 4.18.14 y la 4.18.12, que no llegaron a publicarse.
+
+## 🆙 Actualizar con un solo clic
+
+- En la ventana «Nueva versión disponible», el botón **Actualizar ahora** lo hace todo: descarga la versión nueva, comprueba que es la publicada, la instala y el Organizador **se vuelve a abrir solo**. Solo hay que aceptar el permiso de Windows.
+- Ya no pregunta dónde guardar el instalador, y después de actualizar no aparece la ventana «Nueva versión detectada».
+- Funciona a partir de la próxima actualización, porque la ventana la muestra la versión que ya está instalada.
+
+---
+
 # ✨ Organizador Princess v4.18.18
 
 > Incluye también todo lo de la 4.18.16, la 4.18.14 y la 4.18.12, que no llegaron a publicarse.

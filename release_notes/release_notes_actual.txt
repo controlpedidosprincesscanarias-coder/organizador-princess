@@ -1,8 +1,13 @@
-✨ Organizador Princess v4.18.18
+✨ Organizador Princess v4.18.20
 ================================================================
 
-(Incluye también todo lo de la 4.18.16, la 4.18.14 y la 4.18.12, que
-no llegaron a publicarse.)
+(Incluye también todo lo de la 4.18.18, la 4.18.16, la 4.18.14 y la
+4.18.12, que no llegaron a publicarse.)
+
+🆙 ACTUALIZAR CON UN SOLO CLIC (4.18.20)
+
+• «Actualizar ahora» descarga, comprueba, instala y vuelve a abrir el
+  Organizador solo. Funciona a partir de la próxima actualización.
 
 😊 EMOTICONOS EN EL CHAT (4.18.18)
 

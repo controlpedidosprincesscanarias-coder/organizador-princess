@@ -51,6 +51,13 @@
 
 ---
 
+## 2026-11-09 21:06 — [Organizador / Chat móvil] Pasos para instalar la app del móvil pese a los avisos de Android (v4.18.34)
+
+- **Petición** (Víctor): al instalar la APK, Android y Google Play Protect piden análisis y hablan de peligrosidad; explicarlo junto al QR y en el manual.
+- **Organizador (v4.18.34):** la ventana «📱 Chat en el móvil» (`app/ui/chat_movil.py`) pasa de 4 a 6 pasos: «Descargar de todas formas» si el navegador avisa, «Instalar apps desconocidas», y con Google Play Protect «Más detalles» → «Instalar de todas formas»; la línea de actualizaciones avisa de que puede volver a salir. Manual de usuario, capítulo 8: los mismos pasos y un recuadro «¿Por qué avisa Android de que puede ser peligrosa?» (la app no viene de Google Play y pide permisos de segundo plano, arranque y autoinstalación; descargarla solo del QR o del enlace oficial). Capturas y manuales regenerados.
+- **Chat móvil:** el README explica lo mismo (solo documentación, sin versión nueva de la app).
+- **Pendiente de decidir** (Víctor): pedir a Google la revisión de la app con su formulario de Play Protect, quitar el permiso de ahorro de batería o publicarla en Google Play como app privada para que desaparezcan los avisos.
+
 ## 2026-11-09 20:20 — [Organizador] «Actualizar ahora» cerraba el Organizador sin instalar la versión nueva (v4.18.32)
 
 - **Síntoma** (Víctor, probando la 4.18.30 en Windows): se descargaba la actualización, se cerraba el Organizador y no se instalaba ni se abría la versión nueva.

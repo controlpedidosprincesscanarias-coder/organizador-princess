@@ -92,6 +92,9 @@ ok("carpeta temporal propia y vacía en cada descarga", c == c2 and not os.listd
 iss = open(os.path.join(RAIZ, "OrganizadorPrincess_Setup.iss"), encoding="utf-8").read()
 ok("el .iss reabre el Organizador al instalar en silencio (WizardSilent, usuario normal)",
    "Check: WizardSilent" in iss and "runasoriginaluser" in iss)
+_taskkill = [l for l in iss.splitlines() if "taskkill" in l.lower() and not l.strip().startswith(("{", ";"))]
+ok("el instalador cierra el Organizador SIN «/T» (con /T se cerraba a sí mismo al lanzarlo «Actualizar ahora»)",
+   bool(_taskkill) and all("/T" not in l.upper().replace("/TERM", "") for l in _taskkill), _taskkill)
 
 print(f"\n{'Todas las comprobaciones OK.' if not fallos else str(len(fallos)) + ' fallo(s)'}")
 sys.exit(1 if fallos else 0)

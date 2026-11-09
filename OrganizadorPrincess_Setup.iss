@@ -155,11 +155,15 @@ Name: "cmd.exe"; Parameters: "/c for /d /r ""{src}"" %%C in (__pycache__) do if 
 [Code]
 
 { ── Cierre forzado antes de instalar ───────────────────────────────────── }
+{ (v4.18.32) SIN «/T»: con «Actualizar ahora» este instalador lo abre el propio Organizador,
+  así que Windows lo cuenta como proceso hijo suyo. «/T» (cerrar también los hijos) cerraba
+  el instalador junto con el Organizador: se cerraba la versión actual y no se instalaba
+  ni se abría la nueva. Sin «/T» se cierran todos los OrganizadorPrincess.exe igualmente. }
 procedure KillOrganizador();
 var
   ResultCode: Integer;
 begin
-  Exec('taskkill.exe', '/F /IM OrganizadorPrincess.exe /T', '', SW_HIDE,
+  Exec('taskkill.exe', '/F /IM OrganizadorPrincess.exe', '', SW_HIDE,
        ewWaitUntilTerminated, ResultCode);
   Sleep(2000);
 end;

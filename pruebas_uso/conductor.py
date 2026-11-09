@@ -192,7 +192,18 @@ class Conductor:
         log(f"árbol {os.path.basename(ruta)}")
 
     def cerrar(self, v):
-        if v is not None and v.winfo_exists():
+        """Cierra como el botón ✕ de la ventana: usa su WM_DELETE_WINDOW si lo tiene."""
+        if v is None or not v.winfo_exists():
+            return
+        try:
+            cmd = v.protocol("WM_DELETE_WINDOW")
+        except tk.TclError:
+            cmd = ""
+        if cmd:
+            v.tk.call(cmd)
+            if v.winfo_exists():
+                v.destroy()
+        else:
             v.destroy()
 
     def ok(self, nombre, cond, det=""):

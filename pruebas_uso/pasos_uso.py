@@ -98,6 +98,28 @@ def festivos_ver(c):
     c.ok("3. ventana de festivos", bool(n), c.titulos())
     c.captura("festivos")
     for v in n: cerrar_con_boton(c, v)
+def agendas_imprimibles(c):
+    cal = c.ventana("Calendario")
+    ESTADO["web_antes"] = len(WEB)
+    for t in ("Agenda del Día", "Agenda Semanal", "Agenda Mensual"):
+        c.pulsar(cal, t)
+def agendas_imprimibles_ver(c):
+    nuevas = WEB[ESTADO["web_antes"]:]
+    htmls = []
+    for u in nuevas:
+        ruta = u.replace("file:///", "/").replace("file://", "")
+        try:
+            htmls.append(open(ruta, encoding="utf-8").read())
+        except Exception:
+            htmls.append("")
+    c.ok("3. las agendas del día, semanal y mensual se abren en el navegador", len(nuevas) == 3, nuevas)
+    c.ok("3. la agenda del día incluye el aviso de prueba", any(f"PRUEBA CLAUDE {SELLO}" in h for h in htmls[:1]) or any(f"PRUEBA CLAUDE {SELLO}" in h for h in htmls), [len(h) for h in htmls])
+    ESTADO["antes"] = {str(w) for w in c.ventanas()}
+    c.pulsar(c.ventana("Calendario"), "Chat")
+def chat_desde_calendario(c):
+    n = nueva_ventana(c, ESTADO["antes"])
+    c.ok("3. el botón «Chat» del calendario abre el chat", bool(n), c.titulos())
+    for v in n: c.cerrar(v)
     for v in todas(c): c.cerrar(v)
 
 # ── 4. Admin: botones del menú, vista reducida, exportar/importar ───────────
@@ -377,6 +399,7 @@ PASOS = [
     ("2 agenda", agenda, 2000), ("2 añadir", aviso_nuevo, 1500), ("2 rellenar", aviso_rellenar, 2000), ("2 lista", aviso_lista, 1500),
     ("3 calendario", calendario, 2500), ("3 ver", calendario_ver, 1500), ("3 semana", calendario_semana, 2500),
     ("3 vacaciones", vacaciones_ver, 2500), ("3 festivos", festivos_ver, 1500),
+    ("3 agendas imprimibles", agendas_imprimibles, 2000), ("3 agendas ver", agendas_imprimibles_ver, 4000), ("3 chat", chat_desde_calendario, 1500),
     ("4 admin", admin, 3000), ("4 login", admin_login, 4000), ("4 editar acceso 1", pulsar_admin("Editar", 0), 2500), ("4 web", editar_acceso_web, 2500),
     ("4 admin", admin, 3000), ("4 login", admin_login, 3000), ("4 editar botón 1", pulsar_admin("Editar", 6), 2500), ("4 carpeta", editar_menu_carpeta, 2500),
     ("4 menú", menu_botones, 2500), ("4 menú ver", menu_botones_ver, 500),

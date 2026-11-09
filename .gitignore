@@ -225,3 +225,7 @@ Output/
 
 # Salida de pruebas_uso/ejecutar.sh (capturas y registros)
 pruebas_uso/salida/
+
+# Manuales: capturas y salida de usar y tirar
+docs/manuales_fuente/cap/
+docs/manuales_fuente/salida/

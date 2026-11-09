@@ -51,6 +51,21 @@
 
 ---
 
+## 2026-11-09 08:08 — [Chat] Sin errores 500 cuando varios abren el chat a la vez (v1.2.5)
+
+- **Origen**: log de Render del chat que envió Víctor.
+  - Antes del despliegue de la v1.2.4 se ven, a las 06:05 y 06:10, «connection pool exhausted» y un 500 en `/api/chat/usuarios`.
+  - La v1.2.4 arrancó bien: «Auto-migración del chat OK».
+- **Causa**: psycopg2 falla en el acto si se piden más conexiones que `maxconn` (2 para usuarios, 8 para el chat). Pasa cuando varios Organizadores abren el chat a la vez, con usuarios, canales y mensajes cada uno.
+  - Reproducido en local: 60 peticiones simultáneas con 2+3 conexiones, 36 con 500.
+  - El servicio no se congela; un primer «congelamiento» resultó ser de la propia prueba, que no leía el registro y llenó la tubería.
+- **Arreglo** (commit propio): `_PoolConEspera` (`chat/db.py`) reparte el turno con un semáforo y espera hasta 10 s a que quede una conexión libre. Además, sin el error «connection pool is closed» al apagar.
+- **Pruebas**: `tests/test_chat.py`, 45 comprobaciones, con dos ráfagas de 60 peticiones y pocas conexiones (fallan con el código anterior).
+- **Anotado**: Gunicorn 26 elimina el worker de eventlet; `requirements.txt` ya fija `gunicorn<26`.
+- `PENDIENTES.md` de Control Pedidos: fuera la limpieza de los pedidos de prueba de PR, que Víctor ya hizo. «usuario prueba» queda desactivado por ahora.
+
+---
+
 ## 2026-11-09 07:40 — [Control Pedidos] Rol hotel probado en producción; solo registra entregas en pedidos enviados (v12.34.16)
 
 - **Prueba en producción** con «usuario prueba» en rol hotel, v12.34.14, sin modificar datos: **26 de 26**.

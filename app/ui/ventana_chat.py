@@ -349,7 +349,7 @@ def _ventana_chat(ctx):
             # (2026-08-01) Descartar los que quedaron "limpiados" en este
             # equipo — ver _limpiar_chat() y db/sqlite.py.
             mensajes = filtrar_mensajes_limpiados(resolved_canal, mensajes)
-            win.after(0, lambda: [_pintar_mensaje(m) for m in mensajes])
+            win.after(0, lambda: win.winfo_exists() and [_pintar_mensaje(m) for m in mensajes])
             canal_actual["id"] = resolved_canal
             cliente.unirse_canal(resolved_canal)
 
@@ -368,6 +368,8 @@ def _ventana_chat(ctx):
         def _fetch():
             canales = cliente.obtener_canales()
             def _pintar():
+                if not win.winfo_exists():   # (v4.18.16) la ventana se cerró mientras se cargaba
+                    return
                 lista.delete(0, "end")
                 _canales_por_indice.clear()
                 for c in canales:

@@ -6,11 +6,11 @@ Arranca el Organizador **de verdad** (`main_agenda.py`, Tkinter + ttkbootstrap) 
 
 Lo propio de Windows se simula: el bloqueo de instancia única (`ctypes.windll`), los sonidos (`winsound`), `os.startfile` y el cifrado DPAPI (en Linux la contraseña se guarda sin cifrar, pero en un perfil temporal que se borra al terminar). Los mensajes de `messagebox` se anotan en el registro y se responden solos con «Aceptar» o «Sí».
 
-## Qué comprueba (23 comprobaciones)
+## Qué comprueba (30 comprobaciones)
 1. Primer arranque: ventana «Nueva versión», aviso «Versión actualizada» y saludo diario.
 2. Agenda: crear un aviso, verlo en «Mis Recordatorios» y en `agenda.json`.
-3. Calendario (mes y semana), vacaciones y festivos.
-4. Administración: entrar con la contraseña; configurar un acceso dorado (web) y un botón azul (carpeta) y comprobar que abren lo suyo; vista reducida y extendida; exportar e importar la configuración (la importación cierra la aplicación a propósito).
+3. Calendario (mes y semana), vacaciones, festivos, agendas imprimibles del día, la semana y el mes, y el botón «Chat» del calendario.
+4. Administración: contraseña incorrecta (no entra) y correcta; cambiar el nombre en «Mi Usuario» (se ve sin reiniciar); configurar un acceso dorado (web) y un botón azul (carpeta) y comprobar que abren lo suyo; vista reducida y extendida; exportar e importar la configuración (la importación cierra la aplicación a propósito).
 5. El aviso de la agenda salta a su hora («🔔 AVISO», se cierra con «Entendido»).
 6. Chat: abre la ventana y carga las conversaciones. Solo envía un mensaje si se indica `CHAT_DESTINO`.
 7. Control de Pedidos: con `CREAR_PEDIDO_PR=1` crea un pedido en el hotel PR y lo cancela (el aviso real puede tardar unos minutos en llegar); siempre comprueba con una notificación simulada que el Organizador la muestra como aviso emergente.

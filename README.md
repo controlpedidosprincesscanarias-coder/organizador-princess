@@ -23,7 +23,7 @@ Aplicación de escritorio desarrollada en **Python + ttkbootstrap**, que combina
 
 ```
 /
-├── main_agenda.py                 (punto de entrada de la aplicación)
+├── main_agenda.py                 (punto de entrada: menú principal y arranque de los servicios)
 ├── pedidos_agenda_bridge.py       (sistema de notificaciones — conexión con Control de Pedidos)
 ├── app/
 │   ├── context.py                 (AppContext — dependencias compartidas)
@@ -33,7 +33,9 @@ Aplicación de escritorio desarrollada en **Python + ttkbootstrap**, que combina
 │   │   └── correo.py
 │   ├── services/update_service.py  (comprobación de versión y novedades vía GitHub Releases)
 │   ├── ui/
-│   │   ├── agenda_helpers.py, festivos.py, vacaciones.py, ventana_config.py, saludo.py, assets.py, importexport.py
+│   │   ├── agenda.py, calendario.py, admin.py   (ventanas Agenda, Calendario y Administración — v4.18.08)
+│   │   ├── disposicion.py, colores.py           (constantes del menú y vista; colores comunes)
+│   │   ├── agenda_helpers.py, festivos.py, vacaciones.py, ventana_config.py, ventana_chat.py, saludo.py, assets.py, importexport.py
 │   │   └── __init__.py
 │   └── utils/
 │       ├── fechas.py, rutas.py, sonido.py

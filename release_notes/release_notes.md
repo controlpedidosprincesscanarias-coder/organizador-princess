@@ -1,3 +1,17 @@
+# ✨ Organizador Princess v4.18.08
+
+> Incluye también todo lo de la 4.18.06, que no llegó a publicarse.
+
+## 🛠 Corrección
+
+- **Mi Usuario:** al cambiar el nombre a mostrar, el saludo diario seguía usando el nombre anterior hasta reiniciar el Organizador. Ahora se ve al momento.
+
+## 🧹 Por dentro
+
+- El código de las ventanas Agenda, Calendario y Administración está ahora ordenado en archivos propios. No cambia nada de lo que ves ni de cómo funciona.
+
+---
+
 # ✨ Organizador Princess v4.18.06
 
 ## 🛠 Correcciones

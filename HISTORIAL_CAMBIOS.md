@@ -51,6 +51,10 @@
 
 ---
 
+## 2026-11-09 19:56 — [Organizador] Botones del chat más visibles (v4.18.30)
+
+- «📱 Chat en el móvil» y «🖼 Fotos» pasan de gris (`secondary-outline`) al mismo azul que «Limpiar chat» (`info-outline`): con el tema oscuro parecían desactivados y apenas se veían sin pasar el ratón por encima (aviso de Víctor). Manuales regenerados.
+
 ## 2026-11-09 19:44 — [Chat / Chat móvil / Organizador] Fotos de perfil de personas y grupos (Chat v1.3.0, Chat móvil v1.0.4, Organizador v4.18.28)
 
 Petición de Víctor: poder poner imágenes a cada integrante del chat y a los grupos, en el móvil y en el Organizador.

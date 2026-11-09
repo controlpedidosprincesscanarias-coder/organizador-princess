@@ -38,7 +38,7 @@ Todos los equipos se actualizan solos desde las **Releases de este repositorio**
 - El acceso a Administración se valida contra Control de Pedidos (`admin_auth.py`). La antigua contraseña fija se eliminó en v4.10.6: no reintroducir credenciales fijas (comentario ANTI-REGRESION en `main_agenda.py`).
 
 ## Historial compartido
-`HISTORIAL_CAMBIOS.md` es **el mismo documento** que `docs/HISTORIAL_CAMBIOS.md` de Control Pedidos (y `docs/archivo/` el mismo archivo antiguo). Entrada más reciente arriba, cabecera `## AAAA-MM-DD HH:MM — [Componente] Título (versión)`, componentes: Organizador / Control Pedidos / Chat / Infra. Cada cambio se anota en los dos repositorios con el mismo texto.
+`HISTORIAL_CAMBIOS.md` es **el mismo documento** que `docs/HISTORIAL_CAMBIOS.md` de Control Pedidos (y `docs/archivo/` el mismo archivo antiguo). Entrada más reciente arriba, cabecera `## AAAA-MM-DD HH:MM — [Componente] Título (versión)`, componentes: Organizador / Control Pedidos / Chat / Chat móvil / Infra. Cada cambio se anota en los dos repositorios con el mismo texto.
 
 ## Reglas de trabajo
 1. Leer el código real antes de proponer cambios; buscar todos los usos de una función antes de modificarla.

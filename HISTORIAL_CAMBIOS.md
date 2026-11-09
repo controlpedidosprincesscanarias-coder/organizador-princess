@@ -9,7 +9,7 @@
 > artículos/materiales — repo `dali-sap-articulos-app`, aparte pero
 > integrado con Control Pedidos vía SSO desde el 2026-08-14, ver más
 > abajo), **Infra** (Render / Cloudflare / GitHub Actions, no es código
-> de la app).
+> de la app). **Chat móvil** (app Android, repo `chat-movil-princess`, desde el 2026-11-09).
 
 > **Normas de entrega (obligatorias para cualquier cambio, ya lo
 > implemente Claude, otra IA o cualquier programador humano):**
@@ -48,6 +48,26 @@
 >    recuadro "✅ RESUELTO" añadido) sigue existiendo fuera de este repo.
 >    A partir de aquí, las entradas de norma 5 pueden limitarse a "no
 >    existe en este repo" sin repetir la explicación completa.
+
+---
+
+## 2026-11-09 18:02 — [Chat móvil] Nueva app Android «Chat Princess» (v1.0.0, sin publicar)
+
+- Petición de Víctor: el chat de Control de Pedidos en el móvil, con usuario y contraseña de Control de Pedidos como el Organizador, y conectado a la vez en escritorio y móvil.
+- **Repositorio nuevo y público:** `chat-movil-princess`. Las actualizaciones se buscan en sus Releases sin iniciar sesión, como las del Organizador. Componente nuevo del historial: «Chat móvil».
+- **Qué hace la app** (Kotlin + Jetpack Compose, Android 8 o posterior):
+  - Login en `/api/bridge/login` a través del Worker; la cookie se reenvía al servicio del chat (mismo contrato que `chat_client.py`).
+  - General, privados y grupos; mensajes en tiempo real (Socket.IO); los mismos emoticonos y respuestas rápidas que el Organizador.
+  - Fotos de la cámara o de la galería (reducidas a 1600 px) y documentos de hasta 10 MB; un toque en un adjunto lo abre.
+  - Servicio en marcha («Chat conectado») que avisa con la app cerrada y vuelve a conectar al encender el móvil.
+  - Credenciales cifradas en el móvil (Android Keystore).
+  - Actualizaciones desde las Releases, con comprobación SHA-256.
+- **Servidor del chat sin cambios.** Ya mete cada conexión en la sala `user:<usuario>`, así que el Organizador y el móvil reciben los mismos mensajes, también los propios.
+- **Compilación:** a mano en GitHub Actions («Compilar Chat Princess», «solo-descarga» o «borrador»), firmada con los secretos `FIRMA_*` del repositorio. La clave se generó en esta sesión y Víctor tiene la copia de seguridad.
+- **Pruebas:**
+  - 7 de lógica y lint, sin errores.
+  - Una de punta a punta contra Control Pedidos y el chat **en local**: login, privado de un compañero que llega al móvil y al Organizador del mismo usuario, respuesta desde el móvil que aparece en el escritorio, historial con emoticonos y creación de un grupo.
+- **Falta probarla en un móvil de verdad**: interfaz, avisos con la app cerrada, cámara e instalación de actualizaciones. Aquí no hay emulador.
 
 ---
 

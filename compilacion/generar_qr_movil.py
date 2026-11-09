@@ -1,4 +1,4 @@
-"""Genera el código QR de descarga de Chat Princess para Android (app/ui/qr_chat_movil.png).
+"""Genera el código QR de descarga de Chat Dpto. Compras Princess para Android (app/ui/qr_chat_movil.png).
 
 La idea y el desarrollo de la aplicación Organizador Princess, incluidas sus pruebas, son de
 Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.

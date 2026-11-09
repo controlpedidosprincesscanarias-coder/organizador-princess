@@ -1,7 +1,7 @@
 // Manual de usuario del Organizador Princess. Idea y desarrollo de la aplicación: Víctor Alejandro Martín Andrade.
 const L = require("./lib");
 const { p, vineta, pasos, h1, h2, imagen, leyenda, recuadro, tabla, portada, indice } = L;
-const V = process.env.VERSION || "v4.18.24";
+const V = process.env.VERSION || "v4.18.26";
 
 const s = [];
 s.push(portada({ rol: "Uso diario", subtitulo: "Abre tus accesos, apunta avisos, consulta el calendario y chatea con tus compañeros",
@@ -9,7 +9,7 @@ s.push(portada({ rol: "Uso diario", subtitulo: "Abre tus accesos, apunta avisos,
 s.push(indice([["1. El Organizador de un vistazo", "Qué puedes hacer y qué no"], ["2. Conoce la pantalla", "Menú principal, accesos y submenús"],
   ["3. Vista extendida y reducida", ""], ["4. Agenda de avisos", "Crear, editar, pausar y borrar avisos"],
   ["5. Calendario, vacaciones y festivos", "Mes, semana, detalle del día e impresión"], ["6. Avisos emergentes", "Agenda, vacaciones y festivos, pedidos y saludo del día"],
-  ["7. Chat", "Conversaciones, grupos, adjuntos y burbuja flotante"], ["8. El chat en el móvil", "Chat Princess para Android: instalarla y actualizarla"],
+  ["7. Chat", "Conversaciones, grupos, adjuntos y burbuja flotante"], ["8. El chat en el móvil", "Chat Dpto. Compras Princess para Android: instalarla y actualizarla"],
   ["9. Actualizar la aplicación", ""], ["10. Problemas frecuentes", "Y referencia rápida"]]));
 
 // 1
@@ -22,7 +22,7 @@ for (const t of ["Abrir con un clic **carpetas de red, páginas web, programas y
   "Consultar el **calendario** con tus avisos, vacaciones y festivos, e **imprimir** la agenda del día, la semana o el mes.",
   "Preparar el **correo de aviso** de vacaciones o de cierre por festivo.",
   "Recibir los **avisos de tus pedidos** de Control de Pedidos.",
-  "**Chatear** con compañeros, crear grupos y enviar imágenes y documentos, también desde el **móvil** con Chat Princess (capítulo 8)."]) s.push(vineta(t));
+  "**Chatear** con compañeros, crear grupos y enviar imágenes y documentos, también desde el **móvil** con Chat Dpto. Compras Princess (capítulo 8)."]) s.push(vineta(t));
 s.push(h2("Qué no se hace aquí"));
 for (const t of ["Cambiar los botones, su orden o la vista del menú: se hace en el panel **Admin** (Manual de administrador).",
   "Ver la agenda de otro compañero: cada agenda es local de su PC.",
@@ -158,8 +158,8 @@ s.push(...recuadro("consejo", "La conversación sigue en la burbuja", ["Si tiene
 
 // 8
 s.push(h1("8. El chat en el móvil"));
-s.push(p("**Chat Princess** es el mismo chat en un móvil Android: las mismas conversaciones, la misma cuenta de Control de Pedidos y los mismos emoticonos. Puedes estar conectado **a la vez** en el Organizador y en el móvil: los mensajes llegan a los dos, también los que escribes tú desde el otro."));
-s.push(...tabla(["", "Organizador (Windows)", "Chat Princess (Android)"], [
+s.push(p("**Chat Dpto. Compras Princess** es el mismo chat en un móvil Android: las mismas conversaciones, la misma cuenta de Control de Pedidos y los mismos emoticonos. Puedes estar conectado **a la vez** en el Organizador y en el móvil: los mensajes llegan a los dos, también los que escribes tú desde el otro."));
+s.push(...tabla(["", "Organizador (Windows)", "Chat Dpto. Compras Princess (Android)"], [
   ["Conversaciones, privados y grupos", "Sí", "Sí"], ["Emoticonos y respuestas rápidas", "Sí", "Sí"],
   ["Enviar fotos y documentos", "📎, arrastrar o Ctrl+V", "Cámara, galería o documento"],
   ["Avisos de mensajes nuevos", "Burbuja flotante con sonido", "Notificación del móvil, también con la app cerrada"],
@@ -173,14 +173,14 @@ s.push(...leyenda([[1, "**Código QR**: escanéalo con la cámara del móvil. Ll
   [4, "**Cómo se actualiza** (apartado siguiente)."]]));
 s.push(...pasos(["En la página que se abre, toca el archivo **ChatPrincess_….apk** para descargarlo y ábrelo.",
   "La primera vez, Android pregunta si permites **«Instalar apps desconocidas»** desde el navegador o la app de archivos: permítelo y pulsa **Instalar**.",
-  "Abre **Chat Princess** y entra con tu **usuario y contraseña de Control de Pedidos**, los mismos del Organizador.",
+  "Abre **Chat Dpto. Compras Princess** y entra con tu **usuario y contraseña de Control de Pedidos**, los mismos del Organizador.",
   "Acepta las **notificaciones**.",
   "En **Ajustes** de la app, pulsa **«Quitar el ahorro de batería»**. En algunos móviles (Xiaomi, Huawei, Oppo…) hay que permitir además el «inicio automático»."]));
 s.push(...recuadro("nota", "El aviso fijo «Chat conectado»", ["Mientras la app mantiene la conexión verás un aviso fijo «Chat conectado» en la barra de notificaciones. Es lo que permite que te avise de los mensajes con la app cerrada; al encender el móvil se vuelve a conectar solo."]));
 s.push(h2("Cómo se actualiza"));
 s.push(...pasos(["Al abrir la app, si hay una versión nueva, aparece el aviso **«Nueva versión…»** con sus novedades.",
   "Pulsa **Descargar e instalar**: la app la descarga y comprueba que es la publicada (SHA-256).",
-  "Android muestra su pantalla de instalación: pulsa **Actualizar**. La primera vez pedirá permitir que **Chat Princess** instale apps.",
+  "Android muestra su pantalla de instalación: pulsa **Actualizar**. La primera vez pedirá permitir que **Chat Dpto. Compras Princess** instale apps.",
   "No se pierde nada: la sesión y las conversaciones siguen igual."]));
 s.push(p("También puedes buscarla cuando quieras en **Ajustes → Buscar actualización**. Android no deja instalar sin confirmar, por eso el último paso siempre lo haces tú."));
 s.push(...recuadro("consejo", "Cerrar sesión en el móvil", ["En **Ajustes → Cerrar sesión** se borran del móvil el usuario y la contraseña y deja de avisar. Hazlo si cambias de móvil o si el móvil no es solo tuyo."]));

@@ -1,6 +1,6 @@
 """
 app/ui/chat_movil.py  ·  v4.18.24
-Ventana «Chat en el móvil»: cómo instalar Chat Princess para Android, con un código QR.
+Ventana «Chat en el móvil»: cómo instalar Chat Dpto. Compras Princess para Android, con un código QR.
 
 La idea y el desarrollo de la aplicación Organizador Princess, incluidas sus pruebas, son de
 Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.
@@ -41,7 +41,7 @@ def abrir_chat_movil(parent):
 
     cuerpo = ttk.Frame(win, padding=(20, 16, 20, 12))
     cuerpo.pack(fill="both", expand=True)
-    ttk.Label(cuerpo, text="📱  Chat Princess para Android", font=("Segoe UI", 13, "bold")).pack(anchor="w")
+    ttk.Label(cuerpo, text="📱  Chat Dpto. Compras Princess para Android", font=("Segoe UI", 13, "bold")).pack(anchor="w")
     ttk.Label(cuerpo, text="El mismo chat, con tu cuenta de Control de Pedidos. Puedes tenerlo a la vez\n"
                            "en el Organizador y en el móvil: los mensajes llegan a los dos.",
               font=("Segoe UI", 9), foreground="#adb5bd", justify="left").pack(anchor="w", pady=(4, 12))

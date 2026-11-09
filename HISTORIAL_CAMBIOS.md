@@ -51,6 +51,20 @@
 
 ---
 
+## 2026-11-09 19:17 — [Chat móvil] La corona de Princess como icono y en la cabecera (v1.0.2, sin publicar)
+
+- Petición de Víctor, ya con la v1.0.0 instalada y funcionando en su móvil: usar la corona de Princess como icono de la app y en la parte alta.
+- **Dónde aparece la corona** (silueta de `assets/corona.png` del Organizador):
+  - en blanco sobre el azul marino de las apps de Compras como icono adaptativo, también en el modo monocromo de Android 13 y posterior;
+  - en la cabecera de la lista de conversaciones;
+  - en la pantalla de acceso;
+  - como icono de las notificaciones.
+- **Primera actualización desde la app:** al publicar la 1.0.2, los móviles con la 1.0.0 verán el aviso «Nueva versión 1.0.2» al abrir la app. Sirve para probar el ciclo de actualización.
+- **Publicación de la 1.0.0:** se publica con «Release label: None». Una «Pre-release» no cuenta como última versión y ni el QR ni el aviso de la app la encontrarían.
+- Compila, y las pruebas y lint pasan. Falta verlo en el móvil.
+
+---
+
 ## 2026-11-09 19:04 — [Organizador] El chat en el móvil, enlazado desde el Organizador y en el manual (v4.18.24, sin publicar)
 
 - Petición de Víctor: que el manual explique que existe el chat para Android, cómo descargarlo la primera vez y cómo se actualiza, y que todo quede enlazado.

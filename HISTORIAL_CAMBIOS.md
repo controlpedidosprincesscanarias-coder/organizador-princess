@@ -51,7 +51,7 @@
 
 ---
 
-## 2026-11-09 10:12 — [Organizador] Prueba test_bd_y_acceso.py compatible con Windows (v4.18.10, sin publicar)
+## 2026-11-09 12:27 — [Organizador] Prueba test_bd_y_acceso.py compatible con Windows (v4.18.10, sin publicar)
 
 - La primera compilación automática («Compilar Organizador», destino borrador) falló en la fase de pruebas.
   - `test_bd_y_acceso.py` dejaba abierta su conexión SQLite al consultar columnas y luego borraba el archivo: Windows no deja borrar un archivo abierto (`PermissionError: WinError 32`). En Linux pasaba.

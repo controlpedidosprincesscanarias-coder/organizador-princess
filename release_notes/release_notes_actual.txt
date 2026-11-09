@@ -1,9 +1,14 @@
-✨ Organizador Princess v4.18.28
+✨ Organizador Princess v4.18.30
 ================================================================
 
-(Incluye también todo lo de la 4.18.26, la 4.18.24, la 4.18.22, la
-4.18.20, la 4.18.18, la 4.18.16, la 4.18.14 y la 4.18.12, que no
-llegaron a publicarse.)
+(Incluye también todo lo de la 4.18.28, la 4.18.26, la 4.18.24, la
+4.18.22, la 4.18.20, la 4.18.18, la 4.18.16, la 4.18.14 y la 4.18.12,
+que no llegaron a publicarse.)
+
+👁 BOTONES DEL CHAT MÁS VISIBLES (4.18.30)
+
+• «📱 Chat en el móvil» y «🖼 Fotos» se ven ahora igual de claros que
+  «Limpiar chat» (antes parecían desactivados).
 
 🖼 FOTOS DE PERFIL EN EL CHAT (4.18.28)
 

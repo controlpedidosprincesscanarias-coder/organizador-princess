@@ -1,3 +1,13 @@
+# ✨ Organizador Princess v4.18.30
+
+> Incluye también todo lo de la 4.18.28 y anteriores que no llegaron a publicarse (desde la 4.18.12).
+
+## 👁 Botones del chat más visibles
+
+- En la ventana del chat, **📱 Chat en el móvil** y **🖼 Fotos** tienen ahora el mismo color que «Limpiar chat». Antes eran grises y parecían desactivados.
+
+---
+
 # ✨ Organizador Princess v4.18.28
 
 > Incluye también todo lo de la 4.18.26 y anteriores que no llegaron a publicarse (desde la 4.18.12).

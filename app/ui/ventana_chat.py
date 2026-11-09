@@ -218,7 +218,7 @@ def _ventana_chat(ctx):
             win.after(0, _fin)
         threading.Thread(target=_hilo, daemon=True, name="Chat-Foto-Subir").start()
 
-    btn_fotos = ttk.Menubutton(frm_titulo_chat, text="🖼 Fotos", bootstyle="secondary-outline")
+    btn_fotos = ttk.Menubutton(frm_titulo_chat, text="🖼 Fotos", bootstyle="info-outline")
     menu_fotos = tk.Menu(btn_fotos, tearoff=0)
     btn_fotos.configure(menu=menu_fotos)
 
@@ -237,7 +237,7 @@ def _ventana_chat(ctx):
     menu_fotos.configure(postcommand=_preparar_menu_fotos)
     btn_fotos.pack(side="right", padx=(0, 6))
     # (v4.18.24) Enlace a la app Android: QR y pasos para instalarla
-    ttk.Button(frm_titulo_chat, text="📱 Chat en el móvil", bootstyle="secondary-outline",
+    ttk.Button(frm_titulo_chat, text="📱 Chat en el móvil", bootstyle="info-outline",
                command=lambda: abrir_chat_movil(win)).pack(side="right", padx=(0, 6))
 
     # Paleta a juego con ui/chat_popup.py, para que las burbujas se vean

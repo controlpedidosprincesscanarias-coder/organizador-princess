@@ -1,14 +1,16 @@
-✨ Organizador Princess v4.18.24
+✨ Organizador Princess v4.18.26
 ================================================================
 
-(Incluye también todo lo de la 4.18.22, la 4.18.20, la 4.18.18, la
-4.18.16, la 4.18.14 y la 4.18.12, que no llegaron a publicarse.)
+(Incluye también todo lo de la 4.18.24, la 4.18.22, la 4.18.20, la
+4.18.18, la 4.18.16, la 4.18.14 y la 4.18.12, que no llegaron a
+publicarse.)
 
-📱 EL CHAT TAMBIÉN EN EL MÓVIL (4.18.24)
+📱 EL CHAT TAMBIÉN EN EL MÓVIL (4.18.24 y 4.18.26)
 
-• Nueva app Chat Princess para Android, con tu cuenta de Control de
-  Pedidos. En el chat, «📱 Chat en el móvil» muestra el código QR para
-  descargarla. El Manual de usuario explica cómo instalarla.
+• Nueva app «Chat Dpto. Compras Princess» para Android, con tu cuenta
+  de Control de Pedidos y la corona de Princess como icono. En el chat,
+  «📱 Chat en el móvil» muestra el código QR para descargarla. El
+  Manual de usuario explica cómo instalarla.
 
 😊 EMOTICONOS EN COLOR (4.18.22)
 

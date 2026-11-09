@@ -51,6 +51,17 @@
 
 ---
 
+## 2026-11-09 09:05 — [Chat] Mantenimiento solo desde cron-job.org; fuera el workflow de GitHub (v1.2.6)
+
+- **Petición** (Víctor): eliminar en GitHub lo que sobra para el ping, ahora que cron-job.org tiene las dos tareas del chat:
+  - «Keep-alive chat (servicio)»: `/ping` cada 10 min, L-V 06:00-18:50, hora de Canarias;
+  - «Keep-alive chat (base de datos)»: `/ping/db` a diario a las 9:17.
+- Retirado `.github/workflows/keep-alive-chat.yml` del repo del chat: duplicaba la llamada diaria a `/ping/db`. `GUIA_DESPLIEGUE.md`, `CLAUDE.md`, README y CHANGELOG lo explican. No cambia el código.
+- **No se toca** `.github/workflows/keep-alive-princess.yml` de Control Pedidos: es lo único que mantiene despierto el servicio principal, porque no hay tarea en cron-job.org para él.
+- El fallo «HTTP error» de la tarea de `/ping/db` de esta mañana coincide con los despliegues de hoy. A las 08:2x, `/ping` y `/ping/db` respondían 200 en ~0,5 s.
+
+---
+
 ## 2026-11-09 08:08 — [Chat] Sin errores 500 cuando varios abren el chat a la vez (v1.2.5)
 
 - **Origen**: log de Render del chat que envió Víctor.

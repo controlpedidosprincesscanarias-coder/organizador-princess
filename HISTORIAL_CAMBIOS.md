@@ -51,6 +51,20 @@
 
 ---
 
+## 2026-11-09 06:14 — [Organizador] Novedades con formato en «Nueva versión disponible» (v4.18.10)
+
+- **Petición**: última mejora anotada en la revisión del Organizador (Víctor: «seguir»).
+- **Cambio**: el `body` de la Release (Markdown) se mostraba tal cual, con `#` y `**`. Nuevo `app/ui/markdown_texto.py`:
+  - `analizar()`, sin Tkinter, y `pintar()` sobre el `tk.Text` de la ventana;
+  - entiende títulos, viñetas y listas numeradas, negrita, `código`, citas y separadores;
+  - si algo falla, pone el texto tal cual.
+- **Pruebas**:
+  - `test_markdown_texto.py`, 15 comprobaciones, incluidas las notas reales de `release_notes.md`. Añadido a la compilación automática.
+  - Prueba de uso, 31 de 31. La versión simulada pasa a 9.0.0 (con la app en 4.18.08, una «4.18.08» no sería nueva). La versión del primer arranque se lee del programa, y la ventana del chat se distingue de un aviso que salte a la vez.
+- Versión **4.18.10** (incluye la 4.18.06 y la 4.18.08, sin publicar). No se ha publicado ninguna Release.
+
+---
+
 ## 2026-11-09 02:02 — [Organizador] Reorganización: Agenda, Calendario y Administración salen de main_agenda.py (v4.18.08)
 
 - **Petición**: punto 3 de la revisión del Organizador (Víctor: «Sigue»).

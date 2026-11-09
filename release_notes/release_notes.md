@@ -1,6 +1,14 @@
-# ✨ Organizador Princess v4.18.08
+# ✨ Organizador Princess v4.18.10
 
-> Incluye también todo lo de la 4.18.06, que no llegó a publicarse.
+> Incluye también todo lo de la 4.18.06 y la 4.18.08, que no llegaron a publicarse.
+
+## 🆙 Actualizaciones
+
+- En la ventana **«Nueva versión disponible»** las novedades se ven ahora con formato (títulos, viñetas, negritas), en vez de con los símbolos `#` y `**`.
+
+---
+
+# ✨ Organizador Princess v4.18.08
 
 ## 🛠 Corrección
 

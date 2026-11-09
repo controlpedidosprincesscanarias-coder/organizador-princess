@@ -1,7 +1,7 @@
 // Manual de usuario del Organizador Princess. Idea y desarrollo de la aplicación: Víctor Alejandro Martín Andrade.
 const L = require("./lib");
 const { p, vineta, pasos, h1, h2, imagen, leyenda, recuadro, tabla, portada, indice } = L;
-const V = process.env.VERSION || "v4.18.16";
+const V = process.env.VERSION || "v4.18.18";
 
 const s = [];
 s.push(portada({ rol: "Uso diario", subtitulo: "Abre tus accesos, apunta avisos, consulta el calendario y chatea con tus compañeros",
@@ -134,7 +134,13 @@ s.push(...leyenda([[1, "**Estado** de la conexión: «Conectado» en verde cuand
   [2, "**Conversaciones**: el canal General, los chats privados (👤) y los grupos (👥). El número entre paréntesis son los mensajes sin leer."],
   [3, "**Nueva conversación**."], [4, "**Limpiar chat**: oculta el historial de esa conversación en tu equipo (no se borra para los demás)."],
   [5, "**Mensajes**: los tuyos, a la derecha en verde; los de los demás, a la izquierda. Cada burbuja lleva la fecha y la hora. Un adjunto se abre haciendo clic en él."],
-  [6, "Escribe aquí y pulsa **Intro** o **Enviar**."], [7, "📎 **Adjuntar** una imagen o un documento."], [8, "**Enviar**."]]));
+  [6, "Escribe aquí y pulsa **Intro** o **Enviar**."], [7, "😊 **Emoticonos** y respuestas rápidas (siguiente imagen)."],
+  [8, "📎 **Adjuntar** una imagen o un documento."], [9, "**Enviar**."]]));
+s.push(h2("Emoticonos y respuestas rápidas"));
+s.push(...imagen("u_chat_emoticonos", 8, "Panel de emoticonos."));
+s.push(...leyenda([[1, "**Emoticonos**: un clic añade el emoticono a lo que estás escribiendo y cierra el panel. Con **Mayús + clic** el panel se queda abierto para poner varios."],
+  [2, "**Respuestas rápidas** («👍 Ok», «👌 Perfecto», «🙏 Gracias», «✅ Hecho»…): se añaden igual; luego pulsa Enviar. **Esc** o hacer clic fuera cierran el panel."]]));
+s.push(p("El botón 😊 está también en la burbuja flotante. Los emoticonos son texto normal: los ven todos los compañeros, aunque tengan una versión anterior del Organizador."));
 s.push(h2("Nueva conversación"));
 s.push(...imagen("u_chat_nueva", 9, "Elegir compañeros."));
 s.push(...leyenda([[1, "Elige a quién quieres escribir. **Un compañero** → chat privado. **Dos o más** (con Ctrl) → se crea un grupo y te pide un nombre para él."], [2, "**Abrir chat** para empezar."]]));
@@ -147,7 +153,7 @@ s.push(...recuadro("nota", "Límites de los archivos", ["Las imágenes se reduce
   "Por seguridad, el chat rechaza programas, scripts y archivos con macros (por ejemplo .exe, .bat, .ps1, .lnk, .html, .xlsm o .docm)."]));
 s.push(h2("La burbuja flotante"));
 s.push(...imagen("u_chat_burbuja", 6, "Burbuja flotante con un mensaje nuevo."));
-s.push(p("Cuando te escriben aparece una **burbuja** pequeña abajo a la derecha de la pantalla, con un aviso sonoro. Desde ella puedes leer y responder, adjuntar con 📎, **arrastrar archivos** encima o pegarlos con **Ctrl+V**, y enviar con ➤. **✕** la cierra y **⤢** abre la ventana completa del chat. Si te escriben varias personas, se apilan varias burbujas."));
+s.push(p("Cuando te escriben aparece una **burbuja** pequeña abajo a la derecha de la pantalla, con un aviso sonoro. Desde ella puedes leer y responder, poner emoticonos con 😊, adjuntar con 📎, **arrastrar archivos** encima o pegarlos con **Ctrl+V**, y enviar con ➤. **✕** la cierra y **⤢** abre la ventana completa del chat. Si te escriben varias personas, se apilan varias burbujas."));
 s.push(...recuadro("consejo", "La conversación sigue en la burbuja", ["Si tienes abierta la ventana grande del chat en una conversación y la otra persona contesta, la ventana grande se cierra y la conversación sigue en la burbuja. Lo que estuvieras escribiendo pasa a la burbuja, no se pierde. Para volver a la ventana grande, pulsa ⤢."]));
 
 // 8

@@ -34,11 +34,12 @@ from datetime import datetime, date
 
 from services.chat_client import get_chat_client, EVT_NUEVO_MENSAJE
 from ui.chat_bubbles import BubbleList, fecha_hora_local
+from ui.emoticonos import abrir_panel
 from db.sqlite import filtrar_mensajes_limpiados
 
 _POPUPS = {}   # canal_id -> {"win", "pintar", "handler"}
 
-_ANCHO, _ALTO = 300, 380
+_ANCHO, _ALTO = 330, 380   # (v4.18.18) 330: cabe también el botón 😊
 _MARGEN = 16
 _SEPARACION = 10
 _ALTO_BARRA_TAREAS = 48   # hueco aproximado para no tapar la barra de Windows
@@ -329,10 +330,16 @@ def mostrar_popup_chat(ctx, canal_id, titulo, mensaje_inicial=None, borrador="")
         if ruta:
             _enviar_rutas([ruta])
 
+    # (v4.18.18) Emoticonos y respuestas rápidas
+    btn_emo = tk.Button(frm_envio, text="😊", bg=_COLOR_ENTRY, fg="white", bd=0,
+                        activebackground="#33415a", activeforeground="white",
+                        relief="flat", cursor="hand2", font=("Segoe UI", 12), width=2, pady=4)
+    btn_emo.configure(command=lambda: abrir_panel(btn_emo, entry, encima=True))
+    btn_emo.pack(side="left", padx=(0, 4))
     tk.Button(frm_envio, text="📎", bg=_COLOR_ENTRY, fg="white", bd=0,
               activebackground="#33415a", activeforeground="white",
               relief="flat", cursor="hand2", command=_adjuntar,
-              font=("Segoe UI", 13), width=3, pady=4).pack(side="left", padx=(0, 4))
+              font=("Segoe UI", 13), width=2, pady=4).pack(side="left", padx=(0, 4))
     tk.Button(frm_envio, text="➤", bg=_COLOR_PROPIO, fg="white", bd=0,
               activebackground="#25a374", activeforeground="white",
               relief="flat", cursor="hand2", command=_enviar,

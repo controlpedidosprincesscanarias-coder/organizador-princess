@@ -413,7 +413,19 @@ def chat_ver(c):
     foto(c, v, "u_chat", [(buscar(c, v, "Conectado"), 1, "r"), (de_clase(c, v, "Listbox"), 2, "ir"),
                           (buscar(c, v, "Nueva conversación"), 3, "t"), (buscar(c, v, "Limpiar"), 4, "l"),
                           (buscar(c, v, "Oferta_", n=0) or de_clase(c, v, "Canvas"), 5, "l"),
-                          (de_clase(c, v, "TEntry"), 6, "t"), (buscar(c, v, "📎"), 7, "t"), (buscar(c, v, "Enviar"), 8, "t")])
+                          (de_clase(c, v, "TEntry"), 6, "t"), (buscar(c, v, "😊"), 7, "t"), (buscar(c, v, "📎"), 8, "t"),
+                          (buscar(c, v, "Enviar"), 9, "t")])
+    guardar_ventanas()
+    c.pulsar(v, "😊")
+
+
+def chat_emoticonos(c):
+    n = nuevas(c, ESTADO["antes"])
+    p = n[-1] if n else None
+    foto(c, p, "u_chat_emoticonos", [(buscar(c, p, "👍"), 1, "l"), (buscar(c, p, "Respuestas rápidas"), 2, "r")] if p else [], barra=False)
+    if p:
+        c.cerrar(p)
+    v = ESTADO.get("chat")
     guardar_ventanas()
     c.pulsar(v, "Nueva conversación")
 
@@ -448,10 +460,10 @@ def burbuja_ver(c):
 def actualizacion(c):
     import json, urllib.request
     um = sys.modules["services.update_service"]
-    falso = {"tag_name": "v4.18.18", "name": "Organizador Princess v4.18.18",
-             "body": "# ✨ Organizador Princess v4.18.18\n\n## 🛠 Mejoras\n\n- Mejoras en la agenda y el calendario.\n- Correcciones menores.",
-             "assets": [{"name": "OrganizadorPrincess_Setup_4.18.18.exe", "size": 34_400_000, "browser_download_url": "https://example.invalid/x.exe"},
-                        {"name": "OrganizadorPrincess_Setup_4.18.18.exe.sha256", "size": 90, "browser_download_url": "https://example.invalid/x.sha256"}]}
+    falso = {"tag_name": "v4.18.20", "name": "Organizador Princess v4.18.20",
+             "body": "# ✨ Organizador Princess v4.18.20\n\n## 🛠 Mejoras\n\n- Mejoras en la agenda y el calendario.\n- Correcciones menores.",
+             "assets": [{"name": "OrganizadorPrincess_Setup_4.18.20.exe", "size": 34_400_000, "browser_download_url": "https://example.invalid/x.exe"},
+                        {"name": "OrganizadorPrincess_Setup_4.18.20.exe.sha256", "size": 90, "browser_download_url": "https://example.invalid/x.sha256"}]}
 
     class R(io.BytesIO):
         status = 200
@@ -602,7 +614,7 @@ PASOS = [
     ("popup agenda", popup(AVISO_AGENDA, "HOY:demo"), 2500), ("popup agenda ver", popup_ver("u_popup_aviso", [("Silenciar", 1, "b"), ("Desactivar", 2, "tr"), ("Entendido", 3, "l")]), 1500),
     ("popup vacaciones", popup_vacaciones, 2500), ("popup vacaciones ver", popup_vacaciones_ver, 2500), ("correo ver", correo_ver, 1000),
     ("popup pedidos", aviso_pedidos, 2500), ("popup pedidos ver", popup_ver("u_popup_pedidos"), 1500),
-    ("chat", chat, 2500), ("chat privado", chat_privado, 2500), ("chat ver", chat_ver, 2000), ("chat nueva", chat_nueva_ver, 1500),
+    ("chat", chat, 2500), ("chat privado", chat_privado, 2500), ("chat ver", chat_ver, 1500), ("chat emoticonos", chat_emoticonos, 2000), ("chat nueva", chat_nueva_ver, 1500),
     ("burbuja", burbuja, 2500), ("burbuja ver", burbuja_ver, 1000),
     ("actualización", actualizacion, 5000), ("actualización ver", actualizacion_ver, 1000),
     ("admin", admin, 2500), ("admin login", admin_login, 3000), ("panel", admin_panel, 500),

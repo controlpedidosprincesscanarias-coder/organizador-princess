@@ -23,6 +23,7 @@ from tkinter import messagebox, filedialog
 from services.chat_client import get_chat_client, EVT_CONECTADO, EVT_DESCONECTADO, \
     EVT_NUEVO_MENSAJE, EVT_ERROR
 from ui.chat_bubbles import BubbleList, fecha_hora_local
+from ui.emoticonos import abrir_panel
 from db.sqlite import set_chat_limpiado, filtrar_mensajes_limpiados
 
 _VENTANA_ACTUAL = None  # evita abrir dos veces (instancia única de la ventana)
@@ -277,6 +278,10 @@ def _ventana_chat(ctx):
     entry_msg.bind("<Control-v>", _pegar)
     entry_msg.bind("<Control-V>", _pegar)
 
+    # (v4.18.18) Emoticonos y respuestas rápidas
+    btn_emo = ttk.Button(frm_envio, text="😊", bootstyle="info-outline", width=4)
+    btn_emo.configure(command=lambda: abrir_panel(btn_emo, entry_msg))
+    btn_emo.pack(side="left", padx=(0, 6))
     ttk.Button(frm_envio, text="📎", bootstyle="info-outline", width=4,
                command=_adjuntar).pack(side="left", padx=(0, 6), ipady=4, ipadx=2)
     ttk.Button(frm_envio, text="Enviar", bootstyle="success",

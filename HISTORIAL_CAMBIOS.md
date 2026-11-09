@@ -51,6 +51,23 @@
 
 ---
 
+## 2026-11-09 15:55 — [Organizador] Chat: emoticonos y respuestas rápidas (v4.18.18, sin publicar)
+
+- Petición de Víctor: poder poner emoticonos en el chat («Ok», «perfecto», «me gusta», cosas así).
+- **Botón 😊** en la ventana grande del chat y en la burbuja flotante (`app/ui/emoticonos.py`, nuevo, en `main.spec`). Abre un panel con:
+  - 32 emoticonos;
+  - 8 respuestas rápidas: «👍 Ok», «👌 Perfecto», «👍 Me gusta», «🙏 Gracias», «✅ Hecho», «👀 Lo miro», «⏰ Ahora voy», «📞 Te llamo».
+- Funcionamiento:
+  - Un clic añade lo elegido a lo que se está escribiendo. Con Mayús + clic el panel sigue abierto.
+  - Esc, hacer clic fuera o volver a pulsar 😊 cierran el panel.
+- Los emoticonos son texto normal dentro del mensaje: el servidor del chat no cambia y se ven también en las versiones anteriores. Se han quitado los selectores de variante (❤️ → ❤), que Tk pinta como un recuadro.
+- La burbuja pasa de 300 a 330 px de ancho para que quepa el botón sin tapar ➤.
+- Probado en Linux con la aplicación real y el chat simulado (6 de 6 comprobaciones): panel desde la ventana grande y desde la burbuja, emoticono y respuesta rápida añadidos, y el panel se cierra al elegir.
+- **Falta verlo en Windows**: allí los emoticonos se ven con la fuente Segoe UI Emoji.
+- Incluye la 4.18.16, la 4.18.14 y la 4.18.12, todavía sin publicar. Manual de usuario actualizado, con la captura del panel.
+
+---
+
 ## 2026-11-09 14:23 — [Organizador] Chat: la conversación sigue en la burbuja, y la burbuja admite arrastrar archivos y Ctrl+V (v4.18.16, sin publicar)
 
 - Petición de Víctor, probando el borrador de la 4.18.14:

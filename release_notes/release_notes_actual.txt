@@ -1,8 +1,13 @@
-✨ Organizador Princess v4.18.16
+✨ Organizador Princess v4.18.18
 ================================================================
 
-(Incluye también todo lo de la 4.18.14 y la 4.18.12, que no llegaron
-a publicarse.)
+(Incluye también todo lo de la 4.18.16, la 4.18.14 y la 4.18.12, que
+no llegaron a publicarse.)
+
+😊 EMOTICONOS EN EL CHAT (4.18.18)
+
+• Botón 😊 en la ventana del chat y en la burbuja: emoticonos y
+  respuestas rápidas («👍 Ok», «👌 Perfecto», «🙏 Gracias»…).
 
 💬 CHAT (4.18.16)
 

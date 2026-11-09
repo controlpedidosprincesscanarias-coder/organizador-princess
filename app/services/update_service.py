@@ -24,6 +24,7 @@ LIGHT = "#D8E8F0"
 import json
 import threading
 from datetime import datetime
+from tkinter import messagebox
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -567,7 +568,7 @@ def _check_update_github(app_root, _es_reintento_gracia: bool = False):
         btns = ttk.Frame(upd, padding=(18, 8, 18, 12))
         btns.pack(fill="x")
 
-        btn_instalar = ttk.Button(btns, text="⬇️  Descargar actualización",
+        btn_instalar = ttk.Button(btns, text="⬇️  Actualizar ahora",
                                   bootstyle="success")
         btn_despues  = ttk.Button(btns, text="Recordar después",
                                   bootstyle="secondary",
@@ -594,16 +595,9 @@ def _check_update_github(app_root, _es_reintento_gracia: bool = False):
                 var_err.set("⚠  No se encontró el instalador en este release.")
                 return
 
-            # Pedir carpeta de destino (por defecto Descargas del usuario)
-            import tkinter.filedialog as _fd
-            import pathlib as _pl
-            carpeta_descargas = str(_pl.Path.home() / "Downloads")
-            dest_dir = _fd.askdirectory(
-                title="Selecciona dónde guardar el instalador",
-                initialdir=carpeta_descargas,
-                parent=upd)
-            if not dest_dir:
-                return  # usuario canceló
+            # (v4.18.20, petición de Víctor) Un solo clic: sin preguntar carpeta, se descarga a una
+            # carpeta temporal propia, se comprueba y se instala sola (ver _instalar_ya más abajo).
+            dest_dir = _carpeta_descarga_actualizacion()
 
             _estado_update["descarga_iniciada"] = True
             dest_path = _os.path.join(dest_dir, nombre_asset)
@@ -656,49 +650,50 @@ def _check_update_github(app_root, _es_reintento_gracia: bool = False):
                         else:
                             estado_hash = "ok"
 
-                    # ── Descarga completada ──
+                    # ── Descarga completada: se instala sola ──
                     def _ui_descarga_ok():
                         var_prog.set(100)
                         pb.configure(bootstyle="success")
                         _txt_hash = {
-                            "ok": "\n🔒  Integridad verificada (SHA-256).",
-                            "sin_hash": "\n⚠  Esta versión no publica hash: integridad sin verificar.",
-                            "hash_ilegible": "\n⚠  No se pudo leer el hash publicado: integridad sin verificar.",
+                            "ok": "🔒  Integridad verificada (SHA-256).",
+                            "sin_hash": "⚠  Esta versión no publica hash: integridad sin verificar.",
+                            "hash_ilegible": "⚠  No se pudo leer el hash publicado: integridad sin verificar.",
                         }.get(estado_hash, "")
+                        if estado_hash != "ok" and not messagebox.askyesno(
+                                "Actualización",
+                                f"{_txt_hash}\n\n¿Instalar igualmente la versión {tag_remoto}?",
+                                parent=upd):
+                            _ofrecer_manual(_txt_hash)
+                            return
                         lbl_prog.configure(
-                            text=f"✅  Instalador guardado en:\n{dest_path}{_txt_hash}")
+                            text=f"{_txt_hash}\n⏳  Instalando… Windows puede pedir permiso. El Organizador "
+                                 "se cerrará y volverá a abrirse solo, ya actualizado.")
+                        upd.update_idletasks()
+                        error = _instalar_ya(dest_path, tag_remoto)
+                        if error:
+                            _ofrecer_manual(f"⚠  {error}")
 
-                        # Mensaje informativo
-                        lbl_info = ttk.Label(
-                            body,
-                            text=("Para completar la actualización, abre el archivo descargado\n"
-                                  "y sigue los pasos del instalador. Puedes cerrar esta ventana."),
-                            font=("Segoe UI", 8),
-                            foreground="#adb5bd",
-                            justify="left")
-                        lbl_info.pack(anchor="w", pady=(6, 0))
+                    def _ofrecer_manual(texto):
+                        """Si no se puede instalar sola (permiso de Windows denegado…), queda como
+                        antes: el instalador guardado y un botón para abrir su carpeta."""
+                        lbl_prog.configure(text=f"{texto}\nInstalador guardado en:\n{dest_path}")
 
-                        # Botón abrir carpeta
                         def _abrir_carpeta():
                             try:
-                                import os as _os3
                                 upd.attributes("-topmost", False)
-                                # Abrir directamente la carpeta donde está el instalador
-                                _os3.startfile(_os3.path.dirname(dest_path))
+                                _os.startfile(_os.path.dirname(dest_path))
                             except Exception:  # noqa: BLE001
                                 import sys as _sys, traceback as _tb
                                 print(f"[WARNING] {_tb.format_exc().splitlines()[-1]}", file=_sys.stderr)
 
-                        btn_instalar.configure(
-                            text="📂  Abrir carpeta de descarga",
-                            state="normal",
-                            command=_abrir_carpeta)
-                        btn_despues.configure(
-                            text="Cerrar",
-                            state="normal",
-                            command=upd.destroy)
+                        def _reintentar():
+                            error = _instalar_ya(dest_path, tag_remoto)
+                            if error:
+                                lbl_prog.configure(text=f"⚠  {error}\nInstalador guardado en:\n{dest_path}")
 
-                        # Redimensionar ventana
+                        btn_instalar.configure(text="🔁  Instalar", state="normal", command=_reintentar)
+                        btn_despues.configure(text="📂  Abrir carpeta", state="normal", command=_abrir_carpeta)
+
                         upd.update_idletasks()
                         _nueva_h = max(upd.winfo_reqheight() + 10, 480)
                         _sw = upd.winfo_screenwidth()
@@ -736,6 +731,73 @@ def _check_update_github(app_root, _es_reintento_gracia: bool = False):
     # Aunque haya actualización pendiente, recomprobar en el ciclo normal por si el usuario
     # pospuso varias veces y hay una versión aún más nueva disponible
     _programar_siguiente_check(app_root)
+
+
+_MARCA_AUTO = os.path.join(os.path.dirname(CONFIG_FILE), "actualizacion_automatica.json")
+# Opciones de Inno Setup para la instalación de un clic: solo la barra de progreso, sin preguntas.
+# El instalador cierra el Organizador (KillOrganizador) y lo vuelve a abrir al terminar
+# ([Run] con Check: WizardSilent en el .iss, desde la v4.18.20).
+_ARGS_INSTALADOR = "/SILENT /SUPPRESSMSGBOXES /NORESTART /SP-"
+
+
+def _carpeta_descarga_actualizacion():
+    """Carpeta temporal del usuario para el instalador; se vacía en cada descarga."""
+    import tempfile
+    carpeta = os.path.join(tempfile.gettempdir(), "OrganizadorPrincess_actualizacion")
+    os.makedirs(carpeta, exist_ok=True)
+    for f in os.listdir(carpeta):
+        try:
+            os.remove(os.path.join(carpeta, f))
+        except OSError:
+            pass
+    return carpeta
+
+
+def _instalar_ya(ruta_instalador, version):
+    """Lanza el instalador ya comprobado. Devuelve None si se lanzó, o el motivo si no.
+    Se usa ShellExecute (os.startfile) y no subprocess: el instalador pide permisos de
+    administrador y solo así Windows muestra la pregunta de permiso (UAC)."""
+    try:
+        with open(_MARCA_AUTO, "w", encoding="utf-8") as f:
+            json.dump({"version": str(version).lstrip("vV"), "fecha": datetime.now().isoformat()}, f)
+    except OSError:
+        pass
+    try:
+        os.startfile(ruta_instalador, "open", _ARGS_INSTALADOR)
+        return None
+    except OSError as e:
+        try:
+            os.remove(_MARCA_AUTO)
+        except OSError:
+            pass
+        if getattr(e, "winerror", None) == 1223:
+            return "Se canceló el permiso de Windows. Pulsa «Instalar» para volver a intentarlo."
+        return f"No se pudo abrir el instalador: {e}"
+    except Exception as e:  # noqa: BLE001
+        return f"No se pudo abrir el instalador: {e}"
+
+
+def actualizacion_automatica_aplicada(version_anterior):
+    """Al arrancar una versión nueva instalada con «Actualizar ahora» no se pregunta cómo
+    instalarla: se hace «Solo actualizar versión» (lo normal) y se devuelve True.
+    Solo si la marca es de esta misma versión y de hace menos de un día."""
+    try:
+        with open(_MARCA_AUTO, encoding="utf-8") as f:
+            marca = json.load(f)
+    except (OSError, ValueError):
+        return False
+    try:
+        os.remove(_MARCA_AUTO)
+    except OSError:
+        pass
+    try:
+        reciente = (datetime.now() - datetime.fromisoformat(marca.get("fecha", ""))).total_seconds() < 86400
+    except (TypeError, ValueError):
+        reciente = False
+    if not reciente or _parse_version(marca.get("version", "")) != _parse_version(APP_VERSION):
+        return False
+    _aplicar_solo_actualizacion(version_anterior)
+    return True
 
 
 def _lanzar_check_update(app_root):

@@ -5,7 +5,7 @@
 ; ================================================================
 
 #define MyAppName    "Organizador Princess"
-#define MyAppVersion "4.18.22"
+#define MyAppVersion "4.18.24"
 #define MyAppExe     "OrganizadorPrincess.exe"
 #define MyAppID      "OrganizadorPrincess"
 #define MyAssets     SourcePath + "assets"

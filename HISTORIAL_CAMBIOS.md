@@ -51,6 +51,29 @@
 
 ---
 
+## 2026-11-09 19:04 — [Organizador] El chat en el móvil, enlazado desde el Organizador y en el manual (v4.18.24, sin publicar)
+
+- Petición de Víctor: que el manual explique que existe el chat para Android, cómo descargarlo la primera vez y cómo se actualiza, y que todo quede enlazado.
+- **Organizador:** en el chat, botón **«📱 Chat en el móvil»** (`app/ui/chat_movil.py`).
+  - Abre una ventana con un código QR a `…/chat-movil-princess/releases/latest` (`app/ui/qr_chat_movil.png`, que se regenera con `compilacion/generar_qr_movil.py`).
+  - Muestra los pasos de instalación, el enlace y cómo se actualiza.
+- **Manual de usuario:** capítulo nuevo, «8. El chat en el móvil» (24 páginas). Incluye:
+  - qué es y en qué se diferencia del Organizador (tabla);
+  - la instalación paso a paso con la captura del QR;
+  - el aviso fijo «Chat conectado»;
+  - cómo se actualiza: aviso al abrir la app, «Descargar e instalar» y confirmar «Actualizar» en Android;
+  - cómo cerrar sesión.
+
+  Lo que venía después pasa a ser el capítulo 9 (actualizar) y el 10 (problemas frecuentes, con una fila nueva). Referencia rápida actualizada.
+- **Manual de administrador:** cómo se publica Chat Princess (Actions, firma con los secretos `FIRMA_*` y la copia de seguridad de la clave).
+- **Chat móvil:**
+  - se quita del repositorio `.kotlin/errors` (registro temporal de la compilación) y se añade a `.gitignore`;
+  - el README enlaza al QR del Organizador.
+- **Compilaciones del 9 nov:** Chat Princess v1.0.0 y Organizador v4.18.22 compiladas, las dos en borrador. Los borradores no aparecen en la portada del repositorio, solo en la página Releases.
+- **Pruebas:** las 8 del repositorio pasan y las capturas del manual se han hecho con la app real en Linux. Falta verlo en Windows.
+
+---
+
 ## 2026-11-09 18:49 — [Organizador] Emoticonos del chat en color (v4.18.22, sin publicar)
 
 - Petición de Víctor: en Windows los emoticonos del panel 😊 se veían en blanco y costaba distinguirlos. Tk en Windows dibuja los emoticonos de un solo color.

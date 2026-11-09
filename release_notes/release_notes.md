@@ -1,3 +1,15 @@
+# ✨ Organizador Princess v4.18.14
+
+> Incluye también todo lo de la 4.18.12, que no llegó a publicarse.
+
+## 📅 Fechas y horas más fáciles
+
+- Al crear o editar un **aviso**, unas **vacaciones** o un **festivo**, cada fecha tiene un botón **📅** que abre un calendario: un clic en el día y listo. Se puede seguir escribiendo, y ahora también vale sin guiones (15112026) o con barras (15/11/26).
+- La **hora** de los avisos se elige con dos ruedas, **horas y minutos**, sin escribir los dos puntos: con las flechas, la rueda del ratón o escribiendo el número. En los avisos «cada hora» y «cada 30 minutos» solo cuenta el minuto y la rueda de las horas se desactiva.
+- Los manuales explican cómo usarlo.
+
+---
+
 # ✨ Organizador Princess v4.18.12
 
 ## 📘 Manuales nuevos

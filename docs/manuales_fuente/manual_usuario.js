@@ -1,7 +1,7 @@
 // Manual de usuario del Organizador Princess. Idea y desarrollo de la aplicación: Víctor Alejandro Martín Andrade.
 const L = require("./lib");
 const { p, vineta, pasos, h1, h2, imagen, leyenda, recuadro, tabla, portada, indice } = L;
-const V = process.env.VERSION || "v4.18.14";
+const V = process.env.VERSION || "v4.18.16";
 
 const s = [];
 s.push(portada({ rol: "Uso diario", subtitulo: "Abre tus accesos, apunta avisos, consulta el calendario y chatea con tus compañeros",
@@ -141,13 +141,14 @@ s.push(...leyenda([[1, "Elige a quién quieres escribir. **Un compañero** → c
 s.push(h2("Enviar imágenes y documentos"));
 s.push(p("Hay tres formas de adjuntar. En todas, el Organizador pregunta antes «¿Enviar a …?» con la lista de archivos, y solo se envía si contestas **Sí**:"));
 for (const t of ["**📎**: elige el archivo en el Explorador (imágenes png, jpg, gif, bmp, webp y documentos pdf, doc, docx, xls, xlsx).",
-  "**Arrastrar y soltar**: arrastra uno o varios archivos desde el Explorador de Windows sobre la ventana del chat.",
+  "**Arrastrar y soltar**: arrastra uno o varios archivos desde el Explorador de Windows sobre la ventana del chat o sobre una burbuja.",
   "**Pegar (Ctrl+V)**: con el cursor en la caja de texto, pega una captura de pantalla o archivos copiados en el Explorador. Si lo copiado es texto, se pega como siempre."]) s.push(vineta(t));
 s.push(...recuadro("nota", "Límites de los archivos", ["Las imágenes se reducen solas antes de enviarlas. Los documentos se envían tal cual y no pueden pasar de **10 MB**. Al arrastrar o pegar, hasta **5 archivos** a la vez.",
   "Por seguridad, el chat rechaza programas, scripts y archivos con macros (por ejemplo .exe, .bat, .ps1, .lnk, .html, .xlsm o .docm)."]));
 s.push(h2("La burbuja flotante"));
 s.push(...imagen("u_chat_burbuja", 6, "Burbuja flotante con un mensaje nuevo."));
-s.push(p("Si te escriben cuando no tienes abierta la ventana del chat, aparece una **burbuja** pequeña abajo a la derecha de la pantalla, con un aviso sonoro. Desde ella puedes leer y responder, adjuntar con 📎 y enviar con ➤. **✕** la cierra y **⤢** abre la ventana completa del chat. Si te escriben varias personas, se apilan varias burbujas."));
+s.push(p("Cuando te escriben aparece una **burbuja** pequeña abajo a la derecha de la pantalla, con un aviso sonoro. Desde ella puedes leer y responder, adjuntar con 📎, **arrastrar archivos** encima o pegarlos con **Ctrl+V**, y enviar con ➤. **✕** la cierra y **⤢** abre la ventana completa del chat. Si te escriben varias personas, se apilan varias burbujas."));
+s.push(...recuadro("consejo", "La conversación sigue en la burbuja", ["Si tienes abierta la ventana grande del chat en una conversación y la otra persona contesta, la ventana grande se cierra y la conversación sigue en la burbuja. Lo que estuvieras escribiendo pasa a la burbuja, no se pierde. Para volver a la ventana grande, pulsa ⤢."]));
 
 // 8
 s.push(h1("8. Actualizar la aplicación"));

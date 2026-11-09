@@ -448,10 +448,10 @@ def burbuja_ver(c):
 def actualizacion(c):
     import json, urllib.request
     um = sys.modules["services.update_service"]
-    falso = {"tag_name": "v4.18.16", "name": "Organizador Princess v4.18.16",
-             "body": "# ✨ Organizador Princess v4.18.16\n\n## 🛠 Mejoras\n\n- Mejoras en la agenda y el calendario.\n- Correcciones menores.",
-             "assets": [{"name": "OrganizadorPrincess_Setup_4.18.16.exe", "size": 34_400_000, "browser_download_url": "https://example.invalid/x.exe"},
-                        {"name": "OrganizadorPrincess_Setup_4.18.16.exe.sha256", "size": 90, "browser_download_url": "https://example.invalid/x.sha256"}]}
+    falso = {"tag_name": "v4.18.18", "name": "Organizador Princess v4.18.18",
+             "body": "# ✨ Organizador Princess v4.18.18\n\n## 🛠 Mejoras\n\n- Mejoras en la agenda y el calendario.\n- Correcciones menores.",
+             "assets": [{"name": "OrganizadorPrincess_Setup_4.18.18.exe", "size": 34_400_000, "browser_download_url": "https://example.invalid/x.exe"},
+                        {"name": "OrganizadorPrincess_Setup_4.18.18.exe.sha256", "size": 90, "browser_download_url": "https://example.invalid/x.sha256"}]}
 
     class R(io.BytesIO):
         status = 200

@@ -2,7 +2,8 @@
 
 ## 🛠 Correcciones
 
-- Cuando Control de Pedidos no respondía, el aviso de conexión podía **volver a arrancar el Organizador por dentro** (una segunda ventana y avisos repetidos) en vez de mostrarse. Arreglado.
+- Cuando Control de Pedidos no respondía, el aviso de conexión **volvía a ejecutar el arranque del Organizador por dentro**: la ventana se quedaba congelada un momento y el aviso salía sin icono (o, según la versión, podía llegar a abrirse una segunda ventana principal). Arreglado.
+- **Admin:** si el usuario de Windows tenía un espacio o una «ñ», la ventana de acceso decía «Sin conexión con Control de Pedidos» aunque la hubiera. Arreglado.
 - **Chat:** si un archivo adjunto no se podía descargar, ahora sí aparece el aviso de error (antes no salía nada).
 
 ## 🔄 Actualizaciones

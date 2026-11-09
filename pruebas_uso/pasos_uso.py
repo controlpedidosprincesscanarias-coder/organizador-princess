@@ -37,7 +37,8 @@ def cerrar_con_boton(c, v):
 def arranque(c):
     c.captura("arranque_nueva_version")
     v = c.ventana("Nueva version")
-    c.ok("1. primer arranque: ventana «Nueva versión» v4.18.06", v is not None and "4.18.06" in v.title(), c.titulos())
+    version = c.g["APP_VERSION"].lstrip("v")
+    c.ok(f"1. primer arranque: ventana «Nueva versión» v{version}", v is not None and version in v.title(), c.titulos())
     if v: c.pulsar(v, "Confirmar")
 def saludo(c):
     c.ok("1. tras confirmar: aviso «Versión actualizada»", any("actualizada" in m[1].lower() for m in MENSAJES), MENSAJES[-2:])
@@ -242,7 +243,8 @@ def chat(c):
     ESTADO["antes"] = {str(w) for w in c.ventanas()}
     c.pulsar(c.app, "Chat")
 def chat_ver(c):
-    n = nueva_ventana(c, ESTADO["antes"])
+    # La ventana del chat es la que tiene la lista de conversaciones (puede coincidir con un aviso)
+    n = [w for w in nueva_ventana(c, ESTADO["antes"]) if any(x.winfo_class() == "Listbox" for x in c.widgets(w))]
     v = n[-1] if n else None
     c.ok("6. ventana del chat", v is not None, c.titulos())
     if not v: return
@@ -387,10 +389,10 @@ def actualizacion(c):
     import io, sys
     um = sys.modules["services.update_service"]
     original = urllib.request.urlopen
-    falso = {"tag_name": "v4.18.08", "name": "Organizador Princess v4.18.08",
-             "body": "# ✨ Organizador Princess v4.18.08\n\n- Versión simulada para la prueba.",
-             "assets": [{"name": "OrganizadorPrincess_Setup_4.18.08.exe", "size": 52_000_000, "browser_download_url": "https://example.invalid/x.exe"},
-                        {"name": "OrganizadorPrincess_Setup_4.18.08.exe.sha256", "size": 90, "browser_download_url": "https://example.invalid/x.sha256"}]}
+    falso = {"tag_name": "v9.0.0", "name": "Organizador Princess v9.0.0",
+             "body": "# ✨ Organizador Princess v9.0.0\n\n- **Versión simulada** para la prueba.",
+             "assets": [{"name": "OrganizadorPrincess_Setup_9.0.0.exe", "size": 52_000_000, "browser_download_url": "https://example.invalid/x.exe"},
+                        {"name": "OrganizadorPrincess_Setup_9.0.0.exe.sha256", "size": 90, "browser_download_url": "https://example.invalid/x.sha256"}]}
     class R(io.BytesIO):
         status = 200; headers = {"Content-Length": "1"}
         def __enter__(self): return self
@@ -406,7 +408,8 @@ def actualizacion(c):
 def actualizacion_ver(c):
     n = nueva_ventana(c, ESTADO["antes"])
     textos = " ".join(" ".join(c.texto(w) for w in c.widgets(v)) for v in n)
-    c.ok("9. con una versión nueva en GitHub sale «Actualización disponible»", "4.18.08" in textos, c.titulos())
+    c.ok("9. con una versión nueva en GitHub sale «Actualización disponible»", "9.0.0" in textos, c.titulos())
+    c.ok("9. las novedades se ven con formato (sin «#» de Markdown)", "Versión simulada" in textos and "**" not in textos and "# ✨" not in textos, textos[:300])
     c.captura("actualizacion_disponible")
     for v in n: cerrar_con_boton(c, v)
 

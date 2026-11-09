@@ -61,6 +61,7 @@ hiddenimports += [
     'ui.calendario',     # v4.18.08: ventana Calendario (antes en main_agenda)
     'ui.admin',          # v4.18.08: Administración (antes en main_agenda)
     'ui.disposicion',    # v4.18.08: constantes del menú y vista
+    'ui.markdown_texto', # v4.18.10: novedades con formato en «Actualización disponible»
     'ui.agenda_helpers',
     'ui.importexport',
     'ui.vacaciones',

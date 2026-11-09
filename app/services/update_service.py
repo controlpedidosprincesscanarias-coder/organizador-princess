@@ -531,7 +531,14 @@ def _check_update_github(app_root, _es_reintento_gracia: bool = False):
                            background="#1e1e2e", foreground="#D8E8F0",
                            padx=10, pady=8,
                            yscrollcommand=sb_txt.set)
-            txt.insert("1.0", notas)
+            # (v4.18.10) Las novedades vienen en Markdown (body de la Release): se
+            # muestran con formato. Si algo falla, se ponen tal cual, como antes.
+            try:
+                from ui.markdown_texto import pintar as _pintar_md
+                _pintar_md(txt, notas)
+            except Exception:  # noqa: BLE001
+                txt.delete("1.0", "end")
+                txt.insert("1.0", notas)
             txt.configure(state="disabled")
             txt.pack(side="left", fill="both", expand=True)
             sb_txt.config(command=txt.yview)

@@ -1,3 +1,13 @@
+# ✨ Organizador Princess v4.18.38
+
+## 🛡️ Configuración y agenda a prueba de cortes
+
+- `config.json` y `agenda.json` se escriben en un archivo temporal y se sustituyen de golpe, con copia `.bak` de la versión anterior. Antes se escribía encima: si el Organizador se cerraba en medio (el instalador lo cierra a la fuerza al actualizar), el archivo quedaba vacío y la configuración se perdía sin avisar.
+- Si al abrirse alguno está vacío o dañado, se recupera solo de la copia `.bak` (o, la configuración, de la copia `config_backup_…` de la última actualización). El dañado se guarda aparte.
+- Al actualizar, el instalador pide primero al Organizador que se cierre (guarda la agenda) y solo lo fuerza si a los 4 s sigue abierto.
+
+---
+
 # ✨ Organizador Princess v4.18.36
 
 > Incluye también lo de la 4.18.34, que no llegó a publicarse.

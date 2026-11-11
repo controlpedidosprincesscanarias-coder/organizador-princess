@@ -5,7 +5,7 @@
 ; ================================================================
 
 #define MyAppName    "Organizador Princess"
-#define MyAppVersion "4.18.36"
+#define MyAppVersion "4.18.38"
 #define MyAppExe     "OrganizadorPrincess.exe"
 #define MyAppID      "OrganizadorPrincess"
 #define MyAssets     SourcePath + "assets"
@@ -159,10 +159,16 @@ Name: "cmd.exe"; Parameters: "/c for /d /r ""{src}"" %%C in (__pycache__) do if 
   así que Windows lo cuenta como proceso hijo suyo. «/T» (cerrar también los hijos) cerraba
   el instalador junto con el Organizador: se cerraba la versión actual y no se instalaba
   ni se abría la nueva. Sin «/T» se cierran todos los OrganizadorPrincess.exe igualmente. }
+{ (v4.18.38) Primero se le pide que se cierre (sin /F: el Organizador recibe el cierre de la ventana,
+  guarda la agenda y se cierra) y solo si a los 4 s sigue abierto se fuerza con /F. Antes se forzaba
+  directamente, y si lo pillaba escribiendo config.json o agenda.json el archivo quedaba vacío. }
 procedure KillOrganizador();
 var
   ResultCode: Integer;
 begin
+  Exec('taskkill.exe', '/IM OrganizadorPrincess.exe', '', SW_HIDE,
+       ewWaitUntilTerminated, ResultCode);
+  Sleep(4000);
   Exec('taskkill.exe', '/F /IM OrganizadorPrincess.exe', '', SW_HIDE,
        ewWaitUntilTerminated, ResultCode);
   Sleep(2000);

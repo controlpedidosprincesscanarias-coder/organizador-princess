@@ -293,6 +293,20 @@ class BubbleList(tk.Frame):
         self._ir_al_final()
         return cv
 
+    def agregar_aviso(self, texto, hora=""):
+        """(v4.18.48, chat v1.5.0) Mensaje de sistema del grupo («👥 Ana ha añadido a Carla»): centrado, en
+        gris y sin burbuja."""
+        fila = tk.Frame(self.inner, bg=self._bg)
+        fila.pack(fill="x", pady=(4, 4))
+        lbl = tk.Label(fila, text=f"{texto}   {hora}".strip(), bg=self._bg, fg=self._color_meta,
+                       font=self._font_meta, justify="center",
+                       wraplength=max(220, int(self.canvas.winfo_width() * 0.8) or 220))
+        lbl.pack(anchor="center")
+        self._bind_rueda(fila)
+        self._bind_rueda(lbl)
+        self._ir_al_final()
+        return lbl
+
     def poner_acciones(self, cv, acciones):
         """Menú del clic derecho de la burbuja `cv`: primero `acciones` y después Copiar (o Abrir /
         Guardar como… en los adjuntos). (v4.18.46) Se puede volver a llamar: el mensaje propio se pinta

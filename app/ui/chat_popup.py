@@ -32,7 +32,7 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 from datetime import datetime
 
-from services.chat_client import get_chat_client, nombre_adjunto_seguro, EVT_NUEVO_MENSAJE, EVT_AVATAR, EVT_ELIMINADO
+from services.chat_client import get_chat_client, nombre_adjunto_seguro, EVT_NUEVO_MENSAJE, EVT_AVATAR, EVT_ELIMINADO, EVT_GRUPO
 from ui import avatares, miniaturas, acciones_chat
 from ui.chat_bubbles import BubbleList, fecha_hora_local
 from ui.emoticonos import abrir_panel, imagen as imagen_emoticono
@@ -87,6 +87,16 @@ def procesar_evento(ev):
         for info in list(_POPUPS.values()):
             if info["win"].winfo_exists() and info.get("foto"):
                 info["foto"]()
+        return
+    if ev.get("tipo") == EVT_GRUPO:
+        # (v4.18.48) Si se elimina el grupo, se cierra su burbuja; si cambia, se recarga
+        g = ev.get("grupo") or {}
+        info = _POPUPS.get(g.get("canal_id"))
+        if info and info["win"].winfo_exists():
+            if g.get("eliminado"):
+                info["win"].destroy()
+            elif info.get("recargar"):
+                info["recargar"]()
         return
     if ev.get("tipo") == EVT_ELIMINADO:
         # (v4.18.46) Un mensaje eliminado: la burbuja de ese canal vuelve a cargar la conversación
@@ -280,6 +290,8 @@ def mostrar_popup_chat(ctx, canal_id, titulo, mensaje_inicial=None, borrador="")
             ids_pintados.add(mid)
         quien = "Tú" if propio else cliente.nombre_de(m.get("remitente", ""))
         hora = fecha_hora_local(m)
+        if m.get("tipo") == "sistema":          # (v4.18.48) «👥 Ana ha añadido a Carla»
+            return msgs.agregar_aviso(m.get("contenido", ""), hora)
         # (v4.18.46) Cita, «Reenviado», eliminado y el menú Responder / Reenviar / Eliminar
         extra = dict(acciones_chat.datos_burbuja(m, cliente),
                      acciones=acciones_chat.acciones(m, cliente, win, _responder, _recargar))

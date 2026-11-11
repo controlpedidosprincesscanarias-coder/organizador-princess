@@ -1,15 +1,17 @@
-✨ Organizador Princess v4.18.38
+✨ Organizador Princess v4.18.40
 ================================================================
 
-🛡️ CONFIGURACIÓN Y AGENDA A PRUEBA DE CORTES
+🔧 SE VUELVE A ABRIR BIEN DESPUÉS DE ACTUALIZAR
 
-• La configuración y la agenda se guardan de forma segura: si el
-  Organizador se cierra de golpe mientras guarda (al actualizar, un
-  apagón…), ya no se quedan vacías.
-• Si al abrirse alguna está vacía o dañada, se recupera sola de su
-  copia anterior.
-• Al actualizar, el instalador pide primero al Organizador que se
-  cierre normalmente y solo lo fuerza si no lo hace.
+• Al terminar la actualización, el Organizador nuevo podía no abrirse
+  y mostrar «Failed to load Python DLL … python312.dll». Ya no pasa:
+  se abre solo, ya actualizado. (Si te salió con la 4.18.38, la
+  instalación sí se hizo: bastaba con abrirlo desde su acceso directo.)
+
+🛡️ CONFIGURACIÓN Y AGENDA A PRUEBA DE CORTES (4.18.38)
+
+• La configuración y la agenda se guardan de forma segura y, si al
+  abrirse alguna está vacía o dañada, se recupera sola de su copia.
 
 ================================================================
 La idea y el desarrollo de la aplicación Organizador Princess son de

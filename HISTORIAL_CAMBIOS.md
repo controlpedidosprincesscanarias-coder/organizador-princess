@@ -51,6 +51,20 @@
 
 ---
 
+## 2026-11-11 16:24 — [Organizador] Se vuelve a abrir bien después de actualizar (v4.18.40)
+
+- **Problema** (lo vio Víctor con la 4.18.38): tras «Actualizar ahora», la instalación terminaba, pero el Organizador nuevo no se abría y mostraba «Failed to load Python DLL …\_MEI…\python312.dll».
+- **Causa:**
+  - El Organizador es un único `.exe` de PyInstaller: al abrirse descomprime Python en `%TEMP%\_MEI…` y guarda esa ruta en variables internas (`_PYI_*`).
+  - El instalador las heredaba y se las pasaba al Organizador nuevo, que buscaba Python en la carpeta del viejo.
+  - Hasta la 4.18.36 funcionaba por casualidad: el viejo se cerraba a la fuerza (`taskkill /F`) y su carpeta se quedaba sin borrar.
+  - Con el cierre normal de la 4.18.38, el viejo la borra al salir y el nuevo ya no la encuentra.
+- **Arreglo:**
+  - El `.iss` reabre el Organizador a través de `cmd`, sin `_PYI_*` ni `_MEIPASS2` y con `PYINSTALLER_RESET_ENVIRONMENT=1`. Arregla también la actualización desde la 4.18.38.
+  - `_instalar_ya` limpia el entorno antes de lanzar el instalador (`_limpiar_entorno_pyinstaller`), como ya hacía la Consola.
+  - 3 comprobaciones nuevas en `test_actualizacion.py`.
+- **Por probar en Windows:** de la 4.18.38 a la 4.18.40 con «Actualizar ahora». Debe abrirse solo, sin el error y con la configuración intacta.
+
 ## 2026-11-11 16:02 — [Organizador] Configuración y agenda a prueba de cortes (v4.18.38)
 
 - **Motivo:** en un equipo se perdió la configuración tras actualizar. Lo más probable es que se instalara a mano y se eligiera «Instalación desde cero», que hace copia en `config_backup_…json` y se recupera con Administración → Importar config. Con «Actualizar ahora» no se pregunta, y la configuración se conserva desde la v4.18.20. Al revisarlo apareció un fallo real.

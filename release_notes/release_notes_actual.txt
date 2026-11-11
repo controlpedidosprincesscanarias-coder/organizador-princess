@@ -1,16 +1,17 @@
-✨ Organizador Princess v4.18.46
+✨ Organizador Princess v4.18.48
 ================================================================
 
-↩️ RESPONDER, REENVIAR Y ELIMINAR MENSAJES
+👥 GRUPOS DEL CHAT: INTEGRANTES Y GESTIÓN
 
-• Clic derecho sobre un mensaje del chat (en la ventana grande y en
-  la burbuja):
-  - «↩ Responder»: tu respuesta sale con el mensaje citado encima,
-    como en WhatsApp.
-  - «↪ Reenviar…»: lo mandas a otra conversación o a un compañero
-    (también fotos y archivos).
-  - «🗑 Eliminar» (solo tus mensajes): queda como «Mensaje
-    eliminado» para todos.
+• Pulsa la foto o el nombre de un grupo para ver quién está en él.
+• Quien creó el grupo puede añadir y quitar compañeros, renombrarlo
+  y eliminarlo.
+• Cualquier miembro puede salir del grupo.
+• Cada cambio queda anotado en el grupo («Ana ha añadido a Carla»).
+
+↩️ RESPONDER, REENVIAR Y ELIMINAR MENSAJES (4.18.46)
+
+• Clic derecho sobre un mensaje: Responder, Reenviar… o Eliminar.
 
 ================================================================
 La idea y el desarrollo de la aplicación Organizador Princess son de

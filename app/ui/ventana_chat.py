@@ -21,8 +21,8 @@ from datetime import datetime
 from tkinter import messagebox, filedialog
 
 from services.chat_client import get_chat_client, cuenta_chat_configurada, nombre_adjunto_seguro, EVT_CONECTADO, EVT_DESCONECTADO, \
-    EVT_NUEVO_MENSAJE, EVT_ERROR, EVT_AVATAR
-from ui import avatares, miniaturas
+    EVT_NUEVO_MENSAJE, EVT_ERROR, EVT_AVATAR, EVT_ELIMINADO
+from ui import avatares, miniaturas, acciones_chat
 from ui.chat_bubbles import BubbleList, fecha_hora_local
 from ui.emoticonos import abrir_panel, imagen as imagen_emoticono
 from ui.chat_movil import abrir_chat_movil
@@ -275,19 +275,25 @@ def _ventana_chat(ctx):
         if not contenido:
             return
         canal_envio = canal_actual["id"] if canal_actual["id"] != "general" else "general"
+        citado = respondiendo["m"]          # (v4.18.46) responder citando
         cliente.enviar_mensaje(
             contenido,
             canal_id=canal_envio,
             destinatario=canal_actual["otro"] if canal_actual["id"] != "general" else None,
+            responde_a=citado.get("id") if citado else None,
         )
         entry_msg.delete(0, "end")
         # Pintado optimista — no esperamos al eco del servidor para que se
         # sienta instantáneo; cuando llegue el eco con su id real (ver
         # _pintar_mensaje), se reconoce por contenido+canal en
-        # _pendientes_propios y no se repinta.
-        _pendientes_propios.append({"canal_id": canal_envio, "contenido": contenido})
-        _pintar_mensaje({"remitente": cliente.username, "contenido": contenido,
-                          "creado_en": ""}, propio=True)
+        # _pendientes_propios y no se repinta (solo se le pone el menú completo).
+        pendiente = {"canal_id": canal_envio, "contenido": contenido, "cv": None}
+        _pendientes_propios.append(pendiente)
+        pendiente["cv"] = _pintar_mensaje({
+            "remitente": cliente.username, "contenido": contenido, "creado_en": "",
+            "responde_a": ({"id": citado["id"], "remitente": citado.get("remitente"),
+                            "contenido": acciones_chat.texto_cita(citado)} if citado else None)}, propio=True)
+        _cancelar_respuesta()
 
     entry_msg.bind("<Return>", _enviar)
 
@@ -426,6 +432,24 @@ def _ventana_chat(ctx):
                        cargar_imagen=lambda url, listo: miniaturas.cargar(win, cliente, url, listo))
     msgs.pack(fill="both", expand=True, pady=(4, 6))
 
+    # (v4.18.46) Barra «↩ Respondiendo a …» encima de la caja de escribir (se quita con ✕ o al enviar)
+    respondiendo = {"m": None}
+    frm_resp = ttk.Frame(frm_chat)
+    lbl_resp = ttk.Label(frm_resp, text="", foreground=_COLOR_META)
+    lbl_resp.pack(side="left", fill="x", expand=True)
+
+    def _cancelar_respuesta():
+        respondiendo["m"] = None
+        frm_resp.pack_forget()
+
+    ttk.Button(frm_resp, text="✕", bootstyle="secondary-link", command=_cancelar_respuesta).pack(side="right")
+
+    def _responder(m):
+        respondiendo["m"] = m
+        lbl_resp.configure(text=acciones_chat.resumen_barra(m, cliente))
+        frm_resp.pack(side="bottom", fill="x", after=frm_envio, pady=(4, 0))
+        entry_msg.focus_set()
+
     _ids_pintados = set()
     # Los mensajes propios se pintan al vuelo (optimista, ver _enviar) SIN
     # id porque el socket es "fire and forget" — no hay id real hasta que
@@ -452,6 +476,10 @@ def _ventana_chat(ctx):
                     if pend["canal_id"] == canal_m and pend["contenido"] == contenido_m:
                         del _pendientes_propios[i]
                         _ids_pintados.add(mid)
+                        # (v4.18.46) ya tiene id: Responder, Reenviar y Eliminar en su menú
+                        if pend.get("cv") is not None:
+                            msgs.poner_acciones(pend["cv"], acciones_chat.acciones(
+                                m, cliente, win, _responder, _recargar))
                         return  # ya está en pantalla desde el pintado optimista
             _ids_pintados.add(mid)
         quien = "Tú" if propio else cliente.nombre_de(m.get("remitente", ""))
@@ -463,16 +491,23 @@ def _ventana_chat(ctx):
             remitente = m.get("remitente", "")
             foto = avatares.imagen(win, cliente.avatar_de(remitente), quien, _TAM_FOTO_BURBUJA,
                                    clave=remitente)
+        # (v4.18.46) Cita, «Reenviado», eliminado y el menú Responder / Reenviar / Eliminar
+        extra = dict(acciones_chat.datos_burbuja(m, cliente),
+                     acciones=acciones_chat.acciones(m, cliente, win, _responder, _recargar))
         adjunto = m.get("adjunto")
         if adjunto:
             icono = "📷" if m.get("tipo") == "imagen" else "📎"
-            msgs.agregar_burbuja(f"{icono}  {adjunto['nombre_archivo']}", hora, propio,
-                                  meta_nombre=quien, es_adjunto=True,
-                                  adjunto_url=adjunto["url"],
-                                  adjunto_nombre_archivo=adjunto["nombre_archivo"], foto=foto,
-                                  es_imagen=miniaturas.es_imagen(m))
-        else:
-            msgs.agregar_burbuja(m.get("contenido", ""), hora, propio, meta_nombre=quien, foto=foto)
+            return msgs.agregar_burbuja(f"{icono}  {adjunto['nombre_archivo']}", hora, propio,
+                                         meta_nombre=quien, es_adjunto=True,
+                                         adjunto_url=adjunto["url"],
+                                         adjunto_nombre_archivo=adjunto["nombre_archivo"], foto=foto,
+                                         es_imagen=miniaturas.es_imagen(m), **extra)
+        return msgs.agregar_burbuja(m.get("contenido", ""), hora, propio, meta_nombre=quien, foto=foto, **extra)
+
+    def _recargar():
+        """(v4.18.46) Vuelve a cargar la conversación abierta (p. ej. tras eliminar un mensaje)."""
+        if win.winfo_exists():
+            _cargar_historial(canal_actual["id"], canal_actual["otro"])
 
     def _cargar_historial(canal_id, destinatario):
         msgs.limpiar()
@@ -596,6 +631,11 @@ def _ventana_chat(ctx):
             m = ev["mensaje"]
             if m.get("canal_id") == canal_actual["id"]:
                 _pintar_mensaje(m)
+            _refrescar_lista_canales()
+        elif tipo == EVT_ELIMINADO:
+            # (v4.18.46) Un mensaje de la conversación abierta se ha eliminado: se vuelve a cargar
+            if (ev.get("mensaje") or {}).get("canal_id") == canal_actual["id"]:
+                _recargar()
             _refrescar_lista_canales()
         elif tipo == EVT_ERROR:
             lbl_estado.configure(text="🔴 Error de conexión", bootstyle="danger")

@@ -51,6 +51,24 @@
 
 ---
 
+## 2026-11-11 18:26 — [Chat móvil] Fase 1: menú al mantener pulsado, miniaturas, guardar y compartir, notas de cada versión y apk con nombre fijo (v1.0.6)
+
+- **Petición de Víctor:** las mismas de la fase 1 del Organizador, en el móvil (copiar texto; ver las imágenes en la conversación; descargar y compartir adjuntos y mensajes; ver las notas de cada versión; que el QR descargue la app directamente).
+- **Cambios:**
+  - `ui/Pantallas.kt`: al mantener pulsado un mensaje sale un menú (`combinedClickable`): Copiar y Compartir en los de texto; Abrir, «Guardar en…» y Compartir en los adjuntos.
+  - **Miniaturas** de las imágenes con Coil, solo si la dirección es del almacén permitido (`Seguridad.urlAdjuntoPermitida`); `Mensaje.esImagen` en `Modelos.kt`.
+  - `Archivos.kt`: `guardar` (selector de Android `CreateDocument`, sin permisos), `compartir` y `compartirTexto`.
+  - **Novedades de la versión:** en Ajustes, «Versión… · ver novedades» muestra el apartado de esa versión (`datos/Notas.kt`). Sale de `CHANGELOG.md`, que Gradle copia dentro de la .apk en cada compilación (`assets/CHANGELOG.md`).
+  - **Workflow:** publica también `ChatPrincess.apk`, copia idéntica con nombre fijo, que es la que descarga el QR del Organizador (v4.18.44). Al ser los mismos bytes vale el mismo .sha256, y da igual cuál de las dos .apk elija el actualizador.
+- **Pruebas:** `./gradlew testDebugUnitTest` (3 pruebas nuevas: notas de una versión, que el CHANGELOG tenga la versión actual, y cuándo un mensaje es una imagen), `assembleDebug` y `lintDebug` (los mismos 15 avisos que antes, ninguno nuevo).
+- **Por probar en el móvil:**
+  - el menú al mantener pulsado;
+  - las miniaturas;
+  - «Guardar en…» y Compartir;
+  - las novedades en Ajustes;
+  - el QR, con la Release publicada.
+- **Orden de publicación:** primero esta versión del móvil (trae `ChatPrincess.apk`) y después el Organizador v4.18.44, cuyo QR la descarga.
+
 ## 2026-11-11 18:19 — [Organizador] Chat, fase 1: copiar, miniaturas, «Guardar como…», historial en la burbuja, QR directo y notas al pulsar la versión (v4.18.44)
 
 - **Petición de Víctor** (peticiones de los compañeros desde el chat): copiar texto en la burbuja y en el chat principal; ver las imágenes en la conversación en vez del nombre; descargar los adjuntos y no solo abrirlos; que la burbuja deje subir para ver los mensajes anteriores; que el QR descargue la app directamente; y, al pulsar la versión, ver sus notas.

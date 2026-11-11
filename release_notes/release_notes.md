@@ -1,3 +1,11 @@
+# ✨ Organizador Princess v4.18.42
+
+## 💬 El chat avisa si falta tu cuenta
+
+- Sin usuario y contraseña de Control de Pedidos guardados (Administración → **Mi Usuario**), el chat no puede iniciar sesión. Antes se abría igual, vacío y sin conversaciones, y parecía que no funcionaba. Ahora no se abre y avisa de dónde configurarla. Vale para el botón del menú, el del calendario y la burbuja.
+
+---
+
 # ✨ Organizador Princess v4.18.40
 
 ## 🔧 Se vuelve a abrir bien después de actualizar

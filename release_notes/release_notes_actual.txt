@@ -1,17 +1,16 @@
-✨ Organizador Princess v4.18.40
+✨ Organizador Princess v4.18.42
 ================================================================
 
-🔧 SE VUELVE A ABRIR BIEN DESPUÉS DE ACTUALIZAR
+💬 EL CHAT AVISA SI FALTA TU CUENTA
 
-• Al terminar la actualización, el Organizador nuevo podía no abrirse
-  y mostrar «Failed to load Python DLL … python312.dll». Ya no pasa:
-  se abre solo, ya actualizado. (Si te salió con la 4.18.38, la
-  instalación sí se hizo: bastaba con abrirlo desde su acceso directo.)
+• Si en el equipo no está configurada tu cuenta de Control de
+  Pedidos, el chat ya no se abre vacío: avisa de que hay que
+  configurarla en Administración → Mi Usuario.
 
-🛡️ CONFIGURACIÓN Y AGENDA A PRUEBA DE CORTES (4.18.38)
+🔧 SE VUELVE A ABRIR BIEN DESPUÉS DE ACTUALIZAR (4.18.40)
 
-• La configuración y la agenda se guardan de forma segura y, si al
-  abrirse alguna está vacía o dañada, se recupera sola de su copia.
+• Tras «Actualizar ahora», el Organizador se vuelve a abrir solo, sin
+  el error «Failed to load Python DLL».
 
 ================================================================
 La idea y el desarrollo de la aplicación Organizador Princess son de

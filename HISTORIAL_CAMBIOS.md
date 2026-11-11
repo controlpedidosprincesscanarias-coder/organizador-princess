@@ -51,6 +51,16 @@
 
 ---
 
+## 2026-11-11 18:05 — [Organizador] El chat avisa si falta la cuenta de Control de Pedidos (v4.18.42)
+
+- **Petición de Víctor:** en el equipo que había perdido la configuración, el chat se abría vacío, sin conversaciones, porque faltaba la cuenta de Control de Pedidos. «El chat no debería permitir abrir si no existe cuenta configurada y lanzar un aviso.»
+- **Cambio:**
+  - `cuenta_chat_configurada()` (`services/chat_client.py`) comprueba que hay usuario y contraseña guardados (`get_bridge_credentials`).
+  - Si no los hay, `_ventana_chat()` muestra «Para usar el chat necesitas tu cuenta de Control de Pedidos… Administración → Mi Usuario» y no abre la ventana. Vale para el menú, el calendario y la burbuja.
+  - 3 comprobaciones nuevas en `test_bd_y_acceso.py`.
+- **Diagnóstico de ese equipo:** no era la versión nueva. Faltaban todos los datos del Organizador (configuración y Mi Usuario). Al volver a configurar la cuenta, el chat funcionó.
+- **Por probar en Windows:** abrir el chat en un equipo sin Mi Usuario configurado (debe salir el aviso) y en uno configurado (debe abrirse como siempre).
+
 ## 2026-11-11 16:24 — [Organizador] Se vuelve a abrir bien después de actualizar (v4.18.40)
 
 - **Problema** (lo vio Víctor con la 4.18.38): tras «Actualizar ahora», la instalación terminaba, pero el Organizador nuevo no se abría y mostraba «Failed to load Python DLL …\_MEI…\python312.dll».

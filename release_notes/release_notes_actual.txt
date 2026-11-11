@@ -1,26 +1,16 @@
-✨ Organizador Princess v4.18.44
+✨ Organizador Princess v4.18.46
 ================================================================
 
-💬 CHAT MÁS CÓMODO
+↩️ RESPONDER, REENVIAR Y ELIMINAR MENSAJES
 
-• Doble clic sobre un mensaje para copiarlo (sale «✓ Copiado»).
-  También con clic derecho → «Copiar mensaje».
-• Las imágenes se ven en la conversación, en miniatura, en vez de
-  solo su nombre. Al pulsarla se abre.
-• Clic derecho sobre un adjunto: «Abrir» o «Guardar como…» para
-  elegir dónde guardarlo.
-• La burbuja del chat muestra toda la conversación: se puede subir
-  para ver los mensajes anteriores, igual que en la ventana grande.
-
-📜 NOVEDADES DE CADA VERSIÓN
-
-• Pulsa el número de versión (abajo a la derecha en el menú, en
-  Administración o en Configuración) para ver qué trae esa versión.
-
-📱 CHAT EN EL MÓVIL
-
-• El código QR descarga la app directamente, sin pasar por la
-  página de GitHub (a partir de la próxima versión de la app).
+• Clic derecho sobre un mensaje del chat (en la ventana grande y en
+  la burbuja):
+  - «↩ Responder»: tu respuesta sale con el mensaje citado encima,
+    como en WhatsApp.
+  - «↪ Reenviar…»: lo mandas a otra conversación o a un compañero
+    (también fotos y archivos).
+  - «🗑 Eliminar» (solo tus mensajes): queda como «Mensaje
+    eliminado» para todos.
 
 ================================================================
 La idea y el desarrollo de la aplicación Organizador Princess son de

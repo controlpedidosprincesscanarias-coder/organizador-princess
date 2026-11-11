@@ -1,3 +1,16 @@
+# ✨ Organizador Princess v4.18.46
+
+## ↩️ Responder, reenviar y eliminar mensajes
+
+Clic derecho sobre un mensaje del chat, en la ventana grande o en la burbuja:
+- **↩ Responder:** encima de la caja de escribir sale «Respondiendo a…» (✕ para quitarlo), y tu respuesta lleva el mensaje citado arriba, con quién lo escribió. Como en WhatsApp.
+- **↪ Reenviar…:** eliges la conversación o el compañero. Sirve también para fotos y archivos, que no se vuelven a subir. La copia lleva «↪ Reenviado».
+- **🗑 Eliminar** (solo tus mensajes): pide confirmación y queda como «🚫 Mensaje eliminado» para todos, al momento.
+
+Necesita el servicio del chat v1.4.0.
+
+---
+
 # ✨ Organizador Princess v4.18.44
 
 ## 💬 Chat más cómodo

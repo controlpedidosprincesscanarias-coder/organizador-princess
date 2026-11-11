@@ -1,3 +1,14 @@
+# ✨ Organizador Princess v4.18.36
+
+> Incluye también lo de la 4.18.34, que no llegó a publicarse.
+
+## 🧹 Limpieza tras actualizar
+
+- Al abrirse la versión nueva se borra el **instalador descargado** (unos 40 MB en `%TEMP%\OrganizadorPrincess_actualizacion`), que antes se quedaba hasta la actualización siguiente. Solo se borran los de esta versión o anteriores; uno más nuevo que no llegó a instalarse se deja.
+- El aviso **«Organizador actualizado»** lo confirma («El instalador descargado ya se ha borrado»). Si no se puede borrar (en uso), se reintenta en el próximo arranque.
+
+---
+
 # ✨ Organizador Princess v4.18.34
 
 > Incluye también todo lo de la 4.18.32 y anteriores que no llegaron a publicarse (desde la 4.18.12).

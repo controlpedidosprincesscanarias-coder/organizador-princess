@@ -1,9 +1,14 @@
-✨ Organizador Princess v4.18.34
+✨ Organizador Princess v4.18.36
 ================================================================
 
-(Incluye también todo lo de la 4.18.32, la 4.18.30, la 4.18.28, la
-4.18.26, la 4.18.24, la 4.18.22, la 4.18.20, la 4.18.18, la 4.18.16,
-la 4.18.14 y la 4.18.12, que no llegaron a publicarse.)
+(Incluye también lo de la 4.18.34, que no llegó a publicarse.)
+
+🧹 LIMPIEZA TRAS ACTUALIZAR (4.18.36)
+
+• Al abrirse la versión nueva se borra el instalador descargado
+  (unos 40 MB en la carpeta temporal), que antes se quedaba hasta la
+  actualización siguiente. El aviso «Organizador actualizado» lo
+  confirma.
 
 📱 INSTALAR LA APP DEL MÓVIL, PASO A PASO (4.18.34)
 
@@ -11,84 +16,6 @@ la 4.18.14 y la 4.18.12, que no llegaron a publicarse.)
   hacer con los avisos de Android al instalar la app: «Descargar de
   todas formas», «Instalar apps desconocidas» y, si sale Google Play
   Protect, «Más detalles» → «Instalar de todas formas».
-
-🛠 ACTUALIZAR AHORA (4.18.32)
-
-• Corregido: con «Actualizar ahora» se cerraba el Organizador pero la
-  versión nueva no llegaba a instalarse ni a abrirse.
-
-👁 BOTONES DEL CHAT MÁS VISIBLES (4.18.30)
-
-• «📱 Chat en el móvil» y «🖼 Fotos» se ven ahora igual de claros que
-  «Limpiar chat» (antes parecían desactivados).
-
-🖼 FOTOS DE PERFIL EN EL CHAT (4.18.28)
-
-• Cada persona puede poner su foto, y cualquier miembro de un grupo
-  la foto del grupo: botón «🖼 Fotos» en la ventana del chat.
-• Las fotos se ven en la lista de conversaciones, en la cabecera, junto
-  a los mensajes de General y de los grupos y en la burbuja. Sin foto,
-  se ven las iniciales sobre un círculo de color.
-• Son las mismas fotos que en la app del móvil, y los cambios se ven al
-  momento en todos los equipos.
-
-📱 EL CHAT TAMBIÉN EN EL MÓVIL (4.18.24 y 4.18.26)
-
-• Nueva app «Chat Dpto. Compras Princess» para Android, con tu cuenta
-  de Control de Pedidos y la corona de Princess como icono. En el chat,
-  «📱 Chat en el móvil» muestra el código QR para descargarla. El
-  Manual de usuario explica cómo instalarla.
-
-😊 EMOTICONOS EN COLOR (4.18.22)
-
-• El panel de emoticonos, las respuestas rápidas y los emoticonos de
-  los mensajes del chat se ven en color.
-
-🆙 ACTUALIZAR CON UN SOLO CLIC (4.18.20)
-
-• «Actualizar ahora» descarga, comprueba, instala y vuelve a abrir el
-  Organizador solo. Funciona a partir de la próxima actualización.
-
-😊 EMOTICONOS EN EL CHAT (4.18.18)
-
-• Botón 😊 en la ventana del chat y en la burbuja: emoticonos y
-  respuestas rápidas («👍 Ok», «👌 Perfecto», «🙏 Gracias»…).
-
-💬 CHAT (4.18.16)
-
-• Si tienes abierta la ventana grande del chat en una conversación y
-  la otra persona contesta, la ventana grande se cierra y la
-  conversación sigue en la burbuja, con lo que estuvieras escribiendo.
-• En la burbuja también se pueden arrastrar archivos y pegarlos con
-  Ctrl+V, como en la ventana grande.
-
-📅 FECHAS Y HORAS MÁS FÁCILES (4.18.14)
-
-• Al crear o editar un aviso, unas vacaciones o un festivo, cada fecha
-  tiene un botón 📅 que abre un calendario: un clic en el día y listo.
-  Se puede seguir escribiendo, también sin guiones (15112026) o con
-  barras (15/11/26).
-• La hora de los avisos se elige con dos ruedas, horas y minutos, sin
-  escribir los dos puntos (flechas, rueda del ratón o escribiendo).
-
-📘 MANUALES NUEVOS (4.18.12)
-
-• El Manual de usuario (el que abre el botón «Manual») y el Manual de
-  administrador están renovados, con capturas reales de todas las
-  pantallas, números de referencia, índice y tablas de consulta rápida.
-
-🛠 CORRECCIONES (4.18.12)
-
-• Calendario: el mes o la semana que se ve sale entre las flechas ◀ ▶.
-  Antes le quitaba sitio al calendario y en la vista Semana no se veía
-  el domingo.
-• Calendario: al pasar de «Mes» a «Semana» se abre la semana de hoy
-  (o la del día elegido), no la del día 1 del mes.
-• Agenda: los avisos semanales decían «Luness», «Martess»…; ahora
-  «Lunes», «Martes»… Los de cada 30 minutos ya no muestran minutos
-  imposibles (como «:45 / :75»).
-• Admin: la ventana de subopciones mostraba una versión antigua y los
-  botones sin definir salían como «19 · 19. POR DEFINIR».
 
 ================================================================
 La idea y el desarrollo de la aplicación Organizador Princess son de

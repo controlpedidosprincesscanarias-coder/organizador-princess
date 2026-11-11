@@ -1,3 +1,16 @@
+# ✨ Organizador Princess v4.18.50
+
+## 🔔 Los avisos de Control Pedidos, en el chat
+
+- Los avisos que hasta ahora llegaban por **Telegram** (pedidos sin entregar, techo de gastos, cambios de estado…) llegan también al chat, en una conversación nueva: **«Control Pedidos»**. Suenan y avisan como cualquier mensaje.
+- Cada uno recibe **solo sus avisos**, los mismos que le llegaban por Telegram.
+- En esa conversación **no se puede escribir**: solo llegan avisos. Un aviso se puede **reenviar** a un compañero (clic derecho → «↪ Reenviar…»).
+- Durante un tiempo seguirán llegando también por Telegram; cuando se compruebe que todo llega bien al chat, Telegram se apagará.
+
+Necesita el servicio del chat v1.6.0 y Control Pedidos v12.34.22.
+
+---
+
 # ✨ Organizador Princess v4.18.48
 
 ## 👥 Grupos del chat: integrantes y gestión

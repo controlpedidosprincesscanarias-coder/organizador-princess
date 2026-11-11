@@ -51,6 +51,16 @@
 
 ---
 
+## 2026-11-11 18:31 — [Control Pedidos] Novedades de la versión al pulsar «V x.y.z» (v12.34.20)
+
+- **Petición de Víctor:** que en todas las aplicaciones se vean las notas de la versión pulsando sobre ella (ya en el Organizador v4.18.44 y en el móvil v1.0.6).
+- **Cambios:**
+  - La insignia «V x.y.z» del menú lateral abre la ventana «Novedades de la V…» (`abrirNotasVersion()` y `_apartadoVersionActual()` en `static/js/nueva_version.js`, y `modal-notas-version` en `templates/index.html`).
+  - Misma regla que el aviso de nueva versión (3 sep): el administrador ve las notas de la versión actual, y compras y hotel solo el título que ya devuelve `/api/changelog`. Sin cambios en el servidor.
+- **Pruebas:**
+  - `huella_app.py`: huella idéntica.
+  - `e2e_navegador.py`: paso nuevo «notas al pulsar V x.y.z» en los tres roles; 60 pasos sin errores.
+
 ## 2026-11-11 18:26 — [Chat móvil] Fase 1: menú al mantener pulsado, miniaturas, guardar y compartir, notas de cada versión y apk con nombre fijo (v1.0.6)
 
 - **Petición de Víctor:** las mismas de la fase 1 del Organizador, en el móvil (copiar texto; ver las imágenes en la conversación; descargar y compartir adjuntos y mensajes; ver las notas de cada versión; que el QR descargue la app directamente).

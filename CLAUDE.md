@@ -50,3 +50,12 @@ Todos los equipos se actualizan solos desde las **Releases de este repositorio**
 7. Pruebas (se lanzan también en la compilación automática): `python test_filtrado_popups.py`, `python test_estructura.py`, `python test_limite_github.py`, `python test_bd_y_acceso.py`, `python test_markdown_texto.py`, `python test_fecha_hora.py`, `python test_actualizacion.py`, `python test_emoticonos.py`, `python test_avatares.py`, `python test_chat_fase1.py`, `python test_chat_fase2.py` y `python test_chat_fase3.py`. `test_estructura` y `test_limite_github` simulan Tkinter si no está instalado.
    **Prueba de uso** (`pruebas_uso/`, ver su README): arranca el Organizador real en Linux con pantalla virtual y lo maneja con «usuario prueba» (31 comprobaciones y una captura por pantalla). Ejecutarla tras cambios en la interfaz. No envía mensajes de chat ni crea pedidos salvo que se pida (`CHAT_DESTINO`, `CREAR_PEDIDO_PR=1`).
 8. **Nunca importar `main_agenda` desde otro módulo**: es el script de arranque (`__main__`) y el import vuelve a ejecutar la aplicación entera (pasó en `pedidos_agenda_bridge.py` hasta v4.18.06). Lo compartido va en `app/`. Lo vigila `test_estructura.py`.
+
+## Pendientes para la próxima versión
+1. **Quitar `USUARIOS_INICIALES`** (`app/db/sqlite.py`; acordado con Víctor el 11 nov 2026). Es una lista fija de usuarios de Windows del departamento con el nombre real de cada compañero, que solo sirve para el saludo del menú principal (`get_nombre_usuario`, `_init_db_usuarios`). No da acceso a nada, se queda desfasada (equipos nuevos o con otro usuario de Windows saludan con el usuario, p. ej. «victo») y deja datos personales en un repositorio público. Hacer:
+   - quitar la lista y el `INSERT OR IGNORE` de `_init_db_usuarios`;
+   - guardar como `nombre_real` el nombre que devuelve Control de Pedidos al entrar con la cuenta de cada uno (`/api/bridge/login` ya lo da: `admin_auth.py` y `chat_client.login`);
+   - sin cuenta configurada, saludar con el usuario de Windows y seguir permitiendo cambiarlo en Administración → Mi Usuario;
+   - los equipos que ya tienen el nombre guardado en `usuarios.db` no deben notar nada;
+   - ampliar `test_bd_y_acceso.py`.
+2. **Propuesto, sin decidir:** que el desinstalador no borre `%APPDATA%\OrganizadorPrincess` (`[UninstallDelete]` del `.iss`), para que una reinstalación conserve la configuración, «Mi Usuario», la agenda y sus copias.

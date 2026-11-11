@@ -88,6 +88,24 @@ open(os.path.join(c, "viejo.exe"), "w").close()
 c2 = us._carpeta_descarga_actualizacion()
 ok("carpeta temporal propia y vacía en cada descarga", c == c2 and not os.listdir(c2), os.listdir(c2))
 
+# 5b. (v4.18.36) Al arrancar se borran los instaladores ya aplicados (esta versión o anteriores)
+import tempfile as _tf
+with _tf.TemporaryDirectory() as _c:
+    for _n in ("OrganizadorPrincess_Setup_4.18.34.exe", "OrganizadorPrincess_Setup_4.18.34.exe.sha256",
+               "OrganizadorPrincess_Setup_4.18.36.exe", "OrganizadorPrincess_Setup_4.18.38.exe", "otro.txt"):
+        open(os.path.join(_c, _n), "w").close()
+    b, p = us.borrar_instaladores_aplicados("v4.18.36", carpeta=_c)
+    ok("se borran los instaladores de esta versión y anteriores",
+       sorted(b) == ["OrganizadorPrincess_Setup_4.18.34.exe", "OrganizadorPrincess_Setup_4.18.34.exe.sha256",
+                     "OrganizadorPrincess_Setup_4.18.36.exe"] and p == [], (b, p))
+    ok("se dejan el de una versión más nueva y lo que no es un instalador",
+       sorted(os.listdir(_c)) == ["OrganizadorPrincess_Setup_4.18.38.exe", "otro.txt"], os.listdir(_c))
+    with mock.patch.object(us.os, "remove", side_effect=PermissionError("en uso")):
+        open(os.path.join(_c, "OrganizadorPrincess_Setup_4.18.30.exe"), "w").close()
+        b, p = us.borrar_instaladores_aplicados("v4.18.36", carpeta=_c)
+    ok("si no se puede borrar, queda pendiente sin fallar", b == [] and p == ["OrganizadorPrincess_Setup_4.18.30.exe"], (b, p))
+ok("sin carpeta de descarga, no falla", us.borrar_instaladores_aplicados("v4.18.36", carpeta=os.path.join(RAIZ, "no_existe")) == ([], []))
+
 # 6. El instalador vuelve a abrir el Organizador tras la instalación silenciosa
 iss = open(os.path.join(RAIZ, "OrganizadorPrincess_Setup.iss"), encoding="utf-8").read()
 ok("el .iss reabre el Organizador al instalar en silencio (WizardSilent, usuario normal)",

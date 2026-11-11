@@ -89,7 +89,7 @@ NOMBRE_USUARIO_ACTUAL = get_nombre_usuario()
 
 GOLD  = "#C9A84C"
 LIGHT = "#D8E8F0"
-APP_VERSION  = "v4.18.34"   # ← actualizar en cada release (debe coincidir con el tag del release en GitHub)
+APP_VERSION  = "v4.18.36"   # ← actualizar en cada release (debe coincidir con el tag del release en GitHub)
 GITHUB_REPO  = "controlpedidosprincesscanarias-coder/organizador-princess"  # repo de releases
 _update_mod.APP_VERSION = APP_VERSION  # propagar a services/update_service.py
 _update_mod.GITHUB_REPO = GITHUB_REPO
@@ -130,6 +130,12 @@ _nueva_version_detectada, _version_anterior = _check_version_reset()
 _actualizada_sola = _nueva_version_detectada and _update_mod.actualizacion_automatica_aplicada(_version_anterior)
 if _actualizada_sola:
     _nueva_version_detectada = False
+# (v4.18.36) Borrar el instalador ya aplicado de la carpeta temporal y dejarlo anotado.
+_instaladores_borrados, _instaladores_pendientes = _update_mod.borrar_instaladores_aplicados(APP_VERSION)
+for _n in _instaladores_borrados:
+    logging.getLogger("actualizacion").info("Instalador ya aplicado borrado: %s", _n)
+for _n in _instaladores_pendientes:
+    logging.getLogger("actualizacion").warning("No se pudo borrar el instalador %s (se reintentará al arrancar)", _n)
 
 config = load_config()
 
@@ -1035,7 +1041,10 @@ if _actualizada_sola:
     app.after(1500, lambda: messagebox.showinfo(
         "Organizador actualizado",
         f"El Organizador se ha actualizado a la versión {APP_VERSION}.\n\n"
-        "Tu configuración y tu agenda se mantienen.", parent=app))
+        "Tu configuración y tu agenda se mantienen."
+        + ("\nEl instalador descargado ya se ha borrado." if _instaladores_borrados and not _instaladores_pendientes
+           else "\nEl instalador descargado se borrará en el próximo arranque." if _instaladores_pendientes else ""),
+        parent=app))
 
 # Hilo de vigilancia de avisos (daemon -> muere al cerrar la app)
 # ANTI-REGRESION (bug Fase 3.7e): nombrar el hilo para detectar si ya existe

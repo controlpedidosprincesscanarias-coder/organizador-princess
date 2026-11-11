@@ -753,6 +753,33 @@ def _carpeta_descarga_actualizacion():
     return carpeta
 
 
+def borrar_instaladores_aplicados(version_actual, carpeta=None):
+    """(v4.18.36) Al arrancar: borra de la carpeta de descarga (%TEMP%\\OrganizadorPrincess_actualizacion)
+    los instaladores de esta versión o anteriores, que ya están instalados (~40 MB cada uno). Antes se
+    quedaban ahí hasta la actualización siguiente. Un instalador de una versión MÁS NUEVA (descargado
+    pero sin instalar, p. ej. se canceló el permiso de Windows) se deja. Nunca lanza.
+    Devuelve (borrados, pendientes): nombres borrados y los que no se pudieron borrar."""
+    import re as _re
+    import tempfile
+    carpeta = carpeta or os.path.join(tempfile.gettempdir(), "OrganizadorPrincess_actualizacion")
+    borrados, pendientes = [], []
+    try:
+        nombres = os.listdir(carpeta)
+    except OSError:
+        return borrados, pendientes
+    actual = _parse_version(version_actual)
+    for nombre in sorted(nombres):
+        m = _re.match(r"^OrganizadorPrincess_Setup_v?([\d.]+?)\.exe(\.sha256)?$", nombre, _re.I)
+        if not m or _parse_version(m.group(1)) > actual:
+            continue
+        try:
+            os.remove(os.path.join(carpeta, nombre))
+            borrados.append(nombre)
+        except OSError:
+            pendientes.append(nombre)
+    return borrados, pendientes
+
+
 def _instalar_ya(ruta_instalador, version):
     """Lanza el instalador ya comprobado. Devuelve None si se lanzó, o el motivo si no.
     Se usa ShellExecute (os.startfile) y no subprocess: el instalador pide permisos de

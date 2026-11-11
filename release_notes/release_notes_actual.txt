@@ -1,16 +1,26 @@
-✨ Organizador Princess v4.18.42
+✨ Organizador Princess v4.18.44
 ================================================================
 
-💬 EL CHAT AVISA SI FALTA TU CUENTA
+💬 CHAT MÁS CÓMODO
 
-• Si en el equipo no está configurada tu cuenta de Control de
-  Pedidos, el chat ya no se abre vacío: avisa de que hay que
-  configurarla en Administración → Mi Usuario.
+• Doble clic sobre un mensaje para copiarlo (sale «✓ Copiado»).
+  También con clic derecho → «Copiar mensaje».
+• Las imágenes se ven en la conversación, en miniatura, en vez de
+  solo su nombre. Al pulsarla se abre.
+• Clic derecho sobre un adjunto: «Abrir» o «Guardar como…» para
+  elegir dónde guardarlo.
+• La burbuja del chat muestra toda la conversación: se puede subir
+  para ver los mensajes anteriores, igual que en la ventana grande.
 
-🔧 SE VUELVE A ABRIR BIEN DESPUÉS DE ACTUALIZAR (4.18.40)
+📜 NOVEDADES DE CADA VERSIÓN
 
-• Tras «Actualizar ahora», el Organizador se vuelve a abrir solo, sin
-  el error «Failed to load Python DLL».
+• Pulsa el número de versión (abajo a la derecha en el menú, en
+  Administración o en Configuración) para ver qué trae esa versión.
+
+📱 CHAT EN EL MÓVIL
+
+• El código QR descarga la app directamente, sin pasar por la
+  página de GitHub (a partir de la próxima versión de la app).
 
 ================================================================
 La idea y el desarrollo de la aplicación Organizador Princess son de

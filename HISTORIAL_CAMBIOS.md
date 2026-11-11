@@ -51,6 +51,23 @@
 
 ---
 
+## 2026-11-11 18:19 — [Organizador] Chat, fase 1: copiar, miniaturas, «Guardar como…», historial en la burbuja, QR directo y notas al pulsar la versión (v4.18.44)
+
+- **Petición de Víctor** (peticiones de los compañeros desde el chat): copiar texto en la burbuja y en el chat principal; ver las imágenes en la conversación en vez del nombre; descargar los adjuntos y no solo abrirlos; que la burbuja deje subir para ver los mensajes anteriores; que el QR descargue la app directamente; y, al pulsar la versión, ver sus notas.
+- **Plan acordado:** el resto de peticiones necesita cambiar el servidor del chat y va por fases:
+  - fase 2: responder citando un mensaje, eliminar un mensaje o adjunto propio, reenviar;
+  - fase 3: grupos (ver integrantes, añadir o quitar, renombrar y eliminar);
+  - fase 4: avisos internos de Control Pedidos al chat en lugar de Telegram.
+- **Cambios** (`app/ui/chat_bubbles.py`, `miniaturas.py` y `notas_version.py`, los dos nuevos, `ventana_chat.py`, `chat_popup.py`, `chat_movil.py` y `services/chat_client.py`):
+  - **Copiar:** doble clic sobre un mensaje, con aviso «✓ Copiado». El clic derecho «Copiar mensaje» ya existía, pero nadie lo encontraba.
+  - **Miniaturas** de las imágenes encima de su nombre: descargadas en segundo plano con `ChatClient.descargar_bytes` (solo del almacén de adjuntos, sin redirecciones y con tamaño máximo), reducidas a 240×180 y guardadas en memoria.
+  - **Menú de los adjuntos:** «Abrir», «Guardar como…» (`guardar_adjunto_como`) y «Copiar nombre del archivo».
+  - **Burbuja:** carga el historial completo (antes, los 3 últimos mensajes de hoy).
+  - **QR:** apunta a `releases/latest/download/ChatPrincess.apk`, el nombre fijo que publicará la app del móvil desde su próxima versión. Mientras, el botón «Página de versiones» lleva a la de siempre.
+  - **Versión:** al pulsarla en el menú principal, en Administración o en Configuración se abren sus notas, sacadas de `release_notes/release_notes.md` (lo instala el `.iss` junto al programa).
+- **Pruebas:** `test_chat_fase1.py` nuevo (18 comprobaciones), añadido a la compilación automática. Además, burbujas y ventana de notas probadas con Tkinter real en una pantalla virtual (texto copiado, miniatura, PDF y notas con formato).
+- **Por probar en Windows:** miniaturas con imágenes reales, «Guardar como…», historial y desplazamiento en la burbuja, y las notas desde las tres ventanas. El QR, cuando esté publicada la versión del móvil con `ChatPrincess.apk`.
+
 ## 2026-11-11 18:05 — [Organizador] El chat avisa si falta la cuenta de Control de Pedidos (v4.18.42)
 
 - **Petición de Víctor:** en el equipo que había perdido la configuración, el chat se abría vacío, sin conversaciones, porque faltaba la cuenta de Control de Pedidos. «El chat no debería permitir abrir si no existe cuenta configurada y lanzar un aviso.»

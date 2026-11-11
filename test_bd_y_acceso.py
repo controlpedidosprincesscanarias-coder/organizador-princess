@@ -6,6 +6,8 @@ Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de
 Uso: python test_bd_y_acceso.py   (usa una carpeta de datos temporal; no toca la del equipo)
 1. _init_db_usuarios no repite el ALTER TABLE (antes dejaba «duplicate column name» en cada lectura).
 2. existe_en_plataforma codifica el usuario de Windows (antes, con un espacio, la petición ni salía).
+3. (v4.18.38) config.json y agenda.json a prueba de cortes: escritura segura con copia .bak y
+   recuperación si al arrancar están vacíos o dañados (antes se perdía toda la configuración).
 """
 import contextlib
 import io
@@ -72,6 +74,40 @@ if admin_auth:
        r is True and rutas and rutas[-1].endswith("usuario_windows=usuario%20prueba"), rutas)
     admin_auth.existe_en_plataforma("muñoz")
     ok("…y con «ñ»", rutas[-1].endswith("usuario_windows=mu%C3%B1oz"), rutas)
+
+# ── 3. config.json y agenda.json a prueba de cortes (v4.18.38) ──────────────────
+import json as _json  # noqa: E402
+import logging as _logging  # noqa: E402
+_logging.disable(_logging.CRITICAL)
+bd.save_config({"usuario": "usuario prueba", "accesos": [1, 2]})
+bd.save_config({"usuario": "usuario prueba", "accesos": [1, 2, 3]})
+ok("guardar config deja copia .bak de la versión anterior",
+   _json.load(open(bd.CONFIG_FILE + ".bak")) == {"usuario": "usuario prueba", "accesos": [1, 2]})
+ok("…y no deja el .tmp", not os.path.exists(bd.CONFIG_FILE + ".tmp"))
+open(bd.CONFIG_FILE, "w").close()                       # se cortó a mitad de escritura: vacío
+ok("config.json vacío: se recupera de la copia .bak", bd.load_config() == {"usuario": "usuario prueba", "accesos": [1, 2]},
+   bd.load_config())
+ok("…se reescribe ya bien y se guarda el dañado aparte",
+   _json.load(open(bd.CONFIG_FILE))["usuario"] == "usuario prueba"
+   and any(n.startswith("config.json.danado_") for n in os.listdir(TMP + "/OrganizadorPrincess")))
+with open(bd.CONFIG_FILE, "w") as f:
+    f.write('{"usuario": "usu')                         # a medias
+os.remove(bd.CONFIG_FILE + ".bak")
+with open(os.path.join(os.path.dirname(bd.CONFIG_FILE), "config_backup_v4.18.34_20261111_150000.json"), "w") as f:
+    _json.dump({"usuario": "de la copia de actualizar"}, f)
+ok("config.json a medias y sin .bak: se recupera de la copia de la última actualización",
+   bd.load_config() == {"usuario": "de la copia de actualizar"}, bd.load_config())
+bd.save_config({})
+ok("una configuración vacía guardada a propósito («desde cero») se respeta", bd.load_config() == {})
+bd.save_agenda({"2026-11-11": [{"texto": "Reunión ñ"}]})
+bd.save_agenda({"2026-11-12": [{"texto": "Otra"}]})
+with open(bd.AGENDA_FILE, "w", encoding="utf-8") as f:
+    f.write("{")
+ok("agenda.json dañado: se recupera de la copia .bak", bd.load_agenda() == {"2026-11-11": [{"texto": "Reunión ñ"}]},
+   bd.load_agenda())
+bd.save_agenda({})
+ok("una agenda vaciada a propósito se respeta", bd.load_agenda() == {})
+_logging.disable(_logging.NOTSET)
 
 print(f"\n{'Todas las comprobaciones OK.' if not fallos else str(len(fallos)) + ' fallo(s)'}")
 sys.exit(1 if fallos else 0)

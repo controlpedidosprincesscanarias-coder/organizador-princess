@@ -34,19 +34,93 @@ USUARIOS_INICIALES = {
 
 # ── Config JSON ───────────────────────────────────────────────────────────────
 
+# (v4.18.38) Escritura a prueba de cortes. Antes se escribía encima del archivo: se vaciaba y luego
+# se escribía, así que si el Organizador se cerraba en medio (el instalador lo cierra a la fuerza con
+# taskkill /F al actualizar, un apagón…) el archivo se quedaba vacío o a medias. Al leerlo se tomaba
+# como una configuración vacía sin avisar, y el siguiente guardado (p. ej. el saludo del día)
+# sobrescribía la buena para siempre. Ahora:
+#   - se escribe en <archivo>.tmp y se sustituye de golpe (os.replace), guardando antes la versión
+#     anterior, si era válida, en <archivo>.bak;
+#   - si al leer el archivo está vacío o dañado, se recupera de <archivo>.bak (o, para config.json,
+#     de la copia config_backup_*.json más reciente que tenga datos), se guarda aparte el dañado
+#     (<archivo>.danado_<fecha>) y queda en el log «recuperacion».
+# Lo prueban las comprobaciones de test_bd_y_acceso.py.
+
+def _leer_json(ruta, encoding=None):
+    """Contenido del JSON o None si no existe, está vacío o no se puede leer."""
+    try:
+        with open(ruta, "r", encoding=encoding) as f:
+            contenido = f.read().strip()
+        return json.loads(contenido) if contenido else None
+    except (OSError, ValueError):
+        return None
+
+
+def _escribir_json_seguro(ruta, data, encoding=None, **opciones):
+    """Escribe en <ruta>.tmp, guarda la versión válida anterior en <ruta>.bak y sustituye."""
+    tmp = ruta + ".tmp"
+    with open(tmp, "w", encoding=encoding) as f:
+        json.dump(data, f, indent=4, **opciones)
+        f.flush()
+        try:
+            os.fsync(f.fileno())
+        except OSError:
+            pass
+    if _leer_json(ruta, encoding):          # solo se guarda como copia una versión con datos
+        try:
+            import shutil
+            shutil.copy2(ruta, ruta + ".bak")
+        except OSError:
+            pass
+    os.replace(tmp, ruta)
+
+
+def _recuperar_json(ruta, encoding=None, copias_extra=()):
+    """Si <ruta> existe pero está vacío o dañado, lo recupera de <ruta>.bak o de `copias_extra`
+    (de la más reciente a la más antigua). Devuelve los datos recuperados o None."""
+    import logging
+    import shutil
+    from datetime import datetime
+    log = logging.getLogger("recuperacion")
+    candidatos = [ruta + ".bak"] + sorted(copias_extra, key=lambda r: os.path.getmtime(r) if os.path.exists(r) else 0,
+                                          reverse=True)
+    for copia in candidatos:
+        datos = _leer_json(copia, encoding)
+        if datos:
+            try:
+                shutil.copy2(ruta, ruta + ".danado_" + datetime.now().strftime("%Y%m%d_%H%M%S"))
+            except OSError:
+                pass
+            try:
+                _escribir_json_seguro(ruta, datos, encoding)
+            except OSError:
+                pass
+            log.warning("%s estaba vacío o dañado: recuperado de %s", os.path.basename(ruta), os.path.basename(copia))
+            return datos
+    log.error("%s estaba vacío o dañado y no hay ninguna copia con datos", os.path.basename(ruta))
+    return None
+
+
+def _copias_config():
+    carpeta = os.path.dirname(CONFIG_FILE)
+    try:
+        return [os.path.join(carpeta, n) for n in os.listdir(carpeta)
+                if n.startswith("config_backup_") and n.endswith(".json")]
+    except OSError:
+        return []
+
+
 def load_config():
     if not os.path.exists(CONFIG_FILE):
         return {}
-    with open(CONFIG_FILE, "r") as f:
-        content = f.read().strip()
-        if not content:
-            return {}
-        return json.loads(content)
+    datos = _leer_json(CONFIG_FILE)
+    if datos is None:
+        datos = _recuperar_json(CONFIG_FILE, copias_extra=_copias_config())
+    return datos if isinstance(datos, dict) else {}
 
 
 def save_config(data):
-    with open(CONFIG_FILE, "w") as f:
-        json.dump(data, f, indent=4)
+    _escribir_json_seguro(CONFIG_FILE, data)
 
 
 # ── Marcador local de "Limpiar chat" (2026-08-01) ──────────────────────────────
@@ -109,17 +183,14 @@ def filtrar_mensajes_limpiados(canal_id: str, mensajes: list) -> list:
 def load_agenda():
     if not os.path.exists(AGENDA_FILE):
         return {}
-    try:
-        with open(AGENDA_FILE, "r", encoding="utf-8") as f:
-            content = f.read().strip()
-            return json.loads(content) if content else {}
-    except Exception:
-        return {}
+    datos = _leer_json(AGENDA_FILE, "utf-8")
+    if datos is None:
+        datos = _recuperar_json(AGENDA_FILE, "utf-8")
+    return datos if isinstance(datos, dict) else {}
 
 
 def save_agenda(data):
-    with open(AGENDA_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=4, ensure_ascii=False)
+    _escribir_json_seguro(AGENDA_FILE, data, "utf-8", ensure_ascii=False)
 
 
 # ── DB de usuarios (SQLite) ───────────────────────────────────────────────────

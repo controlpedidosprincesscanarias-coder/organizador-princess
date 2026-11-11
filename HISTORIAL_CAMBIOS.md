@@ -51,6 +51,20 @@
 
 ---
 
+## 2026-11-11 15:17 — [Organizador] Borrar el instalador descargado tras actualizar (v4.18.36)
+
+- **Pregunta de Víctor:** ¿se verifica el borrado de la versión anterior al actualizar?
+- **Cómo estaba:**
+  - el instalador se instala encima, en la misma carpeta y con el mismo AppId, así que el `.exe` antiguo queda sustituido y solo hay una entrada en «Programas instalados»;
+  - pero el instalador descargado (~40 MB) se quedaba en `%TEMP%\OrganizadorPrincess_actualizacion` hasta la actualización siguiente, y nada lo comprobaba.
+- **Ahora:** `borrar_instaladores_aplicados()` (`app/services/update_service.py`) se lanza en cada arranque y borra los instaladores de esta versión o anteriores, con su `.sha256`.
+  - Uno de una versión más nueva, descargado pero sin instalar, se deja.
+  - Queda anotado en el log; si no se puede borrar, se reintenta en el próximo arranque.
+  - Tras «Actualizar ahora», el aviso «Organizador actualizado» añade «El instalador descargado ya se ha borrado».
+  - 5 comprobaciones nuevas en `test_actualizacion.py`.
+- **Notas de versión:** la 4.18.30 y la 4.18.32 ya están publicadas, así que las de la 4.18.36 solo incluyen la 4.18.34.
+- **Aparte (Consola Registro Info SAP, repo propio):** su nueva actualización automática ya hace lo mismo. Al arrancar borra `TARIFA_Finder.anterior.exe` y lo indica en su consola; si sigue en uso, lo reintenta.
+
 ## 2026-11-09 21:06 — [Organizador / Chat móvil] Pasos para instalar la app del móvil pese a los avisos de Android (v4.18.34)
 
 - **Petición** (Víctor): al instalar la APK, Android y Google Play Protect piden análisis y hablan de peligrosidad; explicarlo junto al QR y en el manual.

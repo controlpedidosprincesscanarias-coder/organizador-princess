@@ -145,6 +145,7 @@ EVT_DESCONECTADO   = "desconectado"
 EVT_NUEVO_MENSAJE  = "nuevo_mensaje"
 EVT_ERROR          = "error"
 EVT_AVATAR         = "avatar_cambiado"   # (v4.18.28) foto de perfil de una persona o grupo
+EVT_ELIMINADO      = "mensaje_eliminado"  # (v4.18.46) un mensaje se eliminó (chat v1.4.0)
 
 _LADO_AVATAR = 256            # las fotos de perfil se suben en cuadrado de 256 px (como el móvil)
 _AVATAR_MAX_DESCARGA = 1024 * 1024
@@ -201,6 +202,7 @@ class ChatClient:
         self._sio.on("nuevo_mensaje", self._on_nuevo_mensaje)
         self._sio.on("error_chat", self._on_error_chat)
         self._sio.on("avatar_cambiado", self._on_avatar_cambiado)
+        self._sio.on("mensaje_eliminado", self._on_mensaje_eliminado)
 
     # ── Login (idéntico en espíritu a _Session.login() del bridge) ──────────
 
@@ -315,12 +317,15 @@ class ChatClient:
 
     # ── Envío ─────────────────────────────────────────────────────────────
 
-    def enviar_mensaje(self, contenido: str, canal_id: str = None, destinatario: str = None):
+    def enviar_mensaje(self, contenido: str, canal_id: str = None, destinatario: str = None,
+                       responde_a: int = None):
         payload = {"contenido": contenido}
         if canal_id:
             payload["canal_id"] = canal_id
         if destinatario:
             payload["destinatario"] = destinatario
+        if responde_a:
+            payload["responde_a"] = responde_a      # (v4.18.46) responder citando (chat v1.4.0)
         if self._sio.connected:
             self._sio.emit("enviar_mensaje", payload)
         else:
@@ -328,6 +333,15 @@ class ChatClient:
             # se manda igual por REST, que es la misma ruta que usa el
             # frontend web y nunca depende de que el WebSocket esté arriba.
             self._post_rest("/api/chat/mensajes", payload)
+
+    def eliminar_mensaje(self, mensaje_id: int) -> dict:
+        """(v4.18.46) Elimina un mensaje propio (chat v1.4.0). {"ok": True, ...} o {"error": "..."}."""
+        return self._post_rest(f"/api/chat/mensajes/{int(mensaje_id)}/eliminar", {})
+
+    def reenviar_mensaje(self, mensaje_id: int, canal_id: str = None, destinatario: str = None) -> dict:
+        """(v4.18.46) Reenvía un mensaje a otra conversación (chat v1.4.0)."""
+        body = {"canal_id": canal_id} if canal_id else {"destinatario": destinatario}
+        return self._post_rest(f"/api/chat/mensajes/{int(mensaje_id)}/reenviar", body)
 
     def unirse_canal(self, canal_id: str):
         if self._sio.connected:
@@ -647,6 +661,9 @@ class ChatClient:
 
     def _on_error_chat(self, data):
         self.eventos.put({"tipo": EVT_ERROR, "mensaje": data.get("error", "Error de chat")})
+
+    def _on_mensaje_eliminado(self, data):
+        self.eventos.put({"tipo": EVT_ELIMINADO, "mensaje": data or {}})
 
     def _on_avatar_cambiado(self, data):
         clave = str((data or {}).get("clave") or "")

@@ -51,6 +51,29 @@
 
 ---
 
+## 2026-11-11 20:32 — [Chat] [Organizador] [Chat móvil] Fase 2: responder citando, reenviar y eliminar mensajes (chat v1.4.0, Organizador v4.18.46, móvil v1.0.8)
+
+- **Petición de Víctor** (de los compañeros desde el chat):
+  - responder sobre un mensaje concreto «estilo WhatsApp»;
+  - pulsar un mensaje o adjunto y poder eliminarlo;
+  - compartir (reenviar) mensajes y adjuntos.
+- **Servidor del chat v1.4.0:**
+  - `responde_a` en el envío (REST y socket), solo de la misma conversación. Cada mensaje trae la cita `{id, remitente, contenido, tipo}` y `reenviado`.
+  - `POST /api/chat/mensajes/<id>/eliminar` (solo el autor): «🚫 Mensaje eliminado», sin adjunto; el archivo se borra de Storage si ninguna copia lo usa. Evento `mensaje_eliminado`.
+  - `POST /api/chat/mensajes/<id>/reenviar` (`canal_id` o `destinatario`), sin volver a subir el adjunto.
+  - Columnas nuevas `responde_a`, `reenviado` y `eliminado_en` (migración automática). Solo se añade: las versiones antiguas siguen funcionando.
+  - 81 comprobaciones en `tests/test_chat.py`, 20 de ellas nuevas. Arreglada la tabla de la API del README.
+- **Organizador v4.18.46:**
+  - clic derecho → «↩ Responder», «↪ Reenviar…» y «🗑 Eliminar» (los propios), en la ventana y en la burbuja (`ui/acciones_chat.py`);
+  - barra «Respondiendo a…»; cita con barra, «↪ Reenviado» y eliminados en cursiva en `chat_bubbles.py`;
+  - al eliminarse un mensaje, la conversación se recarga;
+  - `test_chat_fase2.py` (20 comprobaciones).
+- **Móvil v1.0.8:** lo mismo al mantener pulsado, con la barra «Respondiendo a…» y los diálogos «Reenviar a…» y «¿Eliminar?». 2 pruebas unitarias nuevas.
+- **Orden de publicación:**
+  1. Fusionar y desplegar el servidor del chat (Render).
+  2. Publicar el Organizador y el móvil. Con un servidor anterior, las acciones nuevas dan error sin romper nada.
+- **Por probar en Windows y en el móvil:** las tres acciones con dos personas conectadas a la vez (el eliminado debe verse al momento en el otro).
+
 ## 2026-11-11 18:31 — [Control Pedidos] Novedades de la versión al pulsar «V x.y.z» (v12.34.20)
 
 - **Petición de Víctor:** que en todas las aplicaciones se vean las notas de la versión pulsando sobre ella (ya en el Organizador v4.18.44 y en el móvil v1.0.6).

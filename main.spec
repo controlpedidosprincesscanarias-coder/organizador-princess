@@ -68,6 +68,7 @@ hiddenimports += [
     'ui.avatares',       # v4.18.28: fotos de perfil del chat
     'ui.miniaturas',     # v4.18.44: miniaturas de las imágenes del chat
     'ui.notas_version',  # v4.18.44: notas de la versión al pulsar el número de versión
+    'ui.acciones_chat',  # v4.18.46: responder citando, reenviar y eliminar en el chat
     'ui.agenda_helpers',
     'ui.importexport',
     'ui.vacaciones',

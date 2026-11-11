@@ -32,8 +32,8 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 from datetime import datetime
 
-from services.chat_client import get_chat_client, nombre_adjunto_seguro, EVT_NUEVO_MENSAJE, EVT_AVATAR
-from ui import avatares, miniaturas
+from services.chat_client import get_chat_client, nombre_adjunto_seguro, EVT_NUEVO_MENSAJE, EVT_AVATAR, EVT_ELIMINADO
+from ui import avatares, miniaturas, acciones_chat
 from ui.chat_bubbles import BubbleList, fecha_hora_local
 from ui.emoticonos import abrir_panel, imagen as imagen_emoticono
 from db.sqlite import filtrar_mensajes_limpiados
@@ -87,6 +87,12 @@ def procesar_evento(ev):
         for info in list(_POPUPS.values()):
             if info["win"].winfo_exists() and info.get("foto"):
                 info["foto"]()
+        return
+    if ev.get("tipo") == EVT_ELIMINADO:
+        # (v4.18.46) Un mensaje eliminado: la burbuja de ese canal vuelve a cargar la conversación
+        info = _POPUPS.get((ev.get("mensaje") or {}).get("canal_id"))
+        if info and info["win"].winfo_exists() and info.get("recargar"):
+            info["recargar"]()
         return
     if ev.get("tipo") != EVT_NUEVO_MENSAJE:
         return
@@ -190,6 +196,26 @@ def mostrar_popup_chat(ctx, canal_id, titulo, mensaje_inicial=None, borrador="")
     if borrador:
         entry.insert(0, borrador)
 
+    # (v4.18.46) Barra «↩ Respondiendo a …» encima de la caja de escribir
+    respondiendo = {"m": None}
+    frm_resp = tk.Frame(win, bg=_COLOR_FONDO)
+    lbl_resp = tk.Label(frm_resp, text="", bg=_COLOR_FONDO, fg=_COLOR_META, font=("Segoe UI", 8),
+                        anchor="w", justify="left", wraplength=260)
+    lbl_resp.pack(side="left", fill="x", expand=True)
+
+    def _cancelar_respuesta():
+        respondiendo["m"] = None
+        frm_resp.pack_forget()
+
+    tk.Button(frm_resp, text="✕", bg=_COLOR_FONDO, fg=_COLOR_META, bd=0, relief="flat",
+              activebackground=_COLOR_FONDO, command=_cancelar_respuesta).pack(side="right")
+
+    def _responder(m):
+        respondiendo["m"] = m
+        lbl_resp.configure(text=acciones_chat.resumen_barra(m, cliente))
+        frm_resp.pack(side="bottom", fill="x", padx=6, after=frm_envio)
+        entry.focus_set()
+
     def _click_adjunto(url, nombre_archivo):
         def _hilo():
             try:
@@ -246,29 +272,41 @@ def mostrar_popup_chat(ctx, canal_id, titulo, mensaje_inicial=None, borrador="")
                     if pend["canal_id"] == canal_m and pend["contenido"] == contenido_m:
                         del pendientes_propios[i]
                         ids_pintados.add(mid)
+                        # (v4.18.46) ya tiene id: Responder, Reenviar y Eliminar en su menú
+                        if pend.get("cv") is not None:
+                            msgs.poner_acciones(pend["cv"], acciones_chat.acciones(
+                                m, cliente, win, _responder, _recargar))
                         return  # ya está en pantalla desde el pintado optimista
             ids_pintados.add(mid)
         quien = "Tú" if propio else cliente.nombre_de(m.get("remitente", ""))
         hora = fecha_hora_local(m)
+        # (v4.18.46) Cita, «Reenviado», eliminado y el menú Responder / Reenviar / Eliminar
+        extra = dict(acciones_chat.datos_burbuja(m, cliente),
+                     acciones=acciones_chat.acciones(m, cliente, win, _responder, _recargar))
         adjunto = m.get("adjunto")
         if adjunto:
             icono = "📷" if m.get("tipo") == "imagen" else "📎"
-            msgs.agregar_burbuja(f"{icono} {adjunto['nombre_archivo']}", hora, propio,
-                                  meta_nombre=quien, es_adjunto=True,
-                                  adjunto_url=adjunto["url"],
-                                  adjunto_nombre_archivo=adjunto["nombre_archivo"],
-                                  es_imagen=miniaturas.es_imagen(m))
-        else:
-            msgs.agregar_burbuja(m.get("contenido", ""), hora, propio, meta_nombre=quien)
+            return msgs.agregar_burbuja(f"{icono} {adjunto['nombre_archivo']}", hora, propio,
+                                         meta_nombre=quien, es_adjunto=True,
+                                         adjunto_url=adjunto["url"],
+                                         adjunto_nombre_archivo=adjunto["nombre_archivo"],
+                                         es_imagen=miniaturas.es_imagen(m), **extra)
+        return msgs.agregar_burbuja(m.get("contenido", ""), hora, propio, meta_nombre=quien, **extra)
 
     def _enviar(event=None):
         contenido = entry.get().strip()
         if not contenido:
             return
-        cliente.enviar_mensaje(contenido, canal_id=canal_id)
+        citado = respondiendo["m"]          # (v4.18.46) responder citando
+        cliente.enviar_mensaje(contenido, canal_id=canal_id, responde_a=citado.get("id") if citado else None)
         entry.delete(0, "end")
-        pendientes_propios.append({"canal_id": canal_id, "contenido": contenido})
-        _pintar({"remitente": cliente.username, "contenido": contenido}, propio=True)
+        pendiente = {"canal_id": canal_id, "contenido": contenido, "cv": None}
+        pendientes_propios.append(pendiente)
+        pendiente["cv"] = _pintar({
+            "remitente": cliente.username, "contenido": contenido,
+            "responde_a": ({"id": citado["id"], "remitente": citado.get("remitente"),
+                            "contenido": acciones_chat.texto_cita(citado)} if citado else None)}, propio=True)
+        _cancelar_respuesta()
 
     entry.bind("<Return>", _enviar)
 
@@ -430,4 +468,13 @@ def mostrar_popup_chat(ctx, canal_id, titulo, mensaje_inicial=None, borrador="")
             if mensaje_inicial:
                 _pintar(mensaje_inicial)
         win.after(0, _pintar_todos)
+    def _recargar():
+        """(v4.18.46) Vuelve a cargar la conversación (p. ej. tras eliminar un mensaje)."""
+        if not win.winfo_exists():
+            return
+        msgs.limpiar()
+        ids_pintados.clear()
+        threading.Thread(target=_cargar, daemon=True, name="ChatPopup-Historial").start()
+
+    _POPUPS[canal_id]["recargar"] = _recargar
     threading.Thread(target=_cargar, daemon=True, name="ChatPopup-Historial").start()

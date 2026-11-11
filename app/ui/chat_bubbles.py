@@ -154,9 +154,14 @@ class BubbleList(tk.Frame):
     # ── burbujas ─────────────────────────────────────────────────────────
     def agregar_burbuja(self, texto, hora, propio, meta_nombre=None,
                          es_adjunto=False, adjunto_url=None,
-                         adjunto_nombre_archivo=None, foto=None, es_imagen=False):
+                         adjunto_nombre_archivo=None, foto=None, es_imagen=False,
+                         cita=None, reenviado=False, eliminado=False, acciones=None):
         """`foto` (v4.18.28): PhotoImage redonda de quien escribe, a la izquierda de su
-        burbuja (solo en General y en los grupos, y nunca en los mensajes propios)."""
+        burbuja (solo en General y en los grupos, y nunca en los mensajes propios).
+        (v4.18.46, chat v1.4.0) `cita` = (nombre, texto) del mensaje al que responde, que se
+        pinta arriba con una barra a la izquierda; `reenviado` añade «↪ Reenviado»; `eliminado`
+        lo pinta en cursiva y gris, sin menú; `acciones` = [(etiqueta, función)] que van
+        primero en el menú del clic derecho (Responder, Reenviar, Eliminar…)."""
         fila = tk.Frame(self.inner, bg=self._bg)
         fila.pack(fill="x", pady=(2, 2), padx=6)
         self._bind_rueda(fila)
@@ -178,12 +183,25 @@ class BubbleList(tk.Frame):
 
         ancho_disponible = self._ancho_max or max(220, int(self.canvas.winfo_width() * 0.68) or 220)
         lineas = self._envolver_texto(texto or "", ancho_disponible - 24)
-        trozos_lineas = [self._trozos(l) for l in lineas]
+        trozos_lineas = [self._trozos(l) for l in lineas] if not eliminado else [[("t", l)] for l in lineas]
         ancho_texto = max((self._ancho_trozos(t) for t in trozos_lineas), default=0)
         ancho_hora = self._font_meta.measure(hora) if hora else 0
-        ancho_bloque = max(ancho_texto, ancho_hora) + 24
+        # (v4.18.46) Cabecera de la burbuja: «↪ Reenviado» y la cita (nombre + hasta 2 líneas)
+        alto_meta = self._font_meta.metrics("linespace") + 1
+        cabecera = []                    # (texto, fuente, color, es_cita)
+        if reenviado:
+            cabecera.append(("↪ Reenviado", self._font_meta, self._color_meta, False))
+        if cita:
+            nombre_cita, texto_cita = cita
+            cabecera.append((nombre_cita or "", self._font_meta_negrita(), self._color_texto, True))
+            for l in self._envolver_texto(" ".join(str(texto_cita or "").split()), ancho_disponible - 40,
+                                          fuente=self._font_meta)[:2]:
+                cabecera.append((l, self._font_meta, self._color_meta, True))
+        ancho_cabecera = max((f.measure(t) + (12 if es else 0) for t, f, _c, es in cabecera), default=0)
+        ancho_bloque = max(ancho_texto, ancho_hora, ancho_cabecera) + 24
         alto_linea = self._font_texto.metrics("linespace") + 2
-        alto_bloque = len(lineas) * alto_linea + 16 + (14 if hora else 0)
+        alto_cabecera = len(cabecera) * alto_meta + (6 if cabecera else 0)
+        alto_bloque = alto_cabecera + len(lineas) * alto_linea + 16 + (14 if hora else 0)
 
         color = self._color_propio if propio else self._color_ajeno
         # (v4.18.44) Las imágenes se ven en miniatura encima de su nombre; al pulsarla se abre.
@@ -217,6 +235,18 @@ class BubbleList(tk.Frame):
         cv.create_polygon(pts, smooth=True, fill=color, outline=color)
 
         y = 8
+        if cabecera:
+            y_cita = None
+            for t, f, c, es_cita in cabecera:
+                if es_cita and y_cita is None:
+                    y_cita = y
+                cv.create_text(12 + (10 if es_cita else 0), y, text=t, anchor="nw", fill=c, font=f)
+                y += alto_meta
+            if y_cita is not None:
+                cv.create_rectangle(12, y_cita, 15, y - 1, fill=self._color_meta, outline="")
+            y += 6
+        fuente_cuerpo = self._font_cursiva() if eliminado else self._font_texto
+        color_cuerpo = self._color_meta if eliminado else self._color_texto
         for trozos in trozos_lineas:
             x = 12
             for tipo, valor in trozos:
@@ -226,7 +256,7 @@ class BubbleList(tk.Frame):
                     x += img.width() + 1
                     continue
                 item = cv.create_text(x, y, text=valor, anchor="nw",
-                                       fill=self._color_texto, font=self._font_texto)
+                                       fill=color_cuerpo, font=fuente_cuerpo)
                 if es_adjunto:
                     bbox = cv.bbox(item)
                     cv.create_line(bbox[0], bbox[3] + 1, bbox[2], bbox[3] + 1,
@@ -246,8 +276,35 @@ class BubbleList(tk.Frame):
         # No dependemos de la selección nativa de un Canvas (no existe
         # arrastre-para-seleccionar como en un Text) — cada burbuja
         # sabe su propio texto y lo copia entero al portapapeles.
-        texto_copia = texto or ""
+        if eliminado:
+            self._bind_rueda(cv)
+            self._bind_rueda(contenedor)
+            self._ir_al_final()
+            return cv                   # (v4.18.46) un mensaje eliminado no tiene menú
+        if not (es_adjunto and adjunto_url):
+            # (v4.18.44) Doble clic: copia el mensaje entero (el clic derecho no lo encontraba nadie)
+            cv.bind("<Double-Button-1>", lambda e, t=texto or "": self._copiar(t, cv))
+            cv.configure(cursor="xterm")
+        cv._datos_menu = (texto or "", es_adjunto, adjunto_url, adjunto_nombre_archivo)
+        self.poner_acciones(cv, acciones)
+        self._bind_rueda(cv)
+        self._bind_rueda(contenedor)
+
+        self._ir_al_final()
+        return cv
+
+    def poner_acciones(self, cv, acciones):
+        """Menú del clic derecho de la burbuja `cv`: primero `acciones` y después Copiar (o Abrir /
+        Guardar como… en los adjuntos). (v4.18.46) Se puede volver a llamar: el mensaje propio se pinta
+        al momento, sin id, y cuando llega su eco se le ponen Responder, Reenviar y Eliminar."""
+        if not cv.winfo_exists() or not hasattr(cv, "_datos_menu"):
+            return
+        texto_copia, es_adjunto, adjunto_url, adjunto_nombre_archivo = cv._datos_menu
         menu = tk.Menu(cv, tearoff=0)
+        for etiqueta, funcion in (acciones or []):
+            menu.add_command(label=etiqueta, command=funcion)
+        if acciones:
+            menu.add_separator()
         if es_adjunto and adjunto_url:
             # (v4.18.44) Abrir y «Guardar como…» (antes solo se podía abrir desde Descargas)
             if self._on_click_adjunto:
@@ -261,9 +318,6 @@ class BubbleList(tk.Frame):
         else:
             menu.add_command(label="📋  Copiar mensaje",
                               command=lambda t=texto_copia: self._copiar(t, cv))
-            # (v4.18.44) Doble clic: copia el mensaje entero (el clic derecho no lo encontraba nadie)
-            cv.bind("<Double-Button-1>", lambda e, t=texto_copia: self._copiar(t, cv))
-            cv.configure(cursor="xterm")
 
         def _click_derecho(e, m=menu):
             try:
@@ -272,11 +326,6 @@ class BubbleList(tk.Frame):
                 m.grab_release()
 
         cv.bind("<Button-3>", _click_derecho)
-        self._bind_rueda(cv)
-        self._bind_rueda(contenedor)
-
-        self._ir_al_final()
-        return cv
 
     def _trozos(self, linea):
         """Trozos de texto y emoticonos en color (solo los que tienen imagen)."""
@@ -302,16 +351,29 @@ class BubbleList(tk.Frame):
             except tk.TclError:
                 pass
 
-    def _envolver_texto(self, texto, ancho_px):
+    def _font_meta_negrita(self):
+        if not hasattr(self, "_fmn"):
+            self._fmn = tkfont.Font(font=self._font_meta)
+            self._fmn.configure(weight="bold")
+        return self._fmn
+
+    def _font_cursiva(self):
+        if not hasattr(self, "_fcur"):
+            self._fcur = tkfont.Font(font=self._font_texto)
+            self._fcur.configure(slant="italic")
+        return self._fcur
+
+    def _envolver_texto(self, texto, ancho_px, fuente=None):
         """Envuelve `texto` en líneas que no superen ancho_px, respetando
         los saltos de línea que ya traiga el mensaje."""
+        fuente = fuente or self._font_texto
         lineas_final = []
         for parrafo in texto.split("\n"):
             palabras = parrafo.split(" ")
             actual = ""
             for palabra in palabras:
                 prueba = f"{actual} {palabra}".strip()
-                if self._font_texto.measure(prueba) <= ancho_px or not actual:
+                if fuente.measure(prueba) <= ancho_px or not actual:
                     actual = prueba
                 else:
                     lineas_final.append(actual)

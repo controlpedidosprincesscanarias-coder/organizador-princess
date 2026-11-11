@@ -93,6 +93,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit 1 }
           python test_chat_fase1.py
           if ($LASTEXITCODE -ne 0) { exit 1 }
+          python test_chat_fase2.py
+          if ($LASTEXITCODE -ne 0) { exit 1 }
 
       - name: Compilar con PyInstaller
         shell: pwsh

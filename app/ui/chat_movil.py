@@ -1,5 +1,5 @@
 """
-app/ui/chat_movil.py  ·  v4.18.34
+app/ui/chat_movil.py  ·  v4.18.44
 Ventana «Chat en el móvil»: cómo instalar Chat Dpto. Compras Princess para Android, con un código QR.
 
 La idea y el desarrollo de la aplicación Organizador Princess, incluidas sus pruebas, son de
@@ -16,13 +16,17 @@ import ttkbootstrap as ttk
 
 from ui.assets import _apply_icon
 
-URL_DESCARGA = "https://github.com/controlpedidosprincesscanarias-coder/chat-movil-princess/releases/latest"
+# (v4.18.44) El QR descarga la .apk directamente (Víctor: «sin tener que pasar y seleccionar en la cuenta
+# de GitHub»). Cada Release del móvil publica, además de ChatPrincess_<versión>.apk, una copia idéntica con
+# nombre fijo, ChatPrincess.apk, que es la que da este enlace (workflow compilar.yml del repo del móvil).
+URL_DESCARGA = "https://github.com/controlpedidosprincesscanarias-coder/chat-movil-princess/releases/latest/download/ChatPrincess.apk"
+URL_PAGINA = "https://github.com/controlpedidosprincesscanarias-coder/chat-movil-princess/releases/latest"
 _QR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "qr_chat_movil.png")
 _ABIERTA = [None]
 
 PASOS = [
     "Escanea el código con la cámara del móvil (o abre el enlace en el móvil).",
-    "Toca «ChatPrincess_….apk» para descargarlo. Si el navegador avisa de que «puede ser dañino», "
+    "Se descarga «ChatPrincess.apk» directamente. Si el navegador avisa de que «puede ser dañino», "
     "pulsa «Descargar de todas formas».",
     "Abre el archivo descargado. La primera vez, Android pide permitir «Instalar apps desconocidas»: "
     "actívalo, vuelve atrás y pulsa «Instalar».",
@@ -77,6 +81,8 @@ def abrir_chat_movil(parent):
     pie.pack(fill="x")
     ttk.Button(pie, text="🌐  Abrir el enlace", bootstyle="info-outline",
                command=lambda: webbrowser.open(URL_DESCARGA)).pack(side="left")
+    ttk.Button(pie, text="📜  Página de versiones", bootstyle="info-outline",
+               command=lambda: webbrowser.open(URL_PAGINA)).pack(side="left", padx=(6, 0))
     ttk.Button(pie, text="Cerrar", bootstyle="secondary", command=win.destroy).pack(side="right")
     win.update_idletasks()
     w, h = win.winfo_reqwidth(), win.winfo_reqheight()

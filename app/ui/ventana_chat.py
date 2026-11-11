@@ -20,9 +20,9 @@ import ttkbootstrap as ttk
 from datetime import datetime
 from tkinter import messagebox, filedialog
 
-from services.chat_client import get_chat_client, cuenta_chat_configurada, EVT_CONECTADO, EVT_DESCONECTADO, \
+from services.chat_client import get_chat_client, cuenta_chat_configurada, nombre_adjunto_seguro, EVT_CONECTADO, EVT_DESCONECTADO, \
     EVT_NUEVO_MENSAJE, EVT_ERROR, EVT_AVATAR
-from ui import avatares
+from ui import avatares, miniaturas
 from ui.chat_bubbles import BubbleList, fecha_hora_local
 from ui.emoticonos import abrir_panel, imagen as imagen_emoticono
 from ui.chat_movil import abrir_chat_movil
@@ -399,13 +399,31 @@ def _ventana_chat(ctx):
                     "Chat", f"No se pudo descargar «{nombre_archivo}»:\n{e}", parent=win))
         threading.Thread(target=_hilo, daemon=True, name="Chat-DescargarAdjunto").start()
 
+    def _guardar_adjunto(url, nombre_archivo):
+        """(v4.18.44) «Guardar como…»: el usuario elige dónde y con qué nombre."""
+        destino = filedialog.asksaveasfilename(parent=win, title="Guardar adjunto",
+                                               initialfile=nombre_adjunto_seguro(nombre_archivo))
+        if not destino:
+            return
+
+        def _hilo():
+            try:
+                cliente.guardar_adjunto_como(url, destino)
+            except Exception as exc:
+                logging.getLogger("chat").warning("No se pudo guardar el adjunto: %s", exc)
+                win.after(0, lambda e=exc: messagebox.showerror(
+                    "Chat", f"No se pudo guardar «{nombre_archivo}»:\n{e}", parent=win))
+        threading.Thread(target=_hilo, daemon=True, name="Chat-GuardarAdjunto").start()
+
     # Burbujas de verdad (rectángulos redondeados en Canvas), con hora
     # HH:MM y copia por clic derecho — ver ui/chat_bubbles.py. Comparte
     # implementación con la burbuja flotante (ui/chat_popup.py), así que
     # cualquier mejora futura de las burbujas se hace en un solo sitio.
     msgs = BubbleList(frm_chat, bg="#1e2530", color_propio=_COLOR_PROPIO,
                        color_ajeno=_COLOR_AJENO, color_texto="#f2f5f8",
-                       color_meta=_COLOR_META, on_click_adjunto=_click_adjunto)
+                       color_meta=_COLOR_META, on_click_adjunto=_click_adjunto,
+                       on_guardar_adjunto=_guardar_adjunto,
+                       cargar_imagen=lambda url, listo: miniaturas.cargar(win, cliente, url, listo))
     msgs.pack(fill="both", expand=True, pady=(4, 6))
 
     _ids_pintados = set()
@@ -451,7 +469,8 @@ def _ventana_chat(ctx):
             msgs.agregar_burbuja(f"{icono}  {adjunto['nombre_archivo']}", hora, propio,
                                   meta_nombre=quien, es_adjunto=True,
                                   adjunto_url=adjunto["url"],
-                                  adjunto_nombre_archivo=adjunto["nombre_archivo"], foto=foto)
+                                  adjunto_nombre_archivo=adjunto["nombre_archivo"], foto=foto,
+                                  es_imagen=miniaturas.es_imagen(m))
         else:
             msgs.agregar_burbuja(m.get("contenido", ""), hora, propio, meta_nombre=quien, foto=foto)
 

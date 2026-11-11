@@ -396,21 +396,13 @@ class ChatClient:
             mime = "image/jpeg"
         return buf.getvalue(), mime
 
-    def descargar_adjunto(self, url: str, nombre_archivo: str) -> str:
-        """Descarga un adjunto a la carpeta Descargas del usuario (nombre
-        limpio y libre de colisiones) y devuelve la ruta local. Lanza
-        excepción si falla — quien llame decide cómo avisar al usuario.
-
-        (v4.16.9) El nombre se limpia aquí aunque el servidor ya lo haga
-        (los mensajes antiguos pueden traer nombres con rutas), la URL debe
-        ser del almacén de adjuntos y el archivo se crea de forma exclusiva
-        dentro de Descargas."""
+    @staticmethod
+    def descargar_bytes(url: str) -> bytes:
+        """(v4.18.44) Descarga un adjunto a memoria con las mismas comprobaciones de siempre: solo del
+        almacén de adjuntos (url_adjunto_permitida), sin redirecciones y con tamaño máximo. Lo usan
+        descargar_adjunto, guardar_adjunto_como y las miniaturas de las imágenes."""
         if not url_adjunto_permitida(url):
             raise ValueError("La dirección del adjunto no es de confianza.")
-        nombre = nombre_adjunto_seguro(nombre_archivo)
-        carpeta = os.path.realpath(os.path.join(os.path.expanduser("~"), "Downloads"))
-        os.makedirs(carpeta, exist_ok=True)
-        base, ext = os.path.splitext(nombre)
         with requests.get(url, timeout=30, stream=True, allow_redirects=False) as resp:
             resp.raise_for_status()
             declarado = int(resp.headers.get("Content-Length") or 0)
@@ -421,6 +413,30 @@ class ChatClient:
                 datos.extend(trozo)
                 if len(datos) > _ADJUNTO_MAX_DESCARGA:
                     raise ValueError("El adjunto es demasiado grande.")
+        return bytes(datos)
+
+    def guardar_adjunto_como(self, url: str, destino: str) -> str:
+        """(v4.18.44) «Guardar como…»: descarga el adjunto y lo guarda donde ha elegido el usuario en
+        el diálogo de Windows (que ya pregunta si quiere reemplazar un archivo existente)."""
+        datos = self.descargar_bytes(url)
+        with open(destino, "wb") as f:
+            f.write(datos)
+        return destino
+
+    def descargar_adjunto(self, url: str, nombre_archivo: str) -> str:
+        """Descarga un adjunto a la carpeta Descargas del usuario (nombre
+        limpio y libre de colisiones) y devuelve la ruta local. Lanza
+        excepción si falla — quien llame decide cómo avisar al usuario.
+
+        (v4.16.9) El nombre se limpia aquí aunque el servidor ya lo haga
+        (los mensajes antiguos pueden traer nombres con rutas), la URL debe
+        ser del almacén de adjuntos y el archivo se crea de forma exclusiva
+        dentro de Descargas."""
+        datos = self.descargar_bytes(url)
+        nombre = nombre_adjunto_seguro(nombre_archivo)
+        carpeta = os.path.realpath(os.path.join(os.path.expanduser("~"), "Downloads"))
+        os.makedirs(carpeta, exist_ok=True)
+        base, ext = os.path.splitext(nombre)
         n = 0
         while True:
             ruta = os.path.join(carpeta, nombre if n == 0 else f"{base} ({n}){ext}")

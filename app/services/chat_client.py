@@ -644,6 +644,14 @@ class ChatClient:
 # con su propia _Session.
 _cliente_global = None
 
+def cuenta_chat_configurada(username_win=None) -> bool:
+    """(v4.18.42) True si hay usuario y contraseña de Control de Pedidos guardados para este usuario
+    de Windows (Administración → Mi Usuario). Sin ellos el chat no puede iniciar sesión, y la
+    ventana se abría vacía, sin conversaciones y sin decir por qué."""
+    usuario, clave = get_bridge_credentials(username_win)
+    return bool(usuario and clave)
+
+
 def get_chat_client() -> ChatClient:
     global _cliente_global
     if _cliente_global is None:

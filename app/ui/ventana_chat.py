@@ -20,7 +20,7 @@ import ttkbootstrap as ttk
 from datetime import datetime
 from tkinter import messagebox, filedialog
 
-from services.chat_client import get_chat_client, EVT_CONECTADO, EVT_DESCONECTADO, \
+from services.chat_client import get_chat_client, cuenta_chat_configurada, EVT_CONECTADO, EVT_DESCONECTADO, \
     EVT_NUEVO_MENSAJE, EVT_ERROR, EVT_AVATAR
 from ui import avatares
 from ui.chat_bubbles import BubbleList, fecha_hora_local
@@ -61,6 +61,17 @@ def _ventana_chat(ctx):
     if _VENTANA_ACTUAL is not None and _VENTANA_ACTUAL.winfo_exists():
         _VENTANA_ACTUAL.lift()
         _VENTANA_ACTUAL.focus_force()
+        return
+
+    # (v4.18.42) Sin cuenta de Control de Pedidos el chat no puede entrar: se avisa y no se abre
+    # (antes se abría vacía, sin conversaciones, y parecía que el chat no funcionaba).
+    if not cuenta_chat_configurada():
+        messagebox.showwarning(
+            "Chat",
+            "Para usar el chat necesitas tu cuenta de Control de Pedidos.\n\n"
+            "Configúrala en Administración → Mi Usuario (usuario y contraseña de "
+            "Control de Pedidos) y vuelve a abrir el chat.",
+            parent=ctx.app)
         return
 
     cliente = get_chat_client()

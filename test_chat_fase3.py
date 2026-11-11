@@ -70,5 +70,20 @@ ok("el evento grupo_cambiado llega a la cola",
 ok("ui.grupo_info está en hiddenimports de main.spec",
    "'ui.grupo_info'" in open(os.path.join(RAIZ, "main.spec"), encoding="utf-8").read())
 
+# ── (v4.18.50) Avisos de Control Pedidos (chat v1.6.0) ─────────────────────
+ok("la conversación de avisos se reconoce", cc.es_canal_avisos("dm:ana:control-pedidos")
+   and cc.es_canal_avisos("dm:control-pedidos:zoe") and not cc.es_canal_avisos("dm:ana:beto")
+   and not cc.es_canal_avisos("general") and not cc.es_canal_avisos(None))
+c2 = cc.ChatClient.__new__(cc.ChatClient)
+import threading as _th  # noqa: E402
+c2._mapa_nombres_lock, c2._mapa_nombres = _th.Lock(), {}
+ok("la cuenta de avisos se llama «Control Pedidos»", c2.nombre_de("control-pedidos") == "Control Pedidos")
+from ui import acciones_chat  # noqa: E402
+class _Yo:
+    username = "ana"
+    def nombre_de(self, u): return u
+acc = acciones_chat.acciones({"id": 5, "remitente": "control-pedidos", "contenido": "⚠️ Pedido 1"}, _Yo(), None, lambda m: None)
+ok("a un aviso solo se le puede Reenviar (no Responder)", [e for e, _f in acc] == ["↪  Reenviar…"], acc)
+
 print(f"\n{'Todas las comprobaciones OK.' if not fallos else str(len(fallos)) + ' fallo(s)'}")
 sys.exit(1 if fallos else 0)

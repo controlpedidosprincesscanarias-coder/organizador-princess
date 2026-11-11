@@ -32,7 +32,7 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 from datetime import datetime
 
-from services.chat_client import get_chat_client, nombre_adjunto_seguro, EVT_NUEVO_MENSAJE, EVT_AVATAR, EVT_ELIMINADO, EVT_GRUPO
+from services.chat_client import get_chat_client, nombre_adjunto_seguro, es_canal_avisos, EVT_NUEVO_MENSAJE, EVT_AVATAR, EVT_ELIMINADO, EVT_GRUPO
 from ui import avatares, miniaturas, acciones_chat
 from ui.chat_bubbles import BubbleList, fecha_hora_local
 from ui.emoticonos import abrir_panel, imagen as imagen_emoticono
@@ -205,6 +205,9 @@ def mostrar_popup_chat(ctx, canal_id, titulo, mensaje_inicial=None, borrador="")
     entry.pack(side="left", fill="x", expand=True, ipady=5, padx=(0, 4))
     if borrador:
         entry.insert(0, borrador)
+    if es_canal_avisos(canal_id):           # (v4.18.50) avisos de Control Pedidos: solo lectura
+        entry.insert(0, "Solo avisos de Control Pedidos")
+        entry.configure(state="disabled", disabledbackground=_COLOR_ENTRY, disabledforeground=_COLOR_META)
 
     # (v4.18.46) Barra «↩ Respondiendo a …» encima de la caja de escribir
     respondiendo = {"m": None}

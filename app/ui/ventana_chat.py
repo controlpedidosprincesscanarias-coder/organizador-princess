@@ -20,7 +20,7 @@ import ttkbootstrap as ttk
 from datetime import datetime
 from tkinter import messagebox, filedialog
 
-from services.chat_client import get_chat_client, cuenta_chat_configurada, nombre_adjunto_seguro, EVT_CONECTADO, EVT_DESCONECTADO, \
+from services.chat_client import get_chat_client, cuenta_chat_configurada, nombre_adjunto_seguro, es_canal_avisos, EVT_CONECTADO, EVT_DESCONECTADO, \
     EVT_NUEVO_MENSAJE, EVT_ERROR, EVT_AVATAR, EVT_ELIMINADO, EVT_GRUPO
 from ui import avatares, miniaturas, acciones_chat, grupo_info
 from ui.chat_bubbles import BubbleList, fecha_hora_local
@@ -455,6 +455,10 @@ def _ventana_chat(ctx):
                        cargar_imagen=lambda url, listo: miniaturas.cargar(win, cliente, url, listo))
     msgs.pack(fill="both", expand=True, pady=(4, 6))
 
+    lbl_solo_avisos = ttk.Label(frm_chat, text="🔔  Aquí llegan los avisos de Control Pedidos (antes por Telegram). "
+                                               "No se puede escribir en esta conversación.",
+                                foreground=_COLOR_META, wraplength=520, justify="left")
+
     # (v4.18.46) Barra «↩ Respondiendo a …» encima de la caja de escribir (se quita con ✕ o al enviar)
     respondiendo = {"m": None}
     frm_resp = ttk.Frame(frm_chat)
@@ -564,6 +568,14 @@ def _ventana_chat(ctx):
         _CANAL_VISIBLE = canal_id
         lbl_titulo_chat.configure(text=titulo or otro_usuario or "General")
         _pintar_foto_cabecera()
+        # (v4.18.50) En la conversación de avisos de Control Pedidos no se escribe
+        if es_canal_avisos(canal_id):
+            _cancelar_respuesta()
+            frm_envio.pack_forget()
+            lbl_solo_avisos.pack(side="bottom", fill="x", pady=(6, 0), before=msgs)
+        else:
+            lbl_solo_avisos.pack_forget()
+            frm_envio.pack(side="bottom", fill="x", pady=(6, 0), before=msgs)
         _cargar_historial(canal_id, otro_usuario)
         _refrescar_lista_canales()
 

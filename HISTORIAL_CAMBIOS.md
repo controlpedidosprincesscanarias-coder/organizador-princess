@@ -51,6 +51,25 @@
 
 ---
 
+## 2026-11-11 20:59 — [Control Pedidos] [Chat] [Organizador] [Chat móvil] Fase 4: los avisos internos llegan al chat («Control Pedidos») (Control Pedidos v12.34.22, chat v1.6.0, Organizador v4.18.50, móvil v1.0.12)
+
+- **Petición de Víctor:** «eliminar los envíos a Telegram internos, utilizar este chat… crear por ejemplo Control Pedidos y que llegue ahí los mensajes que hasta ahora llegaban al Telegram, así no dependemos de terceros». Y confirma que cada usuario reciba únicamente lo que le corresponde.
+- **Cómo:**
+  - cada aviso que pasa por `_send_telegram` (los 12 envíos: techo, alertas, compradores, cambios de estado, salud…) se manda también al chat, a la **misma persona** (`servicios/aviso_chat.py`): se busca el usuario de ese `telegram_chat_id`;
+  - el chat lo deja en su conversación **privada** con la cuenta «Control Pedidos» (`control-pedidos`, `POST /api/chat/avisos`, `tipo` «aviso»);
+  - se respetan Configuración de Avisos, el silencio total y la redirección del hotel PR a «usuario prueba»;
+  - el envío va en segundo plano y nunca rompe nada (log `[AVISO-CHAT]`).
+- **Solo avisos:** en esa conversación no se puede escribir. El servidor responde 403, y las apps quitan la caja de escribir y «Responder». Los avisos se pueden reenviar.
+- **Variables nuevas en Render:**
+  - `CHAT_AVISOS_SECRET`, el mismo valor en Control Pedidos y en el chat. Sin ella, no se envía nada al chat.
+  - `AVISOS_TELEGRAM`, por defecto 1: Telegram sigue en paralelo. Con 0 se apaga Telegram, sin tocar código.
+- **Pendiente antes de apagar Telegram:** los envíos solo van a quien tiene `telegram_chat_id` (las llamadas filtran por él). Antes de quitarlo, hacer que vayan por usuario, para que también los reciba quien nunca configuró Telegram.
+- **Pruebas:**
+  - chat: 110 comprobaciones (sección 12 nueva);
+  - Control Pedidos: `test_avisos_chat.py` (13), `test_hotel_pruebas.py` (21), `test_flujo.py` (86) y `huella_app.py` regenerada (solo las funciones nuevas);
+  - Organizador: `test_chat_fase3.py` ampliado;
+  - móvil: prueba unitaria nueva.
+
 ## 2026-11-11 20:49 — [Chat] [Organizador] [Chat móvil] Fase 3: gestión de grupos (chat v1.5.0, Organizador v4.18.48, móvil v1.0.10)
 
 - **Petición de Víctor** (de los compañeros desde el chat):

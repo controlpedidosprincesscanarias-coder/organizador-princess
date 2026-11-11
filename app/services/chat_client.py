@@ -146,6 +146,7 @@ EVT_NUEVO_MENSAJE  = "nuevo_mensaje"
 EVT_ERROR          = "error"
 EVT_AVATAR         = "avatar_cambiado"   # (v4.18.28) foto de perfil de una persona o grupo
 EVT_ELIMINADO      = "mensaje_eliminado"  # (v4.18.46) un mensaje se eliminó (chat v1.4.0)
+EVT_GRUPO          = "grupo_cambiado"     # (v4.18.48) un grupo cambió o se eliminó (chat v1.5.0)
 
 _LADO_AVATAR = 256            # las fotos de perfil se suben en cuadrado de 256 px (como el móvil)
 _AVATAR_MAX_DESCARGA = 1024 * 1024
@@ -203,6 +204,7 @@ class ChatClient:
         self._sio.on("error_chat", self._on_error_chat)
         self._sio.on("avatar_cambiado", self._on_avatar_cambiado)
         self._sio.on("mensaje_eliminado", self._on_mensaje_eliminado)
+        self._sio.on("grupo_cambiado", self._on_grupo_cambiado)
 
     # ── Login (idéntico en espíritu a _Session.login() del bridge) ──────────
 
@@ -342,6 +344,23 @@ class ChatClient:
         """(v4.18.46) Reenvía un mensaje a otra conversación (chat v1.4.0)."""
         body = {"canal_id": canal_id} if canal_id else {"destinatario": destinatario}
         return self._post_rest(f"/api/chat/mensajes/{int(mensaje_id)}/reenviar", body)
+
+    # ── (v4.18.48) Gestión de grupos (chat v1.5.0) ───────────────────────────
+    def detalle_grupo(self, canal_id: str) -> dict:
+        """Integrantes del grupo y si puedo gestionarlo ({} si falla o no soy miembro)."""
+        return self._get_rest(f"/api/chat/grupos/{canal_id}")
+
+    def cambiar_miembros_grupo(self, canal_id: str, anadir=(), quitar=()) -> dict:
+        return self._post_rest(f"/api/chat/grupos/{canal_id}/miembros", {"anadir": list(anadir), "quitar": list(quitar)})
+
+    def renombrar_grupo(self, canal_id: str, nombre: str) -> dict:
+        return self._post_rest(f"/api/chat/grupos/{canal_id}/nombre", {"nombre": nombre})
+
+    def salir_grupo(self, canal_id: str) -> dict:
+        return self._post_rest(f"/api/chat/grupos/{canal_id}/salir", {})
+
+    def eliminar_grupo(self, canal_id: str) -> dict:
+        return self._post_rest(f"/api/chat/grupos/{canal_id}/eliminar", {})
 
     def unirse_canal(self, canal_id: str):
         if self._sio.connected:
@@ -661,6 +680,9 @@ class ChatClient:
 
     def _on_error_chat(self, data):
         self.eventos.put({"tipo": EVT_ERROR, "mensaje": data.get("error", "Error de chat")})
+
+    def _on_grupo_cambiado(self, data):
+        self.eventos.put({"tipo": EVT_GRUPO, "grupo": data or {}})
 
     def _on_mensaje_eliminado(self, data):
         self.eventos.put({"tipo": EVT_ELIMINADO, "mensaje": data or {}})

@@ -21,8 +21,8 @@ from datetime import datetime
 from tkinter import messagebox, filedialog
 
 from services.chat_client import get_chat_client, cuenta_chat_configurada, nombre_adjunto_seguro, EVT_CONECTADO, EVT_DESCONECTADO, \
-    EVT_NUEVO_MENSAJE, EVT_ERROR, EVT_AVATAR, EVT_ELIMINADO
-from ui import avatares, miniaturas, acciones_chat
+    EVT_NUEVO_MENSAJE, EVT_ERROR, EVT_AVATAR, EVT_ELIMINADO, EVT_GRUPO
+from ui import avatares, miniaturas, acciones_chat, grupo_info
 from ui.chat_bubbles import BubbleList, fecha_hora_local
 from ui.emoticonos import abrir_panel, imagen as imagen_emoticono
 from ui.chat_movil import abrir_chat_movil
@@ -154,6 +154,25 @@ def _ventana_chat(ctx):
                                  font=("-size", 11, "-weight", "bold"))
     lbl_titulo_chat.pack(side="left", anchor="w")
 
+    def _abrir_info_grupo(_e=None):
+        """(v4.18.48) Pulsar la foto o el nombre de un grupo: sus integrantes y, si lo gestionas, añadir,
+        quitar, renombrar o eliminar."""
+        cid = canal_actual["id"]
+        if not str(cid).startswith("grp:"):
+            return
+
+        def _renombrado(nombre):
+            if nombre and canal_actual["id"] == cid:
+                lbl_titulo_chat.configure(text=nombre)
+            _refrescar_lista_canales()
+
+        def _fuera():
+            _cambiar_canal("general", None, "General")
+        grupo_info.abrir(win, cliente, cid, al_cambiar=_renombrado, al_salir=_fuera)
+
+    for _w in (lbl_foto_chat, lbl_titulo_chat):
+        _w.bind("<Button-1>", _abrir_info_grupo)
+
     def _pintar_foto_cabecera():
         if not win.winfo_exists():
             return
@@ -168,6 +187,10 @@ def _ventana_chat(ctx):
             img = avatares.imagen(win, cliente.avatar_canal(cid, otro), titulo, _TAM_FOTO_CABECERA,
                                   clave=otro, al_cargar=_pintar_foto_cabecera)
         lbl_foto_chat.configure(image=img)
+        # (v4.18.48) En los grupos, la cabecera se puede pulsar (integrantes)
+        es_grupo = str(cid).startswith("grp:")
+        for _w in (lbl_foto_chat, lbl_titulo_chat):
+            _w.configure(cursor="hand2" if es_grupo else "")
 
     def _limpiar_chat():
         # (2026-08-01) A petición del usuario: ahora la limpieza SÍ persiste
@@ -491,6 +514,8 @@ def _ventana_chat(ctx):
             remitente = m.get("remitente", "")
             foto = avatares.imagen(win, cliente.avatar_de(remitente), quien, _TAM_FOTO_BURBUJA,
                                    clave=remitente)
+        if m.get("tipo") == "sistema":          # (v4.18.48) «👥 Ana ha añadido a Carla»
+            return msgs.agregar_aviso(m.get("contenido", ""), hora)
         # (v4.18.46) Cita, «Reenviado», eliminado y el menú Responder / Reenviar / Eliminar
         extra = dict(acciones_chat.datos_burbuja(m, cliente),
                      acciones=acciones_chat.acciones(m, cliente, win, _responder, _recargar))
@@ -631,6 +656,27 @@ def _ventana_chat(ctx):
             m = ev["mensaje"]
             if m.get("canal_id") == canal_actual["id"]:
                 _pintar_mensaje(m)
+            _refrescar_lista_canales()
+        elif tipo == EVT_GRUPO:
+            # (v4.18.48) Un grupo ha cambiado: si es el abierto y se ha eliminado (o ya no soy miembro), al
+            # General; si no, se refresca la lista y el título.
+            g = ev.get("grupo") or {}
+            if g.get("canal_id") == canal_actual["id"]:
+                if g.get("eliminado"):
+                    _cambiar_canal("general", None, "General")
+                else:
+                    def _comprobar(cid=g.get("canal_id"), nombre=g.get("nombre")):
+                        sigo = bool(cliente.detalle_grupo(cid).get("miembros"))
+                        def _aplicar():
+                            if not win.winfo_exists() or canal_actual["id"] != cid:
+                                return
+                            if sigo:
+                                if nombre:
+                                    lbl_titulo_chat.configure(text=nombre)
+                            else:
+                                _cambiar_canal("general", None, "General")
+                        win.after(0, _aplicar)
+                    threading.Thread(target=_comprobar, daemon=True, name="Chat-GrupoCambiado").start()
             _refrescar_lista_canales()
         elif tipo == EVT_ELIMINADO:
             # (v4.18.46) Un mensaje de la conversación abierta se ha eliminado: se vuelve a cargar

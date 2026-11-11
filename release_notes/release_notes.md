@@ -1,3 +1,17 @@
+# ✨ Organizador Princess v4.18.48
+
+## 👥 Grupos del chat: integrantes y gestión
+
+- **Pulsa la foto o el nombre de un grupo** (arriba, en la conversación) para ver quién está en él, con su foto, y quién lo gestiona.
+- **Quien creó el grupo** puede **➕ Añadir** y **➖ Quitar** compañeros, **✏ Renombrarlo** y **🗑 Eliminarlo** (con todos sus mensajes y archivos).
+- **Cualquier miembro** puede **🚪 Salir del grupo**. Si sale quien lo gestiona, pasa a gestionarlo otro miembro.
+- En los grupos creados antes de esta versión no consta quién los creó: puede gestionarlos cualquier miembro, y el primero que lo hace queda como gestor.
+- Cada cambio queda anotado dentro del grupo («👥 Ana ha añadido a Carla»), y la lista de conversaciones se actualiza sola para todos.
+
+Necesita el servicio del chat v1.5.0.
+
+---
+
 # ✨ Organizador Princess v4.18.46
 
 ## ↩️ Responder, reenviar y eliminar mensajes

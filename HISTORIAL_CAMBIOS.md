@@ -51,6 +51,34 @@
 
 ---
 
+## 2026-11-11 20:49 — [Chat] [Organizador] [Chat móvil] Fase 3: gestión de grupos (chat v1.5.0, Organizador v4.18.48, móvil v1.0.10)
+
+- **Petición de Víctor** (de los compañeros desde el chat):
+  - al pulsar en la foto del grupo, ver los integrantes;
+  - incluir o excluir participantes;
+  - modificar o eliminar grupos, desde el móvil y desde el escritorio.
+- **Quién puede** (decisión de Víctor):
+  - quien creó el grupo añade y quita, renombra y elimina;
+  - cualquier miembro ve los integrantes y puede salirse.
+  - Los grupos anteriores no tienen creador guardado: los gestiona cualquier miembro, y el primero que lo hace queda como gestor. En la sesión no viaja el rol, así que los administradores no tienen permisos extra.
+- **Servidor del chat v1.5.0** (`chat/grupos.py`):
+  - rutas `GET /api/chat/grupos/<canal_id>` y `POST …/miembros`, `…/nombre`, `…/salir` y `…/eliminar`;
+  - columna `chat_canales.creado_por`;
+  - si sale quien gestiona, pasa a otro miembro; si no queda nadie, el grupo se elimina;
+  - al eliminar, se borran sus mensajes, su foto y los archivos que solo usaba él;
+  - mensajes de tipo «sistema» y evento `grupo_cambiado` a los miembros de antes y de después;
+  - 100 comprobaciones en `tests/test_chat.py`.
+- **Organizador v4.18.48:**
+  - la foto o el nombre de un grupo en la cabecera abre «Integrantes del grupo» (`ui/grupo_info.py`): Añadir, Quitar, Renombrar, Eliminar grupo y Salir del grupo;
+  - los mensajes de sistema salen centrados en gris (`BubbleList.agregar_aviso`);
+  - si te quitan o se elimina el grupo, se vuelve al General y la burbuja se cierra;
+  - `test_chat_fase3.py`; ventana probada en una pantalla virtual.
+- **Móvil v1.0.10:** lo mismo al tocar la cabecera del grupo (diálogos de integrantes, añadir con casillas, renombrar y confirmaciones). Prueba unitaria nueva.
+- **Orden de publicación:**
+  1. Desplegar el servidor del chat.
+  2. Publicar el Organizador y el móvil.
+- **Por probar en Windows y en el móvil:** crear un grupo, añadir y quitar a alguien (al quitado debe desaparecerle), renombrarlo, salir y eliminarlo.
+
 ## 2026-11-11 20:32 — [Chat] [Organizador] [Chat móvil] Fase 2: responder citando, reenviar y eliminar mensajes (chat v1.4.0, Organizador v4.18.46, móvil v1.0.8)
 
 - **Petición de Víctor** (de los compañeros desde el chat):

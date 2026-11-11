@@ -46,8 +46,10 @@ def acciones(m, cliente, parent, al_responder, al_cambiar=None) -> list:
     que ya tienen id (el pintado optimista de uno propio aún no lo tiene)."""
     if not m or not m.get("id") or m.get("tipo") == "eliminado":
         return []
-    lista = [("↩  Responder", lambda: al_responder(m)),
-             ("↪  Reenviar…", lambda: reenviar(parent, cliente, m))]
+    reenviar_ = ("↪  Reenviar…", lambda: reenviar(parent, cliente, m))
+    if (m.get("remitente") or "").lower() == "control-pedidos":
+        return [reenviar_]          # (v4.18.50) a un aviso de Control Pedidos no se le responde
+    lista = [("↩  Responder", lambda: al_responder(m)), reenviar_]
     if puede_eliminar(m, cliente):
         lista.append(("🗑  Eliminar", lambda: eliminar(parent, cliente, m, al_cambiar)))
     return lista

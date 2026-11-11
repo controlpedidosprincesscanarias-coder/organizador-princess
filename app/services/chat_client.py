@@ -148,6 +148,16 @@ EVT_AVATAR         = "avatar_cambiado"   # (v4.18.28) foto de perfil de una pers
 EVT_ELIMINADO      = "mensaje_eliminado"  # (v4.18.46) un mensaje se eliminó (chat v1.4.0)
 EVT_GRUPO          = "grupo_cambiado"     # (v4.18.48) un grupo cambió o se eliminó (chat v1.5.0)
 
+# (v4.18.50, chat v1.6.0) Cuenta de los avisos de Control de Pedidos (antes por Telegram). Cada persona los
+# recibe en su conversación privada con ella, en la que no se puede escribir.
+BOT_AVISOS = "control-pedidos"
+BOT_NOMBRE = "Control Pedidos"
+
+
+def es_canal_avisos(canal_id) -> bool:
+    partes = str(canal_id or "").split(":")
+    return len(partes) == 3 and partes[0] == "dm" and BOT_AVISOS in partes[1:]
+
 _LADO_AVATAR = 256            # las fotos de perfil se suben en cuadrado de 256 px (como el móvil)
 _AVATAR_MAX_DESCARGA = 1024 * 1024
 
@@ -610,6 +620,8 @@ class ChatClient:
         arranque, antes de que refrescar_mapa_nombres() haya terminado)."""
         if not username:
             return username
+        if username.lower() == BOT_AVISOS:
+            return BOT_NOMBRE
         with self._mapa_nombres_lock:
             return self._mapa_nombres.get(username.lower(), username)
 

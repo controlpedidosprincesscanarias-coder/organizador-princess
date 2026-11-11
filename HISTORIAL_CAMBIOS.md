@@ -51,6 +51,17 @@
 
 ---
 
+## 2026-11-11 16:02 — [Organizador] Configuración y agenda a prueba de cortes (v4.18.38)
+
+- **Motivo:** en un equipo se perdió la configuración tras actualizar. Lo más probable es que se instalara a mano y se eligiera «Instalación desde cero», que hace copia en `config_backup_…json` y se recupera con Administración → Importar config. Con «Actualizar ahora» no se pregunta, y la configuración se conserva desde la v4.18.20. Al revisarlo apareció un fallo real.
+- **Fallo:** `save_config` y `save_agenda` escribían encima del archivo: primero lo vaciaban y luego escribían. Si el Organizador se cerraba en medio (el instalador lo cierra con `taskkill /F`), el archivo quedaba vacío. `load_config` y `load_agenda` lo tomaban como vacío sin avisar, y el guardado siguiente sobrescribía la buena.
+- **Ahora** (`app/db/sqlite.py`):
+  - se escribe en `.tmp` y se sustituye con `os.replace`, guardando antes la versión válida en `.bak`;
+  - si al leer el archivo está vacío o dañado, se recupera de `.bak`; la configuración, si no, de la `config_backup_*.json` más reciente con datos;
+  - el dañado se guarda aparte y queda en el log «recuperacion».
+- **Instalador:** primero cierra el Organizador sin `/F` (guarda la agenda) y, a los 4 s, lo fuerza si sigue abierto.
+- 8 comprobaciones nuevas en `test_bd_y_acceso.py`.
+
 ## 2026-11-11 15:17 — [Organizador] Borrar el instalador descargado tras actualizar (v4.18.36)
 
 - **Pregunta de Víctor:** ¿se verifica el borrado de la versión anterior al actualizar?

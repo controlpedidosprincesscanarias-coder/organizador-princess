@@ -1,21 +1,15 @@
-✨ Organizador Princess v4.18.36
+✨ Organizador Princess v4.18.38
 ================================================================
 
-(Incluye también lo de la 4.18.34, que no llegó a publicarse.)
+🛡️ CONFIGURACIÓN Y AGENDA A PRUEBA DE CORTES
 
-🧹 LIMPIEZA TRAS ACTUALIZAR (4.18.36)
-
-• Al abrirse la versión nueva se borra el instalador descargado
-  (unos 40 MB en la carpeta temporal), que antes se quedaba hasta la
-  actualización siguiente. El aviso «Organizador actualizado» lo
-  confirma.
-
-📱 INSTALAR LA APP DEL MÓVIL, PASO A PASO (4.18.34)
-
-• La ventana «📱 Chat en el móvil» y el Manual de usuario explican qué
-  hacer con los avisos de Android al instalar la app: «Descargar de
-  todas formas», «Instalar apps desconocidas» y, si sale Google Play
-  Protect, «Más detalles» → «Instalar de todas formas».
+• La configuración y la agenda se guardan de forma segura: si el
+  Organizador se cierra de golpe mientras guarda (al actualizar, un
+  apagón…), ya no se quedan vacías.
+• Si al abrirse alguna está vacía o dañada, se recupera sola de su
+  copia anterior.
+• Al actualizar, el instalador pide primero al Organizador que se
+  cierre normalmente y solo lo fuerza si no lo hace.
 
 ================================================================
 La idea y el desarrollo de la aplicación Organizador Princess son de

@@ -43,6 +43,7 @@ from ui.disposicion import (MARGEN, NUM_ACCESOS_RAPIDOS, NUM_OPCIONES, VISTA_ACC
 from ui.agenda_helpers import get_nombre
 from ui.ventana_config import (_ventana_config, _abrir_submenu)
 from ui.ventana_chat import _ventana_chat
+from ui import notas_version as _notas_version
 import ui.ventana_chat as _ventana_chat_mod
 import ui.chat_popup as _chat_popup_mod
 from services.chat_client import get_chat_client, EVT_NUEVO_MENSAJE
@@ -89,7 +90,7 @@ NOMBRE_USUARIO_ACTUAL = get_nombre_usuario()
 
 GOLD  = "#C9A84C"
 LIGHT = "#D8E8F0"
-APP_VERSION  = "v4.18.42"   # ← actualizar en cada release (debe coincidir con el tag del release en GitHub)
+APP_VERSION  = "v4.18.44"   # ← actualizar en cada release (debe coincidir con el tag del release en GitHub)
 GITHUB_REPO  = "controlpedidosprincesscanarias-coder/organizador-princess"  # repo de releases
 _update_mod.APP_VERSION = APP_VERSION  # propagar a services/update_service.py
 _update_mod.GITHUB_REPO = GITHUB_REPO
@@ -621,13 +622,16 @@ ttk.Label(
     anchor="w"
 ).pack(side="left")
 
-ttk.Label(
+_lbl_version = ttk.Label(
     footer_frame,
     text=APP_VERSION,
     font=("Segoe UI", 9, "bold"),
     foreground=GOLD,
     anchor="e"
-).pack(side="right")
+)
+_lbl_version.pack(side="right")
+# (v4.18.44) Al pulsar la versión se ven sus notas (ui/notas_version.py)
+_notas_version.hacer_pulsable(_lbl_version, app, APP_VERSION)
 
 def _aplicar_vista():
     """Reorganiza el menú principal según config["vista_menu"] (v4.18.00):

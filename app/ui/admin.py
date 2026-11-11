@@ -902,9 +902,12 @@ def abrir_admin(ctx):
         ttk.Label(footer_adm,
                   text="\u00a9 VAMA 2026  \u2022  Princess Hotels & Resorts  \u2022  Central Compras Canarias",
                   font=("Segoe UI", 8), foreground=LIGHT, anchor="w").pack(side="left")
-        ttk.Label(footer_adm,
-                  text=ctx.app_version,
-                  font=("Segoe UI", 8, "bold"), foreground=GOLD, anchor="e").pack(side="right")
+        _lbl_v = ttk.Label(footer_adm,
+                           text=ctx.app_version,
+                           font=("Segoe UI", 8, "bold"), foreground=GOLD, anchor="e")
+        _lbl_v.pack(side="right")
+        from ui import notas_version
+        notas_version.hacer_pulsable(_lbl_v, win, ctx.app_version)   # (v4.18.44) notas al pulsar
 
         # ── Grid de opciones — ocupa el espacio restante entre cabecera y bottom ──
         grid = ttk.Frame(win, padding=(14, 0, 14, 0))

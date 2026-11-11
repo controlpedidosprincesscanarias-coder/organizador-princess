@@ -66,6 +66,8 @@ hiddenimports += [
     'ui.emoticonos',     # v4.18.18: panel 😊 del chat
     'ui.chat_movil',     # v4.18.24: ventana «Chat en el móvil» (QR de la app Android)
     'ui.avatares',       # v4.18.28: fotos de perfil del chat
+    'ui.miniaturas',     # v4.18.44: miniaturas de las imágenes del chat
+    'ui.notas_version',  # v4.18.44: notas de la versión al pulsar el número de versión
     'ui.agenda_helpers',
     'ui.importexport',
     'ui.vacaciones',

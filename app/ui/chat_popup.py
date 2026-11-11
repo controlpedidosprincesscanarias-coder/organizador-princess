@@ -30,10 +30,10 @@ import threading
 import logging
 import tkinter as tk
 from tkinter import filedialog, messagebox
-from datetime import datetime, date
+from datetime import datetime
 
-from services.chat_client import get_chat_client, EVT_NUEVO_MENSAJE, EVT_AVATAR
-from ui import avatares
+from services.chat_client import get_chat_client, nombre_adjunto_seguro, EVT_NUEVO_MENSAJE, EVT_AVATAR
+from ui import avatares, miniaturas
 from ui.chat_bubbles import BubbleList, fecha_hora_local
 from ui.emoticonos import abrir_panel, imagen as imagen_emoticono
 from db.sqlite import filtrar_mensajes_limpiados
@@ -55,18 +55,6 @@ _COLOR_AJENO  = "#3a4a63"
 _COLOR_TEXTO  = "#e8edf2"
 _COLOR_META   = "#8fa3b8"
 _COLOR_ENTRY  = "#25313f"
-
-
-def _es_de_hoy(m):
-    """True si creado_en de este mensaje cae en el día de hoy (hora local
-    del PC). Si el formato no se puede interpretar, se descarta (False) en
-    vez de arriesgarse a mostrar algo de otro día por error."""
-    try:
-        ts = m.get("creado_en", "")
-        fecha = datetime.fromisoformat(ts.replace("Z", "+00:00")).date()
-    except Exception:
-        return False
-    return fecha == date.today()
 
 
 def _posicion_libre(app):
@@ -211,12 +199,31 @@ def mostrar_popup_chat(ctx, canal_id, titulo, mensaje_inicial=None, borrador="")
                 logging.getLogger("chat").warning("No se pudo descargar/abrir el adjunto: %s", exc)
         threading.Thread(target=_hilo, daemon=True, name="ChatPopup-DescargarAdjunto").start()
 
+    def _guardar_adjunto(url, nombre_archivo):
+        """(v4.18.44) «Guardar como…», como en la ventana del chat."""
+        destino = _dialogo(filedialog.asksaveasfilename, title="Guardar adjunto",
+                           initialfile=nombre_adjunto_seguro(nombre_archivo))
+        if not destino:
+            return
+
+        def _hilo():
+            try:
+                cliente.guardar_adjunto_como(url, destino)
+            except Exception as exc:
+                logging.getLogger("chat").warning("No se pudo guardar el adjunto: %s", exc)
+                if win.winfo_exists():
+                    win.after(0, lambda e=exc: _dialogo(messagebox.showerror, "Chat",
+                                                        f"No se pudo guardar «{nombre_archivo}»:\n{e}"))
+        threading.Thread(target=_hilo, daemon=True, name="ChatPopup-GuardarAdjunto").start()
+
     # ── Mensajes: burbujas de verdad (rectángulos redondeados en Canvas),
     #    con hora HH:MM y copia por clic derecho — ver ui/chat_bubbles.py.
     msgs = BubbleList(win, bg=_COLOR_FONDO, color_propio=_COLOR_PROPIO,
                        color_ajeno=_COLOR_AJENO, color_texto=_COLOR_TEXTO,
                        color_meta=_COLOR_META, font_texto=("Segoe UI", 9),
-                       font_meta=("Segoe UI", 7), on_click_adjunto=_click_adjunto)
+                       font_meta=("Segoe UI", 7), on_click_adjunto=_click_adjunto,
+                       on_guardar_adjunto=_guardar_adjunto,
+                       cargar_imagen=lambda url, listo: miniaturas.cargar(win, cliente, url, listo))
     msgs.pack(fill="both", expand=True, padx=6, pady=6)
 
     ids_pintados = set()
@@ -249,7 +256,8 @@ def mostrar_popup_chat(ctx, canal_id, titulo, mensaje_inicial=None, borrador="")
             msgs.agregar_burbuja(f"{icono} {adjunto['nombre_archivo']}", hora, propio,
                                   meta_nombre=quien, es_adjunto=True,
                                   adjunto_url=adjunto["url"],
-                                  adjunto_nombre_archivo=adjunto["nombre_archivo"])
+                                  adjunto_nombre_archivo=adjunto["nombre_archivo"],
+                                  es_imagen=miniaturas.es_imagen(m))
         else:
             msgs.agregar_burbuja(m.get("contenido", ""), hora, propio, meta_nombre=quien)
 
@@ -409,16 +417,11 @@ def mostrar_popup_chat(ctx, canal_id, titulo, mensaje_inicial=None, borrador="")
         # y db/sqlite.py. Mismo canal_id, misma marca — si se limpió en la
         # ventana principal, tampoco debe reaparecer aquí.
         mensajes_canal = filtrar_mensajes_limpiados(canal_id, data.get("mensajes", []))
-        # Solo las últimas 3 de HOY — esto es una vista rápida para
-        # responder al vuelo, no el historial completo (para eso está la
-        # ventana completa, con el botón ⤢). Se ordenan por fecha de
-        # creación antes de recortar y pintar, para no depender de en qué
-        # orden las devuelva la API — la más reciente siempre queda
-        # abajo, justo encima de la caja de escribir.
-        mensajes = sorted(
-            (m for m in mensajes_canal if _es_de_hoy(m)),
-            key=lambda m: m.get("creado_en") or "",
-        )[-3:]
+        # (v4.18.44) El historial completo, como en la ventana del chat, para poder subir y ver
+        # los mensajes anteriores (Víctor: «la burbuja debe ser igual en este sentido»). Antes
+        # solo se pintaban los 3 últimos de HOY. Ordenados por fecha: el más reciente abajo,
+        # justo encima de la caja de escribir.
+        mensajes = sorted(mensajes_canal, key=lambda m: m.get("creado_en") or "")
         def _pintar_todos():
             if not win.winfo_exists():
                 return

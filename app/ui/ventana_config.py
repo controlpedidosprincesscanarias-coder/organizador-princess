@@ -313,8 +313,11 @@ def _ventana_admin_submenu(ctx, opcion, idx, count, nombre_padre):
     ttk.Label(footer,
               text="\u00a9 VAMA 2026  \u2022  Princess Hotels & Resorts  \u2022  Central Compras Canarias",
               font=("Segoe UI", 8), foreground=LIGHT, anchor="w").pack(side="left")
-    ttk.Label(footer, text=ctx.app_version,   # (v4.18.12) antes, una versión fija «v4.4.3B»
-              font=("Segoe UI", 8, "bold"), foreground=GOLD, anchor="e").pack(side="right")
+    _lbl_v = ttk.Label(footer, text=ctx.app_version,   # (v4.18.12) antes, una versión fija «v4.4.3B»
+                       font=("Segoe UI", 8, "bold"), foreground=GOLD, anchor="e")
+    _lbl_v.pack(side="right")
+    from ui import notas_version
+    notas_version.hacer_pulsable(_lbl_v, footer.winfo_toplevel(), ctx.app_version)   # (v4.18.44)
 
 
 def _ventana_config_sub(ctx, sub_key, sub_idx, nombre_padre):

@@ -98,7 +98,10 @@ class BubbleList(tk.Frame):
                  color_ajeno="#3a4a63", color_texto="#f2f5f8",
                  color_meta="#9fb2c4", ancho_max_burbuja=None,
                  font_texto=("Segoe UI", 9), font_meta=("Segoe UI", 7),
-                 on_click_adjunto=None, **kw):
+                 on_click_adjunto=None, on_guardar_adjunto=None, cargar_imagen=None, **kw):
+        """(v4.18.44) `on_guardar_adjunto(url, nombre)`: «Guardar como…» en el menú de los adjuntos.
+        `cargar_imagen(url, listo)`: descarga la miniatura de una imagen en segundo plano y llama a
+        `listo(PhotoImage)` en el hilo de la interfaz (ver ui/miniaturas.py)."""
         super().__init__(master, bg=bg, **kw)
         self._bg = bg
         self._color_propio = color_propio
@@ -109,6 +112,8 @@ class BubbleList(tk.Frame):
         self._font_texto = tkfont.Font(font=font_texto)
         self._font_meta = tkfont.Font(font=font_meta)
         self._on_click_adjunto = on_click_adjunto
+        self._on_guardar_adjunto = on_guardar_adjunto
+        self._cargar_imagen = cargar_imagen
 
         self.canvas = tk.Canvas(self, bg=bg, bd=0, highlightthickness=0)
         self.canvas.pack(side="left", fill="both", expand=True)
@@ -149,7 +154,7 @@ class BubbleList(tk.Frame):
     # ── burbujas ─────────────────────────────────────────────────────────
     def agregar_burbuja(self, texto, hora, propio, meta_nombre=None,
                          es_adjunto=False, adjunto_url=None,
-                         adjunto_nombre_archivo=None, foto=None):
+                         adjunto_nombre_archivo=None, foto=None, es_imagen=False):
         """`foto` (v4.18.28): PhotoImage redonda de quien escribe, a la izquierda de su
         burbuja (solo en General y en los grupos, y nunca en los mensajes propios)."""
         fila = tk.Frame(self.inner, bg=self._bg)
@@ -181,6 +186,29 @@ class BubbleList(tk.Frame):
         alto_bloque = len(lineas) * alto_linea + 16 + (14 if hora else 0)
 
         color = self._color_propio if propio else self._color_ajeno
+        # (v4.18.44) Las imágenes se ven en miniatura encima de su nombre; al pulsarla se abre.
+        if es_imagen and es_adjunto and adjunto_url and self._cargar_imagen:
+            lbl_img = tk.Label(contenedor, text="🖼  Cargando imagen…", bg=color, fg=self._color_texto,
+                               font=self._font_meta, bd=0, padx=4, pady=4, cursor="hand2")
+            lbl_img.pack(anchor="e" if propio else "w", pady=(0, 2))
+            self._bind_rueda(lbl_img)
+            if self._on_click_adjunto:
+                lbl_img.bind("<Button-1>",
+                             lambda e: self._on_click_adjunto(adjunto_url, adjunto_nombre_archivo))
+
+            def _imagen_lista(foto_img, lbl=lbl_img):
+                if not lbl.winfo_exists():
+                    return
+                abajo = self.canvas.yview()[1] > 0.98
+                if foto_img is None:
+                    lbl.destroy()                # sin miniatura: queda el nombre, como antes
+                else:
+                    lbl.configure(image=foto_img, text="", padx=0, pady=0)
+                    lbl.image = foto_img
+                if abajo:
+                    self._ir_al_final()
+            self._cargar_imagen(adjunto_url, _imagen_lista)
+
         cv = tk.Canvas(contenedor, width=ancho_bloque, height=alto_bloque,
                         bg=self._bg, bd=0, highlightthickness=0,
                         cursor="hand2" if es_adjunto else "")
@@ -220,8 +248,22 @@ class BubbleList(tk.Frame):
         # sabe su propio texto y lo copia entero al portapapeles.
         texto_copia = texto or ""
         menu = tk.Menu(cv, tearoff=0)
-        menu.add_command(label="📋  Copiar mensaje",
-                          command=lambda t=texto_copia: self._copiar(t))
+        if es_adjunto and adjunto_url:
+            # (v4.18.44) Abrir y «Guardar como…» (antes solo se podía abrir desde Descargas)
+            if self._on_click_adjunto:
+                menu.add_command(label="📂  Abrir", command=lambda: self._on_click_adjunto(
+                    adjunto_url, adjunto_nombre_archivo))
+            if self._on_guardar_adjunto:
+                menu.add_command(label="💾  Guardar como…", command=lambda: self._on_guardar_adjunto(
+                    adjunto_url, adjunto_nombre_archivo))
+            menu.add_command(label="📋  Copiar nombre del archivo",
+                              command=lambda t=adjunto_nombre_archivo or texto_copia: self._copiar(t, cv))
+        else:
+            menu.add_command(label="📋  Copiar mensaje",
+                              command=lambda t=texto_copia: self._copiar(t, cv))
+            # (v4.18.44) Doble clic: copia el mensaje entero (el clic derecho no lo encontraba nadie)
+            cv.bind("<Double-Button-1>", lambda e, t=texto_copia: self._copiar(t, cv))
+            cv.configure(cursor="xterm")
 
         def _click_derecho(e, m=menu):
             try:
@@ -245,9 +287,20 @@ class BubbleList(tk.Frame):
         return sum(_emo.imagen(v, pequena=True).width() + 1 if t == "e" else self._font_texto.measure(v)
                    for t, v in trozos)
 
-    def _copiar(self, texto):
+    def _copiar(self, texto, cv=None):
         self.clipboard_clear()
         self.clipboard_append(texto)
+        if cv is not None:
+            # (v4.18.44) Aviso breve encima de la burbuja para que se vea que se ha copiado
+            try:
+                w, h = int(cv.cget("width")), int(cv.cget("height"))
+                aviso = cv.create_text(w // 2, h // 2, text="✓ Copiado", fill="#ffffff",
+                                       font=(self._font_meta.actual("family"), 9, "bold"))
+                fondo = cv.create_rectangle(cv.bbox(aviso), fill="#111a24", outline="")
+                cv.tag_raise(aviso, fondo)
+                cv.after(900, lambda: (cv.winfo_exists() and (cv.delete(aviso), cv.delete(fondo))))
+            except tk.TclError:
+                pass
 
     def _envolver_texto(self, texto, ancho_px):
         """Envuelve `texto` en líneas que no superen ancho_px, respetando

@@ -1,3 +1,22 @@
+# ✨ Organizador Princess v4.18.44
+
+## 💬 Chat más cómodo
+
+- **Copiar un mensaje con doble clic** (sale «✓ Copiado»). También con clic derecho → «Copiar mensaje».
+- **Las imágenes se ven en la conversación**, en miniatura, en vez de solo su nombre. Al pulsar la miniatura se abre la imagen.
+- **Clic derecho sobre un adjunto**: «Abrir», «Guardar como…» (eliges dónde y con qué nombre) o «Copiar nombre del archivo».
+- **La burbuja muestra toda la conversación**: se puede subir para ver los mensajes anteriores, como en la ventana grande. Antes solo enseñaba los 3 últimos de hoy.
+
+## 📜 Novedades de cada versión
+
+- **Pulsa el número de versión** (abajo a la derecha en el menú principal, en Administración o en Configuración) para ver las notas de esa versión, con un botón para ver las de todas.
+
+## 📱 Chat en el móvil
+
+- El **código QR descarga la app directamente** (`ChatPrincess.apk`), sin tener que elegir el archivo en la página de GitHub. Funciona en cuanto se publique la próxima versión de la app del móvil, que trae ese archivo. Mientras tanto, «📜 Página de versiones» lleva a la página de siempre.
+
+---
+
 # ✨ Organizador Princess v4.18.42
 
 ## 💬 El chat avisa si falta tu cuenta

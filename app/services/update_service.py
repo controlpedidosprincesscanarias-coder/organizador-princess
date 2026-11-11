@@ -780,6 +780,20 @@ def borrar_instaladores_aplicados(version_actual, carpeta=None):
     return borrados, pendientes
 
 
+def _limpiar_entorno_pyinstaller(entorno=None):
+    """(v4.18.40) Quita del entorno las variables internas de PyInstaller de ESTE proceso (_PYI_*,
+    _MEIPASS2) y pone PYINSTALLER_RESET_ENVIRONMENT=1 (PyInstaller 6.9+: «arranque limpio»).
+    El instalador hereda el entorno y se lo pasa al Organizador nuevo que abre al terminar; con esas
+    variables, el nuevo buscaba Python en la carpeta temporal _MEI… del viejo, que ya se había
+    borrado al cerrarse: «Failed to load Python DLL …\\_MEI…\\python312.dll» (v4.18.38). Se cambia el
+    entorno del propio proceso porque os.startfile no admite otro."""
+    entorno = os.environ if entorno is None else entorno
+    for clave in [k for k in entorno if k.startswith("_PYI") or k == "_MEIPASS2"]:
+        entorno.pop(clave, None)
+    entorno["PYINSTALLER_RESET_ENVIRONMENT"] = "1"
+    return entorno
+
+
 def _instalar_ya(ruta_instalador, version):
     """Lanza el instalador ya comprobado. Devuelve None si se lanzó, o el motivo si no.
     Se usa ShellExecute (os.startfile) y no subprocess: el instalador pide permisos de
@@ -790,6 +804,7 @@ def _instalar_ya(ruta_instalador, version):
     except OSError:
         pass
     try:
+        _limpiar_entorno_pyinstaller()
         os.startfile(ruta_instalador, "open", _ARGS_INSTALADOR)
         return None
     except OSError as e:

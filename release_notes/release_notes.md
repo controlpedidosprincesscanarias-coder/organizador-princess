@@ -1,3 +1,13 @@
+# ✨ Organizador Princess v4.18.40
+
+## 🔧 Se vuelve a abrir bien después de actualizar
+
+- Con la 4.18.38, al terminar «Actualizar ahora» el Organizador nuevo podía no abrirse: «Failed to load Python DLL …\_MEI…\python312.dll». La instalación sí se había hecho; fallaba solo la reapertura automática.
+- **Causa:** el instalador heredaba del Organizador viejo las variables internas de PyInstaller (`_PYI_*`) y se las pasaba al nuevo, que buscaba Python en la carpeta temporal del viejo. Antes de la 4.18.38 esa carpeta seguía ahí porque el viejo se cerraba a la fuerza; desde que se cierra normalmente, se borra.
+- **Arreglo:** el instalador abre el Organizador nuevo sin esas variables y con `PYINSTALLER_RESET_ENVIRONMENT=1`, lo que también arregla la actualización desde la 4.18.38. Además, el Organizador las quita antes de lanzar el instalador.
+
+---
+
 # ✨ Organizador Princess v4.18.38
 
 ## 🛡️ Configuración y agenda a prueba de cortes

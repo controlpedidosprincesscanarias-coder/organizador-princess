@@ -5,7 +5,7 @@
 ; ================================================================
 
 #define MyAppName    "Organizador Princess"
-#define MyAppVersion "4.18.38"
+#define MyAppVersion "4.18.40"
 #define MyAppExe     "OrganizadorPrincess.exe"
 #define MyAppID      "OrganizadorPrincess"
 #define MyAssets     SourcePath + "assets"
@@ -131,8 +131,13 @@ Filename: "{app}\{#MyAppExe}"; \
   Flags: nowait postinstall skipifsilent
 ;  (v4.18.20) Instalación de un clic desde «Actualizar ahora» (/SILENT): al terminar se vuelve
 ;  a abrir el Organizador solo, con el usuario normal y no como administrador.
-Filename: "{app}\{#MyAppExe}"; \
-  Flags: nowait runasoriginaluser; Check: WizardSilent
+;  (v4.18.40) A través de cmd, quitando las variables internas de PyInstaller que este instalador
+;  hereda del Organizador viejo (_PYI_*, _MEIPASS2) y con PYINSTALLER_RESET_ENVIRONMENT=1. Sin eso,
+;  el nuevo buscaba Python en la carpeta temporal _MEI… del viejo, ya borrada al cerrarse:
+;  «Failed to load Python DLL» (v4.18.38). Así se arregla también al actualizar desde la v4.18.38.
+Filename: "{cmd}"; \
+  Parameters: "/c set ""_PYI_APPLICATION_HOME_DIR="" & set ""_PYI_ARCHIVE_FILE="" & set ""_PYI_PARENT_PROCESS_LEVEL="" & set ""_PYI_SPLASH_IPC="" & set ""_MEIPASS2="" & set ""PYINSTALLER_RESET_ENVIRONMENT=1"" & start """" /D ""{app}"" ""{app}\{#MyAppExe}"""; \
+  Flags: nowait runhidden runasoriginaluser; Check: WizardSilent
 
 ; ----------------------------------------------------------------
 ;  Limpieza al desinstalar

@@ -114,5 +114,23 @@ _taskkill = [l for l in iss.splitlines() if "taskkill" in l.lower() and not l.st
 ok("el instalador cierra el Organizador SIN «/T» (con /T se cerraba a sí mismo al lanzarlo «Actualizar ahora»)",
    bool(_taskkill) and all("/T" not in l.upper().replace("/TERM", "") for l in _taskkill), _taskkill)
 
+# (v4.18.40) El Organizador nuevo no debe heredar la carpeta temporal _MEI… del viejo
+_env = {"PATH": "x", "_PYI_APPLICATION_HOME_DIR": r"C:\T\_MEI123", "_PYI_ARCHIVE_FILE": "a", "_MEIPASS2": "b"}
+us._limpiar_entorno_pyinstaller(_env)
+ok("entorno limpio: sin _PYI_* ni _MEIPASS2 y con PYINSTALLER_RESET_ENVIRONMENT=1",
+   _env == {"PATH": "x", "PYINSTALLER_RESET_ENVIRONMENT": "1"}, _env)
+with mock.patch.dict(os.environ, {"_PYI_ARCHIVE_FILE": "viejo"}), mock.patch.object(us.os, "startfile", startfile_ok, create=True):
+    us._instalar_ya(os.path.join(RAIZ, "setup.exe"), "v4.18.40")
+    ok("al lanzar el instalador se limpia el entorno que hereda",
+       "_PYI_ARCHIVE_FILE" not in os.environ and os.environ.get("PYINSTALLER_RESET_ENVIRONMENT") == "1")
+try:
+    os.remove(us._MARCA_AUTO)
+except OSError:
+    pass
+_reabrir = [l for l in iss.splitlines() if "PYINSTALLER_RESET_ENVIRONMENT=1" in l and not l.strip().startswith(";")]
+ok("el .iss reabre el Organizador con el entorno de PyInstaller limpio (Failed to load Python DLL, v4.18.38)",
+   len(_reabrir) == 1 and all(v in _reabrir[0] for v in ('_PYI_APPLICATION_HOME_DIR=', '_PYI_ARCHIVE_FILE=',
+                                                         '_PYI_PARENT_PROCESS_LEVEL=', '_MEIPASS2=', 'start """"')), _reabrir)
+
 print(f"\n{'Todas las comprobaciones OK.' if not fallos else str(len(fallos)) + ' fallo(s)'}")
 sys.exit(1 if fallos else 0)

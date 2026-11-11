@@ -8,6 +8,7 @@ Uso: python test_bd_y_acceso.py   (usa una carpeta de datos temporal; no toca la
 2. existe_en_plataforma codifica el usuario de Windows (antes, con un espacio, la petición ni salía).
 3. (v4.18.38) config.json y agenda.json a prueba de cortes: escritura segura con copia .bak y
    recuperación si al arrancar están vacíos o dañados (antes se perdía toda la configuración).
+4. (v4.18.42) El chat solo se abre si hay cuenta de Control de Pedidos guardada (Mi Usuario).
 """
 import contextlib
 import io
@@ -108,6 +109,19 @@ ok("agenda.json dañado: se recupera de la copia .bak", bd.load_agenda() == {"20
 bd.save_agenda({})
 ok("una agenda vaciada a propósito se respeta", bd.load_agenda() == {})
 _logging.disable(_logging.NOTSET)
+
+# ── 4. El chat necesita la cuenta de Control de Pedidos (v4.18.42) ──────────────
+try:
+    from services import chat_client  # noqa: E402
+except ImportError as e:  # socketio/requests no instalados
+    chat_client = None
+    print(f"(se omite la parte del chat: {e})")
+if chat_client:
+    ok("sin cuenta guardada, el chat no se abre", chat_client.cuenta_chat_configurada("sin cuenta") is False)
+    bd.update_bridge_credentials("con cuenta", "usuario prueba", "x")
+    ok("con usuario y contraseña guardados, sí", chat_client.cuenta_chat_configurada("con cuenta") is True)
+    bd.update_bridge_credentials("solo usuario", "usuario prueba", "")
+    ok("con usuario pero sin contraseña, no", chat_client.cuenta_chat_configurada("solo usuario") is False)
 
 print(f"\n{'Todas las comprobaciones OK.' if not fallos else str(len(fallos)) + ' fallo(s)'}")
 sys.exit(1 if fallos else 0)

@@ -51,6 +51,21 @@
 
 ---
 
+## 2026-11-12 18:50 — [Organizador] Versión portátil, sin instalar (v4.18.54)
+
+- **Petición de Víctor:** hay PC que no permiten instalar programas. ¿Puede el Organizador ser un único ejecutable, como la Consola? En uno de esos PC la Consola se abre y se actualiza sola (10.2.46 → 10.2.48) sin problemas.
+- **Ya era un solo `.exe`.** El instalador lo copia en Archivos de programa (pide administrador) junto con los manuales, los accesos directos y el enlace `organizadorprincess://`. Suelto ya arrancaba, pero no se podía actualizar (ejecuta el instalador), no encontraba el manual ni las notas, y «Abrir el Organizador» no funcionaba.
+- **Copia portátil** (`app/services/portatil.py`):
+  - Cada Release lleva también `OrganizadorPrincess_Portatil_v<versión>.zip` y su `.sha256`, generados por el workflow.
+  - Se reconoce porque no tiene al lado el desinstalador `unins000.exe`.
+  - Se actualiza como la Consola, sin administrador: `.zip` → SHA-256 obligatorio → «.nuevo.exe» → el actual pasa a «.anterior.exe» → se abre. Al arrancar borra los restos (6 reintentos cada 10 s).
+  - Registra `organizadorprincess://` para el usuario de Windows (HKCU).
+  - El manual y las notas de las versiones van dentro del `.exe`.
+  - Usa los mismos datos que la instalada (`%APPDATA%\OrganizadorPrincess`).
+- **ANTI-REGRESION:** el portátil va en `.zip`, nunca como `.exe` suelto: los Organizadores instalados hasta la v4.18.52 cogen el primer `.exe` de la Release como instalador. Los equipos instalados siguen igual.
+- **Pruebas:** `test_portatil.py`, nueva, con 25 comprobaciones (detección, archivo que coge cada uno, descarga con SHA-256 bueno y malo, sustitución y vuelta atrás, restos, enlace en HKCU, compilación y publicación). Las otras 13 pruebas, en verde, y arranque del Organizador en Linux con pantalla virtual.
+- **Queda por probar en Windows:** compilar con el workflow, abrir el portátil en un PC sin permisos de instalación, «Actualizar ahora» desde el portátil, y el botón «Abrir el Organizador» y el manual en el portátil.
+
 ## 2026-11-12 18:15 — [Infra] Repositorio de Control Pedidos privado y credencial de GitHub de Render rehecha
 
 - **Petición de Víctor:** pasar a privado el repositorio `control-pedidos-princess` y borrar el bot de Telegram (ya sin uso desde v12.34.28).

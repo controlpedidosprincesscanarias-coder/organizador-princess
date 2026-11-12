@@ -13,6 +13,7 @@ Aplicación de escritorio desarrollada en **Python + ttkbootstrap**, que combina
 - 🏖 Gestión de Vacaciones y Festivos.
 - 🔔 Sistema de notificaciones en segundo plano (bridge) conectado a Control de Pedidos: recibe los mismos avisos que Telegram (techo de gastos, familias repetidas, solicitudes de usuario, cambios de estado de pedidos…) como popup en pantalla, filtrados automáticamente según el usuario y su rol.
 - 🔄 Actualizaciones automáticas desde GitHub Releases, con ventana de "novedades" al terminar de instalar.
+- 💼 Versión portátil (v4.18.54): `OrganizadorPrincess_Portatil_v….zip` en cada Release, para los PC que no permiten instalar. Se descomprime en una carpeta del usuario, se abre `OrganizadorPrincess.exe` y se actualiza sola sin administrador (`app/services/portatil.py`).
 - 🖼️ Interfaz basada en **ttkbootstrap**, con logo corporativo embebido e icono multirresolución para Windows.
 - 📖 Manual de Usuario accesible desde la propia aplicación, y Manual de Administrador (menú Inicio y carpeta `docs/`).
 - 🗂️ Compatible con Windows 10/11, distribuido como instalador `.exe` (Inno Setup) — no requiere tener Python instalado en el equipo destino.
@@ -88,7 +89,7 @@ Para depurar el bridge de forma aislada, su actividad (sincronizaciones, notific
 En GitHub, pestaña **Actions** → **Compilar Organizador** → **Run workflow**. Antes, sube a `main` la versión nueva con sus notas (paso 2 de abajo).
 
 - **solo-descarga**: compila y deja el instalador y su `.sha256` como descarga del propio workflow (30 días). No crea ninguna Release y los equipos no se enteran. Sirve para probar.
-- **borrador**: además crea la Release **en borrador** con el instalador, el `.sha256` y las novedades de `release_notes.md`. Los equipos no la ven (consultan `/releases/latest`, que nunca devuelve borradores). Para que se actualicen, en **Releases** abre el borrador y pulsa **Publish release**.
+- **borrador**: además crea la Release **en borrador** con el instalador, el `.sha256`, la copia portátil (`.zip` y su `.sha256`) y las novedades de `release_notes.md`. Los equipos no la ven (consultan `/releases/latest`, que nunca devuelve borradores). Para que se actualicen, en **Releases** abre el borrador y pulsa **Publish release**.
 
 Antes de compilar se comprueba (`compilacion/preparar_release.py`) que `APP_VERSION` y `MyAppVersion` coinciden, que la versión es par, que `release_notes.md` empieza por esa versión y, para el borrador, que no existe ya una Release con esa versión. Si algo falla, no se crea nada.
 

@@ -1,19 +1,19 @@
-✨ Organizador Princess v4.18.52
+✨ Organizador Princess v4.18.54
 ================================================================
 
-🖥️ CONTROL PEDIDOS SABE QUE TIENES EL ORGANIZADOR ABIERTO
+💼 VERSIÓN PORTÁTIL, SIN INSTALAR
 
-• Si entras en Control Pedidos sin el Organizador abierto, te sale
-  una ventana para abrirlo o descargarlo e instalarlo.
-• El botón «Abrir el Organizador» lo abre desde el navegador: la
-  primera vez, acepta cuando el navegador te pregunte.
-• Para que funcione, pon tu cuenta de Control Pedidos en
-  ⚙️ Configuración.
+• Para los PC que no permiten instalar programas: en cada versión
+  se publica también «OrganizadorPrincess_Portatil_v….zip».
+• Descomprímelo en una carpeta tuya (por ejemplo, Documentos) y
+  abre OrganizadorPrincess.exe. No pide permisos de administrador.
+• Se actualiza solo, igual que la Consola Registro Info: descarga
+  la versión nueva, la comprueba y se vuelve a abrir.
+• Usa la misma agenda, configuración y chat que la versión
+  instalada.
 
-🔔 LOS AVISOS DE CONTROL PEDIDOS, EN EL CHAT (4.18.50)
-
-• Llegan a la conversación «Control Pedidos» del chat; cada uno
-  recibe solo los suyos.
+Si ya lo tienes instalado, no tienes que hacer nada: se sigue
+actualizando como siempre.
 
 ================================================================
 La idea y el desarrollo de la aplicación Organizador Princess son de

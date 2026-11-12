@@ -1,3 +1,17 @@
+# ✨ Organizador Princess v4.18.54
+
+## 💼 Versión portátil, sin instalar
+
+- Para los PC que **no permiten instalar programas**: cada versión se publica también como **`OrganizadorPrincess_Portatil_v….zip`**, en la misma página de descargas que el instalador.
+- **Cómo usarla:** descomprime el `.zip` en una carpeta tuya (por ejemplo, *Documentos\Organizador*) y abre **`OrganizadorPrincess.exe`**. No pide permisos de administrador. Para tenerlo a mano, haz clic derecho sobre el `.exe` → *Anclar a la barra de tareas*.
+- **Se actualiza solo**, igual que la Consola Registro Info: al pulsar «Actualizar ahora» descarga la versión nueva, comprueba su SHA-256 y se vuelve a abrir ya actualizado.
+- Usa la **misma agenda, configuración y chat** que la versión instalada, y lleva dentro el manual y estas notas.
+- El botón **«🖥️ Abrir el Organizador»** de Control Pedidos también funciona con la versión portátil (se registra solo para tu usuario de Windows).
+
+Si ya lo tienes **instalado**, no tienes que hacer nada: se sigue actualizando con el instalador, como siempre.
+
+---
+
 # ✨ Organizador Princess v4.18.52
 
 ## 🖥️ Control Pedidos sabe que tienes el Organizador abierto

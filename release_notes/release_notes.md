@@ -1,3 +1,14 @@
+# ✨ Organizador Princess v4.18.58
+
+## 👋 El saludo con tu nombre de Control Pedidos
+
+- Si en tu equipo **no tenías puesto tu nombre**, el menú principal te saluda con el de **tu cuenta de Control Pedidos** en cuanto el Organizador entra con ella (⚙️ Configuración / Admin → Mi Usuario).
+- Si **ya lo tenías puesto**, no cambia nada. Puedes cambiarlo cuando quieras en **Admin → Mi Usuario**.
+- El Organizador ya no lleva dentro una lista con los nombres de los compañeros del departamento.
+- **Corregido:** cambiar el nombre en *Mi Usuario* podía borrar el usuario y la contraseña de Control Pedidos guardados en el equipo.
+
+---
+
 # ✨ Organizador Princess v4.18.56
 
 ## 🆕 Sin preguntas la primera vez en un equipo
@@ -826,7 +837,7 @@ adivinado a mano en vez de medir el contenido real.
 3. **Ancho del panel lateral y del diálogo "Nueva conversación"**: en vez
    de un ancho fijo en caracteres/píxeles adivinado a ojo (que se quedaba
    corto en cuanto aparecía un nombre más largo del previsto, p. ej.
-   "Jesus Curbelc" en vez de "Jesus Curbelo", o el propio botón "＋ Nueva
+   un nombre cortado en su última letra, o el propio botón "＋ Nueva
    conversación" cortado), ahora se mide con `tkinter.font.Font.measure()`
    el texto más ancho REALMENTE presente cada vez que se refresca la
    lista (conexión, mensaje nuevo, alta de usuario) o se cargan los

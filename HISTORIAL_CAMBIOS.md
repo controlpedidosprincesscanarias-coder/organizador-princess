@@ -51,6 +51,19 @@
 
 ---
 
+## 2026-11-12 18:15 — [Infra] Repositorio de Control Pedidos privado y credencial de GitHub de Render rehecha
+
+- **Petición de Víctor:** pasar a privado el repositorio `control-pedidos-princess` y borrar el bot de Telegram (ya sin uso desde v12.34.28).
+- **Antes de cambiarlo se comprobó** que ninguna otra aplicación (Organizador, chat, chat móvil, Consola, Catálogo) descarga nada de este repositorio, y que no tiene workflows, forks ni Pages. Los repositorios del Organizador, la Consola y el chat móvil **siguen públicos**: sus actualizaciones automáticas leen las Releases sin iniciar sesión.
+- **Fallo al desplegar** tras el cambio: «We are unable to access to your GitHub repository», con la GitHub App «Render» instalada y con acceso a *All repositories*. Era el mismo caso que el Catálogo en septiembre (`dali-sap-articulos-app`, `docs/archivo/HISTORIAL_hasta_2026-09.md`, v0.40): la credencial de Render se rompe por su cuenta.
+- **Solución (repetible):**
+  1. En la cuenta de Render del servicio: **Account Settings → Account Security → Git Deployment Credentials**.
+  2. En GitHub: **«…» → Disconnect credential → Add credential → GitHub**, y autorizar.
+  3. Comprobar el origen en el servicio (**Settings → Build → Source**) y lanzar **Manual Deploy**.
+- **No desinstalar** la GitHub App «Render»: la comparten las cuentas de Render de todas las aplicaciones, y el Catálogo y el chat dejarían de desplegarse solos.
+- **Resultado:** despliegue de las 18:12 correcto (`d40acd6`, v12.34.30, «Auto-migración OK»). La aplicación no se cortó en ningún momento.
+- **Variables de Render** (Control Pedidos): borrada `TELEGRAM_BOT_TOKEN`; `AVISOS_TELEGRAM` no existía. El código tampoco lee `ADMIN_TELEGRAM_CHAT_ID`, `EMAIL_FROM`, `EMAILS_INTERNOS` ni `CHAT_DATABASE_URL`, que se pueden borrar de este servicio. `CHAT_DATABASE_URL` sigue siendo obligatoria en el servicio del chat.
+
 ## 2026-11-12 17:21 — [Control Pedidos] Arranque con la base de datos en solo lectura, y el aviso de EmailJS como información (v12.34.30)
 
 - **Petición de Víctor:** en el despliegue de las 17:05 todas las migraciones fallaron con «cannot execute … in a read-only transaction». Supabase, en cambio, daba `default_transaction_read_only = off`: la base de datos admitía escrituras y fue la conexión del arranque la que llegó en solo lectura, como ya pasó en v12.32.03. Además, Integridad marcaba «1 problema» que solo avisaba de que la cuenta EmailJS había cambiado sola («no sé cuál es el error detectado»).

@@ -206,7 +206,7 @@ def registrar_enlace_usuario(ruta=None, winreg_mod=None):
             (base, "", "URL:Organizador Princess"),
             (base, "URL Protocol", ""),
             (base + r"\DefaultIcon", "", f'"{exe}",0'),
-            (base + r"\shell\open\command", "", f'"{exe}"'),
+            (base + r"\shell\open\command", "", f'"{exe}" "%1"'),   # (v4.18.60) "%1": el enlace con el código del navegador
         ]
         for clave, nombre, dato in valores:
             with winreg_mod.CreateKey(winreg_mod.HKEY_CURRENT_USER, clave) as k:

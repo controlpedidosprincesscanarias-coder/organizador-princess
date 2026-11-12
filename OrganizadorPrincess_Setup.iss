@@ -5,7 +5,7 @@
 ; ================================================================
 
 #define MyAppName    "Organizador Princess"
-#define MyAppVersion "4.18.58"
+#define MyAppVersion "4.18.60"
 #define MyAppExe     "OrganizadorPrincess.exe"
 #define MyAppID      "OrganizadorPrincess"
 #define MyAssets     SourcePath + "assets"
@@ -125,7 +125,7 @@ Name: "{group}\Manual de Administrador";     Filename: "{app}\Manual_Administrad
 Root: HKCR; Subkey: "organizadorprincess"; ValueType: string; ValueName: ""; ValueData: "URL:Organizador Princess"; Flags: uninsdeletekey
 Root: HKCR; Subkey: "organizadorprincess"; ValueType: string; ValueName: "URL Protocol"; ValueData: ""
 Root: HKCR; Subkey: "organizadorprincess\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExe}"",0"
-Root: HKCR; Subkey: "organizadorprincess\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExe}"""
+Root: HKCR; Subkey: "organizadorprincess\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExe}"" ""%1"""
 
 ; ----------------------------------------------------------------
 ;  Tareas opcionales

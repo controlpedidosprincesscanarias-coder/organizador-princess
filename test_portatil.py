@@ -164,7 +164,7 @@ class _WinregFalso:
 w = _WinregFalso()
 ruta = r"C:\Users\alguien\Programas\OrganizadorPrincess.exe"
 ok(P.registrar_enlace_usuario(ruta, winreg_mod=w), "registra el enlace con el registro de Windows del usuario")
-ok(w.valores.get(("HKCU", r"Software\Classes\organizadorprincess\shell\open\command", "")) == f'"{ruta}"'
+ok(w.valores.get(("HKCU", r"Software\Classes\organizadorprincess\shell\open\command", "")) == f'"{ruta}" "%1"'
    and ("HKCU", r"Software\Classes\organizadorprincess", "URL Protocol") in w.valores
    and all(k[0] == "HKCU" for k in w.valores),
    "solo en HKEY_CURRENT_USER (sin administrador) y apuntando a esta copia")

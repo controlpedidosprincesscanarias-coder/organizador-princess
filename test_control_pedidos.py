@@ -8,6 +8,8 @@ Uso: python test_control_pedidos.py  (en cualquier sistema; no se conecta a ning
    este Organizador está abierto y cuál tiene cada uno (Control Pedidos v12.34.26).
 2. El instalador registra el enlace organizadorprincess:// (botón «Abrir el Organizador») apuntando al
    programa instalado, y lo borra al desinstalar.
+3. (v4.18.60) El enlace trae el código del navegador de Control Pedidos: se guarda y se envía en cada
+   consulta (X-Organizador-Navegadores), para que Control Pedidos sepa si está abierto en ESTE PC.
 """
 import json
 import os
@@ -83,9 +85,47 @@ ok("registra el protocolo organizadorprincess con «URL Protocol»",
 ok("…que se borra al desinstalar", any("organizadorprincess" in l and "uninsdeletekey" in l for l in lineas), lineas)
 comando = next((l for l in lineas if "shell\\open\\command" in l), "")
 ok("…y abre el programa instalado", '{app}\\{#MyAppExe}' in comando, comando)
-ok("…sin pasarle el enlace como argumento (el programa no lo necesita)", "%1" not in comando, comando)
+ok("…pasándole el enlace (\"%1\"), con el código del navegador desde la v4.18.60", '""%1""' in comando, comando)
 ok("el instalador sigue pidiendo administrador (HKCR, para todos los usuarios del equipo)",
    "PrivilegesRequired=admin" in iss)
+
+# ── 3. Navegador vinculado (v4.18.60) ───────────────────────────────────────
+import tempfile  # noqa: E402
+import services.vinculo_navegador as vn  # noqa: E402
+COD = "0b6c2e1a-4d2f-4c3b-9e8a-7f6d5c4b3a21"
+ok("lee el código del enlace que abre el navegador",
+   vn.extraer_navegador([f"organizadorprincess://abrir?navegador={COD}"]) == COD)
+ok("…también con «/» antes de «?» y entre comillas",
+   vn.extraer_navegador([f'"organizadorprincess://abrir/?navegador={COD}"']) == COD)
+ok("sin enlace o con un código raro, nada",
+   vn.extraer_navegador([]) is None and vn.extraer_navegador(["--algo"]) is None
+   and vn.extraer_navegador(["organizadorprincess://abrir?navegador=<script>"]) is None
+   and vn.extraer_navegador(["organizadorprincess://abrir"]) is None
+   and vn.extraer_navegador([f"https://otra.web/?navegador={COD}"]) is None)
+with tempfile.TemporaryDirectory() as d:
+    ruta = os.path.join(d, "navegadores.json")
+    ok("sin vincular, la cabecera va vacía", vn.cabecera(ruta) == "")
+    ok("al abrirse con el enlace, guarda el código",
+       vn.guardar_desde_argv([f"organizadorprincess://abrir?navegador={COD}"], ruta) and vn.leer(ruta) == [COD])
+    otros = [f"{i:032d}" for i in range(12)]
+    for o in otros:
+        vn.guardar(o, ruta)
+    vn.guardar(COD, ruta)
+    lista = vn.leer(ruta)
+    ok("como mucho 10, sin repetir y el último vinculado primero",
+       len(lista) == 10 and lista[0] == COD and len(set(lista)) == 10, lista)
+    ok("la cabecera los lleva separados por comas", vn.cabecera(ruta) == ",".join(lista))
+    open(ruta, "w").write("{roto")
+    ok("un archivo dañado no rompe nada", vn.leer(ruta) == [] and vn.guardar(COD, ruta) and vn.leer(ruta) == [COD])
+enviadas.clear()
+with mock.patch.object(vn, "cabecera", return_value=COD), \
+        mock.patch.object(sesion._opener, "open", side_effect=lambda req, timeout=0: enviadas.append(req) or _Resp()):
+    sesion._request("/api/bridge/notificaciones")
+cab = {k.lower(): v for k, v in enviadas[-1].header_items()} if enviadas else {}
+ok("cada consulta lleva los navegadores vinculados", cab.get("x-organizador-navegadores") == COD, cab)
+ok("main_agenda guarda el código al arrancar con el enlace", "guardar_desde_argv(sys.argv[1:])" in main)
+spec = open(os.path.join(RAIZ, "main.spec"), encoding="utf-8").read()
+ok("main.spec incluye services.vinculo_navegador", "'services.vinculo_navegador'" in spec)
 
 print(f"\n{'Todas las comprobaciones OK.' if not fallos else str(len(fallos)) + ' fallo(s)'}")
 sys.exit(1 if fallos else 0)

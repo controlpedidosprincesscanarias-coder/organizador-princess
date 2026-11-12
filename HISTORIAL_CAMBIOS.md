@@ -51,6 +51,23 @@
 
 ---
 
+## 2026-11-12 11:40 — [Control Pedidos] Los avisos llegan al chat de cada persona, tenga o no Telegram (v12.34.24)
+
+**Comprobado en producción (12 nov):** Víctor puso `CHAT_AVISOS_SECRET` en los dos servicios de Render, el del chat y el de Control Pedidos. Al crear un pedido real, el aviso le llegó a Fran en la conversación «Control Pedidos» del chat, igual que por Telegram.
+
+**Petición:** «prepara los avisos por usuario y retira cualquier comentario sobre Telegram». Decisión de Víctor: retirar Telegram del todo, pero no apagarlo hasta que todos tengan el Organizador v4.18.50 y el móvil v1.0.12. Se hace en dos entregas; esta es la primera.
+
+**Causa:** el aviso del chat iba a quien tenía el `telegram_chat_id` del mensaje. Los once puntos de envío exigían ese ID, así que quien no tenía Telegram no recibía nada, aunque estuviera marcado en Configuración de Avisos.
+
+**Cambios:**
+- Cada aviso va al chat del usuario destinatario, tenga o no Telegram (`_send_telegram(..., usuario=…)`, `aviso_chat.enviar_a_usuario`).
+- Telegram sigue saliendo por debajo para quien lo tiene, mientras `AVISOS_TELEGRAM` siga activo.
+- En Configuración de Avisos, la casilla 📱 «Telegram» pasa a 💬 «Chat» (es la misma, se conserva lo marcado) y desaparece la marca «sin chat_id».
+
+**Probado:** `test_avisos_chat` (6 comprobaciones nuevas), `test_hotel_pruebas` (21), `test_flujo` (86), `huella_bd` y `huella_app`.
+
+**Siguiente:** retirar Telegram de la interfaz y del código. El PR queda preparado y abierto hasta que Víctor confirme que todos tienen el chat nuevo.
+
 ## 2026-11-11 20:59 — [Control Pedidos] [Chat] [Organizador] [Chat móvil] Fase 4: los avisos internos llegan al chat («Control Pedidos») (Control Pedidos v12.34.22, chat v1.6.0, Organizador v4.18.50, móvil v1.0.12)
 
 - **Petición de Víctor:** «eliminar los envíos a Telegram internos, utilizar este chat… crear por ejemplo Control Pedidos y que llegue ahí los mensajes que hasta ahora llegaban al Telegram, así no dependemos de terceros». Y confirma que cada usuario reciba únicamente lo que le corresponde.

@@ -7,6 +7,9 @@
 #   - destino «solo-descarga»: deja el instalador y su .sha256 como descarga del propio workflow.
 #     No crea ninguna Release; los equipos no se enteran.
 #   - destino «borrador»: además crea una Release en BORRADOR con el instalador y el .sha256.
+#   (v4.18.54) Las dos opciones generan también la copia PORTÁTIL (sin instalar) en un .zip con su .sha256.
+#   ANTI-REGRESION: el portátil va siempre en .zip y se sube DESPUÉS del instalador. Los Organizadores
+#   instalados hasta la v4.18.52 cogen el primer .exe de la Release como instalador.
 #     Los equipos consultan /releases/latest, que nunca devuelve borradores: no se actualiza nadie
 #     hasta que se pulsa «Publish release» en GitHub.
 # Antes de compilar se comprueba (compilacion/preparar_release.py) que APP_VERSION y el .iss coinciden,
@@ -99,6 +102,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit 1 }
           python test_control_pedidos.py
           if ($LASTEXITCODE -ne 0) { exit 1 }
+          python test_portatil.py
+          if ($LASTEXITCODE -ne 0) { exit 1 }
 
       - name: Compilar con PyInstaller
         shell: pwsh
@@ -124,6 +129,16 @@ jobs:
           "$hash  ${{ steps.version.outputs.instalador }}" | Out-File -Encoding ascii "$exe.sha256"
           Get-Content "$exe.sha256"
 
+      - name: Crear la copia portátil (.zip con el .exe, sin instalar)
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist_portatil | Out-Null
+          $zip = "dist_portatil\${{ steps.version.outputs.portatil }}"
+          Compress-Archive -Path dist\OrganizadorPrincess.exe -DestinationPath $zip -Force
+          $hash = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLower()
+          "$hash  ${{ steps.version.outputs.portatil }}" | Out-File -Encoding ascii "$zip.sha256"
+          Get-Content "$zip.sha256"
+
       - name: Guardar el instalador como descarga
         uses: actions/upload-artifact@v4
         with:
@@ -131,6 +146,8 @@ jobs:
           path: |
             dist_installer/${{ steps.version.outputs.instalador }}
             dist_installer/${{ steps.version.outputs.instalador }}.sha256
+            dist_portatil/${{ steps.version.outputs.portatil }}
+            dist_portatil/${{ steps.version.outputs.portatil }}.sha256
           retention-days: 30
 
       - name: Crear la Release en BORRADOR (no llega a los equipos)
@@ -140,6 +157,8 @@ jobs:
           gh release create "${{ steps.version.outputs.etiqueta }}" `
             "dist_installer\${{ steps.version.outputs.instalador }}" `
             "dist_installer\${{ steps.version.outputs.instalador }}.sha256" `
+            "dist_portatil\${{ steps.version.outputs.portatil }}" `
+            "dist_portatil\${{ steps.version.outputs.portatil }}.sha256" `
             --draft `
             --target "${{ github.sha }}" `
             --title "Organizador Princess v${{ steps.version.outputs.version }}" `

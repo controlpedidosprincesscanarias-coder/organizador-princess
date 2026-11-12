@@ -30,6 +30,12 @@ Todos los equipos se actualizan solos desde las **Releases de este repositorio**
   - etiqueta de la Release igual a esa versión;
   - subir el `.exe` y su `.sha256`;
   - numeración **par** en el último número (decisión de Víctor: 4.18.00, 4.18.02, 4.18.04…).
+- **Copia portátil** (v4.18.54, `app/services/portatil.py`), para los PC que no permiten instalar:
+  - Cada Release lleva también `OrganizadorPrincess_Portatil_v<versión>.zip` y su `.sha256`, con el mismo `OrganizadorPrincess.exe` que mete el instalador. Lo crea el workflow.
+  - Se reconoce porque no tiene al lado el desinstalador `unins000.exe`. Se actualiza sola, como la Consola Registro Info y sin administrador: descarga el `.zip`, comprueba el SHA-256 (obligatorio), deja el `.exe` nuevo como «.nuevo.exe», cambia el actual a «.anterior.exe» y lo abre. Al arrancar, borra los restos y registra `organizadorprincess://` en HKCU.
+  - El manual y `release_notes.md` van **dentro** del `.exe` (`main.spec`, carpeta `documentos`).
+  - **Primer arranque** (`ui/primer_arranque_portatil.py`): pregunta la carpeta (por defecto `Documentos\Organizador Princess`), se copia allí y se reabre desde ella; acceso directo en la carpeta de Inicio (arranque al iniciar sesión) y en el escritorio con PowerShell, o `HKCU\…\Run` si PowerShell está bloqueado. La copia buena se guarda en `%APPDATA%\OrganizadorPrincess\portatil.json`; si se abre otra, ofrece abrir esa.
+  - **ANTI-REGRESION:** la copia portátil va **siempre en un `.zip`**, nunca como `.exe` suelto en la Release. Los Organizadores instalados hasta la v4.18.52 cogen el **primer `.exe`** de la Release como instalador: con un segundo `.exe` podrían bajarse el portátil y no actualizarse nunca. Lo vigila `test_portatil.py`.
 - El repositorio guarda el **código** junto a las Releases. Añadir o cambiar archivos del código no afecta al actualizador.
 
 ## Seguridad
@@ -47,7 +53,7 @@ Todos los equipos se actualizan solos desde las **Releases de este repositorio**
 4. Los errores que se encuentren se reparan aunque ya estuvieran, en un commit propio.
 5. Conservar siempre la línea de autoría en documentos y cabeceras, y añadirla en los nuevos.
 6. Sin Windows no se puede probar la interfaz real: compilar con `python -m py_compile` y probar la lógica aislada (como en `test_filtrado_popups.py`), y decir claramente qué queda por probar en Windows.
-7. Pruebas (se lanzan también en la compilación automática): `python test_filtrado_popups.py`, `python test_estructura.py`, `python test_limite_github.py`, `python test_bd_y_acceso.py`, `python test_markdown_texto.py`, `python test_fecha_hora.py`, `python test_actualizacion.py`, `python test_emoticonos.py`, `python test_avatares.py`, `python test_chat_fase1.py`, `python test_chat_fase2.py`, `python test_chat_fase3.py` y `python test_control_pedidos.py`. `test_estructura` y `test_limite_github` simulan Tkinter si no está instalado.
+7. Pruebas (se lanzan también en la compilación automática): `python test_filtrado_popups.py`, `python test_estructura.py`, `python test_limite_github.py`, `python test_bd_y_acceso.py`, `python test_markdown_texto.py`, `python test_fecha_hora.py`, `python test_actualizacion.py`, `python test_emoticonos.py`, `python test_avatares.py`, `python test_chat_fase1.py`, `python test_chat_fase2.py`, `python test_chat_fase3.py`, `python test_control_pedidos.py` y `python test_portatil.py`. `test_estructura` y `test_limite_github` simulan Tkinter si no está instalado.
    **Prueba de uso** (`pruebas_uso/`, ver su README): arranca el Organizador real en Linux con pantalla virtual y lo maneja con «usuario prueba» (31 comprobaciones y una captura por pantalla). Ejecutarla tras cambios en la interfaz. No envía mensajes de chat ni crea pedidos salvo que se pida (`CHAT_DESTINO`, `CREAR_PEDIDO_PR=1`).
 8. **Nunca importar `main_agenda` desde otro módulo**: es el script de arranque (`__main__`) y el import vuelve a ejecutar la aplicación entera (pasó en `pedidos_agenda_bridge.py` hasta v4.18.06). Lo compartido va en `app/`. Lo vigila `test_estructura.py`.
 

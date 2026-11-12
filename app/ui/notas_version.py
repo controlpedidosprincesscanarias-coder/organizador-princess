@@ -29,6 +29,9 @@ def ruta_notas():
     candidatos = []
     if getattr(sys, "frozen", False):
         candidatos.append(os.path.join(os.path.dirname(sys.executable), "release_notes", "release_notes.md"))
+        # (v4.18.54) La copia portátil las lleva dentro del .exe (main.spec, carpeta «documentos»)
+        if getattr(sys, "_MEIPASS", None):
+            candidatos.append(os.path.join(sys._MEIPASS, "documentos", "release_notes", "release_notes.md"))
     raiz = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     candidatos.append(os.path.join(raiz, "release_notes", "release_notes.md"))
     return next((c for c in candidatos if os.path.isfile(c)), None)

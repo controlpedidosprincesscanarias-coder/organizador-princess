@@ -100,7 +100,8 @@ def main():
 
     if a.github_output:
         with open(a.github_output, "a", encoding="utf-8") as f:
-            f.write(f"version={v_app}\netiqueta=v{v_app}\ninstalador=OrganizadorPrincess_Setup_{v_app}.exe\n")
+            f.write(f"version={v_app}\netiqueta=v{v_app}\ninstalador=OrganizadorPrincess_Setup_{v_app}.exe\n"
+                    f"portatil=OrganizadorPrincess_Portatil_v{v_app}.zip\n")
 
 
 if __name__ == "__main__":

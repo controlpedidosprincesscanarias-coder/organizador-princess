@@ -51,6 +51,27 @@
 
 ---
 
+## 2026-11-12 14:24 — [Control Pedidos] Manuales de usuario regenerados (v12.34.28)
+
+**Petición de Víctor:** «regenerar catálogos y manuales».
+
+**Cambios** (sin cambiar la aplicación ni su versión; solo `docs/`):
+- Los manuales de Hotel, Comprador y Administrador se han regenerado con las pantallas de la v12.34.28. Las capturas son nuevas, con datos inventados en una base local.
+- **Telegram:** fuera todas las menciones. Los avisos se explican como avisos al chat (conversación «Control Pedidos»).
+- **Administrador:**
+  - la ficha de usuario ya no tiene el campo «Telegram Chat ID»;
+  - Usuarios tiene la marca 6, la columna «🖥️ Organizador»;
+  - «Enviar aviso al chat (admin)» en Integridad;
+  - el alta de un comprador incluye instalar el Organizador.
+- **Comprador:**
+  - sección nueva, «El Organizador de escritorio», con la ventana «abre o instala el Organizador»;
+  - la reclamación al proveedor tiene la pestaña «💬 Aviso al chat».
+- **Generador** (`docs/manuales_fuente/`):
+  - `capturas.py` ajusta las marcas de Usuarios a la tabla sin Telegram y añade la captura del aviso, simulando Windows;
+  - `demo_privacidad.sql` pone a un comprador con el Organizador abierto y a otro conectado ayer.
+
+**Revisado:** los tres PDF, página a página en miniatura, y las páginas nuevas a tamaño real. Hotel: 16 páginas; Comprador: 30 (antes 29); Administrador: 23.
+
 ## 2026-11-12 13:56 — [Control Pedidos] Avisos internos solo por el chat: Telegram retirado (v12.34.28)
 
 **Petición:** «retira cualquier comentario sobre Telegram». Decisión de Víctor: retirarlo del todo. **No se publica** hasta que todos tengan el Organizador v4.18.50 y el móvil v1.0.12, porque desde esta versión los avisos internos solo llegan al chat.

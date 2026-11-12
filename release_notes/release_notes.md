@@ -1,3 +1,16 @@
+# ✨ Organizador Princess v4.18.52
+
+## 🖥️ Control Pedidos sabe que tienes el Organizador abierto
+
+- Si entras en Control Pedidos **sin el Organizador abierto**, te sale una ventana para **abrirlo** o **descargarlo e instalarlo** (solo a compras y administradores, una vez al día).
+- El botón **«🖥️ Abrir el Organizador»** de esa ventana abre el programa desde el navegador. La primera vez, el navegador pregunta si permites abrir «Organizador Princess»: acepta (puedes marcar que lo recuerde).
+- Para que Control Pedidos lo sepa, el Organizador tiene que tener puesta **tu cuenta de Control Pedidos** (⚙️ Configuración).
+- En Control Pedidos, *Usuarios* muestra quién tiene el Organizador abierto y con qué versión.
+
+Necesita Control Pedidos v12.34.26.
+
+---
+
 # ✨ Organizador Princess v4.18.50
 
 ## 🔔 Los avisos de Control Pedidos, en el chat

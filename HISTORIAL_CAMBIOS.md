@@ -51,6 +51,38 @@
 
 ---
 
+## 2026-11-12 13:54 — [Control Pedidos] [Organizador] Aviso para abrir o instalar el Organizador de escritorio (Control Pedidos v12.34.26, Organizador v4.18.52)
+
+**Petición de Víctor:** que al entrar en Control Pedidos sin el Organizador abierto salga un mensaje en pantalla para abrirlo o instalarlo, «para tener todas las garantías y recursos que la Central de Compras pone a su disposición», con botón de descarga o de apertura. Decisiones: solo compras y administradores, y una vez al día.
+
+**Cómo lo sabe Control Pedidos:** el Organizador consulta `/api/bridge/notificaciones` cada pocos segundos, y la web no usa esa ruta. Cada consulta anota `usuarios.organizador_visto_en`, como mucho una vez por minuto, y la versión que envía en la cabecera `X-Organizador-Version` (Organizador v4.18.52 o posterior). Se considera abierto si ha consultado en los últimos 2 minutos.
+
+**Control Pedidos (v12.34.26):**
+- Ventana en Windows con:
+  - «🖥️ Abrir el Organizador», que usa el enlace `organizadorprincess://`;
+  - «⬇️ Descargar e instalar», que baja el instalador de la última Release por la API de GitHub (caché de una hora; si falla, la página de versiones);
+  - «Ahora no», que la deja hasta el día siguiente.
+- Se cierra sola si el Organizador se conecta.
+- Explica qué hacer si ya está abierto sin la cuenta de Control Pedidos, porque así no se conecta.
+- Columna «🖥️ Organizador» en Usuarios.
+- Migración, paso 127: dos columnas nuevas, sin tocar datos.
+
+**Organizador (v4.18.52):**
+- Envía su versión en cada consulta (`pedidos_agenda_bridge.py`).
+- El instalador registra el enlace `organizadorprincess://` (`[Registry]` del `.iss`) para todos los usuarios del equipo; se borra al desinstalar.
+
+**Probado:**
+- Control Pedidos:
+  - `test_organizador.py`, nueva: 20 comprobaciones;
+  - `e2e_navegador`: 61 pasos, con uno nuevo que simula Windows;
+  - `test_migraciones`, `test_flujo`, `test_hotel_pruebas` y `test_avisos_chat`;
+  - las huellas, regeneradas.
+- Organizador: `test_control_pedidos.py`, nueva, y las otras 12.
+
+**No probado:** en Windows de verdad.
+- Que el instalador registre el enlace y que el navegador abra el Organizador con él. Se ve al instalar la v4.18.52.
+- Hasta entonces, «Abrir» no hace nada en los equipos con versiones anteriores, y la ventana lo explica.
+
 ## 2026-11-12 11:40 — [Control Pedidos] Los avisos llegan al chat de cada persona, tenga o no Telegram (v12.34.24)
 
 **Comprobado en producción (12 nov):** Víctor puso `CHAT_AVISOS_SECRET` en los dos servicios de Render, el del chat y el de Control Pedidos. Al crear un pedido real, el aviso le llegó a Fran en la conversación «Control Pedidos» del chat, igual que por Telegram.

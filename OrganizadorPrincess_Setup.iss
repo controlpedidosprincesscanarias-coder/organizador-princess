@@ -5,7 +5,7 @@
 ; ================================================================
 
 #define MyAppName    "Organizador Princess"
-#define MyAppVersion "4.18.50"
+#define MyAppVersion "4.18.52"
 #define MyAppExe     "OrganizadorPrincess.exe"
 #define MyAppID      "OrganizadorPrincess"
 #define MyAssets     SourcePath + "assets"
@@ -115,6 +115,17 @@ Name: "{group}\Desinstalar {#MyAppName}";  Filename: "{uninstallexe}"
 Name: "{commondesktop}\{#MyAppName}";      Filename: "{app}\{#MyAppExe}"; Tasks: desktopicon
 Name: "{group}\Manual de Usuario";           Filename: "{app}\Manual_Usuario_OrganizadorPrincess.pdf"
 Name: "{group}\Manual de Administrador";     Filename: "{app}\Manual_Administrador_OrganizadorPrincess.pdf"
+
+; ----------------------------------------------------------------
+;  (v4.18.52) Enlace organizadorprincess:// — el botón «Abrir el Organizador» del aviso de
+;  Control Pedidos (v12.34.26) lo abre desde el navegador. El navegador pregunta la primera vez
+;  si se permite abrirlo. Se borra al desinstalar.
+; ----------------------------------------------------------------
+[Registry]
+Root: HKCR; Subkey: "organizadorprincess"; ValueType: string; ValueName: ""; ValueData: "URL:Organizador Princess"; Flags: uninsdeletekey
+Root: HKCR; Subkey: "organizadorprincess"; ValueType: string; ValueName: "URL Protocol"; ValueData: ""
+Root: HKCR; Subkey: "organizadorprincess\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExe}"",0"
+Root: HKCR; Subkey: "organizadorprincess\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExe}"""
 
 ; ----------------------------------------------------------------
 ;  Tareas opcionales

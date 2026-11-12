@@ -29,7 +29,7 @@ import urllib.request
 import urllib.parse
 import urllib.error
 
-from db.sqlite import (CONFIG_FILE, get_bridge_credentials, get_nombre_usuario,
+from db.sqlite import (CONFIG_FILE, get_bridge_credentials, get_nombre_usuario, guardar_nombre_si_falta,
                         update_bridge_credentials)
 
 # ── Ficheros locales ──────────────────────────────────────────────────────
@@ -450,6 +450,7 @@ def verificar_acceso(username_win: str, password: str) -> dict:
         # fuente de verdad.
         if resultado_online["ok"]:
             resetear_intentos(username_win)
+            guardar_nombre_si_falta(username_win, resultado_online["nombre"])   # (v4.18.58)
             guardar_registro_local(username_win, resultado_online["nombre"], password)
             return {"ok": True, "nombre": resultado_online["nombre"], "modo": "online"}
         else:

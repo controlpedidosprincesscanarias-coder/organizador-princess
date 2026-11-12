@@ -51,6 +51,20 @@
 
 ---
 
+## 2026-11-12 19:19 — [Organizador] Fuera la lista fija de nombres; el saludo usa el nombre de Control Pedidos (v4.18.58)
+
+- **Petición de Víctor** (acordado el 11 nov 2026, y lo preguntó hoy): quitar los nombres metidos en el código.
+- **Causa:** `USUARIOS_INICIALES` (`app/db/sqlite.py`) era una lista fija con el usuario de Windows y el nombre real de cada compañero del departamento, solo para el saludo del menú. Se quedaba desfasada (en un equipo nuevo o con otro usuario de Windows saludaba con el usuario) y dejaba datos personales en un repositorio público.
+- **Cambios:**
+  - Se quita la lista y su `INSERT OR IGNORE`: una base nueva empieza vacía.
+  - Al entrar con la cuenta de Control Pedidos (chat, avisos o Administración), se guarda como nombre el que da `/api/bridge/login`, solo si el equipo no tiene uno propio (`guardar_nombre_si_falta`).
+  - Sin cuenta, saluda con el usuario de Windows y avisa de configurarlo en Admin → Mi Usuario, como antes.
+  - Los equipos que ya tenían su nombre guardado en `usuarios.db` no notan nada.
+  - Fuera también los nombres de personas de los comentarios de `chat_client.py` y de una nota antigua de `release_notes.md`.
+- **Corregido** (commit propio): cambiar el nombre en *Mi Usuario* borraba el usuario y la contraseña de Control Pedidos guardados (`INSERT OR REPLACE` con solo dos columnas). No se notaba porque esa pantalla los vuelve a guardar justo después.
+- **Queda a propósito:** los nombres siguen en commits antiguos del repositorio (público) y en el historial archivado (`docs/archivo/`). Para quitarlos de los commits habría que reescribir la historia, que afecta a las etiquetas de las Releases de las que se actualizan los equipos: no se hace.
+- **Pruebas:** `test_bd_y_acceso.py`, con 16 comprobaciones nuevas, y las otras 13 pruebas en verde. Arranque del Organizador en Linux con una base vacía.
+
 ## 2026-11-12 19:12 — [Organizador] Sin preguntas la primera vez en un equipo (v4.18.56)
 
 - **Petición de Víctor:** al abrir la versión portátil por primera vez en un PC salían a la vez «Nueva versión detectada — Versión anterior: desconocida» y la ventana «Organizador Princess sin instalar».

@@ -9,6 +9,8 @@ Uso: python test_bd_y_acceso.py   (usa una carpeta de datos temporal; no toca la
 3. (v4.18.38) config.json y agenda.json a prueba de cortes: escritura segura con copia .bak y
    recuperación si al arrancar están vacíos o dañados (antes se perdía toda la configuración).
 4. (v4.18.42) El chat solo se abre si hay cuenta de Control de Pedidos guardada (Mi Usuario).
+5. (v4.18.58) Sin lista fija de nombres: el saludo usa el nombre de Control de Pedidos si el equipo no
+   tiene uno propio, y cambiar el nombre ya no borra la cuenta guardada.
 """
 import contextlib
 import io
@@ -122,6 +124,46 @@ if chat_client:
     ok("con usuario y contraseña guardados, sí", chat_client.cuenta_chat_configurada("con cuenta") is True)
     bd.update_bridge_credentials("solo usuario", "usuario prueba", "")
     ok("con usuario pero sin contraseña, no", chat_client.cuenta_chat_configurada("solo usuario") is False)
+
+# ── 5. Sin nombres fijos en el código (v4.18.58) ─────────────────────────────────
+codigo_bd = open(os.path.join(RAIZ, "app", "db", "sqlite.py"), encoding="utf-8").read()
+ok("ya no hay lista fija de usuarios y nombres", "USUARIOS_INICIALES =" not in codigo_bd and not hasattr(bd, "USUARIOS_INICIALES"))
+os.remove(bd.DB_FILE)
+bd._init_db_usuarios()
+con = sqlite3.connect(bd.DB_FILE)
+filas = con.execute("SELECT COUNT(*) FROM config_usuarios").fetchone()[0]
+con.close()
+ok("una base nueva empieza vacía (sin nombres de nadie)", filas == 0, filas)
+os.environ["USERNAME"] = "compras9"
+ok("sin nombre ni cuenta, se saluda con el usuario de Windows", bd.get_nombre_usuario() == "compras9")
+ok("y se avisa de configurar el nombre", bd.tiene_nombre_configurado() is False)
+ok("al entrar en Control de Pedidos se guarda su nombre", bd.guardar_nombre_si_falta(None, "Ana Pérez") is True
+   and bd.get_nombre_usuario() == "Ana Pérez" and bd.tiene_nombre_configurado() is True)
+bd.update_nombre_usuario_db("compras9", "Ana P.")
+ok("un nombre puesto a mano en Mi Usuario no se pisa al volver a entrar",
+   bd.guardar_nombre_si_falta(None, "Ana Pérez Gómez") is False and bd.get_nombre_usuario() == "Ana P.")
+ok("si Control de Pedidos no da nombre (o da el usuario), no se guarda nada",
+   bd.guardar_nombre_si_falta("otro", "") is False and bd.guardar_nombre_si_falta("otro", "OTRO") is False)
+# Equipo que ya tenía el nombre de la lista antigua guardado: no nota nada
+con = sqlite3.connect(bd.DB_FILE)
+con.execute("INSERT INTO config_usuarios (username_win, nombre_real) VALUES ('compras8', 'Nombre Antiguo')")
+con.commit(); con.close()
+os.environ["USERNAME"] = "compras8"
+ok("un equipo con el nombre ya guardado sigue saludando igual",
+   bd.get_nombre_usuario() == "Nombre Antiguo" and bd.guardar_nombre_si_falta(None, "Otro Nombre") is False)
+# Fila con el nombre igual al usuario de Windows (sin configurar): sí se completa
+bd.update_nombre_usuario_db("compras7", "compras7")
+ok("si el nombre guardado es el propio usuario de Windows, se completa con el de Control de Pedidos",
+   bd.guardar_nombre_si_falta("compras7", "Luis Díaz") is True)
+# Corrección: cambiar el nombre no borra la cuenta de Control de Pedidos guardada
+bd.update_bridge_credentials("compras6", "usuario6", "clave6")
+bd.update_nombre_usuario_db("compras6", "Nuevo Nombre")
+ok("cambiar el nombre ya no borra el usuario y la contraseña guardados (antes INSERT OR REPLACE)",
+   bd.get_bridge_credentials("compras6") == ("usuario6", "clave6"), bd.get_bridge_credentials("compras6"))
+for _f in ("chat_client.py", "admin_auth.py"):
+    ok(f"{_f} guarda el nombre de Control de Pedidos al entrar",
+       "guardar_nombre_si_falta(" in open(os.path.join(RAIZ, "app", "services", _f), encoding="utf-8").read())
+ok("pedidos_agenda_bridge.py también", "guardar_nombre_si_falta(" in open(os.path.join(RAIZ, "pedidos_agenda_bridge.py"), encoding="utf-8").read())
 
 print(f"\n{'Todas las comprobaciones OK.' if not fallos else str(len(fallos)) + ' fallo(s)'}")
 sys.exit(1 if fallos else 0)

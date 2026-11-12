@@ -1,18 +1,14 @@
-✨ Organizador Princess v4.18.56
+✨ Organizador Princess v4.18.58
 ================================================================
 
-🆕 SIN PREGUNTAS LA PRIMERA VEZ EN UN EQUIPO
+👋 EL SALUDO CON TU NOMBRE DE CONTROL PEDIDOS
 
-• La primera vez que abres el Organizador en un PC ya no sale
-  «Nueva versión detectada — Versión anterior: desconocida»:
-  no hay nada que instalar y no se borra nada.
-• En la versión portátil, la ventana «sin instalar» (carpeta y
-  arranque con Windows) espera a que no haya otra ventana abierta.
-
-💼 VERSIÓN PORTÁTIL (4.18.54)
-
-• Si la usas, esta es su primera actualización automática: pulsa
-  «Actualizar ahora» y se volverá a abrir sola, ya actualizada.
+• Si en tu equipo no tenías puesto tu nombre, el menú te saluda
+  con el de tu cuenta de Control Pedidos en cuanto entras con ella.
+• Si ya lo tenías puesto, no cambia nada. Puedes cambiarlo cuando
+  quieras en Admin → Mi Usuario.
+• Corregido: cambiar el nombre en Mi Usuario podía borrar la
+  cuenta de Control Pedidos guardada.
 
 ================================================================
 La idea y el desarrollo de la aplicación Organizador Princess son de

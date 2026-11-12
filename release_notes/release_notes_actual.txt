@@ -1,14 +1,17 @@
-✨ Organizador Princess v4.18.58
+✨ Organizador Princess v4.18.60
 ================================================================
 
-👋 EL SALUDO CON TU NOMBRE DE CONTROL PEDIDOS
+🖥️ CONTROL PEDIDOS SABE SI LO TIENES ABIERTO EN ESTE PC
 
-• Si en tu equipo no tenías puesto tu nombre, el menú te saluda
-  con el de tu cuenta de Control Pedidos en cuanto entras con ella.
-• Si ya lo tenías puesto, no cambia nada. Puedes cambiarlo cuando
-  quieras en Admin → Mi Usuario.
-• Corregido: cambiar el nombre en Mi Usuario podía borrar la
-  cuenta de Control Pedidos guardada.
+• Hasta ahora, si tenías el Organizador abierto en un PC, Control
+  Pedidos no te avisaba en otro PC donde no lo tenías.
+• Ahora, la primera vez en cada PC, el aviso de Control Pedidos te
+  pide pulsar «Abrir el Organizador»: se abre (o se reinicia una
+  vez) y queda vinculado con ese navegador.
+• Desde entonces, Control Pedidos solo te avisa si en ESE PC no
+  tienes el Organizador abierto.
+
+Necesita Control Pedidos v12.34.32.
 
 ================================================================
 La idea y el desarrollo de la aplicación Organizador Princess son de

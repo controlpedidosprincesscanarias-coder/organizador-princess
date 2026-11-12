@@ -1,3 +1,16 @@
+# ✨ Organizador Princess v4.18.60
+
+## 🖥️ Control Pedidos sabe si lo tienes abierto en este PC
+
+- Hasta ahora Control Pedidos solo sabía si tenías el Organizador abierto **en algún PC**: si lo tenías abierto en tu equipo de siempre, no te avisaba en otro donde no lo tenías.
+- Ahora, **la primera vez en cada PC** (y en cada navegador), el aviso de Control Pedidos te pide pulsar **«🖥️ Abrir el Organizador»**. El Organizador se abre (si ya estaba abierto, se reinicia una vez) y queda **vinculado con ese navegador**. La ventana del aviso se cierra sola.
+- Desde entonces, Control Pedidos **solo te avisa si en ESE PC no tienes el Organizador abierto**.
+- Si en ese PC no puedes instalar programas, el aviso también ofrece la **versión portátil**.
+
+Necesita Control Pedidos v12.34.32.
+
+---
+
 # ✨ Organizador Princess v4.18.58
 
 ## 👋 El saludo con tu nombre de Control Pedidos

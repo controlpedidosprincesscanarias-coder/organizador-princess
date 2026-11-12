@@ -51,6 +51,29 @@
 
 ---
 
+## 2026-11-12 19:29 — [Control Pedidos] El aviso del Organizador, por equipo (v12.34.32, con el Organizador v4.18.60)
+
+- **Petición de Víctor:** «estoy en un PC que no tiene instalado el Organizador, abro Control Pedidos pero no me indica ni aconseja instalarlo».
+- **Causa:** el aviso (v12.34.26) miraba el usuario: como tenía el Organizador abierto en su PC de siempre, no salía en el otro.
+- **Decisión de Víctor:** vincular el navegador, entre tres opciones. Las otras eran preguntar al propio PC (Chrome y Edge pedirían permiso a cada usuario) o dejarlo como estaba.
+- **Cómo funciona:**
+  - La web guarda en el navegador un código propio y lo manda al preguntar el estado.
+  - «Abrir el Organizador» abre `organizadorprincess://abrir?navegador=<código>`. El Organizador (v4.18.60) lo guarda en `navegadores.json` y lo envía en cada consulta (`X-Organizador-Navegadores`), y Control Pedidos lo anota en `organizador_navegadores` (paso de migración 129).
+  - Con el navegador vinculado, avisa solo si el Organizador de ESE PC no está abierto.
+  - Sin vincular y con un Organizador que ya sabe vincularse, avisa para vincularlo: la primera vez en cada PC.
+  - Con un Organizador anterior o sin código en el navegador, como antes (por usuario).
+- **Organizador v4.18.60:**
+  - el enlace registrado pasa la dirección al programa (`"%1"`, en el `.iss` y en la portátil);
+  - `services/vinculo_navegador.py` guarda el código;
+  - el bridge lo envía.
+  - Al abrirse con el enlace estando ya abierto, se reinicia una vez (instancia única).
+- **El aviso ofrece también la versión portátil**, para los PC que no dejan instalar.
+- **Pruebas:**
+  - Control Pedidos: `test_organizador.py` (32, 13 nuevas), `test_migraciones.py`, huellas regeneradas, `test_flujo.py`, `test_avisos_chat.py`, `test_hotel_pruebas.py` y `e2e_navegador.py`.
+  - Organizador: `test_control_pedidos.py` (12 comprobaciones nuevas), `test_portatil.py` y las demás. En Linux, al arrancar con el enlace guarda el código.
+- **Queda por probar en Windows:** que el navegador abre el Organizador con el código y que, tras vincular, el aviso no sale en ese PC y sí en otro sin Organizador.
+- **Orden de publicación:** primero Control Pedidos (sin el Organizador nuevo funciona como antes) y después el Organizador v4.18.60.
+
 ## 2026-11-12 19:19 — [Organizador] Fuera la lista fija de nombres; el saludo usa el nombre de Control Pedidos (v4.18.58)
 
 - **Petición de Víctor** (acordado el 11 nov 2026, y lo preguntó hoy): quitar los nombres metidos en el código.

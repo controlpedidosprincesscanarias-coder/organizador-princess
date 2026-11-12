@@ -51,6 +51,19 @@
 
 ---
 
+## 2026-11-12 17:21 — [Control Pedidos] Arranque con la base de datos en solo lectura, y el aviso de EmailJS como información (v12.34.30)
+
+- **Petición de Víctor:** en el despliegue de las 17:05 todas las migraciones fallaron con «cannot execute … in a read-only transaction». Supabase, en cambio, daba `default_transaction_read_only = off`: la base de datos admitía escrituras y fue la conexión del arranque la que llegó en solo lectura, como ya pasó en v12.32.03. Además, Integridad marcaba «1 problema» que solo avisaba de que la cuenta EmailJS había cambiado sola («no sé cuál es el error detectado»).
+- **Migraciones:**
+  - Antes de migrar se comprueba que la conexión admite escrituras. Si no, se descarta y se pide otra, hasta 3 veces con 5 s entre una y otra.
+  - Si todas llegan en solo lectura, no se intenta ningún paso y el log lo dice en una sola línea.
+  - Si las migraciones fallan, al minuto de arrancar se avisa por el chat a quien tenga el aviso de integridad, sin esperar a la revisión de las 07:05.
+- **Integridad:**
+  - Comprobación nueva «🗄️ Arranque y migraciones».
+  - Los avisos informativos van aparte, en azul, y no cuentan como problema: el cambio automático de cuenta EmailJS (solo las 24 h siguientes) y una conexión en solo lectura que se cambió por otra.
+- **Corregido:** el aviso diario de integridad no detallaba los problemas de EmailJS; llegaba «Total problemas: 1» sin decir cuál.
+- **Pruebas:** `test_migraciones.py` (nuevos casos de solo lectura y del aviso de 24 h), huellas regeneradas, `test_flujo.py`, `test_avisos_chat.py`, `test_hotel_pruebas.py`, `test_emailjs_rotacion.py` y `e2e_navegador.py`. Pantalla de Integridad revisada en el navegador con datos locales.
+
 ## 2026-11-12 14:24 — [Control Pedidos] Manuales de usuario regenerados (v12.34.28)
 
 **Petición de Víctor:** «regenerar catálogos y manuales».

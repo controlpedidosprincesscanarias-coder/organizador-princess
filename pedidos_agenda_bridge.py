@@ -738,6 +738,16 @@ INTERVALO_POPUP_URGENTE = 1    # 🚨 cada 1 hora (fallback)
 INTERVALO_POPUP_NORMAL  = 24   # ⚠️ una vez al día (fallback)
 
 
+def _version_organizador() -> str:
+    """(v4.18.52) La versión instalada, que main_agenda deja en services.update_service.APP_VERSION. Se lee
+    aquí, al hacer cada petición, porque este módulo nunca puede importar main_agenda."""
+    try:
+        import services.update_service as _update
+        return str(getattr(_update, "APP_VERSION", "") or "")
+    except Exception:  # noqa: BLE001
+        return ""
+
+
 class _Session:
     """Gestiona login/cookie contra la API de Control de Pedidos."""
 
@@ -766,6 +776,10 @@ class _Session:
                     "AppleWebKit/537.36 (KHTML, like Gecko) "
                     "Chrome/124.0.0.0 Safari/537.36"
                 ),
+                # (v4.18.52) Con cada consulta, Control Pedidos anota que el Organizador de esta persona
+                # está abierto y con qué versión: así no le sale el aviso «abre o instala el
+                # Organizador» y en Usuarios se ve quién está actualizado (Control Pedidos v12.34.26).
+                "X-Organizador-Version": _version_organizador(),
             },
             method=method,
         )

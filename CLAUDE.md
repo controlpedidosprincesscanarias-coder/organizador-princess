@@ -58,4 +58,5 @@ Todos los equipos se actualizan solos desde las **Releases de este repositorio**
 8. **Nunca importar `main_agenda` desde otro módulo**: es el script de arranque (`__main__`) y el import vuelve a ejecutar la aplicación entera (pasó en `pedidos_agenda_bridge.py` hasta v4.18.06). Lo compartido va en `app/`. Lo vigila `test_estructura.py`.
 
 ## Pendientes para la próxima versión
-1. **Propuesto, sin decidir:** que el desinstalador no borre `%APPDATA%\OrganizadorPrincess` (`[UninstallDelete]` del `.iss`), para que una reinstalación conserve la configuración, «Mi Usuario», la agenda y sus copias.
+1. **Regenerar los manuales** (`docs/manuales_fuente/`) junto a la próxima versión (Víctor, 12 nov 2026): falta la versión portátil (v4.18.54: `.zip`, carpeta del primer arranque, arranque con Windows y escritorio, actualización sin administrador), que la primera vez en un PC no pregunta (v4.18.56), el saludo con el nombre de Control Pedidos (v4.18.58) y la vinculación con el navegador de Control Pedidos (v4.18.60).
+2. **Propuesto, sin decidir:** que el desinstalador no borre `%APPDATA%\OrganizadorPrincess` (`[UninstallDelete]` del `.iss`), para que una reinstalación conserve la configuración, «Mi Usuario», la agenda y sus copias.

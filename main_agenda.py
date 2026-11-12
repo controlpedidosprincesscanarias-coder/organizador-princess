@@ -90,7 +90,7 @@ NOMBRE_USUARIO_ACTUAL = get_nombre_usuario()
 
 GOLD  = "#C9A84C"
 LIGHT = "#D8E8F0"
-APP_VERSION  = "v4.18.58"   # ← actualizar en cada release (debe coincidir con el tag del release en GitHub)
+APP_VERSION  = "v4.18.60"   # ← actualizar en cada release (debe coincidir con el tag del release en GitHub)
 GITHUB_REPO  = "controlpedidosprincesscanarias-coder/organizador-princess"  # repo de releases
 _update_mod.APP_VERSION = APP_VERSION  # propagar a services/update_service.py
 _update_mod.GITHUB_REPO = GITHUB_REPO
@@ -126,6 +126,11 @@ _update_mod.GITHUB_REPO = GITHUB_REPO
 # Si hay nueva version, config se carga tal cual (sin reset todavia);
 # el usuario decidira que hacer desde la UI.
 _nueva_version_detectada, _version_anterior = _check_version_reset()
+# (v4.18.60) Si se abrió con «Abrir el Organizador» de Control Pedidos (organizadorprincess://abrir?navegador=…),
+# se guarda el código de ese navegador: así Control Pedidos sabe que este PC tiene el Organizador abierto.
+import services.vinculo_navegador as _vinculo_navegador  # noqa: E402
+if _vinculo_navegador.guardar_desde_argv(sys.argv[1:]):
+    logging.getLogger("actualizacion").info("Navegador vinculado con Control Pedidos")
 # (v4.18.20) Si esta versión se instaló con «Actualizar ahora», no se pregunta cómo instalarla:
 # ya se ha hecho «Solo actualizar versión» y al abrir se avisa con un mensaje breve.
 _actualizada_sola = _nueva_version_detectada and _update_mod.actualizacion_automatica_aplicada(_version_anterior)

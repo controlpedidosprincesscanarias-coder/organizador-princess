@@ -748,6 +748,15 @@ def _version_organizador() -> str:
         return ""
 
 
+def _navegadores_vinculados() -> str:
+    """(v4.18.60) Códigos de los navegadores de este PC vinculados (services/vinculo_navegador.py)."""
+    try:
+        import services.vinculo_navegador as _vinculo
+        return _vinculo.cabecera()
+    except Exception:  # noqa: BLE001
+        return ""
+
+
 class _Session:
     """Gestiona login/cookie contra la API de Control de Pedidos."""
 
@@ -780,6 +789,9 @@ class _Session:
                 # está abierto y con qué versión: así no le sale el aviso «abre o instala el
                 # Organizador» y en Usuarios se ve quién está actualizado (Control Pedidos v12.34.26).
                 "X-Organizador-Version": _version_organizador(),
+                # (v4.18.60) Navegadores de este PC vinculados con «Abrir el Organizador» de Control
+                # Pedidos: así sabe si el Organizador está abierto en el mismo equipo (v12.34.32).
+                "X-Organizador-Navegadores": _navegadores_vinculados(),
             },
             method=method,
         )

@@ -90,7 +90,7 @@ NOMBRE_USUARIO_ACTUAL = get_nombre_usuario()
 
 GOLD  = "#C9A84C"
 LIGHT = "#D8E8F0"
-APP_VERSION  = "v4.18.52"   # ← actualizar en cada release (debe coincidir con el tag del release en GitHub)
+APP_VERSION  = "v4.18.54"   # ← actualizar en cada release (debe coincidir con el tag del release en GitHub)
 GITHUB_REPO  = "controlpedidosprincesscanarias-coder/organizador-princess"  # repo de releases
 _update_mod.APP_VERSION = APP_VERSION  # propagar a services/update_service.py
 _update_mod.GITHUB_REPO = GITHUB_REPO
@@ -137,6 +137,17 @@ for _n in _instaladores_borrados:
     logging.getLogger("actualizacion").info("Instalador ya aplicado borrado: %s", _n)
 for _n in _instaladores_pendientes:
     logging.getLogger("actualizacion").warning("No se pudo borrar el instalador %s (se reintentará al arrancar)", _n)
+# (v4.18.54) Copia portátil (sin instalar): borrar el .exe anterior que dejó la actualización y registrar
+# el enlace organizadorprincess:// para este usuario de Windows (el instalador lo hace para todo el equipo).
+from services import portatil as _portatil  # noqa: E402
+_es_portatil = _portatil.es_portatil()
+_restos_portatil_pendientes = []
+if _es_portatil:
+    _restos_borrados, _restos_portatil_pendientes = _portatil.limpiar_restos()
+    for _n in _restos_borrados:
+        logging.getLogger("actualizacion").info("Copia anterior borrada: %s", _n)
+    if not _portatil.registrar_enlace_usuario():
+        logging.getLogger("actualizacion").warning("No se pudo registrar el enlace organizadorprincess:// del usuario")
 
 config = load_config()
 
@@ -247,6 +258,10 @@ def abrir_manual():
         # 3) Directorio de trabajo
         os.path.join(os.getcwd(), MANUAL_NOMBRE),
     ]
+    # 4) (v4.18.54) Dentro del propio .exe: la copia portátil no tiene el PDF al lado (main.spec, «documentos»)
+    _incluido = _portatil.documento_incluido(MANUAL_NOMBRE)
+    if _incluido:
+        candidatos.append(_incluido)
 
     ruta_manual = next((p for p in candidatos if os.path.isfile(p)), None)
 
@@ -1046,9 +1061,23 @@ if _actualizada_sola:
         "Organizador actualizado",
         f"El Organizador se ha actualizado a la versión {APP_VERSION}.\n\n"
         "Tu configuración y tu agenda se mantienen."
-        + ("\nEl instalador descargado ya se ha borrado." if _instaladores_borrados and not _instaladores_pendientes
+        + ("" if _es_portatil
+           else "\nEl instalador descargado ya se ha borrado." if _instaladores_borrados and not _instaladores_pendientes
            else "\nEl instalador descargado se borrará en el próximo arranque." if _instaladores_pendientes else ""),
         parent=app))
+
+
+def _reintentar_restos_portatil(intento=1):
+    """(v4.18.54) La versión anterior puede tardar unos segundos en cerrarse: se reintenta cada 10 s, 6 veces."""
+    _, pendientes = _portatil.limpiar_restos()
+    if pendientes and intento < 6:
+        app.after(10000, lambda: _reintentar_restos_portatil(intento + 1))
+    elif pendientes:
+        logging.getLogger("actualizacion").warning("No se pudo borrar %s; se reintentará al arrancar", pendientes)
+
+
+if _restos_portatil_pendientes:
+    app.after(10000, _reintentar_restos_portatil)
 
 # Hilo de vigilancia de avisos (daemon -> muere al cerrar la app)
 # ANTI-REGRESION (bug Fase 3.7e): nombrar el hilo para detectar si ya existe

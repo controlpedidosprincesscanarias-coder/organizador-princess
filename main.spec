@@ -40,6 +40,11 @@ except Exception:
 # ── Icono .ico (barra de título Windows) ────────────────────
 datas += [('assets/logo.ico', 'assets')]
 
+# (v4.18.54) Manual y notas de las versiones DENTRO del .exe, para la copia portátil (sin instalar), que no
+# los tiene al lado. El instalador los sigue copiando junto al programa (se usan primero los de fuera).
+datas += [('Manual_Usuario_OrganizadorPrincess.pdf', 'documentos'),
+          ('release_notes/release_notes.md', 'documentos/release_notes')]
+
 # ── Módulos propios de app/ ──────────────────────────────────
 # PyInstaller no detecta automáticamente los imports dinámicos
 # (sys.path.insert). Se declaran explícitamente aquí.
@@ -53,6 +58,7 @@ hiddenimports += [
     'negocio.correo',
     'negocio.alertas',
     'services.update_service',
+    'services.portatil',     # v4.18.54: copia portátil (sin instalar) y su actualización
     'services.admin_auth',   # ANTI-REGRESION: nuevo — sistema de login Admin sin hardcode
     'ui.assets',
     'ui.saludo',

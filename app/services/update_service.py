@@ -109,6 +109,7 @@ def _espera_por_limite_github(codigo, cabeceras, ahora=None, azar=None):
 # firma de código del .exe (quien controle el release controla también el hash).
 import hashlib
 import re as _re_hash
+from services import portatil as _portatil   # (v4.18.54) copia portátil, sin instalar
 
 def _asset_hash(assets, nombre_exe):
     """Asset con el hash del instalador, o None."""
@@ -475,13 +476,17 @@ def _check_update_github(app_root, _es_reintento_gracia: bool = False):
         _ulog(f"ERROR comparando versiones: {exc}")
         return
 
-    # Buscar el asset instalador (.exe)
+    # Buscar el asset instalador (.exe) o, en la copia portátil (v4.18.54), el .zip portátil
     assets = data.get("assets", [])
-    asset_exe = next(
-        (a for a in assets if a.get("name", "").lower().endswith(".exe")),
-        None
-    )
-    asset_sha      = _asset_hash(assets, asset_exe["name"]) if asset_exe else None
+    _es_portatil = _portatil.es_portatil()
+    if _es_portatil:
+        asset_exe, asset_sha = _portatil.elegir_assets(assets, portatil=True)
+    else:
+        asset_exe = next(
+            (a for a in assets if a.get("name", "").lower().endswith(".exe")),
+            None
+        )
+        asset_sha = _asset_hash(assets, asset_exe["name"]) if asset_exe else None
     url_sha        = asset_sha["browser_download_url"] if asset_sha else ""
     url_descarga   = asset_exe["browser_download_url"] if asset_exe else ""
     nombre_asset   = asset_exe["name"] if asset_exe else ""
@@ -592,7 +597,11 @@ def _check_update_github(app_root, _es_reintento_gracia: bool = False):
 
         def _descargar():
             if not url_descarga:
-                var_err.set("⚠  No se encontró el instalador en este release.")
+                var_err.set("⚠  No se encontró la copia portátil en este release." if _es_portatil
+                            else "⚠  No se encontró el instalador en este release.")
+                return
+            if _es_portatil:
+                _descargar_portatil()
                 return
 
             # (v4.18.20, petición de Víctor) Un solo clic: sin preguntar carpeta, se descarga a una
@@ -712,6 +721,69 @@ def _check_update_github(app_root, _es_reintento_gracia: bool = False):
             import threading as _thr
             _thr.Thread(target=_hilo_descarga, daemon=True,
                         name="GithubDownload").start()
+
+        def _descargar_portatil():
+            """(v4.18.54) Copia portátil: como la Consola Registro Info, sin instalador ni administrador."""
+            if not _portatil.puede_actualizarse():
+                var_err.set("⚠  No se puede escribir en la carpeta del Organizador: copia a mano el .exe nuevo.")
+                return
+            _estado_update["descarga_iniciada"] = True
+            btn_instalar.configure(state="disabled")
+            btn_despues.configure(state="disabled")
+            pb.pack(fill="x", pady=(8, 2))
+            lbl_prog.pack(anchor="w")
+
+            def _progreso(hecho, total):
+                if total:
+                    pct = hecho / total * 100
+                    app_root.after(0, lambda p=pct, d=round(hecho / 1_048_576, 1), t=round(total / 1_048_576, 1): (
+                        var_prog.set(p), lbl_prog.configure(text=f"Descargando... {d} / {t} MB  ({p:.0f}%)")))
+
+            def _abrir_url(url, timeout):
+                req = urllib.request.Request(url, headers={"User-Agent": "OrganizadorPrincess"})
+                return urllib.request.urlopen(req, timeout=timeout, context=_ssl_ctx())
+
+            def _hilo():
+                try:
+                    nuevo = _portatil.descargar_y_preparar(url_descarga, url_sha, nombre_asset,
+                                                          _carpeta_descarga_actualizacion(),
+                                                          _portatil.ruta_exe(), _abrir_url, _progreso)
+                except Exception as exc_p:  # noqa: BLE001
+                    app_root.after(0, lambda e=str(exc_p): (
+                        var_err.set(f"⚠  {e}"),
+                        btn_instalar.configure(state="normal"),
+                        btn_despues.configure(state="normal")))
+                    return
+                app_root.after(0, lambda n=nuevo: _aplicar_portatil(n))
+
+            def _aplicar_portatil(nuevo):
+                var_prog.set(100)
+                pb.configure(bootstyle="success")
+                lbl_prog.configure(text="🔒  Integridad verificada (SHA-256).\n⏳  El Organizador se cerrará y "
+                                        "volverá a abrirse solo, ya actualizado.")
+                upd.update_idletasks()
+                try:
+                    with open(_MARCA_AUTO, "w", encoding="utf-8") as f:
+                        json.dump({"version": str(tag_remoto).lstrip("vV"), "fecha": datetime.now().isoformat()}, f)
+                except OSError:
+                    pass
+                try:
+                    _portatil.sustituir_exe(nuevo, _portatil.ruta_exe())
+                    _portatil.lanzar(_portatil.ruta_exe())
+                except Exception as exc_s:  # noqa: BLE001
+                    try:
+                        os.remove(_MARCA_AUTO)
+                    except OSError:
+                        pass
+                    var_err.set(f"⚠  {exc_s}")
+                    btn_instalar.configure(state="normal")
+                    btn_despues.configure(state="normal")
+                    return
+                # La versión nueva cierra también esta al arrancar (utils/instancia_unica.py).
+                app_root.after(800, lambda: os._exit(0))
+
+            import threading as _thr
+            _thr.Thread(target=_hilo, daemon=True, name="GithubDownloadPortatil").start()
 
         btn_instalar.configure(command=_descargar)
 

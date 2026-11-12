@@ -255,8 +255,12 @@ def update_nombre_usuario_db(username_win, nuevo_nombre):
     _init_db_usuarios()
     con = sqlite3.connect(DB_FILE)
     cur = con.cursor()
+    # (v4.18.58) Antes era INSERT OR REPLACE con solo dos columnas: al cambiar el nombre se borraban el
+    # usuario y la contraseña de Control de Pedidos guardados (no se notaba porque Mi Usuario los vuelve a
+    # guardar justo después). Ahora solo cambia el nombre.
     cur.execute(
-        "INSERT OR REPLACE INTO config_usuarios (username_win, nombre_real) VALUES (?, ?)",
+        """INSERT INTO config_usuarios (username_win, nombre_real) VALUES (?, ?)
+           ON CONFLICT(username_win) DO UPDATE SET nombre_real = excluded.nombre_real""",
         (username_win, nuevo_nombre)
     )
     con.commit()

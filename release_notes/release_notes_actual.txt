@@ -5,8 +5,11 @@
 
 • Para los PC que no permiten instalar programas: en cada versión
   se publica también «OrganizadorPrincess_Portatil_v….zip».
-• Descomprímelo en una carpeta tuya (por ejemplo, Documentos) y
-  abre OrganizadorPrincess.exe. No pide permisos de administrador.
+• Descomprímelo y abre OrganizadorPrincess.exe. No pide permisos
+  de administrador.
+• La primera vez te pregunta en qué carpeta guardarlo (propone
+  Documentos\Organizador Princess) y pone accesos directos para
+  que arranque al iniciar sesión en Windows y en el escritorio.
 • Se actualiza solo, igual que la Consola Registro Info: descarga
   la versión nueva, la comprueba y se vuelve a abrir.
 • Usa la misma agenda, configuración y chat que la versión

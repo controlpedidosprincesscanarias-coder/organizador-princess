@@ -51,6 +51,28 @@
 
 ---
 
+## 2026-11-12 13:56 — [Control Pedidos] Avisos internos solo por el chat: Telegram retirado (v12.34.28)
+
+**Petición:** «retira cualquier comentario sobre Telegram». Decisión de Víctor: retirarlo del todo. **No se publica** hasta que todos tengan el Organizador v4.18.50 y el móvil v1.0.12, porque desde esta versión los avisos internos solo llegan al chat.
+
+**Cambios:**
+- `_enviar_aviso(texto, usuario)` manda cada aviso solo al chat del usuario.
+- Fuera el bot, su token, `AVISOS_TELEGRAM` y la detección de bot bloqueado.
+- Fuera las dos comprobaciones de Integridad ligadas a Telegram.
+- Fuera el campo y la columna «Telegram Chat ID» de Usuarios.
+- Fuera la ruta `enviar-telegram`, que no se usaba.
+- La pestaña de la ventana de reclamación pasa a «Aviso al chat».
+- Cambian los textos de la interfaz, del registro y de los comentarios.
+- ⚠️ El paso de migración 128 (idempotente) cambia «Telegram» por «chat» en los textos guardados en la base de datos (Parámetros de Alertas y Configuración de Avisos).
+- Se conservan los nombres internos heredados (columna `telegram` de `notificaciones_config`, tipos `telegram_*` de `whatsapp_log`, columnas de `usuarios`), sin borrar datos.
+
+**Tras publicarla:** se pueden borrar `TELEGRAM_BOT_TOKEN` y `AVISOS_TELEGRAM` de Render.
+
+**Probado:**
+- `test_avisos_chat`, `test_migraciones`, `test_hotel_pruebas`, `test_flujo`, `test_techo_gastos`, `test_emailjs_rotacion` y `test_referencias_proveedor`.
+- Las dos huellas, regeneradas por los cambios previstos.
+- `e2e_navegador`.
+
 ## 2026-11-12 13:54 — [Control Pedidos] [Organizador] Aviso para abrir o instalar el Organizador de escritorio (Control Pedidos v12.34.26, Organizador v4.18.52)
 
 **Petición de Víctor:** que al entrar en Control Pedidos sin el Organizador abierto salga un mensaje en pantalla para abrirlo o instalarlo, «para tener todas las garantías y recursos que la Central de Compras pone a su disposición», con botón de descarga o de apertura. Decisiones: solo compras y administradores, y una vez al día.

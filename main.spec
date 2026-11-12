@@ -59,6 +59,7 @@ hiddenimports += [
     'negocio.alertas',
     'services.update_service',
     'services.portatil',     # v4.18.54: copia portátil (sin instalar) y su actualización
+    'ui.primer_arranque_portatil',  # v4.18.54: carpeta, arranque con Windows y escritorio de la portátil
     'services.admin_auth',   # ANTI-REGRESION: nuevo — sistema de login Admin sin hardcode
     'ui.assets',
     'ui.saludo',

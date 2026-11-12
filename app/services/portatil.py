@@ -223,3 +223,126 @@ def documento_incluido(*partes):
         return None
     ruta = os.path.join(base, "documentos", *partes)
     return ruta if os.path.isfile(ruta) else None
+
+
+# ── Primer arranque: carpeta propia, arranque con Windows y escritorio (v4.18.54) ──────────────────────
+# Petición de Víctor: la primera vez, preguntar en qué carpeta guardarlo (así el acceso directo y las
+# actualizaciones van siempre a esa carpeta) y poner un acceso directo en la carpeta de Inicio de Windows
+# para que arranque al iniciar sesión. Todo sin administrador. La ventana está en ui/primer_arranque_portatil.py.
+NOMBRE_ACCESO = "Organizador Princess"
+_CLAVE_RUN = r"Software\Microsoft\Windows\CurrentVersion\Run"
+_CREATE_NO_WINDOW = 0x08000000
+
+
+def carpeta_por_defecto():
+    """Documentos\\Organizador Princess del usuario (carpeta suya, donde Windows deja escribir sin permisos)."""
+    return os.path.join(os.path.expanduser("~"), "Documents", NOMBRE_ACCESO)
+
+
+def leer_estado(ruta_json):
+    """{"ruta_exe": …, "arranque": "acceso"|"registro"|None, "escritorio": bool} o {} si no hay."""
+    import json
+    try:
+        with open(ruta_json, encoding="utf-8") as f:
+            datos = json.load(f)
+        return datos if isinstance(datos, dict) else {}
+    except (OSError, ValueError):
+        return {}
+
+
+def guardar_estado(ruta_json, estado):
+    import json
+    try:
+        os.makedirs(os.path.dirname(ruta_json), exist_ok=True)
+        with open(ruta_json, "w", encoding="utf-8") as f:
+            json.dump(estado, f, ensure_ascii=False, indent=2)
+        return True
+    except OSError:
+        return False
+
+
+def _misma_ruta(a, b):
+    return os.path.normcase(os.path.abspath(a or "")) == os.path.normcase(os.path.abspath(b or ""))
+
+
+def que_hacer_al_arrancar(estado, exe_actual, existe=os.path.isfile):
+    """«primera_vez» (preguntar la carpeta), «otra_copia» (ya hay una guardada en otra carpeta y existe)
+    o «ok» (esta es la copia guardada)."""
+    guardada = (estado or {}).get("ruta_exe")
+    if not guardada or not existe(guardada):
+        return "primera_vez"
+    return "ok" if _misma_ruta(guardada, exe_actual) else "otra_copia"
+
+
+def copiar_a_carpeta(carpeta, exe_actual):
+    """Copia este .exe a `carpeta` (la crea si hace falta) y devuelve la ruta de la copia. Si ya es esa
+    carpeta, devuelve el .exe actual sin copiar. Lanza RuntimeError con un mensaje si no se puede."""
+    import shutil
+    destino = os.path.join(carpeta, NOMBRE_EXE)
+    if _misma_ruta(destino, exe_actual):
+        return exe_actual
+    try:
+        os.makedirs(carpeta, exist_ok=True)
+        tmp = destino + ".copiando"
+        shutil.copy2(exe_actual, tmp)
+        os.replace(tmp, destino)
+    except OSError as e:
+        raise RuntimeError(f"No se pudo copiar el Organizador a «{carpeta}»: {e}")
+    return destino
+
+
+def _ps_texto(s):
+    """Texto entre comillas simples de PowerShell (las comillas simples se duplican)."""
+    return "'" + str(s).replace("'", "''") + "'"
+
+
+def orden_acceso_directo(ruta_exe, carpeta_especial):
+    """Orden de PowerShell que crea «Organizador Princess.lnk» en una carpeta especial de Windows
+    ('Startup' = carpeta de Inicio, 'Desktop' = escritorio) y escribe OK si queda creado."""
+    carpeta = os.path.dirname(ruta_exe)
+    return ("$w = New-Object -ComObject WScript.Shell; "
+            f"$p = Join-Path ([Environment]::GetFolderPath({_ps_texto(carpeta_especial)})) {_ps_texto(NOMBRE_ACCESO + '.lnk')}; "
+            "$s = $w.CreateShortcut($p); "
+            f"$s.TargetPath = {_ps_texto(ruta_exe)}; $s.WorkingDirectory = {_ps_texto(carpeta)}; "
+            f"$s.IconLocation = {_ps_texto(ruta_exe + ',0')}; $s.Description = {_ps_texto(NOMBRE_ACCESO)}; "
+            "$s.Save(); if (Test-Path $p) { 'OK' }")
+
+
+def crear_acceso_directo(ruta_exe, carpeta_especial, ejecutar=None):
+    """Crea el acceso directo con PowerShell (viene con Windows; no pide administrador). True si se creó."""
+    if ejecutar is None:
+        if not sys.platform.startswith("win"):
+            return False
+
+        def ejecutar(orden):
+            return subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass",
+                                   "-Command", orden], capture_output=True, text=True, timeout=30,
+                                  creationflags=_CREATE_NO_WINDOW).stdout
+    try:
+        return "OK" in (ejecutar(orden_acceso_directo(ruta_exe, carpeta_especial)) or "")
+    except Exception:  # noqa: BLE001
+        return False
+
+
+def arranque_por_registro(ruta_exe, winreg_mod=None):
+    """Plan B si PowerShell está bloqueado: arranque al iniciar sesión con HKCU\\…\\Run (sin administrador;
+    se ve y se desactiva en el Administrador de tareas → Aplicaciones de arranque). True si se escribió."""
+    try:
+        if winreg_mod is None:
+            if not sys.platform.startswith("win"):
+                return False
+            import winreg as winreg_mod
+        with winreg_mod.CreateKey(winreg_mod.HKEY_CURRENT_USER, _CLAVE_RUN) as k:
+            winreg_mod.SetValueEx(k, NOMBRE_ACCESO, 0, winreg_mod.REG_SZ, f'"{ruta_exe}"')
+        return True
+    except Exception:  # noqa: BLE001
+        return False
+
+
+def preparar_arranque_con_windows(ruta_exe, ejecutar=None, winreg_mod=None):
+    """Acceso directo en la carpeta de Inicio o, si no se puede, la clave Run. «acceso», «registro» o None."""
+    if crear_acceso_directo(ruta_exe, "Startup", ejecutar):
+        return "acceso"
+    if arranque_por_registro(ruta_exe, winreg_mod):
+        return "registro"
+    return None

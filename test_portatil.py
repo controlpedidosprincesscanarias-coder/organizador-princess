@@ -170,9 +170,59 @@ ok(w.valores.get(("HKCU", r"Software\Classes\organizadorprincess\shell\open\comm
    "solo en HKEY_CURRENT_USER (sin administrador) y apuntando a esta copia")
 ok(P.registrar_enlace_usuario(ruta, winreg_mod=object()) is False, "si el registro falla, no se rompe el arranque")
 
-# ── 6. Compilación y publicación ─────────────────────────────────────────────
+# ── 6. Primer arranque: carpeta propia, arranque con Windows y escritorio ────
+with tempfile.TemporaryDirectory() as d:
+    estado_json = os.path.join(d, "appdata", "portatil.json")
+    ok(P.leer_estado(estado_json) == {}, "sin estado guardado: {}")
+    descargas = os.path.join(d, "Descargas")
+    os.makedirs(descargas)
+    exe_desc = os.path.join(descargas, P.NOMBRE_EXE)
+    open(exe_desc, "wb").write(b"MZ portatil")
+    ok(P.que_hacer_al_arrancar({}, exe_desc) == "primera_vez", "la primera vez se pregunta la carpeta")
+    carpeta = os.path.join(d, "Documentos", "Organizador Princess")
+    copia = P.copiar_a_carpeta(carpeta, exe_desc)
+    ok(copia == os.path.join(carpeta, P.NOMBRE_EXE) and open(copia, "rb").read() == b"MZ portatil"
+       and not os.path.exists(copia + ".copiando"), "se copia a la carpeta elegida (creándola)")
+    ok(P.copiar_a_carpeta(descargas, exe_desc) == exe_desc, "si se deja donde está, no se copia")
+    ok(P.guardar_estado(estado_json, {"ruta_exe": copia, "arranque": "acceso", "escritorio": True})
+       and P.leer_estado(estado_json)["ruta_exe"] == copia, "se guarda qué copia es la buena")
+    est = P.leer_estado(estado_json)
+    ok(P.que_hacer_al_arrancar(est, copia) == "ok", "abriendo la copia guardada no se pregunta nada")
+    ok(P.que_hacer_al_arrancar(est, exe_desc) == "otra_copia",
+       "abriendo otra copia (la de Descargas) se ofrece abrir la guardada")
+    os.remove(copia)
+    ok(P.que_hacer_al_arrancar(est, exe_desc) == "primera_vez", "si la copia guardada ya no existe, se vuelve a preguntar")
+    bloqueada = os.path.join(d, "fichero_no_carpeta")
+    open(bloqueada, "w").close()
+    try:
+        P.copiar_a_carpeta(bloqueada, exe_desc)
+        ok(False, "copiar a una carpeta imposible debe avisar")
+    except RuntimeError as e:
+        ok("No se pudo copiar" in str(e), "si no se puede copiar a esa carpeta, se dice para elegir otra")
+
+ok(P.carpeta_por_defecto().endswith(os.path.join("Documents", "Organizador Princess"))
+   and P.carpeta_por_defecto().startswith(os.path.expanduser("~")), "por defecto, Documentos\\Organizador Princess del usuario")
+
+ruta_rara = r"C:\Users\O'Neil\Documents\Organizador Princess\OrganizadorPrincess.exe"
+orden = P.orden_acceso_directo(ruta_rara, "Startup")
+ok("GetFolderPath('Startup')" in orden and "'C:\\Users\\O''Neil\\Documents\\Organizador Princess\\OrganizadorPrincess.exe'" in orden
+   and "'Organizador Princess.lnk'" in orden, "el acceso directo va a la carpeta de Inicio y las comillas del nombre se escapan")
+vistas = []
+ok(P.crear_acceso_directo(ruta_rara, "Desktop", ejecutar=lambda o: vistas.append(o) or "OK\n")
+   and "GetFolderPath('Desktop')" in vistas[0], "acceso directo del escritorio")
+w2 = _WinregFalso()
+ok(P.preparar_arranque_con_windows(ruta_rara, ejecutar=lambda o: "", winreg_mod=w2) == "registro"
+   and w2.valores.get(("HKCU", r"Software\Microsoft\Windows\CurrentVersion\Run", "Organizador Princess")) == f'"{ruta_rara}"',
+   "si PowerShell no deja crear el acceso, arranca con Windows por el registro del usuario")
+ok(P.preparar_arranque_con_windows(ruta_rara, ejecutar=lambda o: "OK", winreg_mod=_WinregFalso()) == "acceso",
+   "con PowerShell disponible, acceso directo en la carpeta de Inicio (y no además el registro)")
+ok(P.preparar_arranque_con_windows(ruta_rara, ejecutar=lambda o: (_ for _ in ()).throw(OSError("bloqueado")),
+                                  winreg_mod=object()) is None, "si no se puede de ninguna forma, no rompe nada")
+
+# ── 7. Compilación y publicación ─────────────────────────────────────────────
 spec = open(os.path.join(RAIZ, "main.spec"), encoding="utf-8").read()
-ok("'services.portatil'" in spec, "main.spec incluye services.portatil en hiddenimports")
+ok("'services.portatil'" in spec and "'ui.primer_arranque_portatil'" in spec,
+   "main.spec incluye services.portatil y ui.primer_arranque_portatil en hiddenimports")
 ok("'documentos'" in spec and "release_notes/release_notes.md" in spec,
    "el manual y las notas de las versiones van dentro del .exe")
 flujo = open(os.path.join(RAIZ, ".github", "workflows", "compilar.yml"), encoding="utf-8").read()

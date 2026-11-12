@@ -1079,6 +1079,13 @@ def _reintentar_restos_portatil(intento=1):
 if _restos_portatil_pendientes:
     app.after(10000, _reintentar_restos_portatil)
 
+# (v4.18.54) Primer arranque de la copia portátil: carpeta donde guardarla, arranque con Windows y
+# escritorio (ui/primer_arranque_portatil.py). En la versión instalada no hace nada.
+if _es_portatil:
+    import ui.primer_arranque_portatil as _primer_arranque  # noqa: E402
+    app.after(1200, lambda: _primer_arranque.comprobar(
+        app, os.path.join(os.path.dirname(CONFIG_FILE), "portatil.json")))
+
 # Hilo de vigilancia de avisos (daemon -> muere al cerrar la app)
 # ANTI-REGRESION (bug Fase 3.7e): nombrar el hilo para detectar si ya existe
 # (evita que doble-click o reload arranque un segundo monitor en paralelo)

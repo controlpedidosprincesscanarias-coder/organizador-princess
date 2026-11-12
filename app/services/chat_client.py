@@ -70,7 +70,7 @@ import requests
 import socketio
 from PIL import Image
 
-from db.sqlite import get_bridge_credentials, load_config
+from db.sqlite import get_bridge_credentials, guardar_nombre_si_falta, load_config
 
 log = logging.getLogger(__name__)
 
@@ -194,8 +194,8 @@ class ChatClient:
         self.rol      = ""
         self._logged_in = False
 
-        # Caché username(lower) → nombre real, para mostrar "Jesús Curbelo"
-        # en vez de "dcompras" en mensajes/títulos/lista de conversaciones.
+        # Caché username(lower) → nombre real, para mostrar el nombre de la persona
+        # en vez del usuario en mensajes/títulos/lista de conversaciones.
         # Se rellena con refrescar_mapa_nombres() (llamar en un hilo de
         # fondo — hace una petición REST) y se lee con nombre_de().
         self._mapa_nombres = {}
@@ -249,6 +249,8 @@ class ChatClient:
         self.username = data.get("username", bridge_user)
         self.nombre   = data.get("nombre", bridge_user)
         self.rol      = data.get("rol", "")
+        # (v4.18.58) El saludo usa el nombre de Control de Pedidos si este equipo no tiene uno propio.
+        guardar_nombre_si_falta(username_win, data.get("nombre"))
         log.info("ChatClient: sesión iniciada como '%s'", self.username)
         return True
 
@@ -615,7 +617,7 @@ class ChatClient:
         return bytes(datos)
 
     def nombre_de(self, username: str) -> str:
-        """Nombre real de un username (p.ej. 'dcompras' → 'Jesús Curbelo'),
+        """Nombre real de un username (p. ej. 'compras1' → 'Ana Pérez'),
         o el propio username tal cual si aún no está en caché (primer
         arranque, antes de que refrescar_mapa_nombres() haya terminado)."""
         if not username:

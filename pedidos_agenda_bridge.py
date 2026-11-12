@@ -827,6 +827,12 @@ class _Session:
                 self.username = data.get("username", BRIDGE_USER)
                 self.nombre   = data.get("nombre", BRIDGE_USER)
                 self.rol      = data.get("rol", "")
+                # (v4.18.58) El saludo usa el nombre de Control de Pedidos si este equipo no tiene uno propio.
+                try:
+                    from db.sqlite import guardar_nombre_si_falta
+                    guardar_nombre_si_falta(None, data.get("nombre"))
+                except Exception:  # noqa: BLE001
+                    pass
                 log.info("Bridge: sesión iniciada como '%s' (rol=%s)", self.username, self.rol)
                 _resetear_contador_errores()
                 return True, "", ""

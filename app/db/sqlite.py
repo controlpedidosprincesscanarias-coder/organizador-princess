@@ -23,14 +23,11 @@ AGENDA_FILE = os.path.join(os.path.dirname(CONFIG_FILE), "agenda.json")
 DB_FILE      = os.path.join(os.path.dirname(CONFIG_FILE), "usuarios.db")
 VERSION_FILE = os.path.join(os.path.dirname(CONFIG_FILE), "version.json")
 
-USUARIOS_INICIALES = {
-    "dcompras":    "Jesus Curbelo",
-    "comprascan":  "Victor Martin",
-    "comprascan2": "Said Driss",
-    "comprascan3": "David Rodriguez",
-    "comprascan4": "Fran Gonzalez",
-    "comprascan6": "Maria Cruz",
-}  # añadir/editar usuarios desde Admin → Mi Usuario
+# (v4.18.58) Aquí había una lista fija (USUARIOS_INICIALES) con el usuario de Windows y el nombre real de
+# cada compañero del departamento, solo para el saludo del menú. Se quitó (acordado con Víctor el 11 nov
+# 2026): se quedaba desfasada y dejaba datos personales en un repositorio público. Ahora el nombre es el que
+# da Control de Pedidos al entrar con la cuenta de cada uno (guardar_nombre_si_falta) o el que se pone en
+# Administración → Mi Usuario. Los equipos que ya lo tenían guardado en usuarios.db no notan nada.
 
 # ── Config JSON ───────────────────────────────────────────────────────────────
 
@@ -196,7 +193,7 @@ def save_agenda(data):
 # ── DB de usuarios (SQLite) ───────────────────────────────────────────────────
 
 def _init_db_usuarios():
-    """Crea la tabla config_usuarios si no existe y rellena los valores iniciales."""
+    """Crea la tabla config_usuarios si no existe (y las columnas que falten)."""
     con = sqlite3.connect(DB_FILE)
     cur = con.cursor()
     cur.execute("""
@@ -219,11 +216,6 @@ def _init_db_usuarios():
         except Exception:  # noqa: BLE001
             import sys as _sys, traceback as _tb
             print(f"[WARNING] {_tb.format_exc().splitlines()[-1]}", file=_sys.stderr)
-    for uwin, nombre in USUARIOS_INICIALES.items():
-        cur.execute(
-            "INSERT OR IGNORE INTO config_usuarios (username_win, nombre_real) VALUES (?, ?)",
-            (uwin, nombre)
-        )
     con.commit()
     con.close()
 
@@ -250,7 +242,7 @@ def update_nombre_usuario_db(username_win, nuevo_nombre):
     """Actualiza el nombre real de un usuario en la DB.
     Usa INSERT OR REPLACE para garantizar que la fila se crea si no existia,
     evitando el fallo silencioso del UPDATE cuando el login Windows no coincide
-    exactamente con las claves de USUARIOS_INICIALES.
+    exactamente con una fila ya guardada.
     """
     _init_db_usuarios()
     con = sqlite3.connect(DB_FILE)
@@ -328,6 +320,37 @@ def tiene_nombre_configurado():
         import sys as _sys, traceback as _tb
         print(f"[ERROR] {_tb.format_exc().splitlines()[-1]}", file=_sys.stderr)
     return False
+
+
+def guardar_nombre_si_falta(username_win, nombre):
+    """(v4.18.58) Guarda como nombre del usuario de Windows el que da Control de Pedidos al entrar
+    (/api/bridge/login), SOLO si todavía no tiene uno propio (sin fila, vacío o igual al usuario de
+    Windows). Nunca pisa un nombre puesto a mano en Mi Usuario ni toca las credenciales.
+    Devuelve True si lo ha guardado."""
+    uwin = (username_win or os.getenv("USERNAME", "")).lower()
+    nombre = (nombre or "").strip()
+    if not uwin or not nombre or nombre.lower() == uwin:
+        return False
+    try:
+        _init_db_usuarios()
+        con = sqlite3.connect(DB_FILE)
+        cur = con.cursor()
+        cur.execute("SELECT nombre_real FROM config_usuarios WHERE username_win = ?", (uwin,))
+        fila = cur.fetchone()
+        if fila and fila[0] and fila[0].strip() and fila[0].strip().lower() != uwin:
+            con.close()
+            return False
+        cur.execute(
+            """INSERT INTO config_usuarios (username_win, nombre_real) VALUES (?, ?)
+               ON CONFLICT(username_win) DO UPDATE SET nombre_real = excluded.nombre_real""",
+            (uwin, nombre))
+        con.commit()
+        con.close()
+        return True
+    except Exception:  # noqa: BLE001
+        import sys as _sys, traceback as _tb
+        print(f"[WARNING] {_tb.format_exc().splitlines()[-1]}", file=_sys.stderr)
+        return False
 
 
 def update_bridge_credentials(username_win, bridge_user, bridge_password):

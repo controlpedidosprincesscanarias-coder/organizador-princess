@@ -90,7 +90,7 @@ NOMBRE_USUARIO_ACTUAL = get_nombre_usuario()
 
 GOLD  = "#C9A84C"
 LIGHT = "#D8E8F0"
-APP_VERSION  = "v4.18.54"   # ← actualizar en cada release (debe coincidir con el tag del release en GitHub)
+APP_VERSION  = "v4.18.56"   # ← actualizar en cada release (debe coincidir con el tag del release en GitHub)
 GITHUB_REPO  = "controlpedidosprincesscanarias-coder/organizador-princess"  # repo de releases
 _update_mod.APP_VERSION = APP_VERSION  # propagar a services/update_service.py
 _update_mod.GITHUB_REPO = GITHUB_REPO
@@ -130,6 +130,13 @@ _nueva_version_detectada, _version_anterior = _check_version_reset()
 # ya se ha hecho «Solo actualizar versión» y al abrir se avisa con un mensaje breve.
 _actualizada_sola = _nueva_version_detectada and _update_mod.actualizacion_automatica_aplicada(_version_anterior)
 if _actualizada_sola:
+    _nueva_version_detectada = False
+# (v4.18.56) Primera vez en este equipo (no hay versión anterior guardada): no hay nada que «instalar»,
+# así que no se pregunta cómo hacerlo; se hace «Solo actualizar versión», que no borra nada. Pasó con la
+# copia portátil en un PC nuevo: salía «Nueva versión detectada — Versión anterior: desconocida».
+_primera_vez_en_equipo = _update_mod.es_primera_vez_en_equipo(_nueva_version_detectada, _version_anterior)
+if _primera_vez_en_equipo:
+    _update_mod._aplicar_solo_actualizacion(_version_anterior)
     _nueva_version_detectada = False
 # (v4.18.36) Borrar el instalador ya aplicado de la carpeta temporal y dejarlo anotado.
 _instaladores_borrados, _instaladores_pendientes = _update_mod.borrar_instaladores_aplicados(APP_VERSION)

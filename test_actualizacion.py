@@ -132,5 +132,18 @@ ok("el .iss reabre el Organizador con el entorno de PyInstaller limpio (Failed t
    len(_reabrir) == 1 and all(v in _reabrir[0] for v in ('_PYI_APPLICATION_HOME_DIR=', '_PYI_ARCHIVE_FILE=',
                                                          '_PYI_PARENT_PROCESS_LEVEL=', '_MEIPASS2=', 'start """"')), _reabrir)
 
+# (v4.18.56) Primera vez en un equipo: sin versión anterior guardada no se pregunta cómo instalar.
+ok("primera vez en el equipo (sin versión anterior): no se pregunta", us.es_primera_vez_en_equipo(True, "") is True)
+ok("version.json ilegible cuenta como primera vez", us.es_primera_vez_en_equipo(True, "  ") is True)
+ok("con versión anterior guardada se sigue preguntando como siempre", us.es_primera_vez_en_equipo(True, "v4.18.52") is False)
+ok("sin versión nueva no hay nada que hacer", us.es_primera_vez_en_equipo(False, "") is False)
+_main = open(os.path.join(RAIZ, "main_agenda.py"), encoding="utf-8").read()
+_i = _main.index("es_primera_vez_en_equipo(")
+ok("en la primera vez se aplica «Solo actualizar versión» (nunca «desde cero») y no sale la ventana",
+   "_aplicar_solo_actualizacion(_version_anterior)" in _main[_i:_i + 400]
+   and "_nueva_version_detectada = False" in _main[_i:_i + 400]
+   and "_aplicar_instalacion_desde_cero" not in _main[_i:_i + 400]
+   and _i < _main.index("if _nueva_version_detectada:\n    def _dialogo_nueva_version"))
+
 print(f"\n{'Todas las comprobaciones OK.' if not fallos else str(len(fallos)) + ' fallo(s)'}")
 sys.exit(1 if fallos else 0)

@@ -1,22 +1,18 @@
-✨ Organizador Princess v4.18.54
+✨ Organizador Princess v4.18.56
 ================================================================
 
-💼 VERSIÓN PORTÁTIL, SIN INSTALAR
+🆕 SIN PREGUNTAS LA PRIMERA VEZ EN UN EQUIPO
 
-• Para los PC que no permiten instalar programas: en cada versión
-  se publica también «OrganizadorPrincess_Portatil_v….zip».
-• Descomprímelo y abre OrganizadorPrincess.exe. No pide permisos
-  de administrador.
-• La primera vez te pregunta en qué carpeta guardarlo (propone
-  Documentos\Organizador Princess) y pone accesos directos para
-  que arranque al iniciar sesión en Windows y en el escritorio.
-• Se actualiza solo, igual que la Consola Registro Info: descarga
-  la versión nueva, la comprueba y se vuelve a abrir.
-• Usa la misma agenda, configuración y chat que la versión
-  instalada.
+• La primera vez que abres el Organizador en un PC ya no sale
+  «Nueva versión detectada — Versión anterior: desconocida»:
+  no hay nada que instalar y no se borra nada.
+• En la versión portátil, la ventana «sin instalar» (carpeta y
+  arranque con Windows) espera a que no haya otra ventana abierta.
 
-Si ya lo tienes instalado, no tienes que hacer nada: se sigue
-actualizando como siempre.
+💼 VERSIÓN PORTÁTIL (4.18.54)
+
+• Si la usas, esta es su primera actualización automática: pulsa
+  «Actualizar ahora» y se volverá a abrir sola, ya actualizada.
 
 ================================================================
 La idea y el desarrollo de la aplicación Organizador Princess son de

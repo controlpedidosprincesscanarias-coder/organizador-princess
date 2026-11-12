@@ -1,3 +1,16 @@
+# ✨ Organizador Princess v4.18.56
+
+## 🆕 Sin preguntas la primera vez en un equipo
+
+- La primera vez que abres el Organizador en un PC ya **no sale** «Nueva versión detectada — Versión anterior: desconocida». No había nada que instalar: se hace «Solo actualizar versión», que no borra nada. Con una versión anterior guardada, se sigue preguntando como siempre.
+- En la **versión portátil**, la ventana «Organizador Princess sin instalar» (carpeta y arranque con Windows) **espera a que no haya otra ventana abierta** (el saludo, un aviso…), para no salir una encima de otra.
+
+## 💼 Versión portátil
+
+- Si usas la versión portátil (4.18.54), esta es su **primera actualización automática**: pulsa «Actualizar ahora» y se cerrará y volverá a abrirse sola, ya actualizada, en la misma carpeta.
+
+---
+
 # ✨ Organizador Princess v4.18.54
 
 ## 💼 Versión portátil, sin instalar

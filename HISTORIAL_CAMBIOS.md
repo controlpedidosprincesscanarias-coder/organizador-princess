@@ -51,6 +51,14 @@
 
 ---
 
+## 2026-11-12 19:12 — [Organizador] Sin preguntas la primera vez en un equipo (v4.18.56)
+
+- **Petición de Víctor:** al abrir la versión portátil por primera vez en un PC salían a la vez «Nueva versión detectada — Versión anterior: desconocida» y la ventana «Organizador Princess sin instalar».
+- **Corregido:** sin versión anterior guardada (`version.json` no existe o no se lee), es la primera vez en el equipo. Ya no se pregunta cómo instalar: se aplica «Solo actualizar versión», que no borra nada (`es_primera_vez_en_equipo`, `update_service.py`). Con una versión anterior guardada se sigue preguntando como siempre. Pasaba también con el instalador en un PC nuevo.
+- **Portátil:** la ventana del primer arranque espera a que no haya otra ventana abierta (saludo, versión nueva, avisos), como mucho 2 minutos (`hay_otra_ventana`, `ui/primer_arranque_portatil.py`).
+- **Para Víctor:** esta versión es la primera actualización automática de la copia portátil del PC sin permisos de instalación (4.18.54 → 4.18.56).
+- **Pruebas:** `test_actualizacion.py` (5 comprobaciones nuevas) y las demás en verde. En pantalla virtual, la ventana del portátil no sale con otra abierta y sale al cerrarla. Arranque del Organizador en Linux.
+
 ## 2026-11-12 18:50 — [Organizador] Versión portátil, sin instalar (v4.18.54)
 
 - **Petición de Víctor:** hay PC que no permiten instalar programas. ¿Puede el Organizador ser un único ejecutable, como la Consola? En uno de esos PC la Consola se abre y se actualiza sola (10.2.46 → 10.2.48) sin problemas.

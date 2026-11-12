@@ -44,9 +44,24 @@ def _cambiar_de_copia(app, exe_nuevo, salir):
     return True
 
 
-def comprobar(app, ruta_estado, salir=lambda: os._exit(0)):
-    """Llamar al arrancar (con la ventana principal ya creada). Solo hace algo en la copia portátil."""
+def hay_otra_ventana(app):
+    """(v4.18.56) True si hay otra ventana del Organizador abierta (saludo, versión nueva, un aviso…)."""
+    try:
+        if app.grab_current() is not None:
+            return True
+        return any(isinstance(w, tk.Toplevel) and w.winfo_exists() and w.winfo_viewable()
+                   for w in app.winfo_children())
+    except Exception:  # noqa: BLE001
+        return False
+
+
+def comprobar(app, ruta_estado, salir=lambda: os._exit(0), intento=0):
+    """Llamar al arrancar (con la ventana principal ya creada). Solo hace algo en la copia portátil.
+    (v4.18.56) Espera a que no haya otra ventana abierta, para no salir encima de otra (como mucho 2 min)."""
     if not P.es_portatil():
+        return
+    if intento < 80 and hay_otra_ventana(app):
+        app.after(1500, lambda: comprobar(app, ruta_estado, salir, intento + 1))
         return
     exe = P.ruta_exe()
     estado = P.leer_estado(ruta_estado)

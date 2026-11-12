@@ -946,6 +946,13 @@ def _check_version_reset():
     return True, version_guardada  # version anterior (puede ser "")
 
 
+def es_primera_vez_en_equipo(nueva_version, version_anterior):
+    """(v4.18.56) True si es la primera vez que se abre el Organizador en este equipo: hay «versión nueva»
+    pero no hay ninguna anterior guardada (version.json no existe o no se puede leer). En ese caso no se
+    pregunta cómo instalarla; se aplica «Solo actualizar versión», que nunca borra datos."""
+    return bool(nueva_version) and not (version_anterior or "").strip()
+
+
 def _parse_version(tag: str):
     """Convierte 'v4.2.1' → (4, 2, 1) para comparación numérica."""
     import re

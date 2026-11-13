@@ -51,6 +51,21 @@
 
 ---
 
+## 2026-11-13 16:47 — [Organizador] Vaciar y eliminar chats sincronizados con el móvil, y aviso de usuario desactivado o que ya no existe (v4.18.64)
+
+**Petición de Víctor:** que el Organizador tenga también «Vaciar chat» y «Eliminar chat», sincronizados con la app del móvil (hasta ahora «Limpiar chat» solo dejaba de mostrar los mensajes en ese PC).
+
+**Cambios:**
+- `chat_client.py`: `vaciar_chat` y `eliminar_chat` (rutas del chat v1.7.0), evento `conversacion_oculta` y `error_chat` con `codigo`, `usuario` y `canal_id` (también cuando el envío va por REST, que antes no avisaba de nada).
+- Ventana del chat: **🧹 Vaciar chat** vacía en el servidor, solo para mí, aquí y en el móvil; **🗑 Eliminar chat** en los privados. Las marcas antiguas de «Limpiar chat» de cada PC se siguen respetando.
+- Lista y cabecera: ⏸ «Temporalmente desactivado» o ⛔ «Ya no existe» (`otro_estado`).
+- Ventana y burbuja: si el mensaje no se envía porque la otra persona está desactivada o ya no existe, se quita la burbuja pintada, el texto vuelve a la caja y se avisa; si ya no existe, se ofrece eliminar el chat.
+- `test_chat_fase4.py` (15 comprobaciones), también en la compilación automática.
+
+**Probado:** `py_compile` y todas las pruebas del Organizador. Por probar en Windows: los botones, las ventanas de aviso y la sincronización con el móvil. Necesita el chat v1.7.0. Conviene regenerar el manual de usuario (botones del chat).
+
+---
+
 ## 2026-11-13 15:25 — [Chat móvil] Vaciar y eliminar chats, y aviso de usuario desactivado o que ya no existe (v1.0.14)
 
 **Petición de Víctor** (con captura de la lista del móvil): poder vaciar el contenido de un chat y eliminar el chat completo, que solo vuelva a salir si el otro escribe; al escribir a un usuario desactivado en Usuarios de Control Pedidos, avisar de que está temporalmente desactivado; si ya no existe, decirlo y ofrecer eliminar el chat.

@@ -32,7 +32,8 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 from datetime import datetime
 
-from services.chat_client import get_chat_client, nombre_adjunto_seguro, es_canal_avisos, EVT_NUEVO_MENSAJE, EVT_AVATAR, EVT_ELIMINADO, EVT_GRUPO
+from services.chat_client import get_chat_client, nombre_adjunto_seguro, es_canal_avisos, EVT_NUEVO_MENSAJE, EVT_AVATAR, EVT_ELIMINADO, EVT_GRUPO, \
+    EVT_OCULTA, EVT_ERROR, DESTINO_DESACTIVADO, DESTINO_NO_EXISTE
 from ui import avatares, miniaturas, acciones_chat
 from ui.chat_bubbles import BubbleList, fecha_hora_local
 from ui.emoticonos import abrir_panel, imagen as imagen_emoticono
@@ -103,6 +104,22 @@ def procesar_evento(ev):
         info = _POPUPS.get((ev.get("mensaje") or {}).get("canal_id"))
         if info and info["win"].winfo_exists() and info.get("recargar"):
             info["recargar"]()
+        return
+    if ev.get("tipo") == EVT_OCULTA:
+        # (v4.18.64) Chat vaciado o eliminado (aquí o en el móvil): se cierra o se vacía su burbuja
+        c = ev.get("conversacion") or {}
+        info = _POPUPS.get(c.get("canal_id"))
+        if info and info["win"].winfo_exists():
+            if c.get("eliminada"):
+                info["win"].destroy()
+            elif info.get("recargar"):
+                info["recargar"]()
+        return
+    if ev.get("tipo") == EVT_ERROR and ev.get("codigo") in (DESTINO_DESACTIVADO, DESTINO_NO_EXISTE):
+        # (v4.18.64) El mensaje de la burbuja no se envió: la otra persona está desactivada o ya no existe
+        info = _POPUPS.get(ev.get("canal_id"))
+        if info and info["win"].winfo_exists() and info.get("destino"):
+            info["destino"](ev)
         return
     if ev.get("tipo") != EVT_NUEVO_MENSAJE:
         return
@@ -492,4 +509,38 @@ def mostrar_popup_chat(ctx, canal_id, titulo, mensaje_inicial=None, borrador="")
         threading.Thread(target=_cargar, daemon=True, name="ChatPopup-Historial").start()
 
     _POPUPS[canal_id]["recargar"] = _recargar
+
+    def _destino_no_disponible(ev):
+        """(v4.18.64) Como en la ventana grande: se quita lo pintado de antemano, el texto vuelve a la caja y se
+        avisa; si la persona ya no existe, se ofrece eliminar el chat."""
+        for p in reversed(pendientes_propios):
+            if p.get("canal_id") == canal_id:
+                pendientes_propios.remove(p)
+                if not entry.get().strip():
+                    entry.insert(0, p.get("contenido") or "")
+                break
+        _recargar()
+        if ev.get("codigo") == DESTINO_DESACTIVADO:
+            _dialogo(messagebox.showinfo, "Usuario temporalmente desactivado", ev.get("mensaje") or
+                     "Este usuario está temporalmente desactivado. El mensaje no se ha enviado.")
+            return
+        if not str(canal_id).startswith("dm:") or not _dialogo(
+                messagebox.askyesno, "Este usuario ya no existe",
+                (ev.get("mensaje") or "Este usuario ya no existe en Control Pedidos.")
+                + "\n\n¿Eliminar ahora el chat con este usuario?"):
+            return
+
+        def _hilo():
+            r = cliente.eliminar_chat(canal_id)
+            def _fin():
+                if not win.winfo_exists():
+                    return
+                if r.get("ok"):
+                    _cerrar()
+                else:
+                    _dialogo(messagebox.showerror, "Chat", r.get("error") or "No se pudo eliminar el chat.")
+            win.after(0, _fin)
+        threading.Thread(target=_hilo, daemon=True, name="ChatPopup-Eliminar").start()
+
+    _POPUPS[canal_id]["destino"] = _destino_no_disponible
     threading.Thread(target=_cargar, daemon=True, name="ChatPopup-Historial").start()

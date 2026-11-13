@@ -51,6 +51,18 @@
 
 ---
 
+## 2026-11-13 08:02 — [Infra] Compilaciones en GitHub sin el aviso de Node.js 20 (Organizador, Chat móvil y Consola)
+
+> La idea y el desarrollo de las aplicaciones, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.
+
+**Petición de Víctor:** visto bueno a quitar el aviso «Node.js 20 is deprecated» de las compilaciones a mano desde Actions.
+
+**Cambios** (solo el `compilar.yml` de cada repositorio; las aplicaciones no cambian ni suben de versión):
+- `actions/checkout` v4 → v5, `actions/setup-python` v5 → v6 (Organizador y Consola), `actions/setup-java` v4 → v5 (Chat móvil) y `actions/upload-artifact` v4 → v6: la primera versión de cada una que usa Node 24 (comprobado en su `action.yml`; la v5 de `upload-artifact` aún usaba Node 20).
+- Las opciones que usan los workflows no cambian.
+
+**Por probar:** la próxima compilación de cada uno desde Actions (debería salir sin el aviso).
+
 ## 2026-11-12 19:29 — [Control Pedidos] El aviso del Organizador, por equipo (v12.34.32, con el Organizador v4.18.60)
 
 - **Petición de Víctor:** «estoy en un PC que no tiene instalado el Organizador, abro Control Pedidos pero no me indica ni aconseja instalarlo».

@@ -1,17 +1,16 @@
-✨ Organizador Princess v4.18.60
+✨ Organizador Princess v4.18.62
 ================================================================
 
-🖥️ CONTROL PEDIDOS SABE SI LO TIENES ABIERTO EN ESTE PC
+♻️ DESINSTALAR YA NO BORRA TUS DATOS, Y HAY UN «REINICIO LIMPIO»
 
-• Hasta ahora, si tenías el Organizador abierto en un PC, Control
-  Pedidos no te avisaba en otro PC donde no lo tenías.
-• Ahora, la primera vez en cada PC, el aviso de Control Pedidos te
-  pide pulsar «Abrir el Organizador»: se abre (o se reinicia una
-  vez) y queda vinculado con ese navegador.
-• Desde entonces, Control Pedidos solo te avisa si en ESE PC no
-  tienes el Organizador abierto.
-
-Necesita Control Pedidos v12.34.32.
+• Desinstalar el Organizador ya no borra tu configuración, tu
+  agenda ni «Mi Usuario»: si lo vuelves a instalar, está todo
+  como lo dejaste.
+• Nuevo en Administración: «Borrado completo y reinicio limpio».
+  Pide escribir BORRAR para confirmar y el Organizador se vuelve
+  a abrir vacío, como la primera vez. Sin buscar carpetas a mano.
+• Si quieres conservar algo, usa antes «Exportar» (Configuración
+  y Agenda).
 
 ================================================================
 La idea y el desarrollo de la aplicación Organizador Princess son de

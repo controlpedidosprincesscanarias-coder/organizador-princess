@@ -5,7 +5,7 @@
 ; ================================================================
 
 #define MyAppName    "Organizador Princess"
-#define MyAppVersion "4.18.60"
+#define MyAppVersion "4.18.62"
 #define MyAppExe     "OrganizadorPrincess.exe"
 #define MyAppID      "OrganizadorPrincess"
 #define MyAssets     SourcePath + "assets"
@@ -155,7 +155,8 @@ Filename: "{cmd}"; \
 ; ----------------------------------------------------------------
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}"
-Type: filesandordirs; Name: "{userappdata}\{#MyAppID}"
+; (v4.18.62, decisión de Víctor) Ya NO se borra {userappdata}\{#MyAppID} (configuración, agenda, «Mi Usuario»…):
+; una reinstalación los conserva. Para empezar de cero: Administración → «Borrado completo y reinicio limpio».
 
 ; ----------------------------------------------------------------
 ;  Limpieza de __pycache__ antes de empaquetar

@@ -63,6 +63,18 @@ asegurar_instancia_unica()
 
 import atexit
 atexit.register(liberar_instancia_actual)  # red de seguridad para salidas no contempladas
+
+# ── (v4.18.62) BORRADO COMPLETO Y REINICIO LIMPIO ─────────────────────────────
+# Si en Administración se pidió «Borrado completo y reinicio limpio», la copia anterior dejó una marca y se
+# cerró (la ha cerrado también asegurar_instancia_unica). Se borra aquí, ANTES de cargar la configuración y la
+# agenda (más abajo), para que nada vuelva a guardar los datos antiguos. Ver services/reinicio_limpio.py.
+from services import reinicio_limpio as _reinicio_limpio
+_REINICIO_LIMPIO = None
+if _reinicio_limpio.hay_pendiente():
+    try:
+        _REINICIO_LIMPIO = _reinicio_limpio.aplicar()
+    except Exception as _e_rl:  # nunca impedir el arranque por esto
+        _REINICIO_LIMPIO = ([], [str(_e_rl)])
 # ─────────────────────────────────────────────────────────────────────────────
 
 
@@ -90,7 +102,7 @@ NOMBRE_USUARIO_ACTUAL = get_nombre_usuario()
 
 GOLD  = "#C9A84C"
 LIGHT = "#D8E8F0"
-APP_VERSION  = "v4.18.60"   # ← actualizar en cada release (debe coincidir con el tag del release en GitHub)
+APP_VERSION  = "v4.18.62"   # ← actualizar en cada release (debe coincidir con el tag del release en GitHub)
 GITHUB_REPO  = "controlpedidosprincesscanarias-coder/organizador-princess"  # repo de releases
 _update_mod.APP_VERSION = APP_VERSION  # propagar a services/update_service.py
 _update_mod.GITHUB_REPO = GITHUB_REPO
@@ -1244,5 +1256,18 @@ def _vigilar_cierre_automatico():
 # Mostrar la ventana ahora que todo está construido — evita el flash blanco
 app.update_idletasks()
 app.deiconify()
+
+# (v4.18.62) Aviso tras un «Borrado completo y reinicio limpio» (ver arriba, junto a la instancia única)
+if _REINICIO_LIMPIO is not None:
+    def _avisar_reinicio_limpio(_r=_REINICIO_LIMPIO):
+        _texto = ("El Organizador se ha reiniciado en limpio: se han borrado la configuración, la agenda, "
+                  "«Mi Usuario» y las copias de seguridad de este equipo.\n\n"
+                  "Configúralo de nuevo como la primera vez (Administración) y vuelve a iniciar sesión en "
+                  "Control de Pedidos.")
+        if _r[1]:
+            _texto += ("\n\nNo se pudo borrar (estaba en uso): " + ", ".join(_r[1][:5]) +
+                       ". No afecta al funcionamiento.")
+        messagebox.showinfo("Reinicio limpio", _texto)
+    app.after(1500, _avisar_reinicio_limpio)
 
 app.mainloop()

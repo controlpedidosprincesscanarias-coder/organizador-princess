@@ -878,6 +878,55 @@ def abrir_admin(ctx):
             command=lambda: importar_config(ctx, parent_win=win),
         ).pack(side="left", padx=(0, 20))
 
+        # (v4.18.62) Borrado completo y reinicio limpio, a la derecha
+        def _reinicio_limpio():
+            """Borra todos los datos del Organizador en este equipo y lo vuelve a abrir (services/reinicio_limpio.py).
+            Desde esta versión el desinstalador ya no los borra: este es el modo de empezar de cero."""
+            from tkinter import messagebox as _mb, simpledialog as _sd
+            ok = _mb.askyesno(
+                "Borrado completo y reinicio limpio",
+                "Se borrarán TODOS los datos del Organizador en este equipo:\n\n"
+                "  •  la configuración de botones, accesos rápidos y vista\n"
+                "  •  la agenda, los avisos, las vacaciones y los festivos\n"
+                "  •  «Mi Usuario» y el acceso guardado a Control de Pedidos\n"
+                "  •  las copias de seguridad guardadas en la carpeta del Organizador\n\n"
+                "El Organizador se cerrará y se volverá a abrir vacío, como la primera vez.\n"
+                "Si quieres conservar algo, usa antes «Exportar» (Configuración y Agenda).\n\n"
+                "¿Continuar?",
+                icon="warning", parent=win)
+            if not ok:
+                return
+            texto = _sd.askstring("Confirmar borrado completo",
+                                  "Escribe BORRAR para confirmar:", parent=win)
+            if (texto or "").strip().upper() != "BORRAR":
+                _mb.showinfo("Borrado completo", "No se ha borrado nada.", parent=win)
+                return
+            import logging as _logging
+            import subprocess as _sp
+            import sys as _sys
+            from services import reinicio_limpio as _rl, portatil as _pt
+            try:
+                _rl.programar()
+                orden = _rl.orden_relanzar()
+                flags = 0
+                if _sys.platform.startswith("win"):
+                    flags = getattr(_sp, "DETACHED_PROCESS", 0) | getattr(_sp, "CREATE_NEW_PROCESS_GROUP", 0)
+                _sp.Popen(orden, cwd=os.path.dirname(os.path.abspath(orden[-1])), close_fds=True,
+                          creationflags=flags, env=_pt.entorno_limpio())
+            except Exception as e:  # noqa: BLE001
+                _mb.showerror("Borrado completo", f"No se pudo reiniciar el Organizador: {e}\n\n"
+                              "Ciérralo y vuelve a abrirlo: el borrado se hará al arrancar.", parent=win)
+                return
+            _logging.shutdown()
+            os._exit(0)          # la copia nueva borra los datos al arrancar (antes de cargar nada)
+
+        ttk.Button(
+            port_frame,
+            text="♻  Borrado completo y reinicio limpio",
+            bootstyle="danger-outline",
+            command=_reinicio_limpio,
+        ).pack(side="right")
+
         # Grupo Agenda
         ttk.Label(port_frame,
                   text="📅  Agenda:",

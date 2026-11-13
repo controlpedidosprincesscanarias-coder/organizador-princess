@@ -51,6 +51,18 @@
 
 ---
 
+## 2026-11-13 18:40 — [Chat] Conexiones cortadas por la base (v1.7.1)
+
+**Causa:** el log de Render, nada más desplegar la v1.7.0, decía «No se pudo comprobar si el usuario 6 sigue activo: connection already closed». El pool entregaba conexiones que Supabase había cortado por llevar rato sin usarse. En la base de usuarios se dejaba pasar sin comprobar (y no se habría detectado a un usuario desactivado o eliminado); en la del chat, la petición acababa en error 500.
+
+**Cambios** (`chat/db.py`):
+- El pool descarta las conexiones cerradas y comprueba con «SELECT 1» las que llevan más de 30 s sin usarse.
+- Las consultas de la tabla de usuarios se repiten una vez con otra conexión si la suya se corta.
+
+**Probado:** `tests/test_chat.py`, 133 comprobaciones; la sección 14 corta todas las conexiones del servicio y comprueba que se sigue detectando al desactivado y que el chat responde. Antes del arreglo, esa sección fallaba con un error 500.
+
+---
+
 ## 2026-11-13 16:47 — [Organizador] Vaciar y eliminar chats sincronizados con el móvil, y aviso de usuario desactivado o que ya no existe (v4.18.64)
 
 **Petición de Víctor:** que el Organizador tenga también «Vaciar chat» y «Eliminar chat», sincronizados con la app del móvil (hasta ahora «Limpiar chat» solo dejaba de mostrar los mensajes en ese PC).

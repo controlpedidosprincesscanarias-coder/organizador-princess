@@ -21,12 +21,12 @@ from datetime import datetime
 from tkinter import messagebox, filedialog
 
 from services.chat_client import get_chat_client, cuenta_chat_configurada, nombre_adjunto_seguro, es_canal_avisos, EVT_CONECTADO, EVT_DESCONECTADO, \
-    EVT_NUEVO_MENSAJE, EVT_ERROR, EVT_AVATAR, EVT_ELIMINADO, EVT_GRUPO
+    EVT_NUEVO_MENSAJE, EVT_ERROR, EVT_AVATAR, EVT_ELIMINADO, EVT_GRUPO, EVT_OCULTA, DESTINO_DESACTIVADO, DESTINO_NO_EXISTE
 from ui import avatares, miniaturas, acciones_chat, grupo_info
 from ui.chat_bubbles import BubbleList, fecha_hora_local
 from ui.emoticonos import abrir_panel, imagen as imagen_emoticono
 from ui.chat_movil import abrir_chat_movil
-from db.sqlite import set_chat_limpiado, filtrar_mensajes_limpiados
+from db.sqlite import filtrar_mensajes_limpiados
 
 _VENTANA_ACTUAL = None  # evita abrir dos veces (instancia única de la ventana)
 _CANAL_VISIBLE  = None  # canal_id que se está viendo AHORA en la ventana (o None si está cerrada)
@@ -153,6 +153,10 @@ def _ventana_chat(ctx):
     lbl_titulo_chat = ttk.Label(frm_titulo_chat, text="General",
                                  font=("-size", 11, "-weight", "bold"))
     lbl_titulo_chat.pack(side="left", anchor="w")
+    # (v4.18.64) En un chat privado, si la otra persona está desactivada o ya no existe en Control Pedidos
+    lbl_estado_otro = ttk.Label(frm_titulo_chat, text="", foreground="#C0392B")
+    lbl_estado_otro.pack(side="left", anchor="w", padx=(8, 0))
+    _estado_por_canal = {}      # canal_id → "activo" | "desactivado" | "no_existe" (de obtener_canales)
 
     def _abrir_info_grupo(_e=None):
         """(v4.18.48) Pulsar la foto o el nombre de un grupo: sus integrantes y, si lo gestionas, añadir,
@@ -192,31 +196,73 @@ def _ventana_chat(ctx):
         for _w in (lbl_foto_chat, lbl_titulo_chat):
             _w.configure(cursor="hand2" if es_grupo else "")
 
-    def _limpiar_chat():
-        # (2026-08-01) A petición del usuario: ahora la limpieza SÍ persiste
-        # — se guarda una marca de tiempo local (por canal, por equipo) y
-        # _cargar_historial() la usa para no volver a mostrar nada anterior
-        # a esa marca, ni siquiera al reabrir el chat o la app. Sigue sin
-        # borrar nada del servidor (los demás participantes del canal no se
-        # ven afectados), y si el mismo usuario entra desde otro PC seguirá
-        # viendo el histórico completo ahí hasta que también limpie en ese
-        # equipo — ver filtrar_mensajes_limpiados() en db/sqlite.py.
+    def _vaciar_chat():
+        # (v4.18.64, petición de Víctor) Vaciar en el servidor, solo para mí y en todos mis dispositivos (Organizador
+        # y móvil, chat v1.7.0). Antes «Limpiar chat» solo dejaba de mostrar los mensajes en este equipo; esas marcas
+        # antiguas se siguen respetando (filtrar_mensajes_limpiados en _cargar_historial).
+        cid = canal_actual["id"]
         if not messagebox.askyesno(
-                "Limpiar chat",
-                "¿Vaciar el historial de esta conversación en este equipo?\n\n"
-                "Dejarás de ver los mensajes anteriores a ahora mismo, incluso "
-                "si sales del chat y vuelves a entrar. No se borra nada del "
-                "servidor — los demás participantes siguen viendo el "
-                "historial completo, y si tú entras desde otro equipo también "
-                "lo seguirás viendo ahí.",
+                "Vaciar chat",
+                "¿Vaciar esta conversación?\n\n"
+                "Dejarás de ver los mensajes que hay ahora, aquí y en la app del móvil. "
+                "Los demás participantes siguen viendo los suyos.",
                 parent=win):
             return
-        set_chat_limpiado(canal_actual["id"], datetime.utcnow().isoformat() + "Z")
-        msgs.limpiar()
-        _ids_pintados.clear()
 
-    ttk.Button(frm_titulo_chat, text="🧹 Limpiar chat", bootstyle="info-outline",
-               command=lambda: _limpiar_chat()).pack(side="right")
+        def _hilo():
+            r = cliente.vaciar_chat(cid)
+            win.after(0, lambda: _tras_ocultar(r, cid, eliminada=False))
+        threading.Thread(target=_hilo, daemon=True, name="Chat-Vaciar").start()
+
+    def _eliminar_chat(preguntar=True):
+        """(v4.18.64) Eliminar un chat privado solo para mí: sale de la lista y solo vuelve si la otra persona
+        escribe (chat v1.7.0)."""
+        cid = canal_actual["id"]
+        if not str(cid).startswith("dm:"):
+            return
+        if preguntar and not messagebox.askyesno(
+                "Eliminar chat",
+                f"¿Eliminar el chat con {lbl_titulo_chat.cget('text')}?\n\n"
+                "Desaparecerá de tu lista, aquí y en la app del móvil, con todos sus mensajes. "
+                "Solo volverá a salir si esa persona te escribe.",
+                parent=win):
+            return
+
+        def _hilo():
+            r = cliente.eliminar_chat(cid)
+            win.after(0, lambda: _tras_ocultar(r, cid, eliminada=True))
+        threading.Thread(target=_hilo, daemon=True, name="Chat-Eliminar").start()
+
+    def _tras_ocultar(r, cid, eliminada):
+        if not win.winfo_exists():
+            return
+        if not r.get("ok"):
+            messagebox.showerror("Chat", r.get("error") or "No se pudo completar.", parent=win)
+            return
+        _aplicar_oculta(cid, eliminada)
+
+    def _aplicar_oculta(cid, eliminada):
+        """Lo vacío o eliminado (aquí o en otro dispositivo, evento conversacion_oculta)."""
+        if cid == canal_actual["id"]:
+            if eliminada:
+                _cambiar_canal("general", None, "General")
+                return
+            msgs.limpiar()
+            _ids_pintados.clear()
+        _refrescar_lista_canales()
+
+    # Menú ⋮ de la conversación, como en la app del móvil («Eliminar chat» solo en los privados)
+    btn_menu_chat = ttk.Menubutton(frm_titulo_chat, text="⋮", bootstyle="info-outline")
+    menu_chat = tk.Menu(btn_menu_chat, tearoff=0)
+    btn_menu_chat.configure(menu=menu_chat)
+
+    def _preparar_menu_chat():
+        menu_chat.delete(0, "end")
+        menu_chat.add_command(label="🧹 Vaciar chat", command=lambda: _vaciar_chat())
+        if str(canal_actual["id"]).startswith("dm:"):
+            menu_chat.add_command(label="🗑 Eliminar chat", command=lambda: _eliminar_chat())
+    menu_chat.configure(postcommand=_preparar_menu_chat)
+    btn_menu_chat.pack(side="right")
 
     # (v4.18.28) Fotos de perfil: la tuya y la del grupo abierto
     def _elegir_imagen(titulo):
@@ -568,6 +614,7 @@ def _ventana_chat(ctx):
         _CANAL_VISIBLE = canal_id
         lbl_titulo_chat.configure(text=titulo or otro_usuario or "General")
         _pintar_foto_cabecera()
+        _pintar_estado_otro()
         # (v4.18.50) En la conversación de avisos de Control Pedidos no se escribe
         if es_canal_avisos(canal_id):
             _cancelar_respuesta()
@@ -578,6 +625,13 @@ def _ventana_chat(ctx):
             frm_envio.pack(side="bottom", fill="x", pady=(6, 0), before=msgs)
         _cargar_historial(canal_id, otro_usuario)
         _refrescar_lista_canales()
+
+    _TEXTO_ESTADO = {"desactivado": "⏸ Temporalmente desactivado", "no_existe": "⛔ Ya no existe"}
+
+    def _pintar_estado_otro():
+        """(v4.18.64) Junto al nombre: si la otra persona del chat privado está desactivada o ya no existe."""
+        cid = str(canal_actual["id"])
+        lbl_estado_otro.configure(text=_TEXTO_ESTADO.get(_estado_por_canal.get(cid), ""))
 
     def _refrescar_lista_canales():
         def _fetch():
@@ -606,6 +660,13 @@ def _ventana_chat(ctx):
                                               _TAM_FOTO_LISTA, clave=otro, al_cargar=_repintar_lista)
                     no_leidos = c.get("no_leidos", 0)
                     etiqueta = f"  {nombre}"
+                    estado_otro = c.get("otro_estado")      # (v4.18.64) chat v1.7.0
+                    if estado_otro:
+                        _estado_por_canal[c["canal_id"]] = estado_otro
+                    if estado_otro == "desactivado":
+                        etiqueta += "  ⏸"
+                    elif estado_otro == "no_existe":
+                        etiqueta += "  ⛔"
                     if no_leidos:
                         etiqueta += f"  ({no_leidos})"
                     _imagenes_lista.append(img)
@@ -615,6 +676,7 @@ def _ventana_chat(ctx):
                         lista.selection_set(iid)
                 _pintando["si"] = False
                 _ajustar_ancho_sidebar()
+                _pintar_estado_otro()
             win.after(0, _pintar)
         threading.Thread(target=_fetch, daemon=True).start()
 
@@ -695,11 +757,50 @@ def _ventana_chat(ctx):
             if (ev.get("mensaje") or {}).get("canal_id") == canal_actual["id"]:
                 _recargar()
             _refrescar_lista_canales()
+        elif tipo == EVT_OCULTA:
+            # (v4.18.64) Vacié o eliminé un chat (aquí o en el móvil)
+            c = ev.get("conversacion") or {}
+            if c.get("canal_id"):
+                _aplicar_oculta(c["canal_id"], bool(c.get("eliminada")))
+        elif tipo == EVT_ERROR and ev.get("codigo") in (DESTINO_DESACTIVADO, DESTINO_NO_EXISTE):
+            _destino_no_disponible(ev)
         elif tipo == EVT_ERROR:
             lbl_estado.configure(text="🔴 Error de conexión", bootstyle="danger")
         elif tipo == EVT_AVATAR:
             _pintar_foto_cabecera()
             _refrescar_lista_canales()
+
+    def _destino_no_disponible(ev):
+        """(v4.18.64, petición de Víctor) El mensaje no se ha enviado porque la otra persona está desactivada o
+        ya no existe en Control Pedidos: se quita la burbuja pintada de antemano, se devuelve el texto a la caja y
+        se avisa; si ya no existe, se ofrece eliminar el chat."""
+        cid = canal_actual["id"]
+        if ev.get("canal_id") and ev.get("canal_id") != cid:
+            return
+        for p in reversed(_pendientes_propios):
+            if p.get("canal_id") == cid:
+                _pendientes_propios.remove(p)
+                if not entry_msg.get().strip():
+                    entry_msg.insert(0, p.get("contenido") or "")
+                break
+        es_privado = str(cid).startswith("dm:")
+        if es_privado:          # (el estado solo tiene sentido en un chat privado)
+            _recargar()
+            _estado_por_canal[cid] = "desactivado" if ev.get("codigo") == DESTINO_DESACTIVADO else "no_existe"
+            _pintar_estado_otro()
+            _refrescar_lista_canales()
+        if ev.get("codigo") == DESTINO_DESACTIVADO:
+            messagebox.showinfo("Usuario temporalmente desactivado", ev.get("mensaje") or
+                                "Este usuario está temporalmente desactivado. El mensaje no se ha enviado.",
+                                parent=win)
+        elif es_privado and messagebox.askyesno("Este usuario ya no existe",
+                                 (ev.get("mensaje") or "Este usuario ya no existe en Control Pedidos.")
+                                 + "\n\n¿Eliminar ahora el chat con este usuario?", parent=win):
+            entry_msg.delete(0, "end")
+            _eliminar_chat(preguntar=False)
+        elif not es_privado:
+            messagebox.showinfo("Este usuario ya no existe", ev.get("mensaje") or
+                                "Este usuario ya no existe en Control Pedidos.", parent=win)
 
     _HANDLER = _manejar_evento
     # Si el chat ya estaba conectado en segundo plano (arranque del

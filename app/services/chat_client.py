@@ -147,6 +147,11 @@ EVT_ERROR          = "error"
 EVT_AVATAR         = "avatar_cambiado"   # (v4.18.28) foto de perfil de una persona o grupo
 EVT_ELIMINADO      = "mensaje_eliminado"  # (v4.18.46) un mensaje se eliminó (chat v1.4.0)
 EVT_GRUPO          = "grupo_cambiado"     # (v4.18.48) un grupo cambió o se eliminó (chat v1.5.0)
+EVT_OCULTA         = "conversacion_oculta"  # (v4.18.64) vacié o eliminé un chat aquí o en otro dispositivo (chat v1.7.0)
+
+# (v4.18.64) Códigos de error al escribir a alguien que ya no puede recibir mensajes (chat v1.7.0)
+DESTINO_DESACTIVADO = "usuario_desactivado"
+DESTINO_NO_EXISTE   = "usuario_no_existe"
 
 # (v4.18.50, chat v1.6.0) Cuenta de los avisos de Control de Pedidos (antes por Telegram). Cada persona los
 # recibe en su conversación privada con ella, en la que no se puede escribir.
@@ -215,6 +220,7 @@ class ChatClient:
         self._sio.on("avatar_cambiado", self._on_avatar_cambiado)
         self._sio.on("mensaje_eliminado", self._on_mensaje_eliminado)
         self._sio.on("grupo_cambiado", self._on_grupo_cambiado)
+        self._sio.on("conversacion_oculta", self._on_conversacion_oculta)
 
     # ── Login (idéntico en espíritu a _Session.login() del bridge) ──────────
 
@@ -346,7 +352,20 @@ class ChatClient:
             # Sin socket vivo (p.ej. justo tras un cold-start de Render):
             # se manda igual por REST, que es la misma ruta que usa el
             # frontend web y nunca depende de que el WebSocket esté arriba.
-            self._post_rest("/api/chat/mensajes", payload)
+            resp = self._post_rest("/api/chat/mensajes", payload)
+            # (v4.18.64) Por REST el error llega en la respuesta: se pasa a la UI igual que por socket
+            if resp.get("error"):
+                self._on_error_chat({**resp, "canal_id": canal_id})
+
+    def vaciar_chat(self, canal_id: str) -> dict:
+        """(v4.18.64) Vacía la conversación solo para mí, en todos mis dispositivos (chat v1.7.0).
+        {"ok": True, ...} o {"error": "..."}."""
+        return self._post_rest(f"/api/chat/canales/{canal_id}/vaciar", {}) or {"error": "Sin respuesta del chat"}
+
+    def eliminar_chat(self, canal_id: str) -> dict:
+        """(v4.18.64) Elimina un chat privado solo para mí (chat v1.7.0): desaparece de la lista y solo vuelve
+        si la otra persona escribe. {"ok": True, ...} o {"error": "..."}."""
+        return self._post_rest(f"/api/chat/canales/{canal_id}/eliminar", {}) or {"error": "Sin respuesta del chat"}
 
     def eliminar_mensaje(self, mensaje_id: int) -> dict:
         """(v4.18.46) Elimina un mensaje propio (chat v1.4.0). {"ok": True, ...} o {"error": "..."}."""
@@ -693,7 +712,14 @@ class ChatClient:
         self.eventos.put({"tipo": EVT_NUEVO_MENSAJE, "mensaje": data})
 
     def _on_error_chat(self, data):
-        self.eventos.put({"tipo": EVT_ERROR, "mensaje": data.get("error", "Error de chat")})
+        data = data if isinstance(data, dict) else {}
+        # (v4.18.64) «codigo» (usuario_desactivado / usuario_no_existe), «usuario» y «canal_id» desde el chat v1.7.0
+        self.eventos.put({"tipo": EVT_ERROR, "mensaje": data.get("error", "Error de chat"),
+                          "codigo": data.get("codigo"), "usuario": data.get("usuario"),
+                          "canal_id": data.get("canal_id")})
+
+    def _on_conversacion_oculta(self, data):
+        self.eventos.put({"tipo": EVT_OCULTA, "conversacion": data or {}})
 
     def _on_grupo_cambiado(self, data):
         self.eventos.put({"tipo": EVT_GRUPO, "grupo": data or {}})

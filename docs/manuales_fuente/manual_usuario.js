@@ -1,7 +1,7 @@
 // Manual de usuario del Organizador Princess. Idea y desarrollo de la aplicación: Víctor Alejandro Martín Andrade.
 const L = require("./lib");
 const { p, vineta, pasos, h1, h2, imagen, leyenda, recuadro, tabla, portada, indice } = L;
-const V = process.env.VERSION || "v4.18.62";
+const V = process.env.VERSION || "v4.18.64";
 
 const s = [];
 s.push(portada({ rol: "Uso diario", subtitulo: "Abre tus accesos, apunta avisos, consulta el calendario y chatea con tus compañeros",
@@ -28,7 +28,7 @@ for (const t of ["Abrir con un clic **carpetas de red, páginas web, programas y
 s.push(h2("Qué no se hace aquí"));
 for (const t of ["Cambiar los botones, su orden o la vista del menú: se hace en el panel **Admin** (Manual de administrador).",
   "Ver la agenda de otro compañero: cada agenda es local de su PC.",
-  "Borrar mensajes del chat para los demás: «Limpiar chat» solo oculta el historial en tu equipo.",
+  "Borrar mensajes del chat para los demás: «Vaciar chat» y «Eliminar chat» solo los quitan para ti (en el PC y en el móvil).",
   "Usarlo en el móvil o en un Mac: el Organizador es una aplicación de Windows. En un PC donde no se pueden instalar programas, usa la **versión portátil** (capítulo 10)."]) s.push(vineta(t));
 s.push(...recuadro("nota", "Si algo no cuadra", ["Si un botón no abre lo que debería, la ruta puede estar mal o no tienes acceso a esa carpeta: avisa a quien administra el Organizador de tu equipo (capítulo 9)."]));
 
@@ -139,7 +139,7 @@ s.push(p("El **Chat** te conecta con los compañeros que tienen cuenta en Contro
 s.push(...imagen("u_chat", 16, "Ventana del chat (datos de ejemplo)."));
 s.push(...leyenda([[1, "**Estado** de la conexión: «Conectado» en verde cuando todo va bien."],
   [2, "**Conversaciones**: el canal General, los chats privados y los grupos, cada uno con su foto (o sus iniciales sobre un círculo de color si no tiene). El número entre paréntesis son los mensajes sin leer."],
-  [3, "**Nueva conversación**."], [4, "**Limpiar chat**: oculta el historial de esa conversación en tu equipo (no se borra para los demás)."],
+  [3, "**Nueva conversación**."], [4, "**⋮** Menú de la conversación: **🧹 Vaciar chat** y, en los chats privados, **🗑 Eliminar chat** (siguiente apartado)."],
   [5, "**Mensajes**: los tuyos, a la derecha en verde; los de los demás, a la izquierda. Cada burbuja lleva la fecha y la hora. Una respuesta lleva arriba el mensaje citado. Un adjunto se abre haciendo clic en él; las imágenes se ven en miniatura."],
   [6, "Escribe aquí y pulsa **Intro** o **Enviar**."], [7, "😊 **Emoticonos** y respuestas rápidas (siguiente imagen)."],
   [8, "📎 **Adjuntar** una imagen o un documento."], [9, "**Enviar**."],
@@ -153,6 +153,14 @@ s.push(...tabla(["Quiero…", "Cómo"], [
   ["Ver una imagen", "Pulsa su miniatura."],
   ["Guardar un adjunto", "Clic derecho sobre él → «Abrir», «Guardar como…» o «Copiar nombre del archivo»."]], [2600, 7038]));
 s.push(p("Todo esto funciona igual en la ventana grande y en la burbuja flotante."));
+s.push(h2("Vaciar o eliminar un chat"));
+s.push(...tabla(["Quiero…", "Cómo"], [
+  ["Vaciar una conversación", "**⋮ → 🧹 Vaciar chat**. Desaparecen los mensajes que hay ahora, **solo para ti**, en el PC y en la app del móvil. Los demás siguen viendo los suyos."],
+  ["Eliminar un chat privado", "**⋮ → Eliminar chat**. La conversación sale de tu lista (en el PC y en el móvil) con sus mensajes. Solo vuelve a aparecer si esa persona te escribe de nuevo."]], [2600, 7038]));
+s.push(p("Ambas opciones piden confirmación. En un grupo no se puede eliminar el chat: para dejarlo, sal del grupo (apartado «Integrantes de un grupo»)."));
+s.push(h2("Compañeros desactivados o que ya no existen"));
+s.push(p("Si un compañero está **desactivado** en Control de Pedidos, junto a su nombre se ve **⏸ Temporalmente desactivado**. Si le escribes, el mensaje no se envía: te avisa y el texto vuelve a la caja de escribir."));
+s.push(p("Si se ha **eliminado** su usuario, se ve **⛔ Ya no existe**. Al escribirle te lo dice y te ofrece **eliminar el chat** directamente."));
 s.push(h2("Avisos de Control Pedidos"));
 s.push(...imagen("u_chat_avisos", 14, "Conversación «Control Pedidos» (avisos de ejemplo)."));
 s.push(...leyenda([[1, "**Control Pedidos** aparece en tu lista de conversaciones. Ahí te llegan **tus** avisos (pedidos sin entregar, cambios de estado, techo de gastos…), que suenan y avisan como cualquier mensaje."],

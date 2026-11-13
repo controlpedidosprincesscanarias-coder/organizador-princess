@@ -1,3 +1,13 @@
+# ✨ Organizador Princess v4.18.64
+
+## 💬 Vaciar y eliminar chats, igual que en el móvil
+
+- En el menú **⋮** de la conversación (arriba a la derecha), **«🧹 Vaciar chat»** vacía la conversación para ti, aquí y en la app del móvil. Los demás participantes siguen viendo sus mensajes. Antes «Limpiar chat» solo la vaciaba en este equipo.
+- **«🗑 Eliminar chat»** (solo en los chats privados) la quita de tu lista, aquí y en el móvil, con todos sus mensajes. Solo vuelve a salir si esa persona te escribe de nuevo.
+- **Si escribes a alguien que está desactivado en Control Pedidos**, se te avisa de que está temporalmente desactivado: el mensaje no se envía y vuelve a la caja de escribir.
+- **Si esa persona ya no existe**, se te dice y se te ofrece eliminar el chat directamente. En la lista de conversaciones y junto al nombre se ve ⏸ (desactivado) o ⛔ (ya no existe).
+- Funciona igual en la ventana del chat y en las burbujas. Necesita el servidor del chat v1.7.0.
+
 # ✨ Organizador Princess v4.18.62
 
 ## ♻️ Desinstalar ya no borra tus datos, y hay un «reinicio limpio»

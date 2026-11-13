@@ -1,25 +1,23 @@
-✨ Organizador Princess v4.18.62
+✨ Organizador Princess v4.18.64
 ================================================================
 
-♻️ DESINSTALAR YA NO BORRA TUS DATOS, Y HAY UN «REINICIO LIMPIO»
+💬 VACIAR Y ELIMINAR CHATS, IGUAL QUE EN EL MÓVIL
 
-• Desinstalar el Organizador ya no borra tu configuración, tu
-  agenda ni «Mi Usuario»: si lo vuelves a instalar, está todo
-  como lo dejaste.
-• Nuevo en Administración: «Borrado completo y reinicio limpio».
-  Pide escribir BORRAR para confirmar y el Organizador se vuelve
-  a abrir vacío, como la primera vez. Sin buscar carpetas a mano.
-• Si quieres conservar algo, usa antes «Exportar» (Configuración
-  y Agenda).
+• En el menú ⋮ de la conversación (arriba a la derecha):
+  «🧹 Vaciar chat» deja la conversación vacía para ti, aquí y en
+  la app del móvil. Los demás siguen viendo sus mensajes.
+  (Antes «Limpiar chat» solo la vaciaba en este equipo.)
+• «🗑 Eliminar chat» (en los chats privados) la quita de tu
+  lista, aquí y en el móvil. Solo vuelve a salir si esa persona
+  te escribe de nuevo.
+• Si escribes a alguien que está desactivado en Control Pedidos,
+  el Organizador te avisa de que está temporalmente desactivado
+  y el mensaje no se envía (vuelve a la caja de escribir).
+• Si esa persona ya no existe, te lo dice y te ofrece eliminar el
+  chat directamente. En la lista se ve ⏸ (desactivado) o ⛔ (ya
+  no existe) junto a su nombre.
 
 ================================================================
 La idea y el desarrollo de la aplicación Organizador Princess son de
 Víctor Alejandro Martín Andrade, para el Departamento de Central de
 Compras de Princess Hotels en Canarias.
-
-📖 MANUALES AL DÍA
-
-• Los manuales de usuario y de administrador recogen todo lo
-  nuevo: versión portátil, avisos de Control Pedidos en el chat,
-  responder y reenviar, grupos, novedades de cada versión y el
-  reinicio limpio.

@@ -80,5 +80,10 @@ agenda = {
     ],
 }
 save_agenda(agenda)
+# (v4.18.56) Con una versión anterior guardada sale «Nueva versión detectada» (sin ella, la primera vez no pregunta)
+import json  # noqa: E402
+from db.sqlite import VERSION_FILE  # noqa: E402
+with open(VERSION_FILE, "w", encoding="utf-8") as f:
+    json.dump({"version": "v4.18.60"}, f)
 update_nombre_usuario_db(os.environ.get("USERNAME", "compras.demo").lower(), "Ana Demo")
 print("perfil de demostración listo en", os.environ["APPDATA"])

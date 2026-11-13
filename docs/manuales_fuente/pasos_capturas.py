@@ -476,14 +476,99 @@ def burbuja_ver(c):
         c.cerrar(v)
 
 
+# ── 6b. Chat: avisos de Control Pedidos (v4.18.50) e integrantes de un grupo (v4.18.48) ──
+def _elegir_conversacion(c, v, texto):
+    lb = de_clase(c, v, "Treeview")
+    for iid in lb.get_children():
+        if texto in iid or texto.lower() in str(lb.item(iid, "text")).lower():
+            lb.selection_set(iid); lb.see(iid)
+            return True
+    log(f"   ⚠ sin conversación «{texto}»")
+    return False
+
+
+def chat_avisos(c):
+    cerrar_todo(c)
+    guardar_ventanas()
+    c.pulsar(c.app, "Chat")
+
+
+def chat_avisos_elegir(c):
+    v = [w for w in nuevas(c, ESTADO["antes"]) if any(x.winfo_class() == "Treeview" for x in c.widgets(w))]
+    ESTADO["chat"] = v[-1] if v else None
+    if v:
+        _elegir_conversacion(c, v[-1], "Control Pedidos")
+
+
+def chat_avisos_ver(c):
+    v = ESTADO.get("chat")
+    foto(c, v, "u_chat_avisos", [(de_clase(c, v, "Treeview"), 1, "ir"), (buscar(c, v, "Aquí llegan los avisos"), 2, "t")] if v else [])
+    if v:
+        _elegir_conversacion(c, v, "Compras Canarias")
+
+
+def grupo_info(c):
+    v = ESTADO.get("chat")
+    guardar_ventanas()
+    import ui.grupo_info as gi
+    gi.abrir(v or c.app, c.g["get_chat_client"](), "grp:demo")
+
+
+def grupo_info_ver(c):
+    n = nuevas(c, ESTADO["antes"])
+    g = n[-1] if n else None
+    foto(c, g, "u_grupo_info", [(de_clase(c, g, "Treeview"), 1, "ir"), (buscar(c, g, "Añadir"), 2, "t"),
+                                (buscar(c, g, "Renombrar"), 3, "t"), (buscar(c, g, "Salir del grupo"), 4, "ir")] if g else [])
+    for w in n:
+        c.cerrar(w)
+    c.cerrar(ESTADO.get("chat"))
+
+
+# ── 6c. Notas de la versión (v4.18.44) y copia portátil (v4.18.54) ──────────
+def notas_version(c):
+    cerrar_todo(c)
+    guardar_ventanas()
+    import ui.notas_version as nv
+    nv.abrir(c.app, c.g["APP_VERSION"])
+
+
+def notas_version_ver(c):
+    n = nuevas(c, ESTADO["antes"])
+    v = n[-1] if n else None
+    foto(c, v, "u_notas_version", [(buscar(c, v, "todas"), 1, "t")] if v else [])
+    for w in n:
+        c.cerrar(w)
+
+
+def portatil(c):
+    cerrar_todo(c)
+    guardar_ventanas()
+    import ui.primer_arranque_portatil as pa
+    pa._ventana_primera_vez(c.app, r"C:\Users\ana.demo\Downloads\OrganizadorPrincess.exe",
+                            os.path.join(os.environ["APPDATA"], "OrganizadorPrincess", "portatil_demo.json"), lambda: None)
+
+
+def portatil_ver(c):
+    n = nuevas(c, ESTADO["antes"])
+    v = n[-1] if n else None
+    if v:
+        for e in c.entradas(v):
+            c.escribir(e, r"C:\Users\ana.demo\Documents\Organizador Princess")
+    cajas = [w for w in c.widgets(v) if w.winfo_class() == "TCheckbutton"] if v else []
+    foto(c, v, "u_portatil", [(c.entradas(v)[0] if v and c.entradas(v) else None, 1, "ir"), (buscar(c, v, "Cambiar"), 2, "r"),
+                              (caja_de(c, v, cajas) if cajas else None, 3, "r"), (buscar(c, v, "Guardar aquí", "TButton"), 4, "t")] if v else [])
+    for w in n:
+        c.cerrar(w)
+
+
 # ── 7. Actualización disponible (GitHub simulado) ───────────────────────────
 def actualizacion(c):
     import json, urllib.request
     um = sys.modules["services.update_service"]
-    falso = {"tag_name": "v4.18.28", "name": "Organizador Princess v4.18.28",
-             "body": "# ✨ Organizador Princess v4.18.28\n\n## 🛠 Mejoras\n\n- Mejoras en la agenda y el calendario.\n- Correcciones menores.",
-             "assets": [{"name": "OrganizadorPrincess_Setup_4.18.28.exe", "size": 34_400_000, "browser_download_url": "https://example.invalid/x.exe"},
-                        {"name": "OrganizadorPrincess_Setup_4.18.28.exe.sha256", "size": 90, "browser_download_url": "https://example.invalid/x.sha256"}]}
+    falso = {"tag_name": "v4.18.64", "name": "Organizador Princess v4.18.64",
+             "body": "# ✨ Organizador Princess v4.18.64\n\n## 🛠 Mejoras\n\n- Mejoras en la agenda y el calendario.\n- Correcciones menores.",
+             "assets": [{"name": "OrganizadorPrincess_Setup_4.18.64.exe", "size": 34_400_000, "browser_download_url": "https://example.invalid/x.exe"},
+                        {"name": "OrganizadorPrincess_Setup_4.18.64.exe.sha256", "size": 90, "browser_download_url": "https://example.invalid/x.sha256"}]}
 
     class R(io.BytesIO):
         status = 200
@@ -535,7 +620,7 @@ def admin_panel(c):
                            (buscar(c, v, "Limpiar todo"), 3, "b"), (buscar(c, v, "Accesos Rápidos"), 4, "r"),
                            (buscar(c, v, "Editar", "TButton"), 5, "l"), (buscar(c, v, "Opciones del Menú"), 6, "r"),
                            (buscar(c, v, "07 ·"), 7, "l"), (buscar(c, v, "Exportar", "TButton"), 8, "t"),
-                           (buscar(c, v, "Exportar", "TButton", 1), 9, "t")])
+                           (buscar(c, v, "Exportar", "TButton", 1), 9, "t"), (buscar(c, v, "Borrado completo"), 10, "t")])
 
 
 def admin_editar(c):
@@ -635,6 +720,9 @@ PASOS = [
     ("popup vacaciones", popup_vacaciones, 2500), ("popup vacaciones ver", popup_vacaciones_ver, 2500), ("correo ver", correo_ver, 1000),
     ("popup pedidos", aviso_pedidos, 2500), ("popup pedidos ver", popup_ver("u_popup_pedidos"), 1500),
     ("chat", chat, 2500), ("chat privado", chat_privado, 2500), ("chat ver", chat_ver, 1500), ("chat emoticonos", chat_emoticonos, 2000), ("chat móvil", chat_movil_ver, 2000), ("chat nueva", chat_nueva_ver, 1500),
+    ("chat avisos", chat_avisos, 2500), ("chat avisos elegir", chat_avisos_elegir, 2500), ("chat avisos ver", chat_avisos_ver, 2000),
+    ("grupo", grupo_info, 2500), ("grupo ver", grupo_info_ver, 1000),
+    ("notas", notas_version, 1500), ("notas ver", notas_version_ver, 800), ("portátil", portatil, 1500), ("portátil ver", portatil_ver, 800),
     ("burbuja", burbuja, 2500), ("burbuja ver", burbuja_ver, 1000),
     ("actualización", actualizacion, 5000), ("actualización ver", actualizacion_ver, 1000),
     ("admin", admin, 2500), ("admin login", admin_login, 3000), ("panel", admin_panel, 500),

@@ -6,6 +6,10 @@
 - **Nuevo en Administración: «♻ Borrado completo y reinicio limpio».** Si quieres empezar de cero en un equipo, pulsa ese botón (abajo a la derecha): te explica qué se borra, te pide escribir **BORRAR** para confirmar y el Organizador se cierra y se vuelve a abrir **vacío**, como la primera vez. No hace falta buscar ni borrar carpetas a mano.
 - Se borran la configuración de botones y accesos, la agenda con sus avisos, vacaciones y festivos, «Mi Usuario» con el acceso a Control de Pedidos y las copias de seguridad guardadas en la carpeta del Organizador. Si quieres conservar algo, usa antes **Exportar** (Configuración y Agenda).
 
+## 📖 Manuales al día
+
+- Los manuales de usuario y de administrador recogen todo lo nuevo desde la 4.18.36: versión portátil, avisos de Control Pedidos en el chat, responder, reenviar y eliminar mensajes, integrantes de los grupos, novedades de cada versión, el aviso «Abrir el Organizador» de Control Pedidos y el reinicio limpio.
+
 ---
 
 # ✨ Organizador Princess v4.18.60

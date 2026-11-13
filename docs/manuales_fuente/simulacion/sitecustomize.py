@@ -38,6 +38,7 @@ if RAIZ:
         {"username": "economato.demo", "rol": "HOTEL", "nombre": "Economato Demo"},
         {"username": "hotel.demo", "rol": "HOTEL", "nombre": "Recepción Mercancía Demo"},
         {"username": "admin.demo", "rol": "ADMIN", "nombre": "Administración Demo"},
+        {"username": "control-pedidos", "rol": "SISTEMA", "nombre": "Control Pedidos"},
     ]
     YO = "compras.demo"
     DM = "dm:compras.demo:compras2.demo"
@@ -56,11 +57,18 @@ if RAIZ:
             {"id": 11, "remitente": YO, "contenido": "Sí, te la paso ahora.", "creado_en": _ts(1, 20)},
             {"id": 12, "remitente": YO, "contenido": "", "tipo": "archivo", "creado_en": _ts(1, 19),
              "adjunto": {"nombre_archivo": "Oferta_Suministros_Atlantico.pdf", "url": "/demo/oferta.pdf"}},
-            {"id": 13, "remitente": "compras2.demo", "contenido": "¡Gracias! La subo al pedido y la mando a firmar.", "creado_en": _ts(0, 40)},
+            {"id": 13, "remitente": "compras2.demo", "contenido": "¡Gracias! La subo al pedido y la mando a firmar.", "creado_en": _ts(0, 40),
+             "responde_a": {"id": 11, "remitente": YO, "contenido": "Sí, te la paso ahora."}},
         ],
         "dm:compras.demo:economato.demo": [
             {"id": 20, "remitente": "economato.demo", "contenido": "¿Sabes si el pedido de menaje llega esta semana?", "creado_en": _ts(26)},
             {"id": 21, "remitente": YO, "contenido": "El proveedor lo confirma para el jueves.", "creado_en": _ts(25, 30)},
+        ],
+        "dm:compras.demo:control-pedidos": [   # (v4.18.50) avisos de Control Pedidos, inventados
+            {"id": 40, "remitente": "control-pedidos", "tipo": "aviso", "creado_en": _ts(2, 5),
+             "contenido": "📦 Pedido PR-0001 (Hotel de pruebas) pasa a ENVIADO AL PROVEEDOR. Proveedor: Suministros Demo."},
+            {"id": 41, "remitente": "control-pedidos", "tipo": "aviso", "creado_en": _ts(0, 15),
+             "contenido": "⏰ Pedido PR-0002 (Hotel de pruebas) lleva 5 días sin entregar. Proveedor: Menaje Demo."},
         ],
         "grp:demo": [
             {"id": 30, "remitente": "compras2.demo", "contenido": "Recordad revisar los pedidos pendientes de firma antes del viernes.", "creado_en": _ts(50)},
@@ -71,6 +79,8 @@ if RAIZ:
         {"canal_id": DM, "tipo": "privado", "otro_usuario": "compras2.demo", "no_leidos": 2,
          "avatar": "https://demo.supabase.co/storage/v1/object/public/chat/avatares/compras2.jpg"},
         {"canal_id": "dm:compras.demo:economato.demo", "tipo": "privado", "otro_usuario": "economato.demo", "no_leidos": 0},
+        {"canal_id": "dm:compras.demo:control-pedidos", "tipo": "privado", "otro_usuario": "control-pedidos",
+         "no_leidos": 1, "solo_avisos": True},
         {"canal_id": "grp:demo", "tipo": "grupo", "nombre": "Compras Canarias", "no_leidos": 0,
          "avatar": "https://demo.supabase.co/storage/v1/object/public/chat/avatares/grupo.jpg"},
     ]
@@ -102,6 +112,12 @@ if RAIZ:
         _cc.ChatClient.enviar_mensaje = lambda self, contenido, canal_id=None, destinatario=None: None
         _cc.ChatClient.enviar_archivo = lambda self, ruta, canal_id=None, destinatario=None: {"ok": True}
         _cc.ChatClient.crear_grupo = lambda self, nombre, usuarios: {"canal_id": "grp:demo2", "nombre": nombre}
+        _cc.cuenta_chat_configurada = lambda *a, **k: True        # (v4.18.42) el chat pide la cuenta guardada
+        _cc.ChatClient.detalle_grupo = lambda self, canal_id: {   # (v4.18.48) integrantes de un grupo
+            "canal_id": canal_id, "nombre": "Compras Canarias", "puede_gestionar": True, "miembros": [
+                {"username": YO, "nombre": "Ana Demo", "es_creador": True},
+                {"username": "compras2.demo", "nombre": "Compradora Demo 2", "avatar": USUARIOS[1]["avatar"]},
+                {"username": "admin.demo", "nombre": "Administración Demo"}]}
 
         def _foto_demo(url):
             """(v4.18.28) Fotos de perfil de ejemplo, dibujadas aquí (sin red y sin personas reales)."""

@@ -1,7 +1,7 @@
 // Manual de usuario del Organizador Princess. Idea y desarrollo de la aplicación: Víctor Alejandro Martín Andrade.
 const L = require("./lib");
 const { p, vineta, pasos, h1, h2, imagen, leyenda, recuadro, tabla, portada, indice } = L;
-const V = process.env.VERSION || "v4.18.34";
+const V = process.env.VERSION || "v4.18.62";
 
 const s = [];
 s.push(portada({ rol: "Uso diario", subtitulo: "Abre tus accesos, apunta avisos, consulta el calendario y chatea con tus compañeros",
@@ -10,7 +10,8 @@ s.push(indice([["1. El Organizador de un vistazo", "Qué puedes hacer y qué no"
   ["3. Vista extendida y reducida", ""], ["4. Agenda de avisos", "Crear, editar, pausar y borrar avisos"],
   ["5. Calendario, vacaciones y festivos", "Mes, semana, detalle del día e impresión"], ["6. Avisos emergentes", "Agenda, vacaciones y festivos, pedidos y saludo del día"],
   ["7. Chat", "Conversaciones, grupos, adjuntos y burbuja flotante"], ["8. El chat en el móvil", "Chat Dpto. Compras Princess para Android: instalarla y actualizarla"],
-  ["9. Actualizar la aplicación", ""], ["10. Problemas frecuentes", "Y referencia rápida"]]));
+  ["9. Actualizar la aplicación", "Novedades de cada versión y tus datos"], ["10. Versión portátil", "Para los PC donde no se puede instalar"],
+  ["11. Problemas frecuentes", "Y referencia rápida"]]));
 
 // 1
 s.push(h1("1. El Organizador de un vistazo"));
@@ -22,25 +23,26 @@ for (const t of ["Abrir con un clic **carpetas de red, páginas web, programas y
   "Consultar el **calendario** con tus avisos, vacaciones y festivos, e **imprimir** la agenda del día, la semana o el mes.",
   "Preparar el **correo de aviso** de vacaciones o de cierre por festivo.",
   "Recibir los **avisos de tus pedidos** de Control de Pedidos.",
-  "**Chatear** con compañeros, crear grupos y enviar imágenes y documentos, también desde el **móvil** con Chat Dpto. Compras Princess (capítulo 8)."]) s.push(vineta(t));
+  "**Chatear** con compañeros, crear grupos y enviar imágenes y documentos, también desde el **móvil** con Chat Dpto. Compras Princess (capítulo 8).",
+  "Recibir en el chat, en la conversación **«Control Pedidos»**, los avisos internos de Control de Pedidos (capítulo 7)."]) s.push(vineta(t));
 s.push(h2("Qué no se hace aquí"));
 for (const t of ["Cambiar los botones, su orden o la vista del menú: se hace en el panel **Admin** (Manual de administrador).",
   "Ver la agenda de otro compañero: cada agenda es local de su PC.",
   "Borrar mensajes del chat para los demás: «Limpiar chat» solo oculta el historial en tu equipo.",
-  "Usarlo en el móvil o en un Mac: el Organizador es una aplicación de Windows."]) s.push(vineta(t));
+  "Usarlo en el móvil o en un Mac: el Organizador es una aplicación de Windows. En un PC donde no se pueden instalar programas, usa la **versión portátil** (capítulo 10)."]) s.push(vineta(t));
 s.push(...recuadro("nota", "Si algo no cuadra", ["Si un botón no abre lo que debería, la ruta puede estar mal o no tienes acceso a esa carpeta: avisa a quien administra el Organizador de tu equipo (capítulo 9)."]));
 
 // 2
 s.push(h1("2. Conoce la pantalla"));
 s.push(p("Al abrir el Organizador ves el **Menú Principal**. Así es la vista completa (la extendida, capítulo 3). Los nombres de los botones son un ejemplo: en tu PC pueden ser otros."));
 s.push(...imagen("u_menu", 17, "Menú Principal, vista extendida (datos de ejemplo)."));
-s.push(...leyenda([[1, "**Cabecera**: «Menú Principal», el nombre del centro y un saludo con tu nombre. Si aún no lo has puesto, verás en amarillo «Configura tu nombre en Admin → Mi Usuario»."],
+s.push(...leyenda([[1, "**Cabecera**: «Menú Principal», el nombre del centro y un saludo con tu nombre. Si no lo has puesto, el Organizador usa el de tu **cuenta de Control de Pedidos** en cuanto entra con ella; puedes cambiarlo cuando quieras en Admin → Mi Usuario."],
   [2, "**Admin**: panel de administración del menú (botones, vista, tu usuario y copias). Pide tu contraseña de Control de Pedidos; lo explica el Manual de administrador."],
   [3, "**Manual**: abre este manual en PDF."],
   [4, "**Accesos rápidos** (dorados): seis botones para lo que más usas. Los nombres largos se cortan, así que conviene ponerles nombres cortos."],
   [5, "**Agenda**, **Calendario** y **Chat**: los tres botones de trabajo diario (capítulos 4, 5 y 7)."],
   [6, "**Botones del menú** (azules): hasta 30 accesos en 6 columnas. Al pasar el ratón por encima cambian de color."],
-  [7, "**Versión** instalada."]]));
+  [7, "**Versión** instalada. Al pulsarla se ven sus **novedades** (capítulo 9)."]]));
 s.push(h2("Abrir un acceso"));
 s.push(p("Pulsa el botón. Según cómo esté configurado, se abre una **carpeta de red** en el Explorador, una **página web** en tu navegador, o un **programa o documento** (un Excel, un PDF, un .exe…)."));
 s.push(...imagen("u_submenu", 13, "Un botón con submenú abre una ventana con sus subopciones."));
@@ -122,21 +124,47 @@ s.push(...leyenda([[1, "**Asunto**, ya escrito."], [2, "**Cuerpo del correo**: p
 s.push(h2("Avisos de tus pedidos"));
 s.push(...imagen("u_popup_pedidos", 10, "Aviso que llega de Control de Pedidos (ejemplo)."));
 s.push(p("Si has guardado tu usuario y contraseña de Control de Pedidos en **Admin → Mi Usuario**, el Organizador te avisa de lo que pasa con **tus pedidos**: cambios de estado y pedidos que llevan días sin avance (con el pedido, el hotel, el estado, el proveedor, el artículo y los días). Se repiten cada cierto tiempo según lo decida Control de Pedidos y solo se cierran con **Entendido**: no se pueden desactivar desde aquí."));
+s.push(h2("El Organizador y Control de Pedidos en el mismo PC"));
+s.push(p("Control de Pedidos sabe si tienes el Organizador **abierto en el PC desde el que entras**. Si no lo está, a compras y administración les sale una vez al día en la web una ventana con **«🖥️ Abrir el Organizador»** (o descargarlo e instalarlo, también en versión portátil)."));
+for (const t of ["**La primera vez en cada PC** (y en cada navegador), pulsa **«🖥️ Abrir el Organizador»** aunque ya lo tengas abierto. El navegador pregunta si permites abrir «Organizador Princess»: acepta (puedes marcar que lo recuerde). El Organizador se abre (si ya estaba abierto, se reinicia una vez) y queda **vinculado con ese navegador**.",
+  "Desde entonces, la web **solo te avisa si en ese PC no tienes el Organizador abierto**.",
+  "Para que funcione, el Organizador tiene que tener guardada tu cuenta de Control de Pedidos (Admin → Mi Usuario)."]) s.push(vineta(t));
 s.push(h2("Saludo del día"));
 s.push(...imagen("u_saludo", 10, "Saludo del día."));
 s.push(p("La primera vez que abres el Organizador cada día aparece un saludo con tu nombre, cuántos eventos tienes hoy y, si los hay, cuántos pedidos tienen alerta. **Ver eventos** abre el detalle de hoy. Solo sale una vez al día."));
 
 // 7
 s.push(h1("7. Chat"));
-s.push(p("El **Chat** te conecta con los compañeros que tienen cuenta en Control de Pedidos. Para usarlo hace falta haber guardado tu usuario y contraseña en **Admin → Mi Usuario**. Se abre con el botón **Chat** del menú o del calendario."));
+s.push(p("El **Chat** te conecta con los compañeros que tienen cuenta en Control de Pedidos. Para usarlo hace falta haber guardado tu usuario y contraseña en **Admin → Mi Usuario**: sin ellos, el chat no se abre y te dice dónde configurarlos. Se abre con el botón **Chat** del menú o del calendario."));
 s.push(...imagen("u_chat", 16, "Ventana del chat (datos de ejemplo)."));
 s.push(...leyenda([[1, "**Estado** de la conexión: «Conectado» en verde cuando todo va bien."],
   [2, "**Conversaciones**: el canal General, los chats privados y los grupos, cada uno con su foto (o sus iniciales sobre un círculo de color si no tiene). El número entre paréntesis son los mensajes sin leer."],
   [3, "**Nueva conversación**."], [4, "**Limpiar chat**: oculta el historial de esa conversación en tu equipo (no se borra para los demás)."],
-  [5, "**Mensajes**: los tuyos, a la derecha en verde; los de los demás, a la izquierda. Cada burbuja lleva la fecha y la hora. Un adjunto se abre haciendo clic en él."],
+  [5, "**Mensajes**: los tuyos, a la derecha en verde; los de los demás, a la izquierda. Cada burbuja lleva la fecha y la hora. Una respuesta lleva arriba el mensaje citado. Un adjunto se abre haciendo clic en él; las imágenes se ven en miniatura."],
   [6, "Escribe aquí y pulsa **Intro** o **Enviar**."], [7, "😊 **Emoticonos** y respuestas rápidas (siguiente imagen)."],
   [8, "📎 **Adjuntar** una imagen o un documento."], [9, "**Enviar**."],
   [10, "🖼 **Fotos**: cambiar o quitar tu foto de perfil y, en un grupo, la foto del grupo (siguiente apartado)."]]));
+s.push(h2("Copiar, responder, reenviar y eliminar"));
+s.push(...tabla(["Quiero…", "Cómo"], [
+  ["Copiar un mensaje", "**Doble clic** sobre él (sale «✓ Copiado»), o clic derecho → «Copiar mensaje»."],
+  ["Responder citando", "Clic derecho → **↩ Responder**. Encima de la caja de escribir sale «Respondiendo a…» (✕ para quitarlo) y tu respuesta lleva el mensaje citado arriba."],
+  ["Reenviar", "Clic derecho → **↪ Reenviar…** y eliges la conversación o el compañero. Vale también para fotos y archivos (no se vuelven a subir). La copia lleva «↪ Reenviado»."],
+  ["Eliminar un mensaje mío", "Clic derecho → **🗑 Eliminar**. Pide confirmación y queda como «🚫 Mensaje eliminado» para todos, al momento."],
+  ["Ver una imagen", "Pulsa su miniatura."],
+  ["Guardar un adjunto", "Clic derecho sobre él → «Abrir», «Guardar como…» o «Copiar nombre del archivo»."]], [2600, 7038]));
+s.push(p("Todo esto funciona igual en la ventana grande y en la burbuja flotante."));
+s.push(h2("Avisos de Control Pedidos"));
+s.push(...imagen("u_chat_avisos", 14, "Conversación «Control Pedidos» (avisos de ejemplo)."));
+s.push(...leyenda([[1, "**Control Pedidos** aparece en tu lista de conversaciones. Ahí te llegan **tus** avisos (pedidos sin entregar, cambios de estado, techo de gastos…), que suenan y avisan como cualquier mensaje."],
+  [2, "En esta conversación **no se puede escribir**: solo llegan avisos. Un aviso se puede **reenviar** a un compañero (clic derecho → «↪ Reenviar…»)."]]));
+s.push(p("Qué avisos recibe cada persona se decide en Control de Pedidos (Configuración de avisos)."));
+s.push(h2("Integrantes de un grupo"));
+s.push(...imagen("u_grupo_info", 8, "Integrantes de un grupo (datos de ejemplo)."));
+s.push(p("Con un grupo abierto, **pulsa su foto o su nombre** (arriba, en la conversación) para ver quién está en él y quién lo gestiona."));
+s.push(...leyenda([[1, "**Integrantes**, con su foto. «(tú)» eres tú; «gestiona el grupo», quien lo creó."],
+  [2, "**➕ Añadir** y **➖ Quitar** compañeros (solo quien gestiona el grupo)."], [3, "**✏ Renombrar** el grupo o **🗑 Eliminarlo** con todos sus mensajes y archivos (solo quien lo gestiona)."],
+  [4, "**🚪 Salir del grupo**: cualquier miembro. Si sale quien lo gestiona, pasa a gestionarlo otro miembro."]]));
+s.push(p("Cada cambio queda anotado dentro del grupo («👥 Ana ha añadido a Carla») y la lista de conversaciones se actualiza sola para todos. En los grupos creados antes de la versión 4.18.48 no consta quién los creó: puede gestionarlos cualquier miembro, y el primero que lo hace queda como gestor."));
 s.push(h2("Emoticonos y respuestas rápidas"));
 s.push(...imagen("u_chat_emoticonos", 8, "Panel de emoticonos."));
 s.push(...leyenda([[1, "**Emoticonos**: un clic añade el emoticono a lo que estás escribiendo y cierra el panel. Con **Mayús + clic** el panel se queda abierto para poner varios."],
@@ -159,7 +187,7 @@ s.push(...recuadro("nota", "Límites de los archivos", ["Las imágenes se reduce
   "Por seguridad, el chat rechaza programas, scripts y archivos con macros (por ejemplo .exe, .bat, .ps1, .lnk, .html, .xlsm o .docm)."]));
 s.push(h2("La burbuja flotante"));
 s.push(...imagen("u_chat_burbuja", 6, "Burbuja flotante con un mensaje nuevo."));
-s.push(p("Cuando te escriben aparece una **burbuja** pequeña abajo a la derecha de la pantalla, con un aviso sonoro. Desde ella puedes leer y responder, poner emoticonos con 😊, adjuntar con 📎, **arrastrar archivos** encima o pegarlos con **Ctrl+V**, y enviar con ➤. **✕** la cierra y **⤢** abre la ventana completa del chat. Si te escriben varias personas, se apilan varias burbujas."));
+s.push(p("Cuando te escriben aparece una **burbuja** pequeña abajo a la derecha de la pantalla, con un aviso sonoro. Muestra toda la conversación (sube para ver los mensajes anteriores). Desde ella puedes leer y responder, poner emoticonos con 😊, adjuntar con 📎, **arrastrar archivos** encima o pegarlos con **Ctrl+V**, y enviar con ➤. **✕** la cierra y **⤢** abre la ventana completa del chat. Si te escriben varias personas, se apilan varias burbujas."));
 s.push(...recuadro("consejo", "La conversación sigue en la burbuja", ["Si tienes abierta la ventana grande del chat en una conversación y la otra persona contesta, la ventana grande se cierra y la conversación sigue en la burbuja. Lo que estuvieras escribiendo pasa a la burbuja, no se pierde. Para volver a la ventana grande, pulsa ⤢."]));
 
 // 8
@@ -202,9 +230,10 @@ s.push(...leyenda([[1, "**Novedades** de la versión nueva."], [2, "**Actualizar
 s.push(...pasos(["Pulsa **Actualizar ahora**. El Organizador descarga la versión nueva y comprueba que el archivo es el publicado (SHA-256); si no coincide, lo borra y te pide reintentar.",
   "Windows pregunta si permites que el instalador haga cambios: contesta **Sí**.",
   "El Organizador se cierra, se instala la versión nueva (solo verás una barra de progreso) y **vuelve a abrirse solo**, con un mensaje «Organizador actualizado». Tu configuración y tu agenda se mantienen."]));
+s.push(p("En la **versión portátil** (capítulo 10) no hay instalador ni pregunta de Windows: se descarga, se comprueba y el Organizador se cierra y se vuelve a abrir ya actualizado, en la misma carpeta."));
 s.push(...recuadro("nota", "Si algo no va", ["Si contestas **No** a la pregunta de Windows, la ventana ofrece **Instalar** para volver a intentarlo y **Abrir carpeta** para ver el instalador descargado y abrirlo a mano."]));
 s.push(h2("Nueva versión detectada"));
-s.push(p("Si la versión nueva se instaló con **Actualizar ahora**, no aparece nada más: se mantienen tu configuración y tu agenda. Si el instalador se abrió a mano, la primera vez que abres la versión nueva aparece esta ventana, que pregunta cómo continuar:"));
+s.push(p("Si la versión nueva se instaló con **Actualizar ahora**, no aparece nada más: se mantienen tu configuración y tu agenda. La primera vez que se abre el Organizador en un PC tampoco pregunta nada. Si el instalador se abrió a mano sobre una versión anterior, la primera vez que abres la versión nueva aparece esta ventana, que pregunta cómo continuar:"));
 s.push(...imagen("u_nueva_version", 10, "Nueva versión detectada."));
 s.push(...leyenda([[1, "**Solo actualizar versión**: mantiene tu configuración y tu agenda. Es la opción normal."],
   [2, "**Instalación desde cero**: borra la configuración y la agenda."], [3, "Con «desde cero», puedes hacer antes una **copia de seguridad** de la agenda (vacaciones y festivos incluidos) en la carpeta que elijas."],
@@ -212,8 +241,26 @@ s.push(...leyenda([[1, "**Solo actualizar versión**: mantiene tu configuración
 s.push(...recuadro("importante", "Elige «Solo actualizar versión»", ["La instalación desde cero es una restauración completa: úsala solo si te lo pide quien administra el Organizador."]));
 s.push(...recuadro("nota", "Una sola ventana a la vez", ["Solo puede haber un Organizador abierto. Si lo arrancas por segunda vez, se cierra el anterior y continúa el nuevo, para evitar avisos duplicados."]));
 
-// 9
-s.push(h1("10. Problemas frecuentes"));
+s.push(h2("Novedades de cada versión"));
+s.push(...imagen("u_notas_version", 11, "Novedades de la versión instalada."));
+s.push(p("Pulsa el **número de versión** (abajo a la derecha en el menú principal, en Administración o en Configuración) para ver las novedades de esa versión. **Todas las versiones** (1) muestra las de todas; **Ver en GitHub**, la página de versiones."));
+s.push(h2("Tus datos se conservan"));
+s.push(p("Actualizar nunca borra nada, y desde la versión 4.18.62 **desinstalar tampoco**: si desinstalas y vuelves a instalar, encontrarás tu configuración, tu agenda y «Mi Usuario» como los dejaste. Para empezar de cero en un PC, quien administra el Organizador tiene en Admin el botón **♻ Borrado completo y reinicio limpio** (Manual de administrador)."));
+
+// 10
+s.push(h1("10. Versión portátil"));
+s.push(p("Para los PC que **no permiten instalar programas**, cada versión se publica también como **OrganizadorPrincess_Portatil_v….zip**, en la misma página de descargas que el instalador (también la ofrece la ventana «Abrir el Organizador» de Control de Pedidos). Es el mismo programa: misma agenda, configuración, chat y manual."));
+s.push(...pasos(["Descomprime el .zip y abre **OrganizadorPrincess.exe**. No pide permisos de administrador.",
+  "La primera vez te pregunta **en qué carpeta guardarlo** (siguiente imagen). Se copia allí y se vuelve a abrir desde esa carpeta: es la que arranca y la que se actualiza.",
+  "Si más adelante abres otra copia (por ejemplo, la que quedó en Descargas), te dice dónde está la tuya y la abre."]));
+s.push(...imagen("u_portatil", 13, "Primera vez de la versión portátil."));
+s.push(...leyenda([[1, "**Carpeta** donde se guarda. Propone Documentos\\Organizador Princess."], [2, "**Cambiar…** para elegir otra. «Dejarlo donde está ahora» usa la carpeta desde la que lo has abierto."],
+  [3, "**Arrancar al iniciar sesión** (acceso directo en la carpeta de Inicio de Windows) y **acceso directo en el escritorio**. Se pueden desmarcar."],
+  [4, "**Guardar aquí**. «Ahora no» lo deja para la próxima vez."]]));
+s.push(...recuadro("nota", "Se actualiza sola", ["Igual que la instalada: al pulsar «Actualizar ahora» descarga la versión nueva, comprueba su SHA-256 y se vuelve a abrir ya actualizada (capítulo 9). Si ya tienes el Organizador **instalado**, no necesitas la portátil."]));
+
+// 11
+s.push(h1("11. Problemas frecuentes"));
 s.push(...tabla(["Problema", "Qué hacer"], [
   ["Un botón no abre nada o da error", "Comprueba que tienes acceso a la red (carpetas) o a Internet (webs). Si sigue igual, la ruta puede estar mal: díselo a quien administra el Organizador."],
   ["Un botón dice «POR DEFINIR»", "Está sin configurar. Púlsalo para configurarlo (o pide que lo configuren)."],
@@ -223,13 +270,17 @@ s.push(...tabla(["Problema", "Qué hacer"], [
   ["El chat dice que no hay credenciales", "Guarda tus credenciales en Admin → Mi Usuario y reinicia el Organizador."],
   ["El móvil no avisa de los mensajes", "Comprueba que la app tiene permiso de notificaciones, que se ve el aviso «Chat conectado» y quita el ahorro de batería (Ajustes de la app)."],
   ["«Admin» me pide una contraseña", "Es la de tu cuenta de Control de Pedidos. Tras 3 fallos se bloquea 5 minutos. Si no tienes cuenta, pulsa «Crear acceso» (Manual de administrador)."],
-  ["Error al comprobar actualizaciones", "Pulsa «Copiar texto» en la ventana de error y envíaselo a informática. No impide trabajar."]], [3300, 6338]));
+  ["Error al comprobar actualizaciones", "Pulsa «Copiar texto» en la ventana de error y envíaselo a informática. No impide trabajar."],
+  ["Control de Pedidos dice que no tengo el Organizador abierto, pero sí lo está", "La primera vez en ese PC y navegador hay que pulsar «🖥️ Abrir el Organizador» en el aviso de la web para vincularlos (capítulo 6)."],
+  ["En la conversación «Control Pedidos» no puedo escribir", "Es normal: solo recibe avisos. Para comentarlos, reenvíalos a un compañero."],
+  ["En este PC no me deja instalar el Organizador", "Usa la versión portátil (capítulo 10)."]], [3300, 6338]));
 s.push(h2("Referencia rápida"));
 s.push(...tabla(["Quiero…", "Cómo"], [["Abrir una carpeta, web o programa", "Pulsar su botón del menú"], ["Apuntar un recordatorio", "Agenda → + Añadir Aviso"],
   ["Pausar un aviso", "En su ventana emergente, «Desactivar evento»"], ["Ver vacaciones y festivos", "Calendario → Vacaciones / Festivos"],
   ["Imprimir la agenda", "Calendario → Agenda del Día / Semanal / Mensual"], ["Escribir a un compañero", "Chat → Nueva conversación"],
   ["Enviar un archivo por el chat", "📎, arrastrarlo a la ventana o Ctrl+V"], ["Cambiar mi nombre o mis credenciales", "Admin → Mi Usuario"],
   ["Tener el chat en el móvil", "Chat → 📱 Chat en el móvil (código QR)"],
+  ["Responder, reenviar o eliminar un mensaje", "Clic derecho sobre el mensaje"], ["Ver las novedades de la versión", "Pulsar el número de versión"],
   ["Abrir este manual", "Botón Manual del menú, o «Manual de Usuario» en el menú Inicio de Windows"]], [4000, 5638]));
 
 L.generar(process.argv[2] || "salida/Manual_Usuario_OrganizadorPrincess.docx", "Manual de usuario — Organizador Princess", "de usuario", s);

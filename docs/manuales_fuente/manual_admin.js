@@ -1,7 +1,7 @@
 // Manual de administrador del Organizador Princess. Idea y desarrollo de la aplicación: Víctor Alejandro Martín Andrade.
 const L = require("./lib");
 const { p, vineta, pasos, h1, h2, imagen, leyenda, recuadro, tabla, portada, indice } = L;
-const V = process.env.VERSION || "v4.18.62";
+const V = process.env.VERSION || "v4.18.64";
 
 const s = [];
 s.push(portada({ rol: "Administración", subtitulo: "Configura los botones y la vista del menú, el usuario y las copias, e instala y publica versiones",

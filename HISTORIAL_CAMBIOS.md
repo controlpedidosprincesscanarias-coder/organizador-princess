@@ -62,7 +62,7 @@
 - Ventana y burbuja: si el mensaje no se envía porque la otra persona está desactivada o ya no existe, se quita la burbuja pintada, el texto vuelve a la caja y se avisa; si ya no existe, se ofrece eliminar el chat.
 - `test_chat_fase4.py` (15 comprobaciones), también en la compilación automática.
 
-**Probado:** `py_compile`, todas las pruebas del Organizador y la ventana del chat en una pantalla virtual con un chat simulado (menú ⋮, estado ⛔/⏸, avisos y eliminar). Por probar en Windows: el menú ⋮, las ventanas de aviso y la sincronización con el móvil. Necesita el chat v1.7.0. Conviene regenerar el manual de usuario (botones del chat).
+**Probado:** `py_compile`, todas las pruebas del Organizador y la ventana del chat en una pantalla virtual con un chat simulado (menú ⋮, estado ⛔/⏸, avisos y eliminar). Por probar en Windows: el menú ⋮, las ventanas de aviso y la sincronización con el móvil. Necesita el chat v1.7.0. Manuales de usuario y administrador regenerados (v4.18.64): menú ⋮ en la captura del chat y apartados «Vaciar o eliminar un chat» y «Compañeros desactivados o que ya no existen».
 
 ---
 

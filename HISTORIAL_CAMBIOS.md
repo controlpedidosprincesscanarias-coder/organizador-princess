@@ -51,6 +51,32 @@
 
 ---
 
+## 2026-11-13 15:25 — [Chat móvil] Vaciar y eliminar chats, y aviso de usuario desactivado o que ya no existe (v1.0.14)
+
+**Petición de Víctor** (con captura de la lista del móvil): poder vaciar el contenido de un chat y eliminar el chat completo, que solo vuelva a salir si el otro escribe; al escribir a un usuario desactivado en Usuarios de Control Pedidos, avisar de que está temporalmente desactivado; si ya no existe, decirlo y ofrecer eliminar el chat.
+
+**Cambios:**
+- Menú **⋮** de la conversación y pulsación larga en la lista: **🧹 Vaciar chat** y **🗑 Eliminar chat** (solo privados), con confirmación. Solo para mí; mis otros dispositivos se enteran al momento.
+- Al enviar a alguien desactivado: ventana «Usuario desactivado» y el texto vuelve a la caja de escribir. Si ya no existe: «Usuario no disponible» con **Eliminar chat**.
+- En la lista, «⏸ Desactivado» o «⛔ Ya no existe»; en la conversación, un aviso fijo (con «Eliminar chat» si ya no existe).
+- Lógica en `datos/Conversaciones.kt`.
+
+**Probado:** `testDebugUnitTest` (17 pruebas, 2 nuevas) y compilación de la `.apk`. Por probar en un móvil: los menús, las ventanas y la sincronización con el Organizador. Necesita el chat v1.7.0.
+
+---
+
+## 2026-11-13 15:20 — [Chat] Vaciar y eliminar chats por persona, y aviso al escribir a usuarios desactivados o que ya no existen (v1.7.0)
+
+**Cambios:**
+- Tabla nueva `chat_ocultos` (por persona y conversación). Rutas `POST /api/chat/canales/<canal_id>/vaciar` (dejo de ver lo que hay ahora; el otro, no) y `/eliminar` (solo privados: además sale de mi lista hasta que llegue un mensaje nuevo). `canales` y `mensajes` respetan lo vaciado. Evento `conversacion_oculta` a mis otros dispositivos.
+- Enviar (texto, archivo, socket o reenvío) a un privado cuyo otro usuario está desactivado → 409 `codigo: usuario_desactivado`; si se eliminó de Control Pedidos → 410 `codigo: usuario_no_existe`, con un mensaje claro. `canales` lleva `otro_estado` en los privados.
+- Solo se añaden rutas, campos y un evento: el Organizador y las versiones anteriores del móvil siguen igual (muestran el texto del error).
+- **Corregido:** la tabla de usuarios se consulta antes que la del chat (`auth.info_usuarios`); en orden contrario, con pocas conexiones, se bloqueaban entre sí.
+
+**Probado:** `tests/test_chat.py` contra PostgreSQL local, 131 comprobaciones (26 nuevas). Al fusionar se despliega en Render; la tabla nueva se crea sola al arrancar.
+
+---
+
 ## 2026-11-13 11:30 — [Control Pedidos] Manuales de comprador y administrador: el aviso del Organizador, por equipo (v12.34.34)
 
 **Petición de Víctor:** «TODOS» (regenerar los manuales pendientes, anotado el 12 nov).

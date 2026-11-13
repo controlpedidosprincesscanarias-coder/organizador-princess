@@ -8,6 +8,8 @@
 - **Si esa persona ya no existe**, se te dice y se te ofrece eliminar el chat directamente. En la lista de conversaciones y junto al nombre se ve ⏸ (desactivado) o ⛔ (ya no existe).
 - Funciona igual en la ventana del chat y en las burbujas. Necesita el servidor del chat v1.7.0.
 
+---
+
 # ✨ Organizador Princess v4.18.62
 
 ## ♻️ Desinstalar ya no borra tus datos, y hay un «reinicio limpio»

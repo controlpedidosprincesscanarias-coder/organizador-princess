@@ -51,6 +51,15 @@
 
 ---
 
+## 2026-11-13 19:10 — [Infra] Control Pedidos despierto las 24 h (cron-job.org)
+
+- **Motivo:** a las 18:47 la web dio «Verificación de seguridad / No es posible conectarse» (Render respondía 429 `hibernate-rate-limited` mientras despertaba el servicio). Al revisarlo se vio que la tarea «Keep-alive Control Pedidos (servicio)» solo funcionaba de lunes a viernes de 06:00 a 18:50. Fuera de ese horario Render dormía el servicio, así que no se ejecutaban las tareas programadas de madrugada (03:00 adjuntos a Storage, 04:00 purga de correos descartados, 06:00 cupo de EmailJS) ni las de fin de semana.
+- **Cambio** (Víctor, en cron-job.org): la tarea pasa a `*/10 * * * *`, todos los días y a todas horas, zona Atlantic/Canary.
+- **Horas de Render:** Control Pedidos tiene su propia cuenta; encendido todo el mes son ~744 h y caben en las 750 h gratuitas, siempre que esa cuenta no tenga otro servicio gratuito.
+- `GUIA_DESPLIEGUE.md` (paso 5) al día. Sin cambios de código.
+
+---
+
 ## 2026-11-13 18:40 — [Chat] Conexiones cortadas por la base (v1.7.1)
 
 **Causa:** el log de Render, nada más desplegar la v1.7.0, decía «No se pudo comprobar si el usuario 6 sigue activo: connection already closed». El pool entregaba conexiones que Supabase había cortado por llevar rato sin usarse. En la base de usuarios se dejaba pasar sin comprobar (y no se habría detectado a un usuario desactivado o eliminado); en la del chat, la petición acababa en error 500.

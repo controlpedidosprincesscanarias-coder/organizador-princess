@@ -16,3 +16,10 @@
 La idea y el desarrollo de la aplicación Organizador Princess son de
 Víctor Alejandro Martín Andrade, para el Departamento de Central de
 Compras de Princess Hotels en Canarias.
+
+📖 MANUALES AL DÍA
+
+• Los manuales de usuario y de administrador recogen todo lo
+  nuevo: versión portátil, avisos de Control Pedidos en el chat,
+  responder y reenviar, grupos, novedades de cada versión y el
+  reinicio limpio.

@@ -13,7 +13,7 @@ Las capturas son del **Organizador de verdad**, arrancado en Linux con pantalla 
 |---|---|
 | `capturas.sh` | Crea un perfil temporal, arranca el Organizador en Xvfb con la simulación y guarda las capturas en `cap/`. |
 | `perfil_demo.py` | Botones, avisos, vacaciones, festivos y el nombre «Ana Demo» del perfil de ejemplo. |
-| `simulacion/sitecustomize.py` | Corta la red, sustituye el chat por conversaciones inventadas y acepta la contraseña «demo» en Admin. Solo se carga desde `capturas.sh` (va en `PYTHONPATH`). |
+| `simulacion/sitecustomize.py` | Corta la red, sustituye el chat por conversaciones inventadas (con la conversación de avisos «Control Pedidos» y los integrantes de un grupo), da por guardada la cuenta del chat y acepta la contraseña «demo» en Admin. Solo se carga desde `capturas.sh` (va en `PYTHONPATH`). |
 | `pasos_capturas.py` | Recorre las pantallas con `pruebas_uso/conductor.py`: recorta cada ventana al doble de tamaño, le pone una barra de título como la de Windows y dibuja los números de referencia en naranja. |
 | `lib.js` | Maquetación común (portada, índice, leyendas numeradas, recuadros, tablas) con la librería `docx` de Node, adaptada de la de Control de Pedidos. |
 | `manual_usuario.js`, `manual_admin.js` | Texto de cada manual. |

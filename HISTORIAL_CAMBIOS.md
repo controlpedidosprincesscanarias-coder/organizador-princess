@@ -51,6 +51,29 @@
 
 ---
 
+## 2026-11-13 11:30 — [Control Pedidos] Manuales de comprador y administrador: el aviso del Organizador, por equipo (v12.34.34)
+
+**Petición de Víctor:** «TODOS» (regenerar los manuales pendientes, anotado el 12 nov).
+
+**Cambios:** solo documentación. El manual de comprador enseña la ventana «Organizador Princess» con el enlace a la versión portátil, que el aviso sale si no está abierto **en ese PC** y cómo vincular el navegador la primera vez en cada PC (v12.34.32, Organizador 4.18.60 o posterior). El de administrador remite a ello desde la columna 🖥️ Organizador de Usuarios. Capturas regeneradas con datos inventados sobre una base de datos local. El manual de hotel no cambia.
+
+**Probado:** generación de `.docx` y `.pdf` y revisión de las páginas cambiadas; `huella_app.py` idéntica.
+
+---
+
+## 2026-11-13 11:25 — [Organizador] Manuales de usuario y administrador al día (v4.18.62)
+
+**Petición de Víctor:** «TODOS» (los manuales llevaban sin regenerarse desde la v4.18.34).
+
+**Cambios:**
+- **Manual de usuario:** capítulo nuevo «10. Versión portátil» (carpeta del primer arranque, arranque con Windows y escritorio, actualización sola); en el chat, avisos de Control Pedidos, copiar/responder/reenviar/eliminar, integrantes de un grupo y que sin cuenta no se abre; el aviso «Abrir el Organizador» de Control Pedidos y la vinculación con el navegador; el saludo con el nombre de Control Pedidos; novedades al pulsar la versión; la primera vez en un PC no pregunta; los datos se conservan al desinstalar.
+- **Manual de administrador:** botón «♻ Borrado completo y reinicio limpio» (pasos, qué se borra y qué se conserva), «Desinstalar conserva los datos», `navegadores.json` y `portatil.json`, versión portátil en las Releases, nombre tomado de Control Pedidos en Mi Usuario.
+- **Capturas** (`docs/manuales_fuente/`): nuevas `u_chat_avisos`, `u_grupo_info`, `u_notas_version`, `u_portatil` y la marca del botón de reinicio en `a_panel`. La simulación da por guardada la cuenta del chat (v4.18.42) y deja una versión anterior en `version.json` para que salga «Nueva versión detectada» (v4.18.56).
+
+**Probado:** las 37 capturas salen con el Organizador real en Xvfb y datos inventados; revisión del PDF página a página. Llegan a los equipos con el instalador de la v4.18.62.
+
+---
+
 ## 2026-11-13 08:12 — [Organizador] Desinstalar ya no borra los datos; «Borrado completo y reinicio limpio» en Administración (v4.18.62)
 
 > La idea y el desarrollo de la aplicación Organizador Princess, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.

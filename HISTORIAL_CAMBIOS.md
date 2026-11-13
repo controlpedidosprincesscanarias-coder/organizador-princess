@@ -51,6 +51,23 @@
 
 ---
 
+## 2026-11-13 08:12 — [Organizador] Desinstalar ya no borra los datos; «Borrado completo y reinicio limpio» en Administración (v4.18.62)
+
+> La idea y el desarrollo de la aplicación Organizador Princess, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.
+
+**Petición de Víctor:** mantener los datos al desinstalar y, en vez de que el usuario busque y borre carpetas a mano, un botón en el menú de Administración para un borrado completo y un reinicio limpio.
+
+**Causa:** el `[UninstallDelete]` del instalador borraba `{userappdata}\OrganizadorPrincess` (configuración, agenda, «Mi Usuario» con las credenciales de Control Pedidos y las copias). Actualizar nunca borraba nada; desinstalar y reinstalar empezaba de cero.
+
+**Cambios:**
+- El desinstalador solo borra la carpeta del programa; los datos se quedan.
+- Administración → «♻ Borrado completo y reinicio limpio» (abajo a la derecha): explica qué se borra (y que conviene exportar antes), pide escribir **BORRAR**, deja una marca, vuelve a abrir el Organizador y se cierra. La copia nueva cierra la antigua y, antes de cargar la configuración y la agenda, borra la carpeta de datos (reintentando unos segundos lo que aún esté en uso) y avisa al terminar. Se conserva `portatil.json` (dónde está la copia portátil), para que la copia portátil no vuelva a preguntar la carpeta.
+- `app/services/reinicio_limpio.py` (sin interfaz) y `test_reinicio_limpio.py` (13 comprobaciones, también en la compilación automática).
+
+**Probado:** las 15 pruebas del Organizador; el arranque real en Linux con pantalla virtual y un perfil inventado con la marca pendiente (borra configuración, agenda y copias, conserva `portatil.json`, no vuelven los datos antiguos y sale el aviso).
+
+**Por probar en Windows:** pulsar el botón (que se cierre y se vuelva a abrir vacío) y desinstalar y reinstalar conservando los datos.
+
 ## 2026-11-13 08:02 — [Infra] Compilaciones en GitHub sin el aviso de Node.js 20 (Organizador, Chat móvil y Consola)
 
 > La idea y el desarrollo de las aplicaciones, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.

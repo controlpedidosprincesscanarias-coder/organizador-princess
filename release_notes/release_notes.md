@@ -1,3 +1,13 @@
+# ✨ Organizador Princess v4.18.62
+
+## ♻️ Desinstalar ya no borra tus datos, y hay un «reinicio limpio»
+
+- **Desinstalar el Organizador ya no borra tu configuración, tu agenda ni «Mi Usuario».** Si lo desinstalas y lo vuelves a instalar, lo encontrarás todo como lo dejaste. (Actualizar nunca borraba nada.)
+- **Nuevo en Administración: «♻ Borrado completo y reinicio limpio».** Si quieres empezar de cero en un equipo, pulsa ese botón (abajo a la derecha): te explica qué se borra, te pide escribir **BORRAR** para confirmar y el Organizador se cierra y se vuelve a abrir **vacío**, como la primera vez. No hace falta buscar ni borrar carpetas a mano.
+- Se borran la configuración de botones y accesos, la agenda con sus avisos, vacaciones y festivos, «Mi Usuario» con el acceso a Control de Pedidos y las copias de seguridad guardadas en la carpeta del Organizador. Si quieres conservar algo, usa antes **Exportar** (Configuración y Agenda).
+
+---
+
 # ✨ Organizador Princess v4.18.60
 
 ## 🖥️ Control Pedidos sabe si lo tienes abierto en este PC

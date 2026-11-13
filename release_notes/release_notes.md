@@ -1,3 +1,19 @@
+# ✨ Organizador Princess v4.18.66
+
+## 🗓️ Tu agenda, la misma en todos tus PC
+
+- **La agenda, las vacaciones y los festivos se guardan ahora con tu usuario de Control de Pedidos** (el mismo con el que entras al chat). Si entras con ese usuario en otro PC, tendrás allí la misma agenda.
+- **Lo que cambias en un PC llega a los demás en unos minutos**: avisos nuevos, cambios, avisos desactivados y lo que borras. Si las ventanas de Agenda, Calendario, Vacaciones o Festivos están abiertas, se actualizan solas.
+- **Sin conexión sigues trabajando igual** con la copia de tu PC; lo pendiente se sube en cuanto vuelve la conexión.
+- **Si cambias lo mismo en dos PC**, se queda el cambio más reciente.
+- **La primera vez**, si ya tenías agenda en varios PC, se juntan todas, sin duplicar lo que estaba igual en los dos.
+- Si en un PC entra otro usuario de Control de Pedidos, verá su propia agenda (la del anterior sigue guardada con su usuario).
+- **«Importar agenda»** (copia de seguridad) reemplaza la agenda también en tus otros PC.
+- Los avisos de pedidos que llegan de Control de Pedidos no cambian: siguen siendo de cada sesión.
+- Necesita Control de Pedidos v12.34.36 o posterior; con una versión anterior, la agenda sigue solo en este PC, como hasta ahora.
+
+---
+
 # ✨ Organizador Princess v4.18.64
 
 ## 💬 Vaciar y eliminar chats, igual que en el móvil

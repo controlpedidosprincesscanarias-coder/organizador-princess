@@ -11,6 +11,7 @@ Aplicación de escritorio desarrollada en **Python + ttkbootstrap**, que combina
 
 - 📅 Agenda con eventos, avisos recurrentes y calendario con colores, imprimible por día/semana/mes.
 - 🏖 Gestión de Vacaciones y Festivos.
+- 🗓️ (v4.18.66) Agenda, vacaciones y festivos sincronizados con el usuario de Control de Pedidos: la misma agenda en todos los PC donde entres con ese usuario (necesita Control de Pedidos v12.34.36).
 - 🔔 Sistema de notificaciones en segundo plano (bridge) conectado a Control de Pedidos: recibe los mismos avisos que Telegram (techo de gastos, familias repetidas, solicitudes de usuario, cambios de estado de pedidos…) como popup en pantalla, filtrados automáticamente según el usuario y su rol.
 - 🔄 Actualizaciones automáticas desde GitHub Releases, con ventana de "novedades" al terminar de instalar.
 - 💼 Versión portátil (v4.18.54): `OrganizadorPrincess_Portatil_v….zip` en cada Release, para los PC que no permiten instalar. Se descomprime en una carpeta del usuario, se abre `OrganizadorPrincess.exe` y se actualiza sola sin administrador (`app/services/portatil.py`).
@@ -33,6 +34,7 @@ Aplicación de escritorio desarrollada en **Python + ttkbootstrap**, que combina
 │   │   ├── alertas.py              (procesamiento de avisos y recordatorios)
 │   │   └── correo.py
 │   ├── services/update_service.py  (comprobación de versión y novedades vía GitHub Releases)
+│   ├── services/sincro_agenda.py   (v4.18.66: agenda sincronizada con el usuario de Control de Pedidos, sin red ni Tk)
 │   ├── ui/
 │   │   ├── agenda.py, calendario.py, admin.py   (ventanas Agenda, Calendario y Administración — v4.18.08)
 │   │   ├── disposicion.py, colores.py           (constantes del menú y vista; colores comunes)
@@ -126,6 +128,15 @@ Crea un release con el tag `vX.Y.Z` (debe coincidir exactamente con `APP_VERSION
 `pedidos_agenda_bridge.py` sondea periódicamente Control de Pedidos (cada 15 segundos) para comprobar si hay avisos pendientes para el usuario conectado. El filtrado por destinatario lo hace el propio servidor (cada usuario solo recibe lo suyo); el bridge se limita a mostrar en pantalla lo que el servidor le entrega.
 
 Se autentica mediante `/api/bridge/login`, una vía de acceso dedicada para procesos en segundo plano (distinta del login normal de la web), pensada para reconectar automáticamente sin intervención humana.
+
+### 🗓️ Agenda sincronizada (v4.18.66)
+
+Con la misma sesión, el hilo `PedidosBridge-Agenda` (`_loop_agenda`) guarda la agenda (avisos, vacaciones y festivos) en Control de Pedidos (`GET`/`POST /api/bridge/agenda`, v12.34.36) al arrancar, a los 3 s de cada cambio y cada 2 minutos. Qué subir y cómo fusionar está en `app/services/sincro_agenda.py` (pruebas en `test_sincro_agenda.py`):
+- cada elemento lleva un id estable (`_sid`) y la hora de su último cambio; `db/sqlite.save_agenda` anota lo cambiado y lo borrado al guardar, venga de la ventana que venga;
+- gana el cambio más reciente, los borrados se propagan y sin red se sigue con la copia local;
+- la primera vez se fusionan las agendas de todos los PC (lo idéntico no se duplica);
+- los avisos de pedidos (`_bridge_gestionado`) no se suben;
+- con un Control de Pedidos anterior (404) se sigue con la copia local y se vuelve a mirar cada hora.
 
 ---
 

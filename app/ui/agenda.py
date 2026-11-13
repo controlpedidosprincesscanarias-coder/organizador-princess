@@ -19,6 +19,7 @@ from ui.assets import _apply_icon
 from ui.colores import LIGHT
 from ui.selector_fecha_hora import campo_fecha, campo_hora
 from utils.fechas import _iso_a_ui, _ui_a_iso
+from services import sincro_agenda   # (v4.18.66) agenda sincronizada con Control de Pedidos
 
 
 def abrir_agenda(ctx):
@@ -206,8 +207,10 @@ def abrir_agenda(ctx):
                 side="left", fill="x", expand=True)
 
     def _eliminar_aviso(idx):
+        # (v4.18.66) Se borra por su id, no por la posición: mientras se pregunta puede llegar un cambio de otro PC.
+        aviso = ctx.agenda_data.get("avisos", [])[idx]
         if messagebox.askyesno("Confirmar", "¿Eliminar este aviso?", parent=win):
-            ctx.agenda_data.get("avisos", []).pop(idx)
+            sincro_agenda.quitar(ctx.agenda_data.get("avisos", []), aviso)
             ctx.save_agenda(ctx.agenda_data)
             cargar_avisos()
 
@@ -218,6 +221,7 @@ def abrir_agenda(ctx):
         if messagebox.askyesno("Reactivar aviso",
                                f"¿Reactivar '{nombre}'?\n\nVolverá a dispararse según su programación.",
                                parent=win):
+            aviso = sincro_agenda.actual(ctx.agenda_data.get("avisos", []), aviso) or aviso
             aviso["activo"] = True
             ctx.save_agenda(ctx.agenda_data)
             cargar_avisos()
@@ -324,7 +328,8 @@ def abrir_agenda(ctx):
                 "activo":     aviso_actual.get("activo", True),
                 "antelacion": {"dias": ant_d, "horas": ant_h, "minutos": ant_m},
             }
-            ctx.agenda_data.get("avisos", [])[idx] = editado
+            # (v4.18.66) Que siga siendo el mismo elemento (mismo id) y en su sitio aunque otro PC haya cambiado la lista.
+            sincro_agenda.reemplazar(ctx.agenda_data.setdefault("avisos", []), aviso_actual, editado, idx)
             ctx.save_agenda(ctx.agenda_data)
             ev.destroy()
             cargar_avisos()
@@ -472,6 +477,7 @@ def abrir_agenda(ctx):
     # ANTI-REGRESION (Fase 3.7g): registrar cargar_avisos como callback en alertas
     # para que _desactivar_evento() refresque la lista sin necesidad de cerrar y reabrir la ventana.
     _alertas_mod.on_agenda_changed = cargar_avisos
+    sincro_agenda.registrar_refresco(win, cargar_avisos)   # (v4.18.66) cambios llegados de otro PC
 
     cargar_avisos()
 

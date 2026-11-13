@@ -883,6 +883,28 @@ class _Session:
         """GET /api/bridge/notificaciones — cola push de eventos inmediatos."""
         return self._get("/api/bridge/notificaciones")
 
+    def _post(self, path, payload):
+        """POST autenticado (JSON) con reintento de login automático en 401."""
+        body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+        try:
+            result = self._request(path, data=body, method="POST")
+            _resetear_contador_errores()
+            return result
+        except urllib.error.HTTPError as e:
+            if e.code == 401:
+                log.info("Bridge: sesión expirada, reintentando login...")
+                if self.login():
+                    return self._request(path, data=body, method="POST")
+            raise
+
+    def get_agenda(self, desde=0):
+        """(v4.18.66) GET /api/bridge/agenda — la agenda de este usuario cambiada desde la versión `desde`."""
+        return self._get(f"/api/bridge/agenda?desde={int(desde)}")
+
+    def post_agenda(self, elementos):
+        """(v4.18.66) POST /api/bridge/agenda — sube los cambios de la agenda de este usuario."""
+        return self._post("/api/bridge/agenda", {"elementos": elementos})
+
 
 _session = _Session()
 
@@ -1271,6 +1293,138 @@ def _loop_push(agenda_data, save_agenda_fn, mostrar_alerta_fn):
             time.sleep(1)
 
 
+# ── (v4.18.66) Agenda sincronizada con el usuario de Control de Pedidos ──────────────────────────────────
+# Petición de Víctor (13 nov 2026): con el mismo usuario en cualquier PC, la misma agenda (avisos,
+# vacaciones y festivos). La lógica de qué subir y cómo fusionar está en services/sincro_agenda.py (sin red,
+# con pruebas en test_sincro_agenda.py); aquí solo la red y el hilo. Lo que toca agenda_data se hace en el
+# hilo principal de Tk (_en_principal), igual que las ventanas que la editan, y bajo sincro.CERROJO.
+INTERVALO_AGENDA_SEGUNDOS = 120     # comprobar cambios de otros PC cada 2 min
+ESPERA_TRAS_GUARDAR_SEGUNDOS = 3    # tras guardar algo aquí, subirlo a los pocos segundos
+ESPERA_SIN_RUTA_SEGUNDOS = 3600     # Control de Pedidos anterior a v12.34.36 (404): volver a mirar en 1 h
+_estado_agenda = {"ultima": None, "error": "", "sin_ruta": False}
+
+
+def estado_sincro_agenda() -> dict:
+    """Para mostrar en la interfaz: {"ultima": datetime|None, "error": str, "sin_ruta": bool}."""
+    return dict(_estado_agenda)
+
+
+def _en_principal(fn, timeout=30):
+    """Ejecuta fn() en el hilo principal de Tk y devuelve su resultado (o lo ejecuta aquí si no hay Tk)."""
+    if _app_root is None:
+        return fn()
+    hecho = threading.Event()
+    caja = {}
+
+    def _ejecutar():
+        try:
+            caja["r"] = fn()
+        except Exception as exc:  # noqa: BLE001
+            caja["e"] = exc
+        finally:
+            hecho.set()
+
+    try:
+        _app_root.after(0, _ejecutar)
+    except Exception:  # noqa: BLE001 — Tk cerrándose
+        return None
+    if not hecho.wait(timeout):
+        raise TimeoutError("el hilo principal no respondió")
+    if "e" in caja:
+        raise caja["e"]
+    return caja.get("r")
+
+
+def _sincronizar_agenda(agenda_data, save_agenda_fn):
+    """Una vuelta: bajar lo cambiado en otros PC, aplicarlo y subir lo pendiente de este."""
+    from services import sincro_agenda as sincro
+
+    def _preparar():
+        with sincro.CERROJO:
+            cambio = sincro.cambiar_usuario(agenda_data, _session.username or BRIDGE_USER)
+            # marcar_cambios antes de fusionar: la agenda de antes de esta versión aún no tiene ids.
+            if sincro.marcar_cambios(agenda_data) or cambio:
+                save_agenda_fn(agenda_data)
+            if cambio:
+                sincro.refrescar_ventanas()
+            return sincro.estado(agenda_data)["version"]
+
+    desde = _en_principal(_preparar)
+    remotos = []
+    while not _shutdown.is_set():
+        resp = _session.get_agenda(desde)
+        remotos.extend(resp.get("elementos") or [])
+        desde = max(int(desde), int(resp.get("version") or 0))
+        if not resp.get("mas"):
+            break
+
+    def _aplicar():
+        with sincro.CERROJO:
+            cambio = sincro.aplicar_remotos(agenda_data, remotos)
+            sincro.estado(agenda_data)["version"] = max(sincro.estado(agenda_data)["version"], desde)
+            save_agenda_fn(agenda_data)
+            if cambio:
+                sincro.refrescar_ventanas()   # en el mismo paso: las posiciones pintadas siguen valiendo
+            return cambio, sincro.pendientes(agenda_data)
+
+    _cambio, enviar = _en_principal(_aplicar)
+    for i in range(0, len(enviar), sincro.MAX_POR_ENVIO):
+        if _shutdown.is_set():
+            break
+        tanda = enviar[i:i + sincro.MAX_POR_ENVIO]
+        resp = _session.post_agenda(tanda)
+
+        def _respuesta(tanda=tanda, resp=resp):
+            with sincro.CERROJO:
+                c = sincro.aplicar_respuesta(agenda_data, tanda, resp)
+                save_agenda_fn(agenda_data)
+                if c:
+                    sincro.refrescar_ventanas()
+                return c
+
+        _en_principal(_respuesta)
+    # Lo guardado aquí durante la vuelta ya se ha subido (o se subirá en la siguiente): no hace falta otra.
+    with sincro.CERROJO:
+        if not sincro.hay_pendientes(agenda_data):
+            sincro.CAMBIO_LOCAL.clear()
+    if remotos or enviar:
+        log.info("Agenda sincronizada: %d recibido(s), %d enviado(s) — %s",
+                 len(remotos), len(enviar), sincro.resumen(agenda_data))
+
+
+def _loop_agenda(agenda_data, save_agenda_fn):
+    """Hilo: sincroniza la agenda al arrancar, a los pocos segundos de cada cambio y cada 2 min."""
+    from services import sincro_agenda as sincro
+    _bridge_listo.wait(timeout=90)
+    while not _shutdown.is_set():
+        espera = INTERVALO_AGENDA_SEGUNDOS
+        if _session._logged_in:
+            try:
+                _sincronizar_agenda(agenda_data, save_agenda_fn)
+                _estado_agenda.update(ultima=datetime.now(), error="", sin_ruta=False)
+            except urllib.error.HTTPError as exc:
+                if exc.code == 404:
+                    if not _estado_agenda["sin_ruta"]:
+                        log.warning("Agenda: Control de Pedidos aún no sincroniza la agenda (404); "
+                                    "se sigue con la copia local")
+                    _estado_agenda.update(sin_ruta=True, error="")
+                    espera = ESPERA_SIN_RUTA_SEGUNDOS
+                else:
+                    log.warning("Agenda: no se pudo sincronizar (HTTP %s); se reintentará", exc.code)
+                    _estado_agenda["error"] = f"HTTP {exc.code}"
+            except Exception as exc:  # noqa: BLE001 — sin red se sigue con la copia local
+                log.warning("Agenda: no se pudo sincronizar (%s); se reintentará", exc)
+                _estado_agenda["error"] = str(exc)[:200]
+        for _ in range(espera):
+            if _shutdown.is_set():
+                return
+            if sincro.CAMBIO_LOCAL.is_set() and _session._logged_in and not _estado_agenda["sin_ruta"]:
+                sincro.CAMBIO_LOCAL.clear()
+                time.sleep(ESPERA_TRAS_GUARDAR_SEGUNDOS)
+                break
+            time.sleep(1)
+
+
 def iniciar_bridge_pedidos(agenda_data, save_agenda_fn, app_root_legacy=None, app_root=None,
                             mostrar_alerta_fn=None):
     """
@@ -1359,6 +1513,14 @@ def iniciar_bridge_pedidos(agenda_data, save_agenda_fn, app_root_legacy=None, ap
         name="PedidosBridge-Push",
     )
     t2.start()
+
+    t3 = threading.Thread(
+        target=_loop_agenda,
+        args=(agenda_data, save_agenda_fn),
+        daemon=True,
+        name="PedidosBridge-Agenda",
+    )
+    t3.start()
 
     log.info(
         "Bridge iniciado  |  usuario: %s (%s)  |  "

@@ -139,7 +139,8 @@ def importar_agenda(ctx, parent_win=None):
     ok = messagebox.askyesno(
         "Importar agenda",
         "Se reemplazará la agenda actual con la del archivo seleccionado.\n\n"
-        "⚠️  Los eventos, vacaciones y festivos actuales se perderán.\n\n"
+        "⚠️  Los eventos, vacaciones y festivos actuales se perderán, también en tus otros equipos "
+        "con el mismo usuario de Control de Pedidos.\n\n"
         "¿Continuar?",
         icon="warning",
         parent=parent_win,
@@ -147,9 +148,18 @@ def importar_agenda(ctx, parent_win=None):
     if not ok:
         return
     try:
-        shutil.copy2(src, AGENDA_FILE)
-        ctx.agenda_data.clear()
-        ctx.agenda_data.update(datos)
+        # (v4.18.66) Con la agenda sincronizada, lo importado reemplaza también la de los otros PC de este
+        # usuario: se sube como cambio nuevo y lo que no está en el archivo se borra (services/sincro_agenda.py).
+        # Por eso ya no se copia el archivo tal cual, sino que se guarda con save_agenda.
+        from services import sincro_agenda
+        if not isinstance(datos, dict):
+            raise ValueError("El archivo no tiene el formato de una agenda del Organizador.")
+        with sincro_agenda.CERROJO:
+            datos = sincro_agenda.preparar_importacion(datos, ctx.agenda_data)
+            ctx.agenda_data.clear()
+            ctx.agenda_data.update(datos)
+            ctx.save_agenda(ctx.agenda_data)
+            sincro_agenda.refrescar_ventanas()
         messagebox.showinfo(
             "Agenda importada",
             "✅  La agenda se ha restaurado correctamente.\n\n"

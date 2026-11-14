@@ -21,6 +21,7 @@ from ui.assets import _apply_icon, get_crown_tk
 from ui.colores import GOLD, LIGHT
 from ui.festivos import _ventana_festivos
 from ui.vacaciones import _ventana_vacaciones
+from services import sincro_agenda   # (v4.18.66) agenda sincronizada con Control de Pedidos
 from ui.ventana_chat import _ventana_chat
 
 _NOMBRES_MES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio",
@@ -489,6 +490,7 @@ def abrir_calendario(ctx):
             for child in hdr.winfo_children():
                 child.bind("<Button-1>", _on_click_sem)
 
+    sincro_agenda.registrar_refresco(win, renderizar)   # (v4.18.66) cambios llegados de otro PC
     renderizar()
 
     # ── Funciones de impresión ────────────────────────────

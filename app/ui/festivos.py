@@ -10,6 +10,7 @@ import ttkbootstrap as ttk
 from tkinter import messagebox, StringVar    # ANTI-REGRESION: StringVar era global de main_agenda
 from ui.selector_fecha_hora import campo_fecha
 from utils.fechas import _iso_a_ui, _ui_a_iso
+from services import sincro_agenda   # (v4.18.66) agenda sincronizada con Control de Pedidos
 
 # Constantes de color — ANTI-REGRESION: eran globals de main_agenda
 GOLD  = "#C9A84C"
@@ -124,8 +125,10 @@ def _ventana_festivos(ctx):   # ANTI-REGRESIÓN: firma corregida — antes era (
                       foreground=GOLD).pack(anchor="e", pady=(8, 2), padx=4)
 
     def _eliminar(idx):
+        # (v4.18.66) Se borra por su id, no por la posición: mientras se pregunta puede llegar un cambio de otro PC.
+        festivo = ctx.agenda_data.get("festivos", [])[idx]
         if messagebox.askyesno("Confirmar", "¿Eliminar este festivo?", parent=fwin):
-            ctx.agenda_data.get("festivos", []).pop(idx)
+            sincro_agenda.quitar(ctx.agenda_data.get("festivos", []), festivo)
             ctx.save_agenda(ctx.agenda_data)  # ANTI-REGRESIÓN: save_agenda no es global en módulo, usar ctx.save_agenda
             cargar()
 
@@ -191,7 +194,8 @@ def _ventana_festivos(ctx):   # ANTI-REGRESIÓN: firma corregida — antes era (
                 "fecha":      d0.strftime("%Y-%m-%d"),
                 "antelacion": {"dias": ant_d, "horas": ant_h, "minutos": ant_m},
             }
-            ctx.agenda_data.get("festivos", [])[idx] = editado
+            # (v4.18.66) Que siga siendo el mismo elemento (mismo id) y en su sitio aunque otro PC haya cambiado la lista.
+            sincro_agenda.reemplazar(ctx.agenda_data.setdefault("festivos", []), fest_actual, editado, idx)
             ctx.save_agenda(ctx.agenda_data)  # ANTI-REGRESIÓN: save_agenda no es global en módulo, usar ctx.save_agenda
             ew.destroy()
             cargar()
@@ -292,6 +296,7 @@ def _ventana_festivos(ctx):   # ANTI-REGRESIÓN: firma corregida — antes era (
         nw.geometry(f"{_npw}x{_nph}+{(_sw2 - _npw)//2}+{(_sh2 - _nph)//2}")
         nw.grab_set()
 
+    sincro_agenda.registrar_refresco(fwin, cargar)   # (v4.18.66) cambios llegados de otro PC
     cargar()
 
     ttk.Separator(fwin).pack(fill="x", pady=(10, 0))

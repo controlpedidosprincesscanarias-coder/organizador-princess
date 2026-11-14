@@ -51,6 +51,29 @@
 
 ---
 
+## 2026-11-13 21:45 — [Organizador + Control Pedidos] Agenda y calendario sincronizados con el usuario de Control Pedidos (Organizador v4.18.66, Control Pedidos v12.34.36)
+
+**Petición de Víctor:** «sincronizar agenda y calendario del organizador con usuario registrado de control pedidos, el mismo que da registro al chat etc. La idea es que si pongo el mismo usuario en diferentes pc, siempre tenga mi agenda y calendario sincronizado». Hasta ahora la agenda (avisos, vacaciones y festivos) solo estaba en `agenda.json` de cada PC.
+
+**Control Pedidos (v12.34.36):**
+- Tabla nueva `organizador_agenda` (paso de migración 130, con RLS; sin datos existentes que tocar): una fila por elemento y usuario, con `datos` (JSON), `cambiado_en`, `borrado` (marca) y `version` (secuencia).
+- `GET /api/bridge/agenda?desde=` (lo cambiado desde la última vez, por páginas) y `POST /api/bridge/agenda`, con la sesión del Organizador. El usuario sale de la sesión: cada uno solo ve lo suyo. Gana el cambio más reciente, el empate no sobrescribe y nunca se guarda una hora futura (un PC con el reloj adelantado no gana siempre). `servicios/agenda_organizador.py`.
+
+**Organizador (v4.18.66):**
+- `app/services/sincro_agenda.py` (sin red ni Tk): id estable por elemento, hora del cambio y huella; `save_agenda` anota lo cambiado y lo borrado en cada guardado, venga de la ventana que venga.
+- Hilo `PedidosBridge-Agenda` en `pedidos_agenda_bridge.py`: sincroniza al arrancar, a los 3 s de cada cambio y cada 2 min. Sin red sigue con la copia local; con un Control Pedidos anterior (404), también, y vuelve a mirar cada hora.
+- Primera vez: se fusionan las agendas de todos los PC (lo idéntico no se duplica). Si en un PC entra otro usuario, se quita la agenda del anterior (sigue guardada en el servidor).
+- Agenda, Vacaciones y Festivos editan y borran por id (no por posición) y, con Calendario, se repintan solas al llegar cambios de otro PC. «Importar agenda» reemplaza la agenda también en los otros PC (se avisa en la confirmación). Los avisos de pedidos (`_bridge_gestionado`) no se suben.
+- Arreglo aparte (commit propio): faltaba el separador `---` entre las notas de la v4.18.64 y la v4.18.62, y la Release de la 4.18.64 habría llevado las dos.
+
+**Decisión tomada, a confirmar por Víctor:** los festivos siguen siendo de cada usuario (como hasta ahora en cada PC), no comunes al departamento.
+
+**Probado:** Control Pedidos: `tests/test_agenda_organizador.py` (nuevo, 32 comprobaciones), huellas regeneradas (2 rutas nuevas), `test_migraciones`, `test_flujo`, `test_organizador`, `test_avisos_chat` y `test_hotel_pruebas` bien. Organizador: `test_sincro_agenda.py` (nuevo: dos PC y un servidor en memoria con las mismas reglas; fusión, cambios, borrados, conflictos, sin red, paginación, cambio de usuario, importar, guardado real) y el resto de pruebas bien. Prueba de punta a punta con el bridge real del Organizador contra Control Pedidos en local (Postgres local): dos PC con agenda previa se fusionan sin duplicar, y un cambio y un borrado llegan al otro.
+
+**Queda por probar:** en Windows, con dos PC y el mismo usuario (interfaz real, ventanas abiertas mientras llegan cambios), después de desplegar Control Pedidos v12.34.36. Los manuales no cambian de pantalla; si se quiere, añadir un apartado sobre la sincronización.
+
+---
+
 ## 2026-11-13 19:10 — [Infra] Control Pedidos y chat despiertos las 24 h (cron-job.org)
 
 - **Motivo:** a las 18:47 la web dio «Verificación de seguridad / No es posible conectarse» (Render respondía 429 `hibernate-rate-limited` mientras despertaba el servicio). Al revisarlo se vio que la tarea «Keep-alive Control Pedidos (servicio)» solo funcionaba de lunes a viernes de 06:00 a 18:50. Fuera de ese horario Render dormía el servicio, así que no se ejecutaban las tareas programadas de madrugada (03:00 adjuntos a Storage, 04:00 purga de correos descartados, 06:00 cupo de EmailJS) ni las de fin de semana.

@@ -61,6 +61,7 @@ hiddenimports += [
     'services.portatil',     # v4.18.54: copia portátil (sin instalar) y su actualización
     'services.vinculo_navegador',  # v4.18.60: navegador de este PC vinculado con Control Pedidos
     'services.reinicio_limpio',    # v4.18.62: borrado completo y reinicio limpio (Administración)
+    'services.sincro_agenda',      # v4.18.66: agenda sincronizada con el usuario de Control Pedidos
     'ui.primer_arranque_portatil',  # v4.18.54: carpeta, arranque con Windows y escritorio de la portátil
     'services.admin_auth',   # ANTI-REGRESION: nuevo — sistema de login Admin sin hardcode
     'ui.assets',

@@ -187,7 +187,21 @@ def load_agenda():
 
 
 def save_agenda(data):
+    # (v4.18.66) Agenda sincronizada con el usuario de Control de Pedidos: antes de guardar se anota qué ha
+    # cambiado (ids, pendientes, borrados) y se avisa al hilo de sincronización para que lo suba enseguida.
+    # Va aquí para que valga para cualquier ventana que guarde la agenda. Ver services/sincro_agenda.py.
+    hay_cambios = False
+    sincro = None
+    try:
+        from services import sincro_agenda as sincro
+        with sincro.CERROJO:
+            hay_cambios = sincro.marcar_cambios(data)
+    except Exception as exc:  # noqa: BLE001 — la agenda se guarda igual aunque falle la sincronización
+        import logging
+        logging.getLogger("sincro_agenda").warning("marcar_cambios: %s", exc)
     _escribir_json_seguro(AGENDA_FILE, data, "utf-8", ensure_ascii=False)
+    if hay_cambios and sincro is not None:
+        sincro.CAMBIO_LOCAL.set()
 
 
 # ── DB de usuarios (SQLite) ───────────────────────────────────────────────────

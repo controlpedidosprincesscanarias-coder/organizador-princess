@@ -51,6 +51,23 @@
 
 ---
 
+## 2026-11-18 16:10 — [Chat móvil] Manual de uso dentro de la app (v1.0.18)
+
+**Petición de Víctor:** poder consultar el manual del chat desde la propia app del móvil.
+
+**Cambios:**
+- **Ajustes → 📖 Manual de uso:** trece apartados que se abren al tocarlos, desde «Qué es esta app» hasta «Cerrar sesión», pasando por mensajes de voz, vaciar y eliminar chats, avisos de Control Pedidos y ahorro de batería.
+- Buscador sin tildes ni mayúsculas.
+- Funciona sin conexión.
+- Al final, «📄 Manual completo (PDF)» abre el manual de usuario del Organizador (el chat en el móvil es su capítulo 8), desde su repositorio público.
+- El texto sigue a ese manual y está en `datos/Manual.kt`. Si cambia una pantalla de la app, hay que cambiarlo también.
+
+**Manual del Organizador:** en el capítulo 8 del manual de usuario, recuadro nuevo «El manual, también en la app» (PDF regenerado; llega a los equipos con la próxima versión del Organizador, y desde el enlace de la app, en cuanto se fusiona).
+
+**Probado:** `testDebugUnitTest` (20 pruebas, 1 nueva: buscador, títulos únicos y enlace) y compilación de la `.apk`. El enlace al PDF responde. **Por probar en un móvil:** la pantalla y que el enlace abra el PDF.
+
+---
+
 ## 2026-11-18 15:30 — [Chat + Chat móvil + Organizador] Mensajes de voz (chat v1.8.0, chat móvil v1.0.16, Organizador v4.18.70)
 
 **Petición de Víctor:** mensajes de voz en el chat; se graban en la app del móvil y el Organizador solo los reproduce (decisión de Víctor).

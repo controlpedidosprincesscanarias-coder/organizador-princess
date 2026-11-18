@@ -51,6 +51,14 @@
 
 ---
 
+## 2026-11-18 10:15 — [Organizador + Control Pedidos] Decisión: festivos y calendario, de cada usuario
+
+- **Decisión de Víctor:** «los festivos y calendario también son del usuario, así que si un usuario abre sesión en otro PC también debería ver su calendario y festivos además de la agenda».
+- Ya funciona así desde el Organizador v4.18.68 (con Control Pedidos v12.34.38): avisos, vacaciones y festivos se guardan con el usuario de Control Pedidos, y el Calendario los muestra a partir de esa misma agenda. No son comunes al departamento.
+- Solo documentación (`PENDIENTES.md` y `CLAUDE.md` de los dos repositorios). Sin cambios de código.
+
+---
+
 ## 2026-11-18 10:00 — [Organizador + Control Pedidos] La agenda sincronizada ya no pierde cambios por la hora del PC (Organizador v4.18.68, Control Pedidos v12.34.38)
 
 **Petición de Víctor:** «no aparece para compilar la nueva versión del Organizador». Las compilaciones del 14 nov (runs 22 y 23) fallaban en `test_sincro_agenda.py` en el Windows de GitHub: 6 comprobaciones (un cambio y un borrado que no llegaban al otro PC, e «Importar agenda»).

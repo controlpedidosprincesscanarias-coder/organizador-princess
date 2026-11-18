@@ -34,6 +34,7 @@ from datetime import datetime
 
 from services.chat_client import get_chat_client, nombre_adjunto_seguro, es_canal_avisos, EVT_NUEVO_MENSAJE, EVT_AVATAR, EVT_ELIMINADO, EVT_GRUPO, \
     EVT_OCULTA, EVT_ERROR, DESTINO_DESACTIVADO, DESTINO_NO_EXISTE
+from services import voz
 from ui import avatares, miniaturas, acciones_chat
 from ui.chat_bubbles import BubbleList, fecha_hora_local
 from ui.emoticonos import abrir_panel, imagen as imagen_emoticono
@@ -247,6 +248,12 @@ def mostrar_popup_chat(ctx, canal_id, titulo, mensaje_inicial=None, borrador="")
         entry.focus_set()
 
     def _click_adjunto(url, nombre_archivo):
+        if voz.es_url_de_voz(url):          # (v4.18.70) mensaje de voz: escuchar / parar
+            voz.pulsar(url, nombre_archivo, cliente.descargar_bytes,
+                       despues=lambda ms, f: win.winfo_exists() and win.after(ms, f),
+                       al_error=lambda t: _dialogo(messagebox.showerror, "Chat", t))
+            return
+
         def _hilo():
             try:
                 ruta = cliente.descargar_adjunto(url, nombre_archivo)
@@ -316,6 +323,11 @@ def mostrar_popup_chat(ctx, canal_id, titulo, mensaje_inicial=None, borrador="")
         extra = dict(acciones_chat.datos_burbuja(m, cliente),
                      acciones=acciones_chat.acciones(m, cliente, win, _responder, _recargar))
         adjunto = m.get("adjunto")
+        if adjunto and voz.registrar(m):
+            # (v4.18.70, chat v1.8.0) Mensaje de voz: un clic lo escucha (y otro lo para); no se abre como archivo
+            return msgs.agregar_burbuja(voz.texto_burbuja(m), hora, propio, meta_nombre=quien, es_adjunto=True,
+                                         adjunto_url=adjunto["url"], adjunto_nombre_archivo=adjunto["nombre_archivo"],
+                                         **extra)
         if adjunto:
             icono = "📷" if m.get("tipo") == "imagen" else "📎"
             return msgs.agregar_burbuja(f"{icono} {adjunto['nombre_archivo']}", hora, propio,

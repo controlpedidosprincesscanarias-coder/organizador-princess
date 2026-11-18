@@ -21,6 +21,8 @@ _LARGO_BARRA = 90
 def texto_cita(m) -> str:
     """Texto corto de un mensaje para citarlo: el contenido, o «📎 archivo» si es un adjunto."""
     adjunto = (m or {}).get("adjunto") or {}
+    if (m or {}).get("tipo") == "voz":          # (v4.18.70) mensaje de voz
+        return "🎤 Mensaje de voz"
     if adjunto.get("nombre_archivo"):
         return f"{'📷' if (m.get('tipo') == 'imagen') else '📎'} {adjunto['nombre_archivo']}"
     return " ".join(str((m or {}).get("contenido") or "").split())

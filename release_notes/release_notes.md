@@ -1,3 +1,13 @@
+# ✨ Organizador Princess v4.18.70
+
+## 🎤 Mensajes de voz en el chat
+
+- **Los compañeros ya pueden enviar mensajes de voz desde la app del móvil.** En el Organizador se ven como «🎤 Mensaje de voz (0:12)», con su duración.
+- **Un clic en el mensaje lo escucha** en el propio Organizador; otro clic lo para. Solo suena uno a la vez. Funciona igual en la ventana del chat y en las burbujas.
+- Si el reproductor de Windows no puede reproducirlo, se abre con el programa de audio predeterminado del equipo.
+- Los mensajes de voz se graban desde el móvil: en el Organizador solo se escuchan. Se pueden reenviar, guardar y eliminar como cualquier otro mensaje.
+- Necesita el servidor del chat v1.8.0.
+
 # ✨ Organizador Princess v4.18.68
 
 ## 🗓️ Tu agenda, la misma en todos tus PC

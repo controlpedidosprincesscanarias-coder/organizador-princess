@@ -51,6 +51,30 @@
 
 ---
 
+## 2026-11-18 15:30 — [Chat + Chat móvil + Organizador] Mensajes de voz (chat v1.8.0, chat móvil v1.0.16, Organizador v4.18.70)
+
+**Petición de Víctor:** mensajes de voz en el chat; se graban en la app del móvil y el Organizador solo los reproduce (decisión de Víctor).
+
+**Chat v1.8.0:**
+- `POST /api/chat/mensajes/archivo` acepta `"voz": true` y `"duracion_ms"`. El audio (.m4a, .aac, .ogg, .opus o .mp3) se sube a Supabase Storage como cualquier adjunto; el tipo lo fija la extensión, no el cliente.
+- Límites: 3 minutos y 5 MB.
+- El mensaje lleva `tipo` «voz», `contenido` «🎤 Mensaje de voz (0:12)» y `adjunto.duracion_ms` (columna nueva `chat_adjuntos.duracion_ms`, migración idempotente). El historial y el reenvío lo conservan.
+- Solo se añaden campos: los clientes antiguos lo ven como un adjunto más.
+- **Corregido** (commit propio): el límite de tamaño salía como «máximo 0 MB» cuando era menor de 1 MB.
+
+**Chat móvil v1.0.16:**
+- Con la caja de escribir vacía sale el 🎤: mantener pulsado graba (.m4a, AAC mono), soltar envía y deslizar a la izquierda cancela. Al llegar a 3 minutos se envía solo.
+- Permiso del micrófono (`RECORD_AUDIO`), pedido la primera vez.
+- La burbuja tiene ▶/⏸, barra de avance y duración; el audio se descarga una vez a la caché. Solo suena uno a la vez.
+
+**Organizador v4.18.70:**
+- `services/voz.py`: un clic en «🎤 Mensaje de voz (0:12)» lo descarga una vez a una carpeta temporal y lo reproduce con el reproductor de Windows integrado (MCI, `winmm.dll`, sin dependencias nuevas); otro clic lo para. Si MCI no puede, se abre con el programa de audio predeterminado.
+- Funciona en la ventana del chat y en las burbujas.
+
+**Probado:** `tests/test_chat.py` del chat (144 comprobaciones; sección 15 nueva); `testDebugUnitTest` del móvil (19 pruebas, 2 nuevas) y compilación de la `.apk`; todas las pruebas del Organizador, con `test_chat_fase5.py` nueva (18 comprobaciones, reproductor de Windows simulado), y la ventana del chat en una pantalla virtual con un mensaje de voz simulado. **Por probar:** grabar y escuchar en un móvil real, y escuchar en un PC con Windows.
+
+---
+
 ## 2026-11-18 10:15 — [Organizador + Control Pedidos] Decisión: festivos y calendario, de cada usuario
 
 - **Decisión de Víctor:** «los festivos y calendario también son del usuario, así que si un usuario abre sesión en otro PC también debería ver su calendario y festivos además de la agenda».

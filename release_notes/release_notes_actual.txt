@@ -1,22 +1,16 @@
-✨ Organizador Princess v4.18.68
+✨ Organizador Princess v4.18.70
 ================================================================
 
-🗓️ TU AGENDA, LA MISMA EN TODOS TUS PC
+🎤 MENSAJES DE VOZ EN EL CHAT
 
-• La agenda, las vacaciones y los festivos se guardan ahora con
-  tu usuario de Control de Pedidos (el mismo del chat). Si entras
-  con ese usuario en otro PC, tendrás allí la misma agenda.
-• Lo que cambias en un PC llega a los demás en unos minutos:
-  avisos nuevos, cambios, desactivados y lo que borras. Las
-  ventanas abiertas se actualizan solas.
-• Sin conexión sigues trabajando igual; lo pendiente se sube en
-  cuanto vuelve la conexión.
-• Si cambias lo mismo en dos PC, se queda el cambio más reciente.
-  Aunque un PC vaya con la hora atrasada, sus cambios no se pierden.
-• La primera vez se juntan las agendas de todos tus PC, sin
-  duplicar lo que estaba igual.
-• «Importar agenda» reemplaza la agenda también en tus otros PC.
-• Necesita Control de Pedidos v12.34.38 o posterior.
+• Los compañeros ya pueden enviar mensajes de voz desde la app
+  del móvil. En el Organizador se ven como «🎤 Mensaje de voz
+  (0:12)», con su duración.
+• Un clic en el mensaje lo escucha en el propio Organizador;
+  otro clic lo para. Funciona en la ventana del chat y en las
+  burbujas.
+• Los mensajes de voz se graban desde el móvil (en el
+  Organizador solo se escuchan).
 
 ================================================================
 La idea y el desarrollo de la aplicación Organizador Princess son de

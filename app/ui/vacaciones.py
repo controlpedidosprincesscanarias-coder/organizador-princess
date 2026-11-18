@@ -350,7 +350,7 @@ def _ventana_vacaciones(ctx):   # ANTI-REGRESIÓN: firma corregida — antes era
     ttk.Separator(vwin).pack(fill="x", pady=(10, 0))
     bb = ttk.Frame(vwin, padding=(20, 8, 20, 12))
     bb.pack(fill="x")
-    ttk.Button(bb, text="＋  Nuevo Periodo",
+    ttk.Button(bb, text="+  Nuevo Periodo",
                bootstyle="warning", command=_nuevo_periodo).pack(side="left", padx=(0, 8))
     ttk.Button(bb, text="  Cerrar  ",
                bootstyle="secondary", command=vwin.destroy).pack(side="right")

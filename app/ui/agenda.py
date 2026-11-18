@@ -469,7 +469,7 @@ def abrir_agenda(ctx):
     ttk.Separator(win).pack(fill="x", pady=(10, 0))
     btn_bar = ttk.Frame(win, padding=(20, 8, 20, 12))
     btn_bar.pack(fill="x")
-    ttk.Button(btn_bar, text="＋  Añadir Aviso",
+    ttk.Button(btn_bar, text="+  Añadir Aviso",
                bootstyle="warning", command=_nuevo_aviso).pack(side="left", padx=(0, 8))
     ttk.Button(btn_bar, text="  Cerrar  ",
                bootstyle="secondary", command=win.destroy).pack(side="right")

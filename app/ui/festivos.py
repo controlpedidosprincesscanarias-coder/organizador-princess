@@ -302,7 +302,7 @@ def _ventana_festivos(ctx):   # ANTI-REGRESIÓN: firma corregida — antes era (
     ttk.Separator(fwin).pack(fill="x", pady=(10, 0))
     bb = ttk.Frame(fwin, padding=(20, 8, 20, 12))
     bb.pack(fill="x")
-    ttk.Button(bb, text="＋  Nuevo Festivo",
+    ttk.Button(bb, text="+  Nuevo Festivo",
                bootstyle="danger", command=_nuevo_festivo).pack(side="left", padx=(0, 8))
     ttk.Button(bb, text="  Cerrar  ",
                bootstyle="secondary", command=fwin.destroy).pack(side="right")

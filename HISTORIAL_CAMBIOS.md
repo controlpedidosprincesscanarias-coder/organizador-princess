@@ -51,6 +51,26 @@
 
 ---
 
+## 2026-11-18 21:15 — [Infra] «Forma de trabajar con Víctor» en los siete CLAUDE.md
+
+> La idea y el desarrollo de las aplicaciones son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.
+
+**Petición de Víctor:** que en cualquier hilo nuevo se trabaje exactamente igual que en el hilo de hoy («cada vez que cambio a otro no realizas las operaciones de la misma manera y/o no nos entendemos de la misma»).
+
+**Causa:** cada hilo empieza sin memoria de los anteriores y solo lee el `CLAUDE.md` de los repositorios que tiene adjuntos. Las costumbres acordadas en el hilo (qué significa «fusionar», el orden de fusión, el formato de las PR, cómo se informa, qué se despliega solo y qué no) no estaban escritas en ninguno.
+
+**Cambios:** sección nueva «Forma de trabajar con Víctor», **idéntica** en los `CLAUDE.md` de Control Pedidos, chat, chat móvil, Organizador, Catálogo Asignaciones, Activo Operacional y Consola Registro Info. Recoge:
+- las siete aplicaciones y cómo llega cada una a producción;
+- qué leer al empezar un hilo;
+- los pasos de cada petición (rama, entrega completa, historial compartido, pruebas en local, PR, resumen final);
+- qué quieren decir «Sí», «fusionar», «fusionar todo» y «regenerar»;
+- lo que nunca se hace sin confirmación;
+- qué hacer después de fusionar.
+
+Si cambia, se cambia igual en los siete. Sin cambios de código ni de versión en ninguna aplicación.
+
+**Probado:** la sección es igual byte a byte en los siete archivos.
+
 ## 2026-11-18 16:10 — [Chat móvil] Manual de uso dentro de la app (v1.0.18)
 
 **Petición de Víctor:** poder consultar el manual del chat desde la propia app del móvil.

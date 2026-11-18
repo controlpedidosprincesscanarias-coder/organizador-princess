@@ -8,6 +8,8 @@
 - Los mensajes de voz se graban desde el móvil: en el Organizador solo se escuchan. Se pueden reenviar, guardar y eliminar como cualquier otro mensaje.
 - Necesita el servidor del chat v1.8.0.
 
+---
+
 # ✨ Organizador Princess v4.18.68
 
 ## 🗓️ Tu agenda, la misma en todos tus PC

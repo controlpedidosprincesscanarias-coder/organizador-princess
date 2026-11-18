@@ -1,4 +1,4 @@
-✨ Organizador Princess v4.18.66
+✨ Organizador Princess v4.18.68
 ================================================================
 
 🗓️ TU AGENDA, LA MISMA EN TODOS TUS PC
@@ -12,10 +12,11 @@
 • Sin conexión sigues trabajando igual; lo pendiente se sube en
   cuanto vuelve la conexión.
 • Si cambias lo mismo en dos PC, se queda el cambio más reciente.
+  Aunque un PC vaya con la hora atrasada, sus cambios no se pierden.
 • La primera vez se juntan las agendas de todos tus PC, sin
   duplicar lo que estaba igual.
 • «Importar agenda» reemplaza la agenda también en tus otros PC.
-• Necesita Control de Pedidos v12.34.36 o posterior.
+• Necesita Control de Pedidos v12.34.38 o posterior.
 
 ================================================================
 La idea y el desarrollo de la aplicación Organizador Princess son de

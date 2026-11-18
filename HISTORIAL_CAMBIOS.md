@@ -51,6 +51,23 @@
 
 ---
 
+## 2026-11-18 10:00 — [Organizador + Control Pedidos] La agenda sincronizada ya no pierde cambios por la hora del PC (Organizador v4.18.68, Control Pedidos v12.34.38)
+
+**Petición de Víctor:** «no aparece para compilar la nueva versión del Organizador». Las compilaciones del 14 nov (runs 22 y 23) fallaban en `test_sincro_agenda.py` en el Windows de GitHub: 6 comprobaciones (un cambio y un borrado que no llegaban al otro PC, e «Importar agenda»).
+
+**Causa (fallo real, no solo de la prueba):** el servidor decidía qué cambio gana solo por la hora. En Windows el reloj avanza cada ~15 ms, así que un cambio hecho justo después de recibir la versión guardada tenía la misma hora, se tomaba como empate y se descartaba. Por lo mismo, un PC con la hora atrasada nunca habría podido cambiar lo que había guardado otro, y el cambio se habría perdido sin avisar. En Linux la prueba pasaba porque el reloj es más preciso. No hay datos afectados: el Organizador v4.18.66 no llegó a publicarse y Control Pedidos v12.34.36 está fusionado pero aún no desplegado en Render (producción sigue en v12.34.34).
+
+**Corrección:**
+- Control Pedidos (`servicios/agenda_organizador.py`): cada cambio puede traer `base`, la versión sobre la que se hizo; si coincide con la guardada, se acepta sin mirar las horas. Solo en un conflicto real (otro PC lo cambió entretanto) gana el más reciente. La hora guardada nunca retrocede.
+- Organizador (`app/services/sincro_agenda.py`): guarda la versión de cada elemento (`_sincro.versiones`) y la envía como `base`. Para saber si algo ya está subido mira el contenido (huella), no la hora.
+- `test_sincro_agenda.py` usa ahora un reloj parado (el peor caso de Windows) y prueba un PC con 10 minutos de retraso. Con el código anterior falla; con el nuevo pasa.
+
+**Probado:** Organizador: las 17 pruebas bien; `compilacion/preparar_release.py` correcto para la 4.18.68. Control Pedidos: `test_agenda_organizador.py` (37 comprobaciones), huellas sin cambios y el resto de pruebas bien. Prueba de punta a punta con el bridge real contra Control Pedidos en local y el reloj del PC parado.
+
+**Pendiente:** desplegar Control Pedidos en Render. Desde el 13 nov no despliega lo fusionado: lanzar «Manual Deploy» y, si sale «unable to access your GitHub repository», rehacer la credencial de GitHub de Render (ver la entrada [Infra] del 12 nov). Después, compilar el Organizador v4.18.68.
+
+---
+
 ## 2026-11-13 21:45 — [Organizador + Control Pedidos] Agenda y calendario sincronizados con el usuario de Control Pedidos (Organizador v4.18.66, Control Pedidos v12.34.36)
 
 **Petición de Víctor:** «sincronizar agenda y calendario del organizador con usuario registrado de control pedidos, el mismo que da registro al chat etc. La idea es que si pongo el mismo usuario en diferentes pc, siempre tenga mi agenda y calendario sincronizado». Hasta ahora la agenda (avisos, vacaciones y festivos) solo estaba en `agenda.json` de cada PC.

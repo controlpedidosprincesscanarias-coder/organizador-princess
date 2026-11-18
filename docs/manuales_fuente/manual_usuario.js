@@ -59,11 +59,11 @@ s.push(...recuadro("consejo", "Los botones que no ves no desaparecen", ["En la v
 
 // 4
 s.push(h1("4. Agenda de avisos"));
-s.push(p("La **Agenda** («Mis Recordatorios») es tu lista de avisos. Cada uno muestra su fecha u horario, la antelación (⏰) y el título, y a la derecha su repetición."));
+s.push(p("La **Agenda** («Mis Recordatorios») es tu lista de avisos, separada en **Avisos únicos** y **Repetitivos**. Arriba, un resumen con cuántos hay y cuál es el próximo. Cada aviso es una tarjeta con la hora en grande y su tipo debajo, el título, cuándo salta (la fecha, «Cada viernes», «Todos los días»…), cuánto falta y la antelación (⏰). La franja de la izquierda es azul en los avisos únicos, cian en los repetitivos y gris en los desactivados o ya pasados."));
 s.push(...imagen("u_agenda", 16, "Agenda de avisos (datos de ejemplo)."));
 s.push(...leyenda([[1, "✏ **Editar** el aviso: abre el formulario con sus datos."], [2, "🗑 **Borrar** el aviso definitivamente."],
-  [3, "▶ **Reactivar** un aviso desactivado."], [4, "**DESACTIVADO**: el aviso está en pausa; aparece tachado y no saltará hasta que lo reactives."],
-  [5, "**Repetición** (Diario, Semanal, Mensual…). Los avisos sin repetición no llevan etiqueta."], [6, "**+ Añadir Aviso** abre el formulario de un aviso nuevo."]]));
+  [3, "▶ **Reactivar** un aviso desactivado."], [4, "**Desactivado**: el aviso está en pausa; aparece tachado y en gris, y no saltará hasta que lo reactives."],
+  [5, "**Tipo** del aviso, debajo de la hora: Único, Diario, Semanal, Mensual, Anual, Cada hora o Cada 30 min."], [6, "**+ Añadir Aviso** abre el formulario de un aviso nuevo."]]));
 s.push(h2("Pausar un aviso sin perderlo"));
 s.push(p("Se hace desde la propia ventana emergente del aviso, con **Desactivar evento** (capítulo 6). El aviso queda en la lista, tachado y marcado como DESACTIVADO, hasta que pulses ▶. Es la forma más cómoda de pausar un aviso repetitivo."));
 s.push(h2("Crear un aviso"));
@@ -88,20 +88,20 @@ s.push(...recuadro("importante", "Deja el Organizador abierto", ["Un aviso sin a
 
 // 5
 s.push(h1("5. Calendario, vacaciones y festivos"));
-s.push(p("El **Calendario** muestra el mes (o la semana) con todo lo que tienes apuntado. Cada día usa un color:"));
-s.push(...tabla(["Color", "Significado"], [["Dorado", "Hoy."], ["Azul", "Día con algún aviso (puntual o repetitivo)."], ["Verde", "Día de vacaciones."],
-  ["Rojo", "Día festivo."], ["Gris", "Día sin nada apuntado."]], [2200, 7438]));
+s.push(p("El **Calendario** muestra el mes (o la semana) con todo lo que tienes apuntado. Dentro de cada día sale una línea por festivo, vacaciones y aviso (con su hora y el principio del título); si no caben, «+N más». La franja de cada línea dice qué es:"));
+s.push(...tabla(["Color", "Significado"], [["Dorado", "Hoy (borde y número)."], ["Azul", "Aviso único."], ["Cian", "Aviso repetitivo (y borde del día que has pulsado)."], ["Verde", "Vacaciones."],
+  ["Rojo", "Festivo."], ["Gris", "Días del mes anterior o del siguiente."]], [2200, 7438]));
 s.push(...imagen("u_calendario_mes", 16, "Calendario del mes (datos de ejemplo)."));
 s.push(...leyenda([[1, "**◀ ▶**: mes (o semana) anterior y siguiente. Entre las flechas, el periodo que estás viendo."], [2, "**Mes / Semana**: cambia la forma de ver el calendario. «Semana» abre la semana de hoy o la del día que hayas elegido."],
-  [3, "**Chat**: abre el chat."], [4, "**Festivos**: la lista de festivos, donde se añaden y editan."], [5, "**Vacaciones**: la lista de periodos de vacaciones."],
-  [6, "**Leyenda** de los iconos: aviso único, repetitivo, vacaciones, festivo y hoy."], [7, "**Hoy**, en dorado. Pulsa cualquier día para ver su detalle."],
+  [3, "**Hoy**: vuelve al mes (o a la semana) de hoy."], [4, "**Festivos**: la lista de festivos, donde se añaden y editan."], [5, "**Vacaciones**: la lista de periodos de vacaciones."],
+  [6, "**Leyenda** de colores: aviso único, repetitivo, vacaciones, festivo y hoy."], [7, "**Hoy**, en dorado. Pulsa cualquier día para ver su detalle."],
   [8, "**Imprimir**: Agenda del Día, Semanal o Mensual (se abre una página lista para imprimir en tu navegador)."], [9, "La Agenda Mensual imprime el mes que estás viendo."]]));
 s.push(...imagen("u_calendario_semana", 16, "Vista Semana: cada día con sus avisos, vacaciones y festivos."));
 s.push(h2("Detalle de un día"));
 s.push(...imagen("u_detalle_dia", 6, "Detalle del día."));
-s.push(p("Al pulsar un día se abre un panel con todo lo de esa fecha: primero las vacaciones (verde) y los festivos (rojo), con el botón **Enviar correo sobre este aviso**, y debajo los avisos de la agenda con su hora. La **Agenda del Día** que se imprime es la del día que hayas elegido (o la de hoy)."));
+s.push(p("Al pulsar un día se abre un panel con todo lo de esa fecha: primero los festivos (rojo) y las vacaciones (verde), con el botón **Enviar correo sobre este aviso**, y debajo los avisos de la agenda con su hora. La **Agenda del Día** que se imprime es la del día que hayas elegido (o la de hoy)."));
 s.push(h2("Vacaciones y festivos"));
-s.push(p("Desde los botones **Vacaciones** y **Festivos** del calendario se gestionan las dos listas. Se agrupan por año y al final muestran el total de días programados."));
+s.push(p("Desde los botones **Vacaciones** y **Festivos** del calendario se gestionan las dos listas. Arriba, un resumen (días de vacaciones del año, festivos que quedan y el próximo). Cada periodo o festivo es una tarjeta con la fecha como la hoja de un calendario, el título, las fechas, cuánto falta y la antelación del aviso. Se agrupan por año; los ya pasados salen en gris y los que están en curso, con la etiqueta «En curso» (o «Hoy»)."));
 s.push(...imagen("u_vacaciones", 12, "Periodos de vacaciones."));
 s.push(...leyenda([[1, "✏ **Editar** el periodo."], [2, "🗑 **Borrar** el periodo."], [3, "**+ Nuevo Periodo**: título (por ejemplo «Vacaciones de verano»), fechas de inicio y fin (escritas o con el calendario 📅) y, si quieres, con cuánta antelación te avisa el Organizador."]]));
 s.push(...imagen("u_festivos", 12, "Días festivos."));
@@ -135,7 +135,7 @@ s.push(p("La primera vez que abres el Organizador cada día aparece un saludo co
 
 // 7
 s.push(h1("7. Chat"));
-s.push(p("El **Chat** te conecta con los compañeros que tienen cuenta en Control de Pedidos. Para usarlo hace falta haber guardado tu usuario y contraseña en **Admin → Mi Usuario**: sin ellos, el chat no se abre y te dice dónde configurarlos. Se abre con el botón **Chat** del menú o del calendario."));
+s.push(p("El **Chat** te conecta con los compañeros que tienen cuenta en Control de Pedidos. Para usarlo hace falta haber guardado tu usuario y contraseña en **Admin → Mi Usuario**: sin ellos, el chat no se abre y te dice dónde configurarlos. Se abre con el botón **Chat** del menú."));
 s.push(...imagen("u_chat", 16, "Ventana del chat (datos de ejemplo)."));
 s.push(...leyenda([[1, "**Estado** de la conexión: «Conectado» en verde cuando todo va bien."],
   [2, "**Conversaciones**: el canal General, los chats privados y los grupos, cada uno con su foto (o sus iniciales sobre un círculo de color si no tiene). El número entre paréntesis son los mensajes sin leer."],

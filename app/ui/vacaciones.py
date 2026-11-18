@@ -11,6 +11,9 @@ from tkinter import messagebox, StringVar    # ANTI-REGRESION: StringVar era glo
 from ui.selector_fecha_hora import campo_fecha
 from utils.fechas import _iso_a_ui, _ui_a_iso, _dias_entre
 from services import sincro_agenda   # (v4.18.66) agenda sincronizada con Control de Pedidos
+import tkinter as tk
+from ui import estilo_calendario as E          # (v4.18.72) aspecto nuevo
+from utils import textos_calendario as T
 
 # Constantes de color — ANTI-REGRESION: eran globals de main_agenda
 GOLD  = "#C9A84C"
@@ -24,108 +27,67 @@ def _ventana_vacaciones(ctx):   # ANTI-REGRESIÓN: firma corregida — antes era
     (v4.10.5 — el scroll/ancho de canvas ya se unificó en v4.10.4)."""
     vwin = ttk.Toplevel()
     vwin.title("🏖 Vacaciones")
-    vwin.resizable(True, False)   # ANTI-REGRESIÓN: unificado con Agenda — redimensionable en horizontal
+    vwin.resizable(True, True)   # ANTI-REGRESIÓN: unificado con Agenda — redimensionable en horizontal
     ctx.apply_icon(vwin)
 
-    _vw = 600
+    _vw = 640
     _sw = vwin.winfo_screenwidth()
     _sh = vwin.winfo_screenheight()
     vwin.minsize(520, 200)
 
-    main = ttk.Frame(vwin, padding=(20, 16, 20, 12))
-    main.pack(fill="both", expand=True)
-    ttk.Label(main, text="🏖  Periodos de Vacaciones",
-              font=("Segoe UI", 13, "bold")).pack(anchor="w", pady=(0, 10))
-    ttk.Separator(vwin).pack(fill="x")
-
-    # Scrollable list
-    lf = ttk.Frame(main)
-    lf.pack(fill="both", expand=True, pady=(10, 0))
-    canvas = ttk.Canvas(lf, highlightthickness=0)
-    sb     = ttk.Scrollbar(lf, orient="vertical", command=canvas.yview)
-    sf     = ttk.Frame(canvas)
-    sf.bind("<Configure>",
-            lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
-    _canvas_window = canvas.create_window((0, 0), window=sf, anchor="nw")
-    canvas.configure(yscrollcommand=sb.set)
-
-    # ANTI-REGRESION (mismo patrón que Agenda, v4.8.9): sin esto, el ancho
-    # de sf lo decide su contenido más ancho ya insertado, no el ancho real
-    # del canvas — las filas se quedaban cortas salvo que coincidieran con
-    # ser la más ancha del momento.
-    def _ajustar_ancho_interno(event):
-        canvas.itemconfig(_canvas_window, width=event.width)
-    canvas.bind("<Configure>", _ajustar_ancho_interno)
-
-    canvas.pack(side="left", fill="both", expand=True)
-    sb.pack(side="right", fill="y")
-
-    # ANTI-REGRESION (mismo patrón que Agenda, v4.8.9): la rueda del ratón
-    # no movía la lista — solo se enlaza mientras el puntero está dentro
-    # del canvas, para no robarle la rueda a otra ventana abierta a la vez.
-    def _on_mousewheel(event):
-        canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
-        return "break"
-
-    def _activar_scroll_raton(event=None):
-        canvas.bind_all("<MouseWheel>", _on_mousewheel)
-
-    def _desactivar_scroll_raton(event=None):
-        canvas.unbind_all("<MouseWheel>")
-
-    canvas.bind("<Enter>", _activar_scroll_raton)
-    canvas.bind("<Leave>", _desactivar_scroll_raton)
-    vwin.bind("<Destroy>", lambda e: _desactivar_scroll_raton())
+    # (v4.18.72) Rediseño: cabecera con resumen, tarjetas con bloque de fecha y estado (ui/estilo_calendario.py).
+    vwin.configure(background=E.FONDO)
+    v_resumen = StringVar()
+    E.cabecera(vwin, "🏖", "Vacaciones", v_resumen)
+    sf = E.lista_desplazable(vwin, vwin)
 
     def cargar():
         for w in sf.winfo_children():
             w.destroy()
         vacs  = ctx.agenda_data.get("vacaciones", [])
+        hoy   = date.today()
+        v_resumen.set(T.resumen_vacaciones(vacs, hoy))
         vacs_sorted = sorted(vacs, key=lambda x: x["fecha_inicio"])
-        total = sum(_dias_entre(v["fecha_inicio"], v["fecha_fin"]) for v in vacs_sorted)
 
         if not vacs_sorted:
-            ttk.Label(sf, text="No hay periodos definidos.",
-                      foreground=LIGHT).pack(pady=20)
-        else:
-            año_actual = None
-            for i, vac in enumerate(vacs_sorted):
-                año = vac["fecha_inicio"][:4]
-                if año != año_actual:
-                    año_actual = año
-                    ttk.Label(sf, text=f"── {año} ──",
-                              font=("Segoe UI", 9, "bold"),
-                              foreground=GOLD).pack(anchor="w", pady=(8, 2), padx=4)
-                dias = _dias_entre(vac["fecha_inicio"], vac["fecha_fin"])
-                f = ttk.Frame(sf, bootstyle="success", padding=(10, 6))
-                f.pack(fill="x", pady=2, padx=4)
-                ttk.Label(f, text=f"🏖  {vac['titulo']}",
-                          font=("Segoe UI", 10, "bold")).pack(side="left")
-                fecha_ini_ui = _iso_a_ui(vac["fecha_inicio"])
-                fecha_fin_ui = _iso_a_ui(vac["fecha_fin"])
-                ant = vac.get("antelacion", {})
-                ant_d = int(ant.get("dias", 0))
-                ant_h = int(ant.get("horas", 0))
-                ant_m = int(ant.get("minutos", 0))
-                partes_ant = []
-                if ant_d: partes_ant.append(f"{ant_d}d")
-                if ant_h: partes_ant.append(f"{ant_h}h")
-                if ant_m: partes_ant.append(f"{ant_m}min")
-                ant_txt = f"  ⏰ -{' '.join(partes_ant)}" if partes_ant else ""
-                ttk.Label(f,
-                          text=f"  {fecha_ini_ui} → {fecha_fin_ui}  ({dias} d){ant_txt}",
-                          font=("Segoe UI", 9)).pack(side="left")
-                ttk.Button(f, text="🗑", bootstyle="danger-outline", width=3,
-                           command=lambda ix=vacs.index(vac): _eliminar(ix)
-                           ).pack(side="right")
-                ttk.Button(f, text="✏", bootstyle="success-outline", width=3,
-                           command=lambda ix=vacs.index(vac): _editar_periodo(ix)
-                           ).pack(side="right", padx=(0, 4))
+            E.vacia(sf, "No hay periodos de vacaciones.\nPulsa «+  Nuevo Periodo» para añadir el primero.")
+            return
+        año_actual = None
+        for vac in vacs_sorted:
+            año = vac["fecha_inicio"][:4]
+            if año != año_actual:
+                año_actual = año
+                total = sum(_dias_entre(v["fecha_inicio"], v["fecha_fin"])
+                            for v in vacs_sorted if v["fecha_inicio"][:4] == año)
+                E.separador_anio(sf, año, T.dias(total))
+            estado = T.estado_periodo(vac["fecha_inicio"], vac["fecha_fin"], hoy)
+            pasado = estado == "pasado"
+            _, cuerpo = E.tarjeta(sf, E.VERDE, apagado=pasado)
+            E.bloque_fecha(cuerpo, vac["fecha_inicio"], E.VERDE, apagado=pasado).pack(side="left", padx=(0, 14))
 
-            ttk.Label(sf,
-                      text=f"Total programado: {total} días",
-                      font=("Segoe UI", 9, "bold"),
-                      foreground=GOLD).pack(anchor="e", pady=(8, 2), padx=4)
+            ix = vacs.index(vac)
+            E.botones_fila(cuerpo, lambda ix=ix: _editar_periodo(ix),
+                           lambda ix=ix: _eliminar(ix)).pack(side="right")
+
+            texto = tk.Frame(cuerpo, bg=E.TARJETA)
+            texto.pack(side="left", fill="x", expand=True)
+            fila1 = tk.Frame(texto, bg=E.TARJETA)
+            fila1.pack(fill="x")
+            E.etiqueta(fila1, vac.get("titulo") or "Vacaciones", fuente=E.F_NEGRITA,
+                       color=E.TEXTO_SUAVE if pasado else E.TEXTO, anchor="w").pack(side="left")
+            if estado == "en_curso":
+                E.etiqueta_estado(fila1, "En curso", E.VERDE).pack(side="left", padx=(8, 0))
+            elif pasado:
+                E.etiqueta_estado(fila1, "Pasado", E.TEXTO_APAGADO).pack(side="left", padx=(8, 0))
+            n = _dias_entre(vac["fecha_inicio"], vac["fecha_fin"])
+            E.etiqueta(texto, f"{T.rango(vac['fecha_inicio'], vac['fecha_fin'])}   ·   {T.dias(n)}",
+                       color=E.TEXTO_SUAVE, fuente=E.F_SUBTITULO, anchor="w").pack(fill="x", pady=(2, 0))
+            ant = T.antelacion(vac.get("antelacion"))
+            falta = "" if estado != "proximo" else T.cuanto_falta(vac["fecha_inicio"], hoy)
+            detalle = "   ·   ".join(x for x in (f"Empieza {falta}" if falta else "", f"⏰ {ant}" if ant else "") if x)
+            if detalle:
+                E.etiqueta(texto, detalle, color=E.TEXTO_APAGADO if pasado else E.TEXTO_SUAVE,
+                           fuente=E.F_PEQUE, anchor="w").pack(fill="x", pady=(2, 0))
 
     def _eliminar(idx):
         # (v4.18.66) Se borra por su id, no por la posición: mientras se pregunta puede llegar un cambio de otro PC.
@@ -230,7 +192,7 @@ def _ventana_vacaciones(ctx):   # ANTI-REGRESIÓN: firma corregida — antes era
         fb = ttk.Frame(ew, padding=(20, 8, 20, 12))
         fb.pack(fill="x")
         ttk.Button(fb, text="  Guardar  ",
-                   bootstyle="warning", command=guardar).pack(side="left", padx=(0, 8))
+                   bootstyle="success", command=guardar).pack(side="left", padx=(0, 8))
         ttk.Button(fb, text="  Cancelar  ",
                    bootstyle="secondary", command=ew.destroy).pack(side="left")
 
@@ -335,7 +297,7 @@ def _ventana_vacaciones(ctx):   # ANTI-REGRESIÓN: firma corregida — antes era
         fb = ttk.Frame(nw, padding=(20, 8, 20, 12))
         fb.pack(fill="x")
         ttk.Button(fb, text="  Guardar  ",
-                   bootstyle="warning", command=guardar).pack(side="left", padx=(0, 8))
+                   bootstyle="success", command=guardar).pack(side="left", padx=(0, 8))
         ttk.Button(fb, text="  Cancelar  ",
                    bootstyle="secondary", command=nw.destroy).pack(side="left")
 
@@ -347,31 +309,15 @@ def _ventana_vacaciones(ctx):   # ANTI-REGRESIÓN: firma corregida — antes era
     sincro_agenda.registrar_refresco(vwin, cargar)   # (v4.18.66) cambios llegados de otro PC
     cargar()
 
-    ttk.Separator(vwin).pack(fill="x", pady=(10, 0))
-    bb = ttk.Frame(vwin, padding=(20, 8, 20, 12))
-    bb.pack(fill="x")
-    ttk.Button(bb, text="+  Nuevo Periodo",
-               bootstyle="warning", command=_nuevo_periodo).pack(side="left", padx=(0, 8))
-    ttk.Button(bb, text="  Cerrar  ",
+    pie = tk.Frame(vwin, bg=E.FONDO)
+    pie.pack(fill="x", padx=22, pady=(12, 16))
+    # (v4.18.72) «+» normal: el «＋» de ancho completo salía con otra letra (con serifa) en el botón.
+    ttk.Button(pie, text="+  Nuevo Periodo",
+               bootstyle="success", command=_nuevo_periodo).pack(side="left")
+    ttk.Button(pie, text="  Cerrar  ",
                bootstyle="secondary", command=vwin.destroy).pack(side="right")
 
     vwin.update_idletasks()
-    _vh = min(vwin.winfo_reqheight() + 10, _sh - 80)
+    _vh = min(max(vwin.winfo_reqheight() + 10, 460), _sh - 80)
     vwin.geometry(f"{_vw}x{_vh}+{(_sw - _vw)//2}+{(_sh - _vh)//2}")
-
-    # ANTI-REGRESIÓN: igual que en abrir_agenda — reajusta el wraplength de
-    # las etiquetas de fila si el usuario ensancha la ventana (ahora
-    # redimensionable en horizontal).
-    def _on_resize(event):
-        if event.widget is vwin:
-            new_wrap = max(300, event.width - 160)
-            for f in sf.winfo_children():
-                for child in f.winfo_children():
-                    if isinstance(child, ttk.Label) and child.cget("anchor") == "w":
-                        try:
-                            child.configure(wraplength=new_wrap)
-                        except Exception:
-                            pass  # UI — ignorar silenciosamente
-    vwin.bind("<Configure>", _on_resize)
-
     vwin.grab_set()

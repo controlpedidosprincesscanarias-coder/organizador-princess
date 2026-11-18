@@ -126,6 +126,8 @@ def foto(c, v, nombre, marcas=(), titulo=None, recorte=None, barra=True):
         img, dy = _barra_titulo(img, titulo if titulo is not None else v.title())
     d = ImageDraw.Draw(img)
     rx, ry = (recorte[0], recorte[1]) if recorte else (0, 0)
+    if os.environ.get("SIN_MARCAS") == "1":   # capturas limpias, sin números (p. ej. para comparar diseños)
+        marcas = ()
     for m in marcas:
         w, n = m[0], m[1]
         if w is None:
@@ -269,10 +271,13 @@ def calendario(c):
 
 def calendario_ver(c):
     v = c.ventana("Calendario")
-    hoy = [w for w in c.widgets(v) if w.winfo_class() == "TLabel" and c.texto(w).strip() == str(datetime.now().day) and w.winfo_ismapped()]
+    # (v4.18.72) El número de hoy es un Label normal (fondo dorado); los días de otro mes llevan _fuera_mes
+    hoy = [w for w in c.widgets(v) if w.winfo_class() in ("Label", "TLabel") and c.texto(w).strip() == str(datetime.now().day)
+           and w.winfo_ismapped() and not getattr(w, "_fuera_mes", False)]
+    # (v4.18.72) Sin botón «Chat» en el calendario: la marca 3 es ahora el botón «Hoy»
     foto(c, v, "u_calendario_mes", [(buscar(c, v, "◀"), 1, "b"), (buscar(c, v, "Mes", "TRadiobutton"), 2, "b"),
-                                     (buscar(c, v, "Chat", "TButton"), 3, "b"), (buscar(c, v, "Festivos", "TButton"), 4, "b"),
-                                     (buscar(c, v, "Vacaciones", "TButton"), 5, "b"), (buscar(c, v, "Aviso único"), 6, "l"),
+                                     (buscar(c, v, "Hoy", "TButton"), 3, "b"), (buscar(c, v, "Festivos", "TButton"), 4, "b"),
+                                     (buscar(c, v, "Vacaciones", "TButton"), 5, "b"), (buscar(c, v, "Aviso único"), 6, "b"),
                                      (hoy[0].master if hoy else None, 7, "ir"), (buscar(c, v, "Agenda del Día"), 8, "t"),
                                      (buscar(c, v, "Agenda Mensual"), 9, "t")])
     c.pulsar(v, "Semana")
@@ -288,7 +293,8 @@ def calendario_dia(c):
     # Un día con vacaciones y un aviso (el de «Asuntos propios» del perfil de ejemplo), si cae en este mes
     dia = datetime.now() + timedelta(days=10)
     hoy = str(dia.day if dia.month == datetime.now().month else datetime.now().day)
-    etiqueta = [w for w in c.widgets(v) if c.texto(w).strip() == hoy and w.winfo_ismapped()]
+    etiqueta = [w for w in c.widgets(v) if c.texto(w).strip() == hoy and w.winfo_ismapped()
+                and not getattr(w, "_fuera_mes", False)]
     guardar_ventanas()
     if etiqueta:
         etiqueta[0].event_generate("<Button-1>")

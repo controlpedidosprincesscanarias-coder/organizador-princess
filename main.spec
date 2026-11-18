@@ -55,6 +55,7 @@ hiddenimports += [
     'utils.fechas',
     'utils.sonido',
     'utils.rutas',       # ANTI-REGRESION: _lanzar_ruta movida aquí desde main_agenda
+    'utils.textos_calendario',  # v4.18.72: textos de Agenda, Calendario, Vacaciones y Festivos
     'negocio.correo',
     'negocio.alertas',
     'services.update_service',
@@ -85,6 +86,7 @@ hiddenimports += [
     'ui.importexport',
     'ui.vacaciones',
     'ui.festivos',
+    'ui.estilo_calendario',  # v4.18.72: aspecto común de Agenda, Calendario, Vacaciones y Festivos
     'ui.ventana_config',
     'ui.ventana_chat',
     'services.chat_client',

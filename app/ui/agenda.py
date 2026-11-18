@@ -14,19 +14,20 @@ from tkinter import StringVar, messagebox
 import ttkbootstrap as ttk
 
 import negocio.alertas as _alertas_mod
-from negocio.alertas import _descripcion_aviso
 from ui.assets import _apply_icon
-from ui.colores import LIGHT
 from ui.selector_fecha_hora import campo_fecha, campo_hora
 from utils.fechas import _iso_a_ui, _ui_a_iso
 from services import sincro_agenda   # (v4.18.66) agenda sincronizada con Control de Pedidos
+import tkinter as tk
+from ui import estilo_calendario as E          # (v4.18.72) aspecto nuevo
+from utils import textos_calendario as T
 
 
 def abrir_agenda(ctx):
     """Ventana principal de avisos/recordatorios."""
     win = ttk.Toplevel()
     win.title("📅 Agenda de Avisos")
-    win.resizable(True, False)   # redimensionable en horizontal
+    win.resizable(True, True)   # (v4.18.72) también en vertical, como Vacaciones y Festivos
     _apply_icon(win)
 
     # ── Compartido entre "Nuevo Aviso" y "Editar Aviso" ─────────────────────
@@ -66,80 +67,60 @@ def abrir_agenda(ctx):
     _sh = win.winfo_screenheight()
     win.minsize(_aw_min, 200)
 
-    main_frame = ttk.Frame(win, padding=(20, 16, 20, 12))
-    main_frame.pack(fill="both", expand=True)
+    # (v4.18.72) Rediseño con el mismo aspecto que Calendario, Vacaciones y Festivos (ui/estilo_calendario.py):
+    # cabecera con resumen y una tarjeta por aviso, con la hora en grande, la franja del color de su tipo
+    # (azul único, cian repetitivo, gris desactivado) y, debajo del título, cuándo salta y su antelación.
+    win.configure(background=E.FONDO)
+    v_resumen = StringVar()
+    E.cabecera(win, "📅", "Mis Recordatorios", v_resumen)
+    scrollable_frame = E.lista_desplazable(win, win)
 
-    ttk.Label(main_frame, text="📅  Mis Recordatorios",
-              font=("Segoe UI", 13, "bold")).pack(anchor="w", pady=(0, 10))
-    ttk.Separator(win).pack(fill="x")
+    def _tarjeta_aviso(i, aviso, ahora):
+        rep    = aviso.get("repeticion", "ninguna")
+        es_rep = rep != "ninguna"
+        # ANTI-REGRESION (Fase 3.7g): indicador visual de aviso desactivado
+        activo = aviso.get("activo", True)
+        pasado = T.aviso_pasado(aviso, ahora)
+        apagado = (not activo) or pasado
+        color = E.CIAN if es_rep else E.AZUL
+        _, cuerpo = E.tarjeta(scrollable_frame, color, apagado=apagado)
 
-    # ── Lista con scroll ──────────────────────────────────
-    list_frame = ttk.Frame(main_frame)
-    list_frame.pack(fill="both", expand=True, pady=(10, 0))
+        # Hora en grande y tipo debajo, como el bloque de fecha de Vacaciones y Festivos
+        bloque = tk.Frame(cuerpo, bg=E.TARJETA, width=64)
+        bloque.pack(side="left", padx=(0, 14))
+        E.etiqueta(bloque, T.hora_aviso(aviso), color=E.TEXTO_APAGADO if apagado else E.TEXTO,
+                   fuente=("Segoe UI", 15, "bold")).pack()
+        E.etiqueta(bloque, T.NOMBRE_REPETICION.get(rep, rep).upper(),
+                   color=E.TEXTO_APAGADO if apagado else color, fuente=E.F_PEQUE_NEG).pack()
 
-    canvas = ttk.Canvas(list_frame, highlightthickness=0)
-    scrollbar = ttk.Scrollbar(list_frame, orient="vertical", command=canvas.yview)
-    scrollable_frame = ttk.Frame(canvas)
+        # Botones PRIMERO (side=right) para que el texto no los desplace
+        botones = E.botones_fila(cuerpo, lambda ix=i: _editar_aviso(ix), lambda ix=i: _eliminar_aviso(ix))
+        botones.pack(side="right")
+        if not activo:
+            ttk.Button(botones, text="▶", bootstyle="success-outline", width=3,
+                       command=lambda ix=i: _reactivar_aviso(ix)).pack(side="left", padx=(6, 0))
 
-    scrollable_frame.bind(
-        "<Configure>",
-        lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
-    )
-    _canvas_window = canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
-    canvas.configure(yscrollcommand=scrollbar.set)
-
-    # ANTI-REGRESION (reportado 2026-07-21): sin esto, el ancho de
-    # scrollable_frame lo decide su contenido más ancho (el título del
-    # aviso más largo que haya en ese momento), no el ancho real del
-    # canvas — por eso las filas "a veces sí" ocupaban todo el ancho (si
-    # coincidían con ser las más anchas) y otras veces se quedaban cortas.
-    # Al redimensionar el canvas (incluida la primera vez que se dibuja),
-    # se fuerza el ancho de la ventana interna a igualar el del canvas, y
-    # cada fila (empaquetada con fill="x") sí ocupa entonces todo el ancho
-    # visible, sin importar lo larga o corta que sea su propia etiqueta.
-    def _ajustar_ancho_interno(event):
-        canvas.itemconfig(_canvas_window, width=event.width)
-    canvas.bind("<Configure>", _ajustar_ancho_interno)
-
-    canvas.pack(side="left", fill="both", expand=True)
-    scrollbar.pack(side="right", fill="y")
-
-    # ANTI-REGRESION (reportado 2026-07-21): la rueda del ratón no movía
-    # la lista porque el canvas nunca recibía el evento <MouseWheel> — solo
-    # respondía si se arrastraba la barra de scroll a mano. Se enlaza
-    # mientras el puntero está DENTRO de esta ventana (bind_all, pero solo
-    # entre <Enter>/<Leave> del propio canvas) para no robarle la rueda del
-    # ratón a cualquier otra ventana que esté abierta al mismo tiempo.
-    def _on_mousewheel(event):
-        canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
-        return "break"
-
-    def _activar_scroll_raton(event=None):
-        canvas.bind_all("<MouseWheel>", _on_mousewheel)
-
-    def _desactivar_scroll_raton(event=None):
-        canvas.unbind_all("<MouseWheel>")
-
-    canvas.bind("<Enter>", _activar_scroll_raton)
-    canvas.bind("<Leave>", _desactivar_scroll_raton)
-    win.bind("<Destroy>", lambda e: _desactivar_scroll_raton())
-
-    # Etiquetas legibles para cada modo de repetición (solo para esta lista;
-    # la descripción completa de cada aviso la genera _descripcion_aviso,
-    # importada de negocio.alertas — ver cabecera del fichero. ANTI-REGRESION
-    # (limpieza 2026-07-21): existía una copia local de _descripcion_aviso
-    # aquí mismo que TAPABA la importada sin usarla, con la lógica de
-    # repetición duplicada en los dos sitios — cualquier cambio futuro (como
-    # el tipo "anual") había que aplicarlo dos veces o se quedaba a medias.
-    _REP_LABEL = {
-        "ninguna":     "Sin repetición",
-        "cada_30min":  "↺ Cada 30 min",
-        "cada_hora":   "↺ Cada hora",
-        "diario":      "↺ Diario",
-        "semanal":     "↺ Semanal",
-        "mensual":     "↺ Mensual",
-        "anual":       "↺ Anual",
-    }
+        texto = tk.Frame(cuerpo, bg=E.TARJETA)
+        texto.pack(side="left", fill="x", expand=True)
+        fila1 = tk.Frame(texto, bg=E.TARJETA)
+        fila1.pack(fill="x")
+        E.etiqueta(fila1, aviso.get("titulo", ""), fuente=("Segoe UI", 10, "bold overstrike") if not activo else E.F_NEGRITA,
+                   color=E.TEXTO_SUAVE if apagado else E.TEXTO, anchor="w", justify="left",
+                   wraplength=max(300, win.winfo_width() - 330)).pack(side="left")
+        if not activo:
+            E.etiqueta_estado(fila1, "⏸ Desactivado", E.DORADO).pack(side="left", padx=(8, 0))
+        elif pasado:
+            E.etiqueta_estado(fila1, "Pasado", E.TEXTO_APAGADO).pack(side="left", padx=(8, 0))
+        detalle = T.cuando_aviso(aviso)
+        if not es_rep and not pasado:
+            falta = T.cuanto_falta(aviso.get("fecha"), ahora.date())
+            if falta:
+                detalle += f"   ·   {falta}"
+        ant = T.antelacion(aviso.get("antelacion"))
+        if ant:
+            detalle += f"   ·   ⏰ {ant}"
+        E.etiqueta(texto, detalle, color=E.TEXTO_APAGADO if apagado else E.TEXTO_SUAVE,
+                   fuente=E.F_SUBTITULO, anchor="w").pack(fill="x", pady=(2, 0))
 
     def cargar_avisos():
         for w in scrollable_frame.winfo_children():
@@ -147,64 +128,20 @@ def abrir_agenda(ctx):
         avisos = ctx.agenda_data.get("avisos", [])
         avisos.sort(key=lambda x: (x.get("repeticion","ninguna") != "ninguna",
                                    x["hora"], x["fecha"]))
+        ahora = datetime.now()
+        v_resumen.set(T.resumen_agenda(avisos, ahora))
         if not avisos:
-            ttk.Label(scrollable_frame,
-                      text="No hay avisos programados.",
-                      foreground=LIGHT).pack(pady=20)
+            E.vacia(scrollable_frame, "No hay avisos programados.\nPulsa «+  Añadir Aviso» para crear el primero.")
             return
+        grupo = None
         for i, aviso in enumerate(avisos):
-            rep      = aviso.get("repeticion", "ninguna")
-            es_rep   = rep != "ninguna"
-            # ANTI-REGRESION (Fase 3.7g): indicador visual de aviso desactivado
-            activo   = aviso.get("activo", True)
-            if not activo:
-                # Aviso desactivado: frame gris oscuro, texto apagado
-                estilo_frame = "dark"
-                color_texto  = "#888888"
-                fuente_texto = ("Segoe UI", 10, "overstrike")  # tachado
-            elif es_rep:
-                estilo_frame = "info"
-                color_texto  = None   # color por defecto del theme
-                fuente_texto = ("Segoe UI", 10, "bold")
-            else:
-                estilo_frame = "secondary"
-                color_texto  = None
-                fuente_texto = ("Segoe UI", 10, "bold")
-            f = ttk.Frame(scrollable_frame,
-                          bootstyle=estilo_frame,
-                          padding=(10, 6))
-            f.pack(fill="x", pady=2, padx=4)
-            # Botones y badges PRIMERO (side=right) para que el label no los desplace
-            if not activo:
-                # Badge "DESACTIVADO" con botón de reactivar
-                ttk.Label(f, text="⏸ DESACTIVADO",
-                          font=("Segoe UI", 8, "bold"),
-                          foreground="#FF9900",
-                          bootstyle="inverse-dark").pack(side="right", padx=(4, 0))
-                ttk.Button(
-                    f, text="▶", bootstyle="success-outline", width=3,
-                    command=lambda ix=i: _reactivar_aviso(ix)
-                ).pack(side="right", padx=(0, 2))
-            elif es_rep:
-                ttk.Label(f, text=_REP_LABEL.get(rep, rep),
-                          font=("Segoe UI", 8),
-                          bootstyle="inverse-info").pack(side="right", padx=(4, 0))
-            ttk.Button(
-                f, text="🗑", bootstyle="danger-outline", width=3,
-                command=lambda ix=i: _eliminar_aviso(ix)
-            ).pack(side="right")
-            ttk.Button(
-                f, text="✏", bootstyle="warning-outline", width=3,
-                command=lambda ix=i: _editar_aviso(ix)
-            ).pack(side="right", padx=(0, 4))
-            # Label DESPUÉS con wraplength para que no desborde
-            lbl_kw = dict(font=fuente_texto,
-                          wraplength=max(400, win.winfo_width() - 200),
-                          anchor="w")
-            if color_texto:
-                lbl_kw["foreground"] = color_texto
-            ttk.Label(f, text=_descripcion_aviso(aviso), **lbl_kw).pack(
-                side="left", fill="x", expand=True)
+            es_rep = aviso.get("repeticion", "ninguna") != "ninguna"
+            if es_rep != grupo:
+                grupo = es_rep
+                n = sum(1 for a in avisos if (a.get("repeticion", "ninguna") != "ninguna") == es_rep)
+                E.separador_anio(scrollable_frame, "Repetitivos" if es_rep else "Avisos únicos",
+                                 f"{n} aviso{'s' if n != 1 else ''}")
+            _tarjeta_aviso(i, aviso, ahora)
 
     def _eliminar_aviso(idx):
         # (v4.18.66) Se borra por su id, no por la posición: mientras se pregunta puede llegar un cambio de otro PC.
@@ -466,11 +403,11 @@ def abrir_agenda(ctx):
         nv.grab_set()
 
     # ── Barra inferior ────────────────────────────────────
-    ttk.Separator(win).pack(fill="x", pady=(10, 0))
-    btn_bar = ttk.Frame(win, padding=(20, 8, 20, 12))
-    btn_bar.pack(fill="x")
+    btn_bar = tk.Frame(win, bg=E.FONDO)
+    btn_bar.pack(fill="x", padx=22, pady=(12, 16))
+    # (v4.18.72) «+» normal: el «＋» de ancho completo salía con otra letra en el botón.
     ttk.Button(btn_bar, text="+  Añadir Aviso",
-               bootstyle="warning", command=_nuevo_aviso).pack(side="left", padx=(0, 8))
+               bootstyle="primary", command=_nuevo_aviso).pack(side="left")
     ttk.Button(btn_bar, text="  Cerrar  ",
                bootstyle="secondary", command=win.destroy).pack(side="right")
 
@@ -483,20 +420,7 @@ def abrir_agenda(ctx):
 
     # Centrar con altura real tras construir todos los widgets
     win.update_idletasks()
-    _ah = min(win.winfo_reqheight() + 10, _sh - 80)
+    _ah = min(max(win.winfo_reqheight() + 10, 520), _sh - 80)
     win.geometry(f"{_aw}x{_ah}+{(_sw - _aw)//2}+{(_sh - _ah)//2}")
-
-    # Reajustar wraplength de los labels si el usuario redimensiona la ventana
-    def _on_resize(event):
-        if event.widget is win:
-            new_wrap = max(400, event.width - 200)
-            for f in scrollable_frame.winfo_children():
-                for child in f.winfo_children():
-                    if isinstance(child, ttk.Label) and child.cget("anchor") == "w":
-                        try:
-                            child.configure(wraplength=new_wrap)
-                        except Exception:
-                            pass  # UI — ignorar silenciosamente
-    win.bind("<Configure>", _on_resize)
 
     win.grab_set()

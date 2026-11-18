@@ -115,12 +115,11 @@ def agendas_imprimibles_ver(c):
             htmls.append("")
     c.ok("3. las agendas del día, semanal y mensual se abren en el navegador", len(nuevas) == 3, nuevas)
     c.ok("3. la agenda del día incluye el aviso de prueba", any(f"PRUEBA CLAUDE {SELLO}" in h for h in htmls[:1]) or any(f"PRUEBA CLAUDE {SELLO}" in h for h in htmls), [len(h) for h in htmls])
-    ESTADO["antes"] = {str(w) for w in c.ventanas()}
-    c.pulsar(c.ventana("Calendario"), "Chat")
 def chat_desde_calendario(c):
-    n = nueva_ventana(c, ESTADO["antes"])
-    c.ok("3. el botón «Chat» del calendario abre el chat", bool(n), c.titulos())
-    for v in n: c.cerrar(v)
+    # (v4.18.72) El calendario ya no tiene botón «Chat» (petición de Víctor): el chat está en el menú principal.
+    cal = c.ventana("Calendario")
+    c.ok("3. el calendario ya no tiene botón «Chat»",
+         cal is not None and not any(w.winfo_class() == "TButton" and "Chat" in c.texto(w) for w in c.widgets(cal)))
     for v in todas(c): c.cerrar(v)
 
 # ── 4. Admin: botones del menú, vista reducida, exportar/importar ───────────

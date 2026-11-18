@@ -73,6 +73,8 @@
 
 **Probado:** `tests/test_chat.py` del chat (144 comprobaciones; sección 15 nueva); `testDebugUnitTest` del móvil (19 pruebas, 2 nuevas) y compilación de la `.apk`; todas las pruebas del Organizador, con `test_chat_fase5.py` nueva (18 comprobaciones, reproductor de Windows simulado), y la ventana del chat en una pantalla virtual con un mensaje de voz simulado. **Por probar:** grabar y escuchar en un móvil real, y escuchar en un PC con Windows.
 
+**Manuales:** manual de usuario y de administrador del Organizador regenerados (v4.18.70): la captura del chat lleva un mensaje de voz de ejemplo, y hay apartados «Mensajes de voz» en el capítulo 7 (escuchar en el Organizador) y en el 8 (grabar y escuchar en el móvil; el chat móvil no tiene manual propio). Fila nueva en la tabla Organizador / móvil.
+
 ---
 
 ## 2026-11-18 10:15 — [Organizador + Control Pedidos] Decisión: festivos y calendario, de cada usuario

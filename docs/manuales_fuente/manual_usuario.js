@@ -1,7 +1,7 @@
 // Manual de usuario del Organizador Princess. Idea y desarrollo de la aplicación: Víctor Alejandro Martín Andrade.
 const L = require("./lib");
 const { p, vineta, pasos, h1, h2, imagen, leyenda, recuadro, tabla, portada, indice } = L;
-const V = process.env.VERSION || "v4.18.64";
+const V = process.env.VERSION || "v4.18.70";
 
 const s = [];
 s.push(portada({ rol: "Uso diario", subtitulo: "Abre tus accesos, apunta avisos, consulta el calendario y chatea con tus compañeros",
@@ -140,7 +140,7 @@ s.push(...imagen("u_chat", 16, "Ventana del chat (datos de ejemplo)."));
 s.push(...leyenda([[1, "**Estado** de la conexión: «Conectado» en verde cuando todo va bien."],
   [2, "**Conversaciones**: el canal General, los chats privados y los grupos, cada uno con su foto (o sus iniciales sobre un círculo de color si no tiene). El número entre paréntesis son los mensajes sin leer."],
   [3, "**Nueva conversación**."], [4, "**⋮** Menú de la conversación: **🧹 Vaciar chat** y, en los chats privados, **🗑 Eliminar chat** (siguiente apartado)."],
-  [5, "**Mensajes**: los tuyos, a la derecha en verde; los de los demás, a la izquierda. Cada burbuja lleva la fecha y la hora. Una respuesta lleva arriba el mensaje citado. Un adjunto se abre haciendo clic en él; las imágenes se ven en miniatura."],
+  [5, "**Mensajes**: los tuyos, a la derecha en verde; los de los demás, a la izquierda. Cada burbuja lleva la fecha y la hora. Una respuesta lleva arriba el mensaje citado. Un adjunto se abre haciendo clic en él; las imágenes se ven en miniatura. Un **mensaje de voz** (🎤) se escucha con un clic (apartado «Mensajes de voz»)."],
   [6, "Escribe aquí y pulsa **Intro** o **Enviar**."], [7, "😊 **Emoticonos** y respuestas rápidas (siguiente imagen)."],
   [8, "📎 **Adjuntar** una imagen o un documento."], [9, "**Enviar**."],
   [10, "🖼 **Fotos**: cambiar o quitar tu foto de perfil y, en un grupo, la foto del grupo (siguiente apartado)."]]));
@@ -161,6 +161,13 @@ s.push(p("Ambas opciones piden confirmación. En un grupo no se puede eliminar e
 s.push(h2("Compañeros desactivados o que ya no existen"));
 s.push(p("Si un compañero está **desactivado** en Control de Pedidos, junto a su nombre se ve **⏸ Temporalmente desactivado**. Si le escribes, el mensaje no se envía: te avisa y el texto vuelve a la caja de escribir."));
 s.push(p("Si se ha **eliminado** su usuario, se ve **⛔ Ya no existe**. Al escribirle te lo dice y te ofrece **eliminar el chat** directamente."));
+s.push(h2("Mensajes de voz"));
+s.push(p("Los mensajes de voz se **graban en el móvil** (capítulo 8); en el Organizador se **escuchan**. Se ven como **«🎤 Mensaje de voz (0:12)»**, con su duración."));
+s.push(...tabla(["Quiero…", "Cómo"], [
+  ["Escuchar un mensaje de voz", "**Un clic** sobre él: suena en el propio Organizador, con los altavoces o auriculares del PC."],
+  ["Pararlo", "**Otro clic** sobre el mismo mensaje. Si pulsas otro mensaje de voz, el primero se para y suena el nuevo."],
+  ["Guardarlo, reenviarlo o eliminarlo (si es tuyo)", "**Clic derecho**, como cualquier otro mensaje."]], [2600, 7038]));
+s.push(p("Funciona igual en la ventana grande y en la burbuja flotante. Si el reproductor de Windows no puede reproducirlo, el mensaje se abre con el programa de audio del equipo."));
 s.push(h2("Avisos de Control Pedidos"));
 s.push(...imagen("u_chat_avisos", 14, "Conversación «Control Pedidos» (avisos de ejemplo)."));
 s.push(...leyenda([[1, "**Control Pedidos** aparece en tu lista de conversaciones. Ahí te llegan **tus** avisos (pedidos sin entregar, cambios de estado, techo de gastos…), que suenan y avisan como cualquier mensaje."],
@@ -204,6 +211,7 @@ s.push(p("**Chat Dpto. Compras Princess** es el mismo chat en un móvil Android:
 s.push(...tabla(["", "Organizador (Windows)", "Chat Dpto. Compras Princess (Android)"], [
   ["Conversaciones, privados y grupos", "Sí", "Sí"], ["Emoticonos y respuestas rápidas", "Sí", "Sí"],
   ["Enviar fotos y documentos", "📎, arrastrar o Ctrl+V", "Cámara, galería o documento"],
+  ["Mensajes de voz", "Escucharlos (un clic)", "Grabarlos (mantener pulsado 🎤) y escucharlos"],
   ["Foto de perfil (tuya y de los grupos)", "🖼 Fotos, en la ventana del chat", "Ajustes → Mi foto (galería o cámara); la del grupo, en su cabecera"],
   ["Avisos de mensajes nuevos", "Burbuja flotante con sonido", "Notificación del móvil, también con la app cerrada"],
   ["Agenda, calendario, accesos y avisos de pedidos", "Sí", "No: solo el chat"],
@@ -223,6 +231,13 @@ s.push(...pasos(["En la página que se abre, toca el archivo **ChatPrincess_….
 s.push(...recuadro("importante", "¿Por qué avisa Android de que puede ser peligrosa?", ["Android y Google Play Protect avisan de **cualquier app que no se instala desde Google Play**, y más si la usa poca gente y pide permisos para funcionar en segundo plano, arrancar con el móvil o instalar sus propias actualizaciones. Chat Dpto. Compras Princess necesita esos permisos para avisarte de los mensajes con la app cerrada y para actualizarse sola.",
   "Es la app del departamento, publicada en su repositorio oficial, y cada versión va firmada siempre con la misma clave. Descárgala **solo** desde el código QR del Organizador o desde su enlace; si alguien te la pasa por otro medio (WhatsApp, correo…), no la instales."]));
 s.push(...recuadro("nota", "El aviso fijo «Chat conectado»", ["Mientras la app mantiene la conexión verás un aviso fijo «Chat conectado» en la barra de notificaciones. Es lo que permite que te avise de los mensajes con la app cerrada; al encender el móvil se vuelve a conectar solo."]));
+s.push(h2("Mensajes de voz"));
+s.push(p("Con la caja de escribir **vacía**, a su derecha aparece el **🎤** (cuando escribes algo, cambia por el botón de enviar)."));
+s.push(...pasos(["**Mantén pulsado el 🎤** y habla. Mientras grabas, en lugar de la caja de escribir se ve **🔴** y el tiempo que llevas.",
+  "**Suelta** para enviarlo.",
+  "Si no quieres enviarlo, **desliza el dedo a la izquierda** antes de soltar: cuando aparece **«Suelta para cancelar»**, suelta y no se envía nada.",
+  "Para **escucharlo**, pulsa **▶** en la burbuja del mensaje (⏸ lo para); la barra muestra lo que lleva."]));
+s.push(p("La primera vez, Android pregunta si la app puede **usar el micrófono**: pulsa **Permitir**. Un mensaje de voz dura como mucho **3 minutos**: al llegar, se envía solo. Si lo pulsas sin mantenerlo, la app te recuerda que hay que mantenerlo pulsado. Como cualquier mensaje, manteniéndolo pulsado se puede **responder, reenviar, guardar, compartir** o **eliminar** (si es tuyo)."));
 s.push(h2("Cómo se actualiza"));
 s.push(...pasos(["Al abrir la app, si hay una versión nueva, aparece el aviso **«Nueva versión…»** con sus novedades.",
   "Pulsa **Descargar e instalar**: la app la descarga y comprueba que es la publicada (SHA-256).",

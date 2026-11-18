@@ -571,10 +571,14 @@ def portatil_ver(c):
 def actualizacion(c):
     import json, urllib.request
     um = sys.modules["services.update_service"]
-    falso = {"tag_name": "v4.18.64", "name": "Organizador Princess v4.18.64",
-             "body": "# ✨ Organizador Princess v4.18.64\n\n## 🛠 Mejoras\n\n- Mejoras en la agenda y el calendario.\n- Correcciones menores.",
-             "assets": [{"name": "OrganizadorPrincess_Setup_4.18.64.exe", "size": 34_400_000, "browser_download_url": "https://example.invalid/x.exe"},
-                        {"name": "OrganizadorPrincess_Setup_4.18.64.exe.sha256", "size": 90, "browser_download_url": "https://example.invalid/x.sha256"}]}
+    # La versión simulada es siempre la instalada + 2: con una fija (4.18.64) el Organizador se daba por
+    # «al día» en cuanto se pasaba de ella y la captura «u_actualizacion» se quedaba sin ventana.
+    _a, _b, _c = (int(x) for x in um.APP_VERSION.lstrip("vV").split("."))
+    nueva = f"{_a}.{_b}.{_c + 2}"
+    falso = {"tag_name": f"v{nueva}", "name": f"Organizador Princess v{nueva}",
+             "body": f"# ✨ Organizador Princess v{nueva}\n\n## 🛠 Mejoras\n\n- Mejoras en la agenda y el calendario.\n- Correcciones menores.",
+             "assets": [{"name": f"OrganizadorPrincess_Setup_{nueva}.exe", "size": 34_400_000, "browser_download_url": "https://example.invalid/x.exe"},
+                        {"name": f"OrganizadorPrincess_Setup_{nueva}.exe.sha256", "size": 90, "browser_download_url": "https://example.invalid/x.sha256"}]}
 
     class R(io.BytesIO):
         status = 200

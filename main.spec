@@ -58,6 +58,7 @@ hiddenimports += [
     'negocio.correo',
     'negocio.alertas',
     'services.update_service',
+    'services.voz',          # v4.18.70: escuchar los mensajes de voz del chat
     'services.portatil',     # v4.18.54: copia portátil (sin instalar) y su actualización
     'services.vinculo_navegador',  # v4.18.60: navegador de este PC vinculado con Control Pedidos
     'services.reinicio_limpio',    # v4.18.62: borrado completo y reinicio limpio (Administración)

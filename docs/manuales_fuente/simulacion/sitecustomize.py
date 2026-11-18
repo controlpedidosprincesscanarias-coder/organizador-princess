@@ -59,6 +59,9 @@ if RAIZ:
              "adjunto": {"nombre_archivo": "Oferta_Suministros_Atlantico.pdf", "url": "/demo/oferta.pdf"}},
             {"id": 13, "remitente": "compras2.demo", "contenido": "¡Gracias! La subo al pedido y la mando a firmar.", "creado_en": _ts(0, 40),
              "responde_a": {"id": 11, "remitente": YO, "contenido": "Sí, te la paso ahora."}},
+            # (v4.18.70) Mensaje de voz grabado en el móvil
+            {"id": 14, "remitente": "compras2.demo", "contenido": "🎤 Mensaje de voz (0:12)", "tipo": "voz", "creado_en": _ts(0, 35),
+             "adjunto": {"nombre_archivo": "voz_demo.m4a", "url": "/demo/voz.m4a", "duracion_ms": 12400}},
         ],
         "dm:compras.demo:economato.demo": [
             {"id": 20, "remitente": "economato.demo", "contenido": "¿Sabes si el pedido de menaje llega esta semana?", "creado_en": _ts(26)},

@@ -62,6 +62,8 @@
 - Al final, «📄 Manual completo (PDF)» abre el manual de usuario del Organizador (el chat en el móvil es su capítulo 8), desde su repositorio público.
 - El texto sigue a ese manual y está en `datos/Manual.kt`. Si cambia una pantalla de la app, hay que cambiarlo también.
 
+**Manual del Organizador:** en el capítulo 8 del manual de usuario, recuadro nuevo «El manual, también en la app» (PDF regenerado; llega a los equipos con la próxima versión del Organizador, y desde el enlace de la app, en cuanto se fusiona).
+
 **Probado:** `testDebugUnitTest` (20 pruebas, 1 nueva: buscador, títulos únicos y enlace) y compilación de la `.apk`. El enlace al PDF responde. **Por probar en un móvil:** la pantalla y que el enlace abra el PDF.
 
 ---

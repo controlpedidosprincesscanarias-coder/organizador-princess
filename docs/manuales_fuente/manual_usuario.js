@@ -1,7 +1,7 @@
 // Manual de usuario del Organizador Princess. Idea y desarrollo de la aplicación: Víctor Alejandro Martín Andrade.
 const L = require("./lib");
 const { p, vineta, pasos, h1, h2, imagen, leyenda, recuadro, tabla, portada, indice } = L;
-const V = process.env.VERSION || "v4.18.70";
+const V = process.env.VERSION || "v4.18.72";
 
 const s = [];
 s.push(portada({ rol: "Uso diario", subtitulo: "Abre tus accesos, apunta avisos, consulta el calendario y chatea con tus compañeros",
@@ -92,7 +92,7 @@ s.push(p("El **Calendario** muestra el mes (o la semana) con todo lo que tienes 
 s.push(...tabla(["Color", "Significado"], [["Dorado", "Hoy (borde y número)."], ["Azul", "Aviso único."], ["Cian", "Aviso repetitivo (y borde del día que has pulsado)."], ["Verde", "Vacaciones."],
   ["Rojo", "Festivo."], ["Gris", "Días del mes anterior o del siguiente."]], [2200, 7438]));
 s.push(...imagen("u_calendario_mes", 16, "Calendario del mes (datos de ejemplo)."));
-s.push(...leyenda([[1, "**◀ ▶**: mes (o semana) anterior y siguiente. Entre las flechas, el periodo que estás viendo."], [2, "**Mes / Semana**: cambia la forma de ver el calendario. «Semana» abre la semana de hoy o la del día que hayas elegido."],
+s.push(...leyenda([[1, "**◀ ▶**: mes (o semana) anterior y siguiente. El periodo que estás viendo sale arriba, en grande."], [2, "**Mes / Semana**: cambia la forma de ver el calendario. «Semana» abre la semana de hoy o la del día que hayas elegido."],
   [3, "**Hoy**: vuelve al mes (o a la semana) de hoy."], [4, "**Festivos**: la lista de festivos, donde se añaden y editan."], [5, "**Vacaciones**: la lista de periodos de vacaciones."],
   [6, "**Leyenda** de colores: aviso único, repetitivo, vacaciones, festivo y hoy."], [7, "**Hoy**, en dorado. Pulsa cualquier día para ver su detalle."],
   [8, "**Imprimir**: Agenda del Día, Semanal o Mensual (se abre una página lista para imprimir en tu navegador)."], [9, "La Agenda Mensual imprime el mes que estás viendo."]]));

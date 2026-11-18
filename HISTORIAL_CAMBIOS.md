@@ -51,6 +51,35 @@
 
 ---
 
+## 2026-11-18 21:35 — [Organizador] Aspecto nuevo de Agenda, Calendario, Vacaciones y Festivos (v4.18.72)
+
+> La idea y el desarrollo de la aplicación Organizador Princess, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.
+
+**Petición de Víctor** (13 nov 2026): «aspecto más moderno y profesional» de Agenda, Calendario, Vacaciones y Festivos. El 18 nov, además: quitar del calendario el botón «Chat», que quedó de versiones antiguas, y dar a la Agenda el mismo aspecto que al calendario.
+
+**Causa de lo que se veía mal:** bloques de color muy saturados que llenaban cada día o cada fila, y un recuadro oscuro detrás de cada texto (los `ttk.Label` dentro de un marco de color pintan el fondo del tema). En el calendario, los avisos eran solo un icono, sin hora ni título.
+
+**Cambios:**
+- `app/ui/estilo_calendario.py` (nuevo): colores sobre el tema, tarjeta con franja de color, bloque de fecha («28 / NOV»), separador por año y lista con desplazamiento, que antes estaba copiada en cada ventana. Los textos se dibujan con el fondo de su marco.
+- `app/utils/textos_calendario.py` (nuevo, sin Tk): fechas cortas en español, antelación en palabras («Aviso 1 día y 3 h antes»), cuánto falta, estado (pasado, en curso, próximo), resúmenes de cabecera, cuándo salta cada aviso («Cada viernes», «Día 5 de cada mes») y líneas de cada día.
+- **Calendario:** celdas oscuras con una línea por festivo, vacaciones y aviso (con su hora y el principio del título; si no caben, «+N más»). Hoy con borde y número dorados, el día elegido en cian y los días del mes anterior y siguiente en gris. Botón «Hoy», leyenda de colores y cabecera en dos filas. En la vista Semana se puede pulsar todo el día, no solo la cabecera. El detalle del día va en tarjetas y con la fecha completa. **Sin botón «Chat».**
+- **Agenda:** avisos únicos y repetitivos por separado, cada uno con la hora en grande, su tipo, cuándo salta, cuánto falta y la antelación. Los desactivados o ya pasados salen en gris. Arriba, cuántos hay y el próximo.
+- **Vacaciones y Festivos:** tarjetas con bloque de fecha, rango y días, cuánto falta, antelación y etiquetas «En curso», «Hoy» y «Pasado». Arriba, los días de vacaciones del año o los festivos que quedan, y el próximo.
+- Se puede ampliar la ventana en vertical en Agenda, Vacaciones y Festivos.
+- **Errores corregidos, cada uno en su commit:**
+  - el botón «Nuevo Periodo» salía con otra letra (el «＋» de ancho completo);
+  - faltaba el separador `---` entre las notas de la v4.18.70 y la v4.18.68 (la Release habría llevado las dos);
+  - la captura «Actualización disponible» del manual no salía (la versión simulada era fija y más antigua que la instalada).
+- Manual de usuario regenerado (capítulos 4 y 5) con datos inventados. Prueba de uso adaptada (ya no hay botón «Chat» en el calendario). `main.spec`, workflow, README, CLAUDE.md y notas de la versión al día.
+
+**Probado (Linux, pantalla virtual):**
+- las 18 pruebas del Organizador y la nueva `test_textos_calendario.py` (35 comprobaciones);
+- una prueba de humo con las ventanas reales: reactivar, editar y borrar avisos, editar y borrar vacaciones, editar festivos, navegar con ◀, Hoy y ▶, y comprobar que no hay botón «Chat»;
+- las capturas del manual de las cuatro ventanas;
+- `preparar_release.py` para la 4.18.72.
+
+**No probado:** el aspecto en Windows (Segoe UI, escalado de pantalla) y la prueba de uso completa con «usuario prueba» (necesita su contraseña). Se ve con el instalador en borrador.
+
 ## 2026-11-18 21:15 — [Infra] «Forma de trabajar con Víctor» en los siete CLAUDE.md
 
 > La idea y el desarrollo de las aplicaciones son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.

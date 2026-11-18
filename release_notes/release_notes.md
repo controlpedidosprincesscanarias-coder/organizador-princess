@@ -1,3 +1,18 @@
+# ✨ Organizador Princess v4.18.72
+
+## 🎨 Agenda, Calendario, Vacaciones y Festivos con aspecto nuevo
+
+- **Calendario más claro.** Cada día muestra una línea por festivo, vacaciones y aviso, con su hora y el principio del título (si no caben, «+N más»). Hoy va con borde y número dorados, el día que pulsas en cian y los días del mes anterior y siguiente en gris.
+- **Botón «Hoy»** para volver al mes o a la semana actual, y leyenda de colores en lugar de iconos.
+- **En la vista Semana** se puede pulsar cualquier parte del día, no solo la cabecera.
+- **El detalle del día** muestra cada cosa en una tarjeta del color de su tipo y la fecha completa («28 de noviembre de 2026»).
+- **Agenda**: avisos únicos y repetitivos por separado, cada uno con la hora en grande, cuándo salta («Cada viernes», «Día 5 de cada mes»…), cuánto falta y la antelación. Arriba, cuántos hay y cuál es el próximo.
+- **Vacaciones y Festivos**: tarjetas con la fecha como la hoja de un calendario, cuánto falta y la antelación del aviso. Arriba, los días de vacaciones del año, los festivos que quedan y el próximo. Lo ya pasado sale en gris y lo que está en curso, marcado.
+- El calendario ya no tiene botón «Chat»: el chat está en el menú principal.
+- Corregido: el botón «Nuevo Periodo» salía con otra letra.
+
+---
+
 # ✨ Organizador Princess v4.18.70
 
 ## 🎤 Mensajes de voz en el chat

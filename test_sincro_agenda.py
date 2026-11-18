@@ -6,8 +6,12 @@ Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de
 Uso: python test_sincro_agenda.py  (en cualquier sistema; no se conecta a ningún servidor).
 
 Simula dos PC con el mismo usuario y un servidor en memoria con las mismas reglas que Control de Pedidos
-v12.34.36 (GET/POST /api/bridge/agenda: gana el cambio más reciente, un empate no sobrescribe, nunca una hora
-futura). Cada vuelta usa el código real del bridge (_sincronizar_agenda) y de services/sincro_agenda.py:
+v12.34.38 (GET/POST /api/bridge/agenda: un cambio sobre la última versión se acepta siempre; si otro PC lo
+cambió entretanto, gana el más reciente y un empate no sobrescribe; nunca una hora futura).
+
+(v4.18.68) El reloj está parado salvo cuando la prueba lo adelanta (RELOJ): es el peor caso del reloj de
+Windows, que solo avanza cada ~15 ms y con el que la v4.18.66 perdía cambios en la compilación de GitHub.
+También se prueba un PC con la hora atrasada. Cada vuelta usa el código real del bridge (_sincronizar_agenda) y de services/sincro_agenda.py:
 primera vez con agendas en los dos PC (fusión sin duplicados), cambios, borrados, conflictos, sin red,
 cambio de usuario, «Importar agenda», los avisos de Control de Pedidos (no se suben) y el guardado real.
 """
@@ -16,7 +20,6 @@ import json
 import os
 import sys
 import tempfile
-import time
 from datetime import datetime, timedelta, timezone
 from unittest import mock
 
@@ -50,6 +53,23 @@ from services import sincro_agenda as sincro  # noqa: E402
 fallos = []
 
 
+class Reloj:
+    """Hora de la prueba: parada salvo que se adelante. `desfase` atrasa o adelanta solo la de los PC."""
+    def __init__(self):
+        self.t = datetime(2026, 11, 14, 9, 0, tzinfo=timezone.utc)
+        self.desfase = timedelta(0)
+
+    def avanzar(self, segundos=1):
+        self.t += timedelta(seconds=segundos)
+
+    def iso_pc(self):
+        return (self.t + self.desfase).isoformat()
+
+
+RELOJ = Reloj()
+sincro.ahora_iso = RELOJ.iso_pc
+
+
 def ok(nombre, cond, det=""):
     print(("OK    " if cond else "FALLO ") + nombre + ("" if cond else f"  → {det}"))
     if not cond:
@@ -80,14 +100,16 @@ class Servidor:
         if self.caido:
             raise urllib.error.URLError("sin red")
         aceptados, rechazados = [], []
-        ahora = datetime.now(timezone.utc)
+        ahora = RELOJ.t
         for e in elementos:
             cuando = min(self._dt(e["cambiado_en"]), ahora)
             clave = (usuario, e["sid"])
             actual = self.filas.get(clave)
-            if actual and not (self._dt(actual["cambiado_en"]) < cuando):
+            if actual and actual["version"] != e.get("base") and not (self._dt(actual["cambiado_en"]) < cuando):
                 rechazados.append(copy.deepcopy(actual))
                 continue
+            if actual:
+                cuando = max(cuando, self._dt(actual["cambiado_en"]) + timedelta(microseconds=1))
             self.seq += 1
             self.filas[clave] = {"sid": e["sid"], "tipo": e["tipo"], "borrado": bool(e.get("borrado")),
                                  "datos": {} if e.get("borrado") else copy.deepcopy(e["datos"]),
@@ -199,7 +221,7 @@ v1 = next(v for v in pc1["vacaciones"])
 v2 = next(v for v in pc2["vacaciones"])
 sincro.reemplazar(pc1["vacaciones"], v1, dict(VACACION, titulo="Vacaciones (PC 1)"))
 guardar(pc1)
-time.sleep(0.01)
+RELOJ.avanzar(1)
 sincro.reemplazar(pc2["vacaciones"], v2, dict(VACACION, titulo="Vacaciones (PC 2, después)"))
 guardar(pc2)
 try:
@@ -221,7 +243,7 @@ srv.caido = True
 v1 = pc1["vacaciones"][0]
 sincro.reemplazar(pc2["vacaciones"], pc2["vacaciones"][0], dict(VACACION, titulo="Vacaciones (PC 2, antes)"))
 guardar(pc2)
-time.sleep(0.01)
+RELOJ.avanzar(1)
 sincro.reemplazar(pc1["vacaciones"], v1, dict(VACACION, titulo="Vacaciones (PC 1, después)"))
 guardar(pc1)
 srv.caido = False
@@ -237,7 +259,7 @@ inv1 = next(a for a in pc1["avisos"] if a.get("titulo") == "Inventario")
 inv2 = next(a for a in pc2["avisos"] if a.get("titulo") == "Inventario")
 sincro.quitar(pc1["avisos"], inv1)
 guardar(pc1)
-time.sleep(0.01)
+RELOJ.avanzar(1)
 sincro.reemplazar(pc2["avisos"], inv2, dict(aviso("Inventario anual", "12:00")))
 guardar(pc2)
 srv.caido = False
@@ -246,6 +268,24 @@ sincronizar(pc2, srv)
 sincronizar(pc1, srv)
 ok("el cambio, más reciente que el borrado, vuelve al PC 1", any(a.get("titulo") == "Inventario anual"
                                                                for a in pc1["avisos"]), pc1["avisos"])
+ok("las dos agendas quedan iguales", iguales(pc1, pc2), (pc1, pc2))
+
+print("5b. Un PC con la hora atrasada no pierde sus cambios (el reloj no avanza entre PC):")
+nota = next(a for a in pc1["avisos"] if a.get("titulo") == "Inventario anual")
+sincro.reemplazar(pc1["avisos"], nota, dict(aviso("Inventario anual (PC 1)", "12:00")))
+guardar(pc1)
+sincronizar(pc1, srv)
+sincronizar(pc2, srv)
+RELOJ.desfase = timedelta(minutes=-10)       # el PC 2 va 10 minutos atrasado
+nota2 = next(a for a in pc2["avisos"] if a.get("titulo") == "Inventario anual (PC 1)")
+sincro.reemplazar(pc2["avisos"], nota2, dict(aviso("Inventario anual (PC 2, atrasado)", "12:00")))
+guardar(pc2)
+sincronizar(pc2, srv)
+RELOJ.desfase = timedelta(0)
+sincronizar(pc1, srv)
+ok("su cambio, hecho sobre la última versión, se acepta y llega al PC 1",
+   any(a.get("titulo") == "Inventario anual (PC 2, atrasado)" for a in pc1["avisos"]), pc1["avisos"])
+ok("sin nada pendiente en ninguno", not sincro.hay_pendientes(pc1) and not sincro.hay_pendientes(pc2))
 ok("las dos agendas quedan iguales", iguales(pc1, pc2), (pc1, pc2))
 
 print("6. Paginación (la agenda llega en varias páginas):")

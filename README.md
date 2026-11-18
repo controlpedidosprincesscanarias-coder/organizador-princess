@@ -11,7 +11,7 @@ Aplicación de escritorio desarrollada en **Python + ttkbootstrap**, que combina
 
 - 📅 Agenda con eventos, avisos recurrentes y calendario con colores, imprimible por día/semana/mes.
 - 🏖 Gestión de Vacaciones y Festivos.
-- 🗓️ (v4.18.66) Agenda, vacaciones y festivos sincronizados con el usuario de Control de Pedidos: la misma agenda en todos los PC donde entres con ese usuario (necesita Control de Pedidos v12.34.36).
+- 🗓️ (v4.18.66) Agenda, vacaciones y festivos sincronizados con el usuario de Control de Pedidos: la misma agenda en todos los PC donde entres con ese usuario (necesita Control de Pedidos v12.34.38).
 - 🔔 Sistema de notificaciones en segundo plano (bridge) conectado a Control de Pedidos: recibe los mismos avisos que Telegram (techo de gastos, familias repetidas, solicitudes de usuario, cambios de estado de pedidos…) como popup en pantalla, filtrados automáticamente según el usuario y su rol.
 - 🔄 Actualizaciones automáticas desde GitHub Releases, con ventana de "novedades" al terminar de instalar.
 - 💼 Versión portátil (v4.18.54): `OrganizadorPrincess_Portatil_v….zip` en cada Release, para los PC que no permiten instalar. Se descomprime en una carpeta del usuario, se abre `OrganizadorPrincess.exe` y se actualiza sola sin administrador (`app/services/portatil.py`).
@@ -133,7 +133,8 @@ Se autentica mediante `/api/bridge/login`, una vía de acceso dedicada para proc
 
 Con la misma sesión, el hilo `PedidosBridge-Agenda` (`_loop_agenda`) guarda la agenda (avisos, vacaciones y festivos) en Control de Pedidos (`GET`/`POST /api/bridge/agenda`, v12.34.36) al arrancar, a los 3 s de cada cambio y cada 2 minutos. Qué subir y cómo fusionar está en `app/services/sincro_agenda.py` (pruebas en `test_sincro_agenda.py`):
 - cada elemento lleva un id estable (`_sid`) y la hora de su último cambio; `db/sqlite.save_agenda` anota lo cambiado y lo borrado al guardar, venga de la ventana que venga;
-- gana el cambio más reciente, los borrados se propagan y sin red se sigue con la copia local;
+- (v4.18.68) cada cambio lleva la versión del servidor sobre la que se hizo (`base`): si nadie lo ha tocado entretanto, se acepta sin mirar las horas (en Windows el reloj tiene poca precisión y los PC pueden ir desajustados); si lo cambiaron dos PC, gana el más reciente;
+- los borrados se propagan y sin red se sigue con la copia local;
 - la primera vez se fusionan las agendas de todos los PC (lo idéntico no se duplica);
 - los avisos de pedidos (`_bridge_gestionado`) no se suben;
 - con un Control de Pedidos anterior (404) se sigue con la copia local y se vuelve a mirar cada hora.

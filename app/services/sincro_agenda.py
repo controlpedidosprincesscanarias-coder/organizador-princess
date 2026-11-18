@@ -1,5 +1,5 @@
 """
-services/sincro_agenda.py — agenda sincronizada con el usuario de Control de Pedidos (v4.18.66).
+services/sincro_agenda.py — agenda sincronizada con el usuario de Control de Pedidos (v4.18.66, v4.18.68).
 
 La idea y el desarrollo de la aplicación Organizador Princess, incluidas sus pruebas, son de
 Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.
@@ -20,7 +20,14 @@ Cómo se guarda en agenda.json (el formato de siempre, con unas claves internas 
 marcar_cambios() se llama en cada save_agenda (db/sqlite.py): así cualquier ventana que guarde (Agenda,
 Vacaciones, Festivos, «Desactivar evento» del popup…) queda anotada sin tocar su código.
 
-Reglas: gana el cambio más reciente (también en el servidor); los borrados se propagan; sin red se sigue
+(v4.18.68) Cada cambio se sube con `base`, la versión del servidor sobre la que se hizo
+(`agenda["_sincro"]["versiones"]`): si nadie lo ha cambiado entretanto, el servidor (Control Pedidos v12.34.38) lo
+acepta sin mirar las horas. Antes solo se miraban las horas y se perdían cambios: en Windows el reloj avanza cada
+~15 ms (un cambio con la misma hora que la versión guardada se tomaba como empate y se descartaba; falló la
+compilación de la v4.18.66) y un PC con la hora atrasada no podía cambiar lo que había guardado otro. Si ya está
+pendiente, se mira el contenido (huella), no la hora.
+
+Reglas: si otro PC lo cambió entretanto, gana el más reciente (en empate, el del servidor); los borrados se propagan; sin red se sigue
 trabajando con la copia local y lo pendiente se sube al volver. La primera vez se fusiona: un elemento que
 aún no está en el servidor y es idéntico a uno que llega de otro PC se queda con el del servidor, en vez de
 duplicarse.
@@ -81,6 +88,7 @@ def estado(data: dict) -> dict:
     est.setdefault("usuario", "")
     est.setdefault("conocidos", {})
     est.setdefault("borrados", {})
+    est.setdefault("versiones", {})   # (v4.18.68) {sid: versión del servidor que tiene este PC}
     return est
 
 
@@ -149,16 +157,24 @@ def hay_pendientes(data: dict) -> bool:
 
 
 def pendientes(data: dict) -> list:
-    """Lo que hay que subir (POST /api/bridge/agenda)."""
+    """Lo que hay que subir (POST /api/bridge/agenda). (v4.18.68) Cada uno lleva `base`, la versión del
+    servidor sobre la que se hizo el cambio: si nadie lo ha cambiado desde entonces, el servidor lo acepta sin
+    mirar las horas (que en Windows tienen poca precisión y entre PC pueden no coincidir)."""
     est = estado(data)
     salida = []
     for _lista, tipo, _i, item in _elementos(data):
         if item.get("_pendiente"):
-            salida.append({"sid": item["_sid"], "tipo": tipo, "datos": contenido(item),
-                           "cambiado_en": item.get("_cambiado") or ahora_iso()})
+            e = {"sid": item["_sid"], "tipo": tipo, "datos": contenido(item),
+                 "cambiado_en": item.get("_cambiado") or ahora_iso()}
+            if est["versiones"].get(item["_sid"]):
+                e["base"] = est["versiones"][item["_sid"]]
+            salida.append(e)
     for sid, b in est["borrados"].items():
-        salida.append({"sid": sid, "tipo": b.get("tipo", "aviso"), "borrado": True,
-                       "cambiado_en": b.get("cambiado_en") or ahora_iso()})
+        e = {"sid": sid, "tipo": b.get("tipo", "aviso"), "borrado": True,
+             "cambiado_en": b.get("cambiado_en") or ahora_iso()}
+        if est["versiones"].get(sid):
+            e["base"] = est["versiones"][sid]
+        salida.append(e)
     return salida
 
 
@@ -180,13 +196,23 @@ def cambiar_usuario(data: dict, usuario: str) -> bool:
         if isinstance(items, list):
             data[lista] = [it for it in items if not sincronizable(it) or it.get("_nuevo")]
     est["borrados"] = {}
+    est["versiones"] = {}
     est["conocidos"] = {it["_sid"]: tipo for _l, tipo, _i, it in _elementos(data) if it.get("_sid")}
     return True
 
 
+def _version(e) -> int:
+    try:
+        return int(e.get("version") or 0)
+    except (TypeError, ValueError):
+        return 0
+
+
 def aplicar_remotos(data: dict, elementos: list) -> bool:
-    """Aplica lo que llega del servidor (GET, o los rechazados de un POST). Si el cambio local pendiente es
-    más reciente, se conserva el local (se subirá). Devuelve True si ha cambiado la agenda."""
+    """Aplica lo que llega del servidor (GET, o los rechazados de un POST). Si aquí hay un cambio pendiente:
+    - sobre esa misma versión (nadie más lo ha tocado) → se conserva el de aquí, que se subirá;
+    - sobre una anterior (lo cambiaron los dos PC) → gana el más reciente; en empate, el del servidor.
+    Devuelve True si ha cambiado la agenda."""
     est = estado(data)
     cambio = False
     for e in elementos or []:
@@ -194,6 +220,10 @@ def aplicar_remotos(data: dict, elementos: list) -> bool:
         lista = TIPO_A_LISTA.get(tipo)
         if not sid or not lista:
             continue
+        version = _version(e)
+        conocida = int(est["versiones"].get(sid) or 0)
+        if version and version <= conocida:
+            continue                                  # ya la tengo (p. ej., mi propio cambio que vuelve)
         remoto_dt = _dt(e.get("cambiado_en"))
         borrado_local = est["borrados"].get(sid)
         if borrado_local:
@@ -203,11 +233,14 @@ def aplicar_remotos(data: dict, elementos: list) -> bool:
         l_actual, i_actual, local = _buscar(data, sid)
         if local is not None and local.get("_pendiente") and _dt(local.get("_cambiado")) > remoto_dt:
             continue                                  # mi cambio es más reciente: se subirá
+        if version:
+            est["versiones"][sid] = version
         if e.get("borrado"):
             if local is not None:
                 data[l_actual].pop(i_actual)
                 cambio = True
             est["conocidos"].pop(sid, None)
+            est["versiones"].pop(sid, None)
             continue
         datos = e.get("datos") if isinstance(e.get("datos"), dict) else {}
         nuevo = dict(contenido(datos))
@@ -236,9 +269,15 @@ def aplicar_remotos(data: dict, elementos: list) -> bool:
     return cambio
 
 
+def _sin_tocar_desde(local: dict, enviado: dict) -> bool:
+    """¿El elemento sigue igual que cuando se envió? Se compara el contenido, no la hora: en Windows dos
+    cambios seguidos pueden tener la misma hora."""
+    return enviado is not None and huella(local) == huella(enviado.get("datos") or {})
+
+
 def aplicar_respuesta(data: dict, enviados: list, respuesta: dict) -> bool:
     """Tras el POST: lo aceptado deja de estar pendiente (si no se ha vuelto a cambiar mientras tanto) y lo
-    rechazado (el servidor tenía algo igual o más nuevo) se aplica. Devuelve True si cambia la agenda."""
+    rechazado (otro PC lo cambió después) se aplica. Devuelve True si cambia la agenda."""
     est = estado(data)
     por_sid = {e["sid"]: e for e in enviados}
     for a in (respuesta or {}).get("aceptados", []):
@@ -246,21 +285,30 @@ def aplicar_respuesta(data: dict, enviados: list, respuesta: dict) -> bool:
         if not e:
             continue
         if e.get("borrado"):
+            est["versiones"].pop(e["sid"], None)
             b = est["borrados"].get(e["sid"])
             if b and b.get("cambiado_en") == e["cambiado_en"]:
                 del est["borrados"][e["sid"]]
             continue
+        if _version(a):
+            est["versiones"][e["sid"]] = _version(a)
         _l, _i, local = _buscar(data, e["sid"])
         if local is not None:
             local.pop("_nuevo", None)
-            if local.get("_cambiado") == e["cambiado_en"]:
+            if _sin_tocar_desde(local, e):
                 local.pop("_pendiente", None)
     rechazados = (respuesta or {}).get("rechazados", [])
     for r in rechazados:
+        e = por_sid.get(r.get("sid"))
+        if e and e.get("borrado"):
+            b = est["borrados"].get(r.get("sid"))
+            if b and b.get("cambiado_en") == e["cambiado_en"]:
+                del est["borrados"][r["sid"]]    # otro PC lo cambió después de mi borrado: vuelve
+            continue
         _l, _i, local = _buscar(data, r.get("sid"))
         if local is not None:
             local.pop("_nuevo", None)
-            if local.get("_cambiado") == (por_sid.get(r.get("sid")) or {}).get("cambiado_en"):
+            if _sin_tocar_desde(local, e):
                 local.pop("_pendiente", None)    # no se ha tocado desde el envío: manda el servidor
     return aplicar_remotos(data, rechazados)
 

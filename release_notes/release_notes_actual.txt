@@ -1,16 +1,15 @@
-✨ Organizador Princess v4.18.70
+✨ Organizador Princess v4.18.72
 ================================================================
 
-🎤 MENSAJES DE VOZ EN EL CHAT
+🎨 AGENDA, CALENDARIO, VACACIONES Y FESTIVOS CON ASPECTO NUEVO
 
-• Los compañeros ya pueden enviar mensajes de voz desde la app
-  del móvil. En el Organizador se ven como «🎤 Mensaje de voz
-  (0:12)», con su duración.
-• Un clic en el mensaje lo escucha en el propio Organizador;
-  otro clic lo para. Funciona en la ventana del chat y en las
-  burbujas.
-• Los mensajes de voz se graban desde el móvil (en el
-  Organizador solo se escuchan).
+• Calendario más claro: cada día muestra sus avisos con la hora
+  y el título, sus vacaciones y sus festivos. Hoy, en dorado.
+• Botón «Hoy» para volver al mes o la semana actual.
+• Agenda, Vacaciones y Festivos en tarjetas, con cuánto falta,
+  la antelación del aviso y, arriba, el próximo.
+• El calendario ya no tiene botón «Chat» (está en el menú).
+• Corregido: el botón «Nuevo Periodo» salía con otra letra.
 
 ================================================================
 La idea y el desarrollo de la aplicación Organizador Princess son de

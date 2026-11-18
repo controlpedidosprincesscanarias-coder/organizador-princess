@@ -1,7 +1,7 @@
 """
 ui/calendario.py
 Ventana «Calendario» (vista de mes y de semana) con avisos, vacaciones y festivos, y acceso a
-Chat, Festivos, Vacaciones y a las agendas imprimibles del día, la semana y el mes.
+Festivos, Vacaciones y a las agendas imprimibles del día, la semana y el mes.
 Extraída de main_agenda.py en v4.18.08 (antes, abrir_calendario() era una función de ~620 líneas allí).
 
 La idea y el desarrollo de la aplicación Organizador Princess, incluidas sus pruebas, son de
@@ -18,11 +18,13 @@ import ttkbootstrap as ttk
 from negocio.correo import _abrir_ventana_correo, _enriquecer_evento_correo
 from ui.agenda_helpers import _eventos_del_dia, _festivos_del_dia, _vacaciones_del_dia
 from ui.assets import _apply_icon, get_crown_tk
-from ui.colores import GOLD, LIGHT
+from ui.colores import LIGHT
 from ui.festivos import _ventana_festivos
 from ui.vacaciones import _ventana_vacaciones
 from services import sincro_agenda   # (v4.18.66) agenda sincronizada con Control de Pedidos
-from ui.ventana_chat import _ventana_chat
+import tkinter as tk
+from ui import estilo_calendario as E          # (v4.18.72) aspecto nuevo
+from utils.textos_calendario import lineas_celda, MESES_CORTOS as _MESES_CORTOS, rango as rango_fechas
 
 _NOMBRES_MES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio",
                 "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"]
@@ -118,7 +120,7 @@ def abrir_calendario(ctx):
         ttk.Separator(pw).pack(fill="x")
 
         # ── Cuerpo scrollable de eventos ──────────────────────────────────────
-        pan_body = ttk.Frame(pw, padding=(12, 10, 12, 10))
+        pan_body = tk.Frame(pw, bg=E.FONDO, padx=12, pady=10)
         pan_body.pack(fill="both", expand=True)
 
         # Pie con botón cerrar
@@ -144,8 +146,9 @@ def abrir_calendario(ctx):
 
         _dia_nombres = ["LUNES","MARTES","MIÉRCOLES","JUEVES",
                         "VIERNES","SÁBADO","DOMINGO"]
-        pw._lbl_dia_nombre.config(text=_dia_nombres[fecha_dt.weekday()])
-        pw._lbl_dia_fecha.config(text=fecha_dt.strftime("%d/%m/%Y"))
+        pw._lbl_dia_nombre.config(text=_dia_nombres[fecha_dt.weekday()].capitalize())
+        # (v4.18.72) «28 de noviembre de 2026» en lugar de «28/11/2026»
+        pw._lbl_dia_fecha.config(text=f"{fecha_dt.day} de {_NOMBRES_MES[fecha_dt.month-1].lower()} de {fecha_dt.year}")
 
         # Limpiar cuerpo anterior
         for w in pw._pan_body.winfo_children():
@@ -155,69 +158,43 @@ def abrir_calendario(ctx):
         vacs    = _vacaciones_del_dia(ctx, fecha_dt)
         fests   = _festivos_del_dia(ctx, fecha_dt)
 
+        # (v4.18.72) Cada cosa del día en una tarjeta con la franja de su color, como en el calendario.
+        def _tarjeta(tipo, titulo, detalle="", ev_correo=None):
+            fondo = E.TARJETA
+            marco = tk.Frame(pw._pan_body, bg=fondo, highlightthickness=1, highlightbackground=E.BORDE)
+            marco.pack(fill="x", pady=(0, 6))
+            tk.Frame(marco, bg=E.COLOR_TIPO[tipo], width=4).pack(side="left", fill="y")
+            cuerpo = tk.Frame(marco, bg=fondo)
+            cuerpo.pack(side="left", fill="both", expand=True, padx=10, pady=7)
+            E.etiqueta(cuerpo, f"{E.ICONO_TIPO[tipo]}  {titulo}", fuente=E.F_NEGRITA, anchor="w",
+                       justify="left", wraplength=pw._pw_val - 60).pack(fill="x")
+            if detalle:
+                E.etiqueta(cuerpo, detalle, color=E.TEXTO_SUAVE, fuente=E.F_PEQUE, anchor="w",
+                           justify="left", wraplength=pw._pw_val - 60).pack(fill="x", pady=(2, 0))
+            if ev_correo is not None and ev_correo["PermiteCorreo"]:
+                ttk.Button(cuerpo, text="  ✉  Enviar correo sobre este aviso  ",
+                           bootstyle="light-outline",
+                           command=lambda e=ev_correo, p=pw: _abrir_ventana_correo(e, parent=p),
+                           ).pack(anchor="w", pady=(6, 0))
+
         if not eventos and not vacs and not fests:
-            ttk.Label(pw._pan_body,
-                      text="Sin eventos para este día.",
-                      font=("Segoe UI", 9),
-                      foreground=LIGHT,
-                      wraplength=pw._pw_val - 28,
-                      anchor="center",
-                      justify="center").pack(expand=True, pady=20)
+            E.etiqueta(pw._pan_body, "Sin avisos para este día.", fondo=E.FONDO, color=E.TEXTO_SUAVE,
+                       fuente=E.F_NORMAL).pack(expand=True, pady=30)
         else:
-            # ── VACACIONES ──────────────────────────────────────
-            for v in vacs:
-                ev_enr = _enriquecer_evento_correo(
-                    v, "VACACIONES",
-                    v.get("fecha_inicio", ""), v.get("fecha_fin", "")
-                )
-                frv = ttk.Frame(pw._pan_body, bootstyle="success", padding=(8, 5))
-                frv.pack(fill="x", pady=(0, 6))
-                ttk.Label(frv, text="🏖  " + v["titulo"],
-                          font=("Segoe UI", 9, "bold"),
-                          bootstyle="inverse-success",
-                          wraplength=pw._pw_val - 36).pack(anchor="w")
-                if ev_enr["PermiteCorreo"]:
-                    ttk.Button(
-                        frv,
-                        text="  ✉  Enviar correo sobre este aviso  ",
-                        bootstyle="success-outline",
-                        command=lambda e=ev_enr, p=pw: _abrir_ventana_correo(e, parent=p),
-                    ).pack(anchor="w", pady=(4, 0))
-
-            # ── FESTIVOS ────────────────────────────────────────
             for ft in fests:
-                ev_enr = _enriquecer_evento_correo(
-                    ft, "FESTIVO",
-                    ft.get("fecha", "")
-                )
-                frf = ttk.Frame(pw._pan_body, bootstyle="danger", padding=(8, 5))
-                frf.pack(fill="x", pady=(0, 6))
-                ttk.Label(frf, text="🎉  " + ft["titulo"],
-                          font=("Segoe UI", 9, "bold"),
-                          bootstyle="inverse-danger",
-                          wraplength=pw._pw_val - 36).pack(anchor="w")
-                if ev_enr["PermiteCorreo"]:
-                    ttk.Button(
-                        frf,
-                        text="  ✉  Enviar correo sobre este aviso  ",
-                        bootstyle="danger-outline",
-                        command=lambda e=ev_enr, p=pw: _abrir_ventana_correo(e, parent=p),
-                    ).pack(anchor="w", pady=(4, 0))
-
+                ev_enr = _enriquecer_evento_correo(ft, "FESTIVO", ft.get("fecha", ""))
+                _tarjeta("festivo", ft["titulo"], "Festivo", ev_enr)
+            for v in vacs:
+                ev_enr = _enriquecer_evento_correo(v, "VACACIONES",
+                                                   v.get("fecha_inicio", ""), v.get("fecha_fin", ""))
+                _tarjeta("vacaciones", v["titulo"],
+                         "Vacaciones: " + rango_fechas(v.get("fecha_inicio"), v.get("fecha_fin")), ev_enr)
+            _rep = {"diario": "Todos los días", "semanal": "Cada semana", "mensual": "Cada mes",
+                    "cada_hora": "Cada hora", "cada_30min": "Cada 30 minutos"}
             for ev in sorted(eventos, key=lambda x: x["hora"]):
-                es_rep = ev.get("repeticion", "ninguna") != "ninguna"
-                icono  = "🔁" if es_rep else "🔔"
-                fre = ttk.Frame(pw._pan_body, bootstyle="secondary", padding=(8, 6))
-                fre.pack(fill="x", pady=(0, 5))
-                ttk.Label(fre,
-                          text=f"{icono}  {ev['hora']}",
-                          font=("Segoe UI", 10, "bold"),
-                          bootstyle="inverse-secondary").pack(anchor="w")
-                ttk.Label(fre,
-                          text=ev["titulo"],
-                          font=("Segoe UI", 9),
-                          bootstyle="inverse-secondary",
-                          wraplength=pw._pw_val - 36).pack(anchor="w", pady=(2, 0))
+                rep = ev.get("repeticion", "ninguna")
+                _tarjeta("aviso" if rep == "ninguna" else "repetitivo", f"{ev['hora']}   {ev['titulo']}",
+                         _rep.get(rep, "Aviso único") if rep != "ninguna" else "Aviso único")
 
     def _posicionar_panel_win():
         """Coloca la subventana a la izquierda del calendario principal."""
@@ -254,14 +231,23 @@ def abrir_calendario(ctx):
     # (v4.18.12) La cabecera se crea antes que el título del periodo para que este sea hijo
     # suyo y quede entre ◀ y ▶. Antes era hijo de frm_cal y se colocaba a la izquierda del
     # calendario, quitándole ancho (en la vista Semana no se veía el domingo).
-    top = ttk.Frame(frm_cal, padding=(16, 12, 16, 6))
+    # (v4.18.72) Rediseño: celdas oscuras con el número del día y, dentro, una línea por festivo,
+    # vacaciones y aviso (con su hora y su título), hoy con borde dorado, el día elegido en cian y los
+    # días del mes anterior y siguiente en gris. Colores en ui/estilo_calendario.py.
+    win.configure(background=E.FONDO)
+    top = ttk.Frame(frm_cal, padding=(18, 14, 18, 2))      # fila 1: periodo y botones de las otras ventanas
     top.pack(fill="x")
-    cal_frame   = ttk.Frame(frm_cal, padding=(10, 8, 10, 8))
-    lbl_periodo = ttk.Label(top, text="", font=("Segoe UI", 13, "bold"))
+    nav = ttk.Frame(frm_cal, padding=(18, 8, 18, 8))       # fila 2: navegación, Mes/Semana y leyenda
+    nav.pack(fill="x")
+    cal_frame   = tk.Frame(frm_cal, bg=E.FONDO)
+    lbl_periodo = ttk.Label(top, text="", font=E.F_TITULO)
 
     def renderizar():
         for w in cal_frame.winfo_children():
             w.destroy()
+        for i in range(8):
+            cal_frame.rowconfigure(i, weight=0, minsize=0, uniform="")
+            cal_frame.columnconfigure(i, weight=0, minsize=0, uniform="")
         if vista_var.get() == "mes":
             _render_mes()
         else:
@@ -279,17 +265,23 @@ def abrir_calendario(ctx):
             nav_fecha[0] = d + timedelta(weeks=delta)
         renderizar()
 
+    def _ir_a_hoy():
+        # (v4.18.72) Botón «Hoy»: vuelve al mes (o a la semana) de hoy.
+        nav_fecha[0] = hoy if vista_var.get() == "semana" else hoy.replace(day=1)
+        renderizar()
+
     # ── Cabecera de navegación (el marco «top» se crea más arriba) ──
 
-    ttk.Button(top, text="◀", width=3, bootstyle="secondary-outline",
+    lbl_periodo.pack(side="left")
+
+    ttk.Button(nav, text="◀", width=3, bootstyle="secondary",
                command=lambda: _navegar(-1)).pack(side="left")
+    ttk.Button(nav, text="Hoy", bootstyle="light-outline",
+               command=_ir_a_hoy).pack(side="left", padx=4)
+    ttk.Button(nav, text="▶", width=3, bootstyle="secondary",
+               command=lambda: _navegar(+1)).pack(side="left", padx=(0, 14))
 
-    lbl_periodo.pack(side="left", padx=10)
-
-    ttk.Button(top, text="▶", width=3, bootstyle="secondary-outline",
-               command=lambda: _navegar(+1)).pack(side="left", padx=(0, 16))
-
-    frm_toggle = ttk.Frame(top)
+    frm_toggle = ttk.Frame(nav)
     frm_toggle.pack(side="left")
     ttk.Radiobutton(frm_toggle, text="  Mes  ", variable=vista_var, value="mes",
                     bootstyle="toolbutton-info",
@@ -308,28 +300,85 @@ def abrir_calendario(ctx):
                     bootstyle="toolbutton-info",
                     command=_a_semana).pack(side="left")
 
-    ttk.Button(top, text="  🏖  Vacaciones  ", bootstyle="warning-outline",
+    ttk.Button(top, text="  🏖  Vacaciones  ", bootstyle="success-outline",
                command=lambda: _ventana_vacaciones(ctx)).pack(side="right")
     ttk.Button(top, text="  🎉  Festivos  ", bootstyle="danger-outline",
                command=lambda: _ventana_festivos(ctx)).pack(side="right", padx=(0, 6))
-    ttk.Button(top, text="  💬  Chat  ", bootstyle="info-outline",
-               command=lambda: _ventana_chat(ctx)).pack(side="right", padx=(0, 6))
+    # (v4.18.72) Sin botón «Chat»: venía de versiones antiguas y el chat ya está en el menú principal (petición de Víctor).
 
-    # ── Leyenda ───────────────────────────────────────────
-    ley = ttk.Frame(frm_cal, padding=(16, 0, 16, 6))
-    ley.pack(fill="x")
-    for txt, fg in [("🔔 Aviso único", LIGHT),
-                    ("🔁 Repetitivo",  LIGHT),
-                    ("🏖 Vacaciones",  LIGHT),
-                    ("🎉 Festivo",     LIGHT),
-                    ("■ Hoy",         GOLD)]:
-        ttk.Label(ley, text=txt, font=("Segoe UI", 8),
-                  foreground=fg).pack(side="left", padx=8)
-
-    ttk.Separator(frm_cal).pack(fill="x")
+    # ── Leyenda: un punto del color de cada tipo ──────────
+    ley = tk.Frame(nav, bg=E.FONDO)
+    ley.pack(side="right")
+    for txt, color in [("Aviso único", E.AZUL), ("Repetitivo", E.CIAN), ("Vacaciones", E.VERDE),
+                       ("Festivo", E.ROJO), ("Hoy", E.DORADO)]:
+        E.etiqueta(ley, "●", fondo=E.FONDO, color=color, fuente=E.F_NORMAL).pack(side="left", padx=(12, 0))
+        E.etiqueta(ley, txt, fondo=E.FONDO, color=E.TEXTO_SUAVE, fuente=E.F_PEQUE).pack(side="left", padx=(3, 0))
 
     # ── Área del calendario ───────────────────────────────
-    cal_frame.pack(fill="both", expand=True)
+    cal_frame.pack(fill="both", expand=True, padx=16, pady=(0, 4))
+
+    def _al_pulsar(widget, fd):
+        """Clic en la celda o en cualquier cosa de dentro: abre o cierra el detalle del día."""
+        def _on_click(e, fd=fd):
+            if dia_sel[0] == fd:
+                _ocultar_panel_dia()
+                renderizar()
+            else:
+                _mostrar_panel_dia(fd)
+                renderizar()
+                # Reposicionar subventana tras renderizar (win puede haber cambiado)
+                win.after(50, _posicionar_panel_win)
+        pila = [widget]
+        while pila:
+            w = pila.pop()
+            w.bind("<Button-1>", _on_click)
+            w.configure(cursor="hand2")
+            pila.extend(w.winfo_children())
+
+    def _linea(padre, tipo, texto, fondo):
+        """Una línea de la celda: franja del color del tipo y el texto sobre un fondo suave."""
+        fila = tk.Frame(padre, bg=E.FONDO_TIPO.get(tipo, fondo))
+        fila.pack(fill="x", pady=(2, 0))
+        if tipo != "mas":
+            tk.Frame(fila, bg=E.COLOR_TIPO[tipo], width=3).pack(side="left", fill="y")
+        icono = E.ICONO_TIPO.get(tipo, "")
+        E.etiqueta(fila, f"{icono} {texto}".strip() if tipo in ("festivo", "vacaciones") else texto,
+                   fondo=E.FONDO_TIPO.get(tipo, fondo),
+                   color=E.TEXTO_SUAVE if tipo == "mas" else E.TEXTO,
+                   fuente=E.F_PEQUE, anchor="w").pack(side="left", fill="x", padx=(4, 2))
+
+    def _numero_dia(padre, fecha_dt, fondo, es_hoy, fuera, grande=False):
+        fuente = ("Segoe UI", 16 if grande else 10, "bold" if (es_hoy or grande) else "normal")
+        if es_hoy:
+            lbl = tk.Label(padre, text=f" {fecha_dt.day} ", bg=E.DORADO, fg=E.FONDO, font=fuente, bd=0)
+        else:
+            lbl = E.etiqueta(padre, str(fecha_dt.day), fondo=fondo,
+                             color=E.TEXTO_APAGADO if fuera else E.TEXTO, fuente=fuente)
+        lbl._fuera_mes = fuera   # (v4.18.72) las capturas del manual distinguen los días de otro mes
+        return lbl
+
+    def _celda(fecha_dt, fuera):
+        es_hoy = fecha_dt == hoy
+        es_sel = fecha_dt == dia_sel[0]
+        if fuera:
+            fondo = E.FUERA_MES
+        elif fecha_dt.weekday() >= 5:
+            fondo = E.TARJETA_FIN
+        else:
+            fondo = E.TARJETA
+        borde = E.CIAN if es_sel else (E.DORADO if es_hoy else E.BORDE)
+        cell = tk.Frame(cal_frame, bg=fondo, highlightthickness=2 if (es_sel or es_hoy) else 1,
+                        highlightbackground=borde, highlightcolor=borde)
+        dentro = tk.Frame(cell, bg=fondo)
+        dentro.pack(fill="both", expand=True, padx=6, pady=5)
+        _numero_dia(dentro, fecha_dt, fondo, es_hoy, fuera).pack(anchor="nw")
+        if not fuera:
+            lineas = lineas_celda(_eventos_del_dia(ctx, fecha_dt), _vacaciones_del_dia(ctx, fecha_dt),
+                                  _festivos_del_dia(ctx, fecha_dt), maximo=3, ancho=10)
+            for tipo, texto in lineas:
+                _linea(dentro, tipo, texto, fondo)
+            _al_pulsar(cell, fecha_dt)
+        return cell
 
     def _render_mes():
         d   = nav_fecha[0]
@@ -338,157 +387,60 @@ def abrir_calendario(ctx):
         lbl_periodo.config(text=f"{_NOMBRES_MES[mes-1]}  {año}")
 
         for c, ds in enumerate(_DIAS_SEM):
-            cal_frame.columnconfigure(c, weight=1, minsize=110)
-            ttk.Label(cal_frame, text=ds, font=("Segoe UI", 9, "bold"),
-                      anchor="center", bootstyle="inverse-secondary"
-                      ).grid(row=0, column=c, padx=2, pady=(0, 4),
-                             sticky="ew", ipady=4)
+            cal_frame.columnconfigure(c, weight=1, minsize=110, uniform="col")
+            E.etiqueta(cal_frame, ds.upper(), fondo=E.FONDO,
+                       color=E.TEXTO_APAGADO if c >= 5 else E.TEXTO_SUAVE,
+                       fuente=E.F_PEQUE_NEG, anchor="w").grid(row=0, column=c, padx=(8, 2), pady=(0, 4), sticky="ew")
 
-        semanas = _cal_mod.monthcalendar(año, mes)
+        semanas = _cal_mod.Calendar(firstweekday=0).monthdatescalendar(año, mes)
         for s_idx, semana in enumerate(semanas):
-            cal_frame.rowconfigure(s_idx + 1, weight=1, minsize=90)
-            for d_idx, dia in enumerate(semana):
-                if dia == 0:
-                    ttk.Frame(cal_frame).grid(
-                        row=s_idx+1, column=d_idx, padx=2, pady=2, sticky="nsew")
-                    continue
-                fecha_dt = date(año, mes, dia)
-                eventos  = _eventos_del_dia(ctx, fecha_dt)
-                vacs     = _vacaciones_del_dia(ctx, fecha_dt)
-                fests    = _festivos_del_dia(ctx, fecha_dt)
-                es_hoy   = fecha_dt == hoy
-                es_sel   = fecha_dt == dia_sel[0]
-
-                if es_sel:
-                    estilo = "info"
-                elif es_hoy:
-                    estilo = "warning"
-                elif fests:
-                    estilo = "danger"
-                elif vacs:
-                    estilo = "success"
-                elif eventos:
-                    estilo = "primary"
-                else:
-                    estilo = "secondary"
-
-                cell = ttk.Frame(cal_frame, bootstyle=estilo, padding=(4, 3),
-                                 cursor="hand2")
-                cell.grid(row=s_idx+1, column=d_idx, padx=2, pady=2, sticky="nsew")
-
-                ttk.Label(cell, text=str(dia),
-                          font=("Segoe UI", 10, "bold" if es_hoy else "normal"),
-                          anchor="nw",
-                          cursor="hand2").pack(anchor="nw")
-
-                iconos = ""
-                if any(a.get("repeticion","ninguna") == "ninguna" for a in eventos):
-                    iconos += "🔔"
-                if any(a.get("repeticion","ninguna") != "ninguna" for a in eventos):
-                    iconos += "🔁"
-                if vacs:
-                    iconos += "🏖"
-                if fests:
-                    iconos += "🎉"
-                if iconos:
-                    ttk.Label(cell, text=iconos,
-                              font=("Segoe UI", 8),
-                              cursor="hand2").pack(anchor="sw")
-                if fests:
-                    nombre = fests[0]["titulo"]
-                    if len(nombre) > 18: nombre = nombre[:17] + "…"
-                    ttk.Label(cell, text=nombre,
-                              font=("Segoe UI", 8),
-                              wraplength=95,
-                              cursor="hand2").pack(anchor="sw", fill="x")
-                elif vacs:
-                    nombre = vacs[0]["titulo"]
-                    if len(nombre) > 18: nombre = nombre[:17] + "…"
-                    ttk.Label(cell, text=nombre,
-                              font=("Segoe UI", 8),
-                              wraplength=95,
-                              cursor="hand2").pack(anchor="sw", fill="x")
-
-                # Clic en cualquier widget del cell → mostrar subventana de detalle
-                def _on_click_dia(e, fd=fecha_dt):
-                    if dia_sel[0] == fd:
-                        _ocultar_panel_dia()
-                        renderizar()
-                    else:
-                        _mostrar_panel_dia(fd)
-                        renderizar()
-                        # Reposicionar subventana tras renderizar (win puede haber cambiado)
-                        win.after(50, _posicionar_panel_win)
-                cell.bind("<Button-1>", _on_click_dia)
-                for child in cell.winfo_children():
-                    child.bind("<Button-1>", _on_click_dia)
+            cal_frame.rowconfigure(s_idx + 1, weight=1, minsize=92, uniform="fila")
+            for d_idx, fecha_dt in enumerate(semana):
+                _celda(fecha_dt, fecha_dt.month != mes).grid(
+                    row=s_idx + 1, column=d_idx, padx=2, pady=2, sticky="nsew")
 
     def _render_semana():
         d     = nav_fecha[0]
         lunes = d - timedelta(days=d.weekday())
         dom   = lunes + timedelta(days=6)
         lbl_periodo.config(
-            text=f"Semana  {lunes.strftime('%d/%m')} — {dom.strftime('%d/%m/%Y')}")
+            text=f"{lunes.day} {_MESES_CORTOS[lunes.month-1]} – {dom.day} {_MESES_CORTOS[dom.month-1]} {dom.year}")
+        cal_frame.rowconfigure(0, weight=1)
 
         for c in range(7):
-            cal_frame.columnconfigure(c, weight=1)
+            cal_frame.columnconfigure(c, weight=1, uniform="col")
             fecha_dt = lunes + timedelta(days=c)
             eventos  = _eventos_del_dia(ctx, fecha_dt)
             vacs     = _vacaciones_del_dia(ctx, fecha_dt)
             fests    = _festivos_del_dia(ctx, fecha_dt)
             es_hoy   = fecha_dt == hoy
             es_sel   = fecha_dt == dia_sel[0]
+            fondo    = E.TARJETA_FIN if c >= 5 else E.TARJETA
+            borde    = E.CIAN if es_sel else (E.DORADO if es_hoy else E.BORDE)
 
-            h_estilo = "info" if es_sel else ("warning" if es_hoy else "secondary")
-            hdr = ttk.Frame(cal_frame, bootstyle=h_estilo, padding=(4, 3),
-                            cursor="hand2")
-            hdr.grid(row=0, column=c, padx=3, sticky="ew", ipady=2)
-            ttk.Label(hdr, text=_DIAS_SEM[c],
-                      font=("Segoe UI", 9, "bold"), anchor="center",
-                      cursor="hand2").pack()
-            ttk.Label(hdr, text=fecha_dt.strftime("%d/%m"),
-                      font=("Segoe UI", 8), anchor="center",
-                      cursor="hand2").pack()
+            col = tk.Frame(cal_frame, bg=fondo, highlightthickness=2 if (es_sel or es_hoy) else 1,
+                           highlightbackground=borde, highlightcolor=borde)
+            col.grid(row=0, column=c, padx=3, pady=2, sticky="nsew")
+            cab = tk.Frame(col, bg=fondo)
+            cab.pack(fill="x", padx=8, pady=(8, 6))
+            E.etiqueta(cab, _DIAS_SEM[c].upper(), fondo=fondo,
+                       color=E.DORADO if es_hoy else E.TEXTO_SUAVE, fuente=E.F_PEQUE_NEG).pack(anchor="w")
+            _numero_dia(cab, fecha_dt, fondo, es_hoy, False, grande=True).pack(anchor="w")
+            tk.Frame(col, bg=E.BORDE, height=1).pack(fill="x", padx=8)
 
-            c_estilo = "danger" if fests else ("success" if vacs else ("primary" if eventos else "dark"))
-            cuerpo = ttk.Frame(cal_frame, bootstyle=c_estilo, padding=(6, 6))
-            cuerpo.grid(row=1, column=c, padx=3, pady=(2, 0), sticky="nsew")
-            cal_frame.rowconfigure(1, weight=1)
-
-            if fests:
-                for ft in fests:
-                    ttk.Label(cuerpo, text=f"🎉 {ft['titulo']}",
-                              font=("Segoe UI", 8, "bold"),
-                              wraplength=108).pack(anchor="w", pady=(0, 4))
-
-            if vacs:
-                for v in vacs:
-                    ttk.Label(cuerpo, text=f"🏖 {v['titulo']}",
-                              font=("Segoe UI", 8, "bold"),
-                              wraplength=108).pack(anchor="w", pady=(0, 4))
-
-            for ev in sorted(eventos, key=lambda x: x["hora"]):
-                icono = "🔁" if ev.get("repeticion","ninguna") != "ninguna" else "🔔"
-                ttk.Label(cuerpo,
-                          text=f"{icono} {ev['hora']}  {ev['titulo']}",
-                          font=("Segoe UI", 8),
-                          wraplength=108).pack(anchor="w", pady=1)
-
-            if not eventos and not vacs and not fests:
-                ttk.Label(cuerpo, text="—", foreground="gray",
-                          font=("Segoe UI", 9)).pack(pady=10)
-
-            def _on_click_sem(e, fd=fecha_dt):
-                if dia_sel[0] == fd:
-                    _ocultar_panel_dia()
-                    renderizar()
-                else:
-                    _mostrar_panel_dia(fd)
-                    renderizar()
-                    win.after(50, _posicionar_panel_win)
-            hdr.bind("<Button-1>", _on_click_sem)
-            for child in hdr.winfo_children():
-                child.bind("<Button-1>", _on_click_sem)
+            cuerpo = tk.Frame(col, bg=fondo)
+            cuerpo.pack(fill="both", expand=True, padx=6, pady=6)
+            for tipo, texto in lineas_celda(eventos, vacs, fests, maximo=99, ancho=60):
+                fila = tk.Frame(cuerpo, bg=E.FONDO_TIPO[tipo])
+                fila.pack(fill="x", pady=(0, 4))
+                tk.Frame(fila, bg=E.COLOR_TIPO[tipo], width=3).pack(side="left", fill="y")
+                E.etiqueta(fila, f"{E.ICONO_TIPO[tipo]} {texto}", fondo=E.FONDO_TIPO[tipo],
+                           fuente=E.F_PEQUE, anchor="w", justify="left",
+                           wraplength=104).pack(side="left", fill="x", padx=(4, 2), pady=3)
+            if not (eventos or vacs or fests):
+                E.etiqueta(cuerpo, "Sin avisos", fondo=fondo, color=E.TEXTO_APAGADO,
+                           fuente=E.F_PEQUE).pack(pady=14)
+            _al_pulsar(col, fecha_dt)   # (v4.18.72) toda la columna se puede pulsar, no solo la cabecera
 
     sincro_agenda.registrar_refresco(win, renderizar)   # (v4.18.66) cambios llegados de otro PC
     renderizar()
@@ -622,8 +574,7 @@ def abrir_calendario(ctx):
         _abrir_html_impresion(titulo, subtitulo, filas)
 
     # ── Pie de página ─────────────────────────────────────
-    ttk.Separator(frm_cal).pack(fill="x", pady=(6, 0))
-    pie = ttk.Frame(frm_cal, padding=(16, 8, 16, 12))
+    pie = ttk.Frame(frm_cal, padding=(18, 10, 18, 14))
     pie.pack(fill="x")
     def _cerrar_todo():
         _ocultar_panel_dia()
@@ -634,15 +585,15 @@ def abrir_calendario(ctx):
     frm_print.pack(side="left")
     ttk.Button(frm_print,
                text="🖨  Agenda del Día",
-               bootstyle="info-outline",
+               bootstyle="light-outline",
                command=_imprimir_dia).pack(side="left", padx=(0, 6))
     ttk.Button(frm_print,
                text="🖨  Agenda Semanal",
-               bootstyle="success-outline",
+               bootstyle="light-outline",
                command=_imprimir_semana).pack(side="left", padx=(0, 6))
     ttk.Button(frm_print,
                text="🖨  Agenda Mensual",
-               bootstyle="warning-outline",
+               bootstyle="light-outline",
                command=_imprimir_mes).pack(side="left")
 
     ttk.Button(pie, text="  Cerrar  ",

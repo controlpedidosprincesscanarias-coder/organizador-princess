@@ -111,6 +111,7 @@ jobs:
           python test_reinicio_limpio.py
           if ($LASTEXITCODE -ne 0) { exit 1 }
           python test_sincro_agenda.py
+          python test_textos_calendario.py
           if ($LASTEXITCODE -ne 0) { exit 1 }
 
       - name: Compilar con PyInstaller

@@ -11,6 +11,7 @@ Aplicación de escritorio desarrollada en **Python + ttkbootstrap**, que combina
 
 - 📅 Agenda con eventos, avisos recurrentes y calendario con colores, imprimible por día/semana/mes.
 - 🏖 Gestión de Vacaciones y Festivos.
+- 🎨 (v4.18.72) Agenda, Calendario, Vacaciones y Festivos con aspecto nuevo: tarjetas con la franja del color de cada tipo, hora o fecha en grande, resumen y próximo aviso en la cabecera y, en el calendario, una línea por aviso con su hora y su título (`ui/estilo_calendario.py`, textos en `utils/textos_calendario.py`).
 - 🗓️ (v4.18.66) Agenda, vacaciones y festivos sincronizados con el usuario de Control de Pedidos: la misma agenda en todos los PC donde entres con ese usuario (necesita Control de Pedidos v12.34.38).
 - 🔔 Sistema de notificaciones en segundo plano (bridge) conectado a Control de Pedidos: recibe los mismos avisos que Telegram (techo de gastos, familias repetidas, solicitudes de usuario, cambios de estado de pedidos…) como popup en pantalla, filtrados automáticamente según el usuario y su rol.
 - 🔄 Actualizaciones automáticas desde GitHub Releases, con ventana de "novedades" al terminar de instalar.
@@ -38,10 +39,11 @@ Aplicación de escritorio desarrollada en **Python + ttkbootstrap**, que combina
 │   ├── ui/
 │   │   ├── agenda.py, calendario.py, admin.py   (ventanas Agenda, Calendario y Administración — v4.18.08)
 │   │   ├── disposicion.py, colores.py           (constantes del menú y vista; colores comunes)
+│   │   ├── estilo_calendario.py                 (v4.18.72: aspecto común de Agenda, Calendario, Vacaciones y Festivos)
 │   │   ├── agenda_helpers.py, festivos.py, vacaciones.py, ventana_config.py, ventana_chat.py, saludo.py, assets.py, importexport.py
 │   │   └── __init__.py
 │   └── utils/
-│       ├── fechas.py, rutas.py, sonido.py
+│       ├── fechas.py, rutas.py, sonido.py, textos_calendario.py (v4.18.72)
 ├── assets/                         (logo.ico multirresolución, imágenes del wizard de instalación)
 ├── release_notes/
 │   ├── release_notes.md            (historial completo acumulado — nombre fijo, no lleva versión)

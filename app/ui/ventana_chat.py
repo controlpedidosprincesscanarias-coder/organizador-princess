@@ -23,7 +23,8 @@ from tkinter import messagebox, filedialog
 from services.chat_client import get_chat_client, cuenta_chat_configurada, nombre_adjunto_seguro, es_canal_avisos, EVT_CONECTADO, EVT_DESCONECTADO, \
     EVT_NUEVO_MENSAJE, EVT_ERROR, EVT_AVATAR, EVT_ELIMINADO, EVT_GRUPO, EVT_OCULTA, DESTINO_DESACTIVADO, DESTINO_NO_EXISTE
 from services import voz
-from ui import avatares, miniaturas, acciones_chat, grupo_info
+from ui import avatares, miniaturas, acciones_chat, grupo_info, vista_previa
+from utils import enlaces
 from ui.chat_bubbles import BubbleList, fecha_hora_local
 from ui.emoticonos import abrir_panel, imagen as imagen_emoticono
 from ui.chat_movil import abrir_chat_movil
@@ -505,7 +506,9 @@ def _ventana_chat(ctx):
                        color_ajeno=_COLOR_AJENO, color_texto="#f2f5f8",
                        color_meta=_COLOR_META, on_click_adjunto=_click_adjunto,
                        on_guardar_adjunto=_guardar_adjunto,
-                       cargar_imagen=lambda url, listo: miniaturas.cargar(win, cliente, url, listo))
+                       cargar_imagen=lambda url, listo: miniaturas.cargar(win, cliente, url, listo),
+                       # (v4.18.74, chat v1.9.0) tarjeta de los enlaces de vídeo
+                       cargar_tarjeta=lambda url, listo: vista_previa.cargar(win, cliente, url, listo))
     msgs.pack(fill="both", expand=True, pady=(4, 6))
 
     lbl_solo_avisos = ttk.Label(frm_chat, text="🔔  Aquí llegan los avisos de Control Pedidos (antes por Telegram). "
@@ -583,8 +586,10 @@ def _ventana_chat(ctx):
                                          adjunto_url=adjunto["url"], adjunto_nombre_archivo=adjunto["nombre_archivo"],
                                          foto=foto, **extra)
         if adjunto:
-            icono = "📷" if m.get("tipo") == "imagen" else "📎"
-            return msgs.agregar_burbuja(f"{icono}  {adjunto['nombre_archivo']}", hora, propio,
+            # (v4.18.74) Un vídeo se abre al pulsarlo con el reproductor de Windows
+            icono = "📷" if m.get("tipo") == "imagen" else ("🎬" if enlaces.es_video(m) else "📎")
+            texto_adj = f"{icono}  {adjunto['nombre_archivo']}" + ("   ▶ clic para ver" if icono == "🎬" else "")
+            return msgs.agregar_burbuja(texto_adj, hora, propio,
                                          meta_nombre=quien, es_adjunto=True,
                                          adjunto_url=adjunto["url"],
                                          adjunto_nombre_archivo=adjunto["nombre_archivo"], foto=foto,

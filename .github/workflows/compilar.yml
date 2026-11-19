@@ -104,6 +104,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit 1 }
           python test_chat_fase5.py
           if ($LASTEXITCODE -ne 0) { exit 1 }
+          python test_chat_fase6.py
+          if ($LASTEXITCODE -ne 0) { exit 1 }
           python test_control_pedidos.py
           if ($LASTEXITCODE -ne 0) { exit 1 }
           python test_portatil.py

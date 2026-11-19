@@ -62,6 +62,9 @@ if RAIZ:
             # (v4.18.70) Mensaje de voz grabado en el móvil
             {"id": 14, "remitente": "compras2.demo", "contenido": "🎤 Mensaje de voz (0:12)", "tipo": "voz", "creado_en": _ts(0, 35),
              "adjunto": {"nombre_archivo": "voz_demo.m4a", "url": "/demo/voz.m4a", "duracion_ms": 12400}},
+            # (v4.18.74) Enlace de vídeo con su tarjeta (dirección y datos inventados; ver vista_previa más abajo)
+            {"id": 15, "remitente": "compras2.demo", "contenido": "Así lo presenta el proveedor: https://youtu.be/demo-menaje",
+             "creado_en": _ts(0, 20)},
         ],
         "dm:compras.demo:economato.demo": [
             {"id": 20, "remitente": "economato.demo", "contenido": "¿Sabes si el pedido de menaje llega esta semana?", "creado_en": _ts(26)},
@@ -141,6 +144,22 @@ if RAIZ:
             img.save(buf, format="JPEG", quality=90)
             return buf.getvalue()
 
+        def _tarjeta_demo(self, url):
+            """(v4.18.74) Tarjeta de un enlace de vídeo, inventada y dibujada aquí (sin red)."""
+            import base64
+            from io import BytesIO
+            from PIL import Image, ImageDraw
+            img = Image.new("RGB", (480, 270), "#2d3e50")
+            d = ImageDraw.Draw(img)
+            d.rectangle((60, 150, 420, 230), fill="#c9b79c")                 # mesa
+            for x, color in ((110, "#e8eef2"), (210, "#d35d6e"), (310, "#f6c343")):
+                d.ellipse((x, 95, x + 70, 165), fill=color)                  # platos y tazas
+            buf = BytesIO()
+            img.save(buf, format="JPEG", quality=85)
+            return {"url": url, "proveedor": "youtube", "sitio": "YouTube", "titulo": "Presentación de la vajilla nueva (demo)",
+                    "autor": "Menaje Demo", "miniatura": "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()}
+
+        _cc.ChatClient.vista_previa = _tarjeta_demo
         _cc.ChatClient.descargar_avatar = lambda self, url: _foto_demo(url)
         _cc.ChatClient.mi_avatar = lambda self: None
         _cc.ChatClient.cambiar_avatar = lambda self, ruta=None, canal_id=None: {"ok": True, "avatar": None}

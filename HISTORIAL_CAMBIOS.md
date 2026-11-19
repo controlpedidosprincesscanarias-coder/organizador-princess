@@ -51,6 +51,21 @@
 
 ---
 
+## 2026-11-19 09:25 — [Consola Registro Info] «Faltan los listados de SAP»: la misma regla de fechas que antes de la Acción 3 (v10.2.78)
+
+> La idea y el desarrollo de la aplicación Consola Registro Info, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.
+
+**Petición de Víctor** (19 nov 2026): «arreglar para que todo funcione de la misma manera y evitar problemas futuros».
+
+**Causa:** la ventana «Faltan los listados de SAP actualizados» (tras guardar códigos SAP en las Acciones 4 y 8) decía «descargado de nuevo» si la fecha del listado era posterior a la hora del PC. En la unidad G: esa fecha la pone el reloj del servidor; si no coincide con el del PC, un listado recién descargado podía no marcarse ✔. No se ha visto en real.
+
+**Cambios:**
+- Ahora, como en la ventana de antes de la Acción 3: se guardan las fechas de los listados al salir el aviso y cuenta como descargado de nuevo si la fecha ha cambiado. Una sola regla para las dos ventanas.
+- Revisado el resto de la app: ningún otro sitio compara la fecha de un archivo con la hora del PC para decidir algo.
+- Pruebas al día (292 en verde). README, CLAUDE.md e historial de la Consola al día. **Pendiente:** probarlo en Windows con la unidad G:. Para que llegue a los compañeros: compilar y publicar el borrador.
+
+---
+
 ## 2026-11-19 08:40 — [Consola Registro Info] La Acción 1 también con ARTICULOS.htm (v10.2.76)
 
 > La idea y el desarrollo de la aplicación Consola Registro Info, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.

@@ -56,6 +56,7 @@ hiddenimports += [
     'utils.sonido',
     'utils.rutas',       # ANTI-REGRESION: _lanzar_ruta movida aquí desde main_agenda
     'utils.textos_calendario',  # v4.18.72: textos de Agenda, Calendario, Vacaciones y Festivos
+    'utils.enlaces',     # v4.18.74: enlaces pulsables y de vídeo en el chat
     'negocio.correo',
     'negocio.alertas',
     'services.update_service',
@@ -79,6 +80,7 @@ hiddenimports += [
     'ui.chat_movil',     # v4.18.24: ventana «Chat en el móvil» (QR de la app Android)
     'ui.avatares',       # v4.18.28: fotos de perfil del chat
     'ui.miniaturas',     # v4.18.44: miniaturas de las imágenes del chat
+    'ui.vista_previa',   # v4.18.74: tarjeta de los enlaces de vídeo en el chat
     'ui.notas_version',  # v4.18.44: notas de la versión al pulsar el número de versión
     'ui.acciones_chat',  # v4.18.46: responder citando, reenviar y eliminar en el chat
     'ui.grupo_info',     # v4.18.48: integrantes y gestión de los grupos del chat

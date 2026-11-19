@@ -566,6 +566,15 @@ class ChatClient:
         except Exception as exc:
             log.warning("ChatClient: no se pudo refrescar el mapa de nombres — %s", exc)
 
+    # ── Vista previa de enlaces de vídeo (v4.18.74; servidor del chat v1.9.0) ─────────
+
+    def vista_previa(self, url: str):
+        """Tarjeta de un enlace de TikTok, YouTube o Instagram ({url, proveedor, sitio, titulo, autor,
+        miniatura}) o None (otro sitio, servidor anterior a la v1.9.0 o sin conexión)."""
+        datos = self._get_rest("/api/chat/vista-previa", params={"url": url})
+        tarjeta = datos.get("tarjeta") if isinstance(datos, dict) else None
+        return tarjeta if isinstance(tarjeta, dict) else None
+
     # ── Fotos de perfil (v4.18.28; servidor del chat v1.3.0) ─────────────────
 
     def avatar_de(self, username: str):

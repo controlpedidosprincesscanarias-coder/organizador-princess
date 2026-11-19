@@ -18,6 +18,8 @@ cada mensaje ya recibido.
 
 import tkinter as tk
 import ui.emoticonos as _emo
+import ui.vista_previa as vista_previa
+from utils import enlaces
 import tkinter.font as tkfont
 from datetime import datetime
 
@@ -98,10 +100,13 @@ class BubbleList(tk.Frame):
                  color_ajeno="#3a4a63", color_texto="#f2f5f8",
                  color_meta="#9fb2c4", ancho_max_burbuja=None,
                  font_texto=("Segoe UI", 9), font_meta=("Segoe UI", 7),
-                 on_click_adjunto=None, on_guardar_adjunto=None, cargar_imagen=None, **kw):
+                 on_click_adjunto=None, on_guardar_adjunto=None, cargar_imagen=None, cargar_tarjeta=None,
+                 color_enlace="#8fd3ff", **kw):
         """(v4.18.44) `on_guardar_adjunto(url, nombre)`: «Guardar como…» en el menú de los adjuntos.
         `cargar_imagen(url, listo)`: descarga la miniatura de una imagen en segundo plano y llama a
-        `listo(PhotoImage)` en el hilo de la interfaz (ver ui/miniaturas.py)."""
+        `listo(PhotoImage)` en el hilo de la interfaz (ver ui/miniaturas.py).
+        (v4.18.74, chat v1.9.0) `cargar_tarjeta(url, listo)`: datos de la tarjeta de un enlace de vídeo
+        (ver ui/vista_previa.py). Los enlaces del texto se pintan en `color_enlace` y se abren al pulsarlos."""
         super().__init__(master, bg=bg, **kw)
         self._bg = bg
         self._color_propio = color_propio
@@ -114,6 +119,8 @@ class BubbleList(tk.Frame):
         self._on_click_adjunto = on_click_adjunto
         self._on_guardar_adjunto = on_guardar_adjunto
         self._cargar_imagen = cargar_imagen
+        self._cargar_tarjeta = cargar_tarjeta
+        self._color_enlace = color_enlace
 
         self.canvas = tk.Canvas(self, bg=bg, bd=0, highlightthickness=0)
         self.canvas.pack(side="left", fill="both", expand=True)
@@ -255,13 +262,21 @@ class BubbleList(tk.Frame):
                     cv.create_image(x, y + alto_linea // 2 - 1, image=img, anchor="w")
                     x += img.width() + 1
                     continue
-                item = cv.create_text(x, y, text=valor, anchor="nw",
-                                       fill=color_cuerpo, font=fuente_cuerpo)
-                if es_adjunto:
-                    bbox = cv.bbox(item)
-                    cv.create_line(bbox[0], bbox[3] + 1, bbox[2], bbox[3] + 1,
-                                    fill=self._color_texto)
-                x += self._font_texto.measure(valor)
+                # (v4.18.74) Los enlaces, subrayados en otro color y pulsables (se abren en el navegador)
+                partes = enlaces.trozos(valor) if not (es_adjunto or eliminado) else [(valor, None)]
+                for parte, url in partes:
+                    item = cv.create_text(x, y, text=parte, anchor="nw",
+                                           fill=self._color_enlace if url else color_cuerpo, font=fuente_cuerpo)
+                    if es_adjunto or url:
+                        bbox = cv.bbox(item)
+                        linea = cv.create_line(bbox[0], bbox[3] + 1, bbox[2], bbox[3] + 1,
+                                               fill=self._color_enlace if url else self._color_texto)
+                        if url:
+                            for it in (item, linea):
+                                cv.tag_bind(it, "<Button-1>", lambda e, u=url: vista_previa.abrir(u))
+                                cv.tag_bind(it, "<Enter>", lambda e: cv.configure(cursor="hand2"))
+                                cv.tag_bind(it, "<Leave>", lambda e: cv.configure(cursor="xterm"))
+                    x += self._font_texto.measure(parte)
             y += alto_linea
 
         if hora:
@@ -271,6 +286,16 @@ class BubbleList(tk.Frame):
         if es_adjunto and self._on_click_adjunto and adjunto_url:
             cv.bind("<Button-1>",
                     lambda e: self._on_click_adjunto(adjunto_url, adjunto_nombre_archivo))
+
+        # (v4.18.74, chat v1.9.0) Tarjeta del primer enlace de vídeo (TikTok, YouTube, Instagram)
+        url_video = enlaces.primer_video(texto) if not (es_adjunto or eliminado) else None
+        if url_video:
+            tarjeta, piezas = vista_previa.pintar_tarjeta(
+                contenedor, url_video, color, self._color_texto, self._color_meta, self._color_enlace,
+                self._font_texto, self._font_meta, self._cargar_tarjeta)
+            tarjeta.pack(anchor="e" if propio else "w", pady=(2, 0))
+            for w in piezas:
+                self._bind_rueda(w)
 
         # ── Copiar texto (clic derecho → menú contextual) ──────────────
         # No dependemos de la selección nativa de un Canvas (no existe

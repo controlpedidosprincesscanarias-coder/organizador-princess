@@ -1,3 +1,16 @@
+# ✨ Organizador Princess v4.18.74
+
+## 🎬 Enlaces y vídeos en el chat
+
+Petición de Víctor (19 nov 2026): «¿se podría poner reproductor de vídeos o vídeos web si se envían?», también en el chat de escritorio.
+
+- **Enlaces pulsables.** Los enlaces de los mensajes salen subrayados en azul; con un clic se abren en el navegador.
+- **Tarjeta de los enlaces de vídeo.** Bajo un enlace de TikTok, YouTube o Instagram sale una tarjeta con la imagen del vídeo, el sitio, el título y el autor. Un clic la abre. Los datos los da el servidor del chat (v1.9.0); si no puede, la tarjeta sale solo con el nombre del sitio.
+- **Vídeos adjuntos.** Los vídeos enviados como archivo salen con 🎬 y «▶ clic para ver»: un clic los abre con el reproductor de Windows.
+- En la ventana del chat y en la burbuja.
+
+---
+
 # ✨ Organizador Princess v4.18.72
 
 ## 🎨 Agenda, Calendario, Vacaciones y Festivos con aspecto nuevo

@@ -35,7 +35,8 @@ from datetime import datetime
 from services.chat_client import get_chat_client, nombre_adjunto_seguro, es_canal_avisos, EVT_NUEVO_MENSAJE, EVT_AVATAR, EVT_ELIMINADO, EVT_GRUPO, \
     EVT_OCULTA, EVT_ERROR, DESTINO_DESACTIVADO, DESTINO_NO_EXISTE
 from services import voz
-from ui import avatares, miniaturas, acciones_chat
+from ui import avatares, miniaturas, acciones_chat, vista_previa
+from utils import enlaces
 from ui.chat_bubbles import BubbleList, fecha_hora_local
 from ui.emoticonos import abrir_panel, imagen as imagen_emoticono
 from db.sqlite import filtrar_mensajes_limpiados
@@ -286,7 +287,9 @@ def mostrar_popup_chat(ctx, canal_id, titulo, mensaje_inicial=None, borrador="")
                        color_meta=_COLOR_META, font_texto=("Segoe UI", 9),
                        font_meta=("Segoe UI", 7), on_click_adjunto=_click_adjunto,
                        on_guardar_adjunto=_guardar_adjunto,
-                       cargar_imagen=lambda url, listo: miniaturas.cargar(win, cliente, url, listo))
+                       cargar_imagen=lambda url, listo: miniaturas.cargar(win, cliente, url, listo),
+                       # (v4.18.74, chat v1.9.0) tarjeta de los enlaces de vídeo
+                       cargar_tarjeta=lambda url, listo: vista_previa.cargar(win, cliente, url, listo))
     msgs.pack(fill="both", expand=True, padx=6, pady=6)
 
     ids_pintados = set()
@@ -329,8 +332,10 @@ def mostrar_popup_chat(ctx, canal_id, titulo, mensaje_inicial=None, borrador="")
                                          adjunto_url=adjunto["url"], adjunto_nombre_archivo=adjunto["nombre_archivo"],
                                          **extra)
         if adjunto:
-            icono = "📷" if m.get("tipo") == "imagen" else "📎"
-            return msgs.agregar_burbuja(f"{icono} {adjunto['nombre_archivo']}", hora, propio,
+            # (v4.18.74) Un vídeo se abre al pulsarlo con el reproductor de Windows
+            icono = "📷" if m.get("tipo") == "imagen" else ("🎬" if enlaces.es_video(m) else "📎")
+            texto_adj = f"{icono} {adjunto['nombre_archivo']}" + ("  ▶ ver" if icono == "🎬" else "")
+            return msgs.agregar_burbuja(texto_adj, hora, propio,
                                          meta_nombre=quien, es_adjunto=True,
                                          adjunto_url=adjunto["url"],
                                          adjunto_nombre_archivo=adjunto["nombre_archivo"],

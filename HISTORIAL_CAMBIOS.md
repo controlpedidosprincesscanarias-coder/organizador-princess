@@ -51,7 +51,15 @@
 
 ---
 
-## 2026-11-19 09:25 — [Consola Registro Info] «Faltan los listados de SAP»: la misma regla de fechas que antes de la Acción 3 (v10.2.78)
+## 2026-11-19 09:30 — [Consola Registro Info] Números de versión corregidos en la documentación
+
+> La idea y el desarrollo de la aplicación Consola Registro Info, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.
+
+**Petición de Víctor** (19 nov 2026). La compilación de las 09:22, publicada como **v10.2.74**, ya llevaba la Acción 3 guiada y la Acción 1 con ARTICULOS.htm. La regla de fechas de «Faltan los listados de SAP» sale en la próxima, la **v10.2.76**. Corregido en las dos entradas de abajo (ponían v10.2.76 y v10.2.78) y en README, CLAUDE.md e historial de la Consola. Sin cambios de funcionamiento.
+
+---
+
+## 2026-11-19 09:25 — [Consola Registro Info] «Faltan los listados de SAP»: la misma regla de fechas que antes de la Acción 3 (v10.2.76)
 
 > La idea y el desarrollo de la aplicación Consola Registro Info, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.
 
@@ -66,7 +74,7 @@
 
 ---
 
-## 2026-11-19 08:40 — [Consola Registro Info] La Acción 1 también con ARTICULOS.htm (v10.2.76)
+## 2026-11-19 08:40 — [Consola Registro Info] La Acción 1 también con ARTICULOS.htm (v10.2.74)
 
 > La idea y el desarrollo de la aplicación Consola Registro Info, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.
 

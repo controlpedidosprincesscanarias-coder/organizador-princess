@@ -51,6 +51,20 @@
 
 ---
 
+## 2026-11-19 15:20 — [Consola Registro Info] RINFO: con varios Purchasing del mismo proveedor se usa el más reciente (v10.2.84)
+
+> La idea y el desarrollo de la aplicación Consola Registro Info, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.
+
+**Revisión del log de SAP** que mandó Víctor (importación del RINFO de GRUPO DISTRIBUIDOR GARAU, 19 nov 2026): 4 errores «Ya existe el registro Info de compras».
+
+- **Causa:** el RINFO se generó con el Purchasing del 18/11, de antes de importar el RINFO de ese día. La Consola, con varios Purchasing del mismo proveedor en TARIFAS, cogía el primero que encontraba, no el más reciente.
+- **Arreglo:** ahora usa el más reciente y dice en la consola cuándo se descargó. En el manual, recuadro «Descarga el Purchasing después de cada importación».
+- **Comprobado:** con los archivos de Víctor, las 2.450 condiciones importadas ya estaban en SAP con el mismo periodo y precio. No cambió ningún precio.
+
+**Probado:** 311 pruebas en verde, en local. **No probado:** en Windows. Sale en la próxima compilación (v10.2.84).
+
+---
+
 ## 2026-11-19 14:45 — [Organizador + Consola Registro Info] Manuales al día y tarjeta del chat que salía cortada (Organizador v4.18.74, Consola v10.2.84)
 
 > La idea y el desarrollo del Organizador Princess y de la Consola Registro Info, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.

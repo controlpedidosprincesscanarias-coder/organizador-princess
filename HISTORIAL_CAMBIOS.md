@@ -51,6 +51,34 @@
 
 ---
 
+## 2026-11-19 14:15 — [Chat + Chat móvil + Organizador] Enlaces pulsables, tarjeta de los vídeos web y vídeos dentro del chat (chat v1.9.0, móvil v1.0.20, Organizador v4.18.74)
+
+> La idea y el desarrollo de Control Pedidos Princess Canarias (con su chat), del Chat en el móvil y del Organizador Princess, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.
+
+**Petición de Víctor** (19 nov 2026, con un enlace de TikTok de ejemplo): «¿se podría poner reproductor automático de vídeos o vídeos web si se envían?». Decisiones de Víctor:
+- los enlaces se abren en su app o en el navegador, con una tarjeta de vista previa en el chat;
+- los vídeos enviados se reproducen al pulsarlos, no solos;
+- el límite de 10 MB se queda;
+- «en el chat de escritorio igual».
+
+**Cambios:**
+- **Servidor del chat (v1.9.0):** `GET /api/chat/vista-previa?url=` prepara la tarjeta (miniatura, sitio, título y autor) con el servicio oficial de TikTok y YouTube; de Instagram, solo el nombre. Solo esos sitios y por https: no es un proxy abierto. Solo se añade una ruta.
+- **Chat en el móvil (v1.0.20):**
+  - los enlaces se pueden pulsar y la tarjeta sale bajo los de vídeo;
+  - los vídeos adjuntos se ven con ▶ y se reproducen dentro de la app al pulsarlos;
+  - apartado «Enlaces y vídeos» en el manual de la app.
+- **Organizador (v4.18.74):** enlaces subrayados que se abren en el navegador y la misma tarjeta, en la ventana del chat y en la burbuja. Los vídeos adjuntos salen con 🎬 y se abren con el reproductor de Windows.
+
+**Probado** (en local, sin datos reales):
+- pruebas del servidor sin red y la prueba completa con PostgreSQL local;
+- pruebas y compilación de la app Android;
+- las 20 pruebas del Organizador, con una burbuja con enlace y tarjeta pintada de verdad.
+- Desde aquí, YouTube devolvió título, autor y miniatura; TikTok, solo el autor.
+
+**No probado:** en el móvil real, en Windows ni desde Render (si TikTok da allí la miniatura). Orden de publicación: primero el servidor del chat; luego compilar y publicar la app y el Organizador.
+
+---
+
 ## 2026-11-19 13:30 — [Consola Registro Info] Crear Registro Info más rápido y con menos avisos amarillos (v10.2.82)
 
 > La idea y el desarrollo de la aplicación Consola Registro Info, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.

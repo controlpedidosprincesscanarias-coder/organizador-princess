@@ -51,6 +51,21 @@
 
 ---
 
+## 2026-11-19 08:40 — [Consola Registro Info] La Acción 1 también con ARTICULOS.htm (v10.2.76)
+
+> La idea y el desarrollo de la aplicación Consola Registro Info, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.
+
+**Petición de Víctor** (19 nov 2026): «cuando se pulsa la Acción 1, actualmente la aplicación busca los Excel ARTICULOS1 y 2 para trabajar; necesito que también se pueda realizar la misma operación con ARTICULOS.htm».
+
+**Cambios:**
+- La Acción 1 lee `ARTICULOS.htm`: el listado de artículos de DALI exportado como informe, con las 9 columnas de ARTICULOS1 + ARTICULOS2 en un solo archivo. Se pasa con la misma forma que los `.xls`, así que el resto de la Acción 1 no cambia. Comprueba el «Total Líneas» del informe.
+- **Qué descarga usar** (decisiones de Víctor): con las dos en RECURSOS, la más reciente; después se borran las tres, como hasta ahora los `.xls`.
+- **Hallazgo:** no todas las páginas del informe llevan la marca de salto de página. Las páginas se separan por su recuadro; si no, se perdían 2 artículos.
+- **Con los datos reales del 19 nov** (solo lectura): mismo resultado que con los `.xls` en los 30.246 artículos, salvo 146 descripciones que salen sin el espacio que DALI mete al exportar a Excel («PIÑA-PLATANO- MANZANA» → «PIÑA-PLATANO-MANZANA»). La primera vez que se use el `.htm`, esas descripciones se corregirán en el catálogo y en Catálogo Asignaciones.
+- 8 pruebas nuevas (292 en verde). README, CLAUDE.md e historial de la Consola al día. **Pendiente:** probar la Acción 1 completa en Windows y añadir `ARTICULOS.htm` al manual. Para que llegue a los compañeros: lanzar «Compilar Consola Registro Info» y publicar el borrador.
+
+---
+
 ## 2026-11-19 07:58 — [Consola Registro Info] Acción 3 guiada: la Consola sabe sola si hay que descargar los listados de SAP (v10.2.74)
 
 > La idea y el desarrollo de la aplicación Consola Registro Info, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.

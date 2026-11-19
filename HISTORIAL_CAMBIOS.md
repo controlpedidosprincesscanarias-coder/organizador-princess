@@ -51,6 +51,28 @@
 
 ---
 
+## 2026-11-19 13:30 — [Consola Registro Info + Catálogo Asignaciones] Cambio de nombre del proveedor en DALI: mismo proveedor (Consola v10.2.78, Catálogo v1.20.72)
+
+> La idea y el desarrollo de las aplicaciones Consola Registro Info y Catálogo Asignaciones, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.
+
+**Petición de Víctor** (19 nov 2026, opción A): reconocer el cambio de nombre del proveedor en DALI. Esta vez arregla él a mano los precios de B Refreshing.
+
+**Causa:** DALI pasó «B REFRESHING COMPANY S.L. ( BEBIDAS REFRESCANTES CANARIAS SL )» a «B REFRESHING COMPANY S.L.». Se comparaba solo el nombre, así que se tomó como un cambio de proveedor:
+- en la Consola se vaciaron el código de proveedor y el precio de sus 12 artículos;
+- la web dio de alta un proveedor nuevo y vació también sus precios.
+
+**Cambios:**
+- **Consola:** reconoce el cambio de nombre cuando todos los artículos de un proveedor pasan a un mismo nombre nuevo y no queda ninguno con el antiguo. Conserva el código y el precio, y manda el cambio de nombre a la web.
+- **Catálogo Asignaciones:** renombra el proveedor existente, en vez de crear otro. Se conservan precios, códigos, imágenes, fichas y asignaciones locales.
+- Un cambio de proveedor de verdad sigue como siempre.
+- **Consola, aparte:** un código de proveedor que la web no acepta (caso del DALI 21905, «COMODIN») ya no se reenvía en cada envío. Se queda el de la web también en el Excel.
+
+**Probado:** Consola, 301 pruebas en verde; Catálogo Asignaciones, 64 pruebas del backend en verde. **No probado:** en Windows con datos reales y la web desplegada.
+
+**Pendiente:** antes de la próxima Acción 1, fusionar en Catálogo Asignaciones los dos proveedores de B Refreshing (Gestión → Proveedores → «Fusionar proveedores»).
+
+---
+
 ## 2026-11-19 11:00 — [Consola Registro Info] Fuera las ventanas de resumen que repetían lo que enseña el envío a la web (v10.2.78)
 
 > La idea y el desarrollo de la aplicación Consola Registro Info, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.

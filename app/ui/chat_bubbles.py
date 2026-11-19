@@ -292,7 +292,7 @@ class BubbleList(tk.Frame):
         if url_video:
             tarjeta, piezas = vista_previa.pintar_tarjeta(
                 contenedor, url_video, color, self._color_texto, self._color_meta, self._color_enlace,
-                self._font_texto, self._font_meta, self._cargar_tarjeta)
+                self._font_texto, self._font_meta, self._cargar_tarjeta, seguir_abajo=self._seguir_abajo)
             tarjeta.pack(anchor="e" if propio else "w", pady=(2, 0))
             for w in piezas:
                 self._bind_rueda(w)
@@ -317,6 +317,12 @@ class BubbleList(tk.Frame):
 
         self._ir_al_final()
         return cv
+
+    def _seguir_abajo(self):
+        """(v4.18.74) Para lo que crece después de pintarse (la tarjeta de un enlace): devuelve una función que
+        vuelve al final si ahora se está al final (como las miniaturas de las imágenes)."""
+        abajo = self.canvas.yview()[1] > 0.98
+        return (lambda: self.after_idle(self._ir_al_final)) if abajo else (lambda: None)
 
     def agregar_aviso(self, texto, hora=""):
         """(v4.18.48, chat v1.5.0) Mensaje de sistema del grupo («👥 Ana ha añadido a Carla»): centrado, en

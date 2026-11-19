@@ -420,7 +420,8 @@ def chat_ver(c):
     v = ESTADO.get("chat")
     foto(c, v, "u_chat", [(buscar(c, v, "Conectado"), 1, "ir"), (de_clase(c, v, "Treeview"), 2, "ir"),
                           (buscar(c, v, "Nueva conversación"), 3, "t"), (buscar(c, v, "⋮"), 4, "b"), (buscar(c, v, "Fotos"), 10, "b"),
-                          (buscar(c, v, "Oferta_", n=0) or de_clase(c, v, "Canvas"), 5, "l"),
+                          (buscar(c, v, "Mensaje de voz", n=0) or de_clase(c, v, "Canvas"), 5, "r"),
+                          (buscar(c, v, "YouTube"), 11, "r"),          # (v4.18.74) tarjeta de un enlace de vídeo
                           (de_clase(c, v, "TEntry"), 6, "t"), (boton_emoticonos(c, v), 7, "t"), (buscar(c, v, "📎"), 8, "t"),
                           (buscar(c, v, "Enviar"), 9, "t")])
     guardar_ventanas()

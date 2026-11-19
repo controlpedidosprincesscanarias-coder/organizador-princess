@@ -51,6 +51,30 @@
 
 ---
 
+## 2026-11-19 14:45 — [Organizador + Consola Registro Info] Manuales al día y tarjeta del chat que salía cortada (Organizador v4.18.74, Consola v10.2.84)
+
+> La idea y el desarrollo del Organizador Princess y de la Consola Registro Info, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.
+
+**Petición de Víctor** (19 nov 2026): «revisar los manuales del Organizador, chat y consola».
+
+**Cambios:**
+- **Organizador, manual de usuario:**
+  - captura del chat con un enlace de vídeo y su tarjeta (datos inventados), con marca nueva;
+  - apartado «Enlaces y vídeos» en los capítulos del chat y del móvil.
+- **Organizador, corregido** (commit propio, antes de publicar la v4.18.74): la conversación no bajaba al llegar la miniatura de la tarjeta, que quedaba cortada abajo.
+- **Chat en el móvil:** su manual (Ajustes → Manual de uso) ya tenía todo, con «Enlaces y vídeos» de la v1.0.20. Enlaza al PDF del Organizador, que ya está al día.
+- **Consola, manual:**
+  - la Acción 1 con ARTICULOS.htm;
+  - la ventana de antes de la Acción 3, con captura nueva;
+  - cambio de nombre del proveedor en DALI, código de proveedor que no acepta la web y presupuestos de Activo Operacional;
+  - ya no salen las ventanas de «completado»;
+  - avisos del RINFO en una sola línea.
+  - Todas las capturas, con la v 10.2.84.
+
+**Probado:** pruebas del Organizador (20) y de la Consola (308) en verde, y los dos PDF revisados página a página. **No probado:** en Windows.
+
+---
+
 ## 2026-11-19 14:15 — [Chat + Chat móvil + Organizador] Enlaces pulsables, tarjeta de los vídeos web y vídeos dentro del chat (chat v1.9.0, móvil v1.0.20, Organizador v4.18.74)
 
 > La idea y el desarrollo de Control Pedidos Princess Canarias (con su chat), del Chat en el móvil y del Organizador Princess, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.

@@ -1,7 +1,7 @@
 // Manual de usuario del Organizador Princess. Idea y desarrollo de la aplicación: Víctor Alejandro Martín Andrade.
 const L = require("./lib");
 const { p, vineta, pasos, h1, h2, imagen, leyenda, recuadro, tabla, portada, indice } = L;
-const V = process.env.VERSION || "v4.18.72";
+const V = process.env.VERSION || "v4.18.74";
 
 const s = [];
 s.push(portada({ rol: "Uso diario", subtitulo: "Abre tus accesos, apunta avisos, consulta el calendario y chatea con tus compañeros",
@@ -9,7 +9,7 @@ s.push(portada({ rol: "Uso diario", subtitulo: "Abre tus accesos, apunta avisos,
 s.push(indice([["1. El Organizador de un vistazo", "Qué puedes hacer y qué no"], ["2. Conoce la pantalla", "Menú principal, accesos y submenús"],
   ["3. Vista extendida y reducida", ""], ["4. Agenda de avisos", "Crear, editar, pausar y borrar avisos"],
   ["5. Calendario, vacaciones y festivos", "Mes, semana, detalle del día e impresión"], ["6. Avisos emergentes", "Agenda, vacaciones y festivos, pedidos y saludo del día"],
-  ["7. Chat", "Conversaciones, grupos, adjuntos y burbuja flotante"], ["8. El chat en el móvil", "Chat Dpto. Compras Princess para Android: instalarla y actualizarla"],
+  ["7. Chat", "Conversaciones, grupos, adjuntos, enlaces y vídeos, y burbuja flotante"], ["8. El chat en el móvil", "Chat Dpto. Compras Princess para Android: instalarla y actualizarla"],
   ["9. Actualizar la aplicación", "Novedades de cada versión y tus datos"], ["10. Versión portátil", "Para los PC donde no se puede instalar"],
   ["11. Problemas frecuentes", "Y referencia rápida"]]));
 
@@ -140,10 +140,11 @@ s.push(...imagen("u_chat", 16, "Ventana del chat (datos de ejemplo)."));
 s.push(...leyenda([[1, "**Estado** de la conexión: «Conectado» en verde cuando todo va bien."],
   [2, "**Conversaciones**: el canal General, los chats privados y los grupos, cada uno con su foto (o sus iniciales sobre un círculo de color si no tiene). El número entre paréntesis son los mensajes sin leer."],
   [3, "**Nueva conversación**."], [4, "**⋮** Menú de la conversación: **🧹 Vaciar chat** y, en los chats privados, **🗑 Eliminar chat** (siguiente apartado)."],
-  [5, "**Mensajes**: los tuyos, a la derecha en verde; los de los demás, a la izquierda. Cada burbuja lleva la fecha y la hora. Una respuesta lleva arriba el mensaje citado. Un adjunto se abre haciendo clic en él; las imágenes se ven en miniatura. Un **mensaje de voz** (🎤) se escucha con un clic (apartado «Mensajes de voz»)."],
+  [5, "**Mensajes**: los tuyos, a la derecha en verde; los de los demás, a la izquierda. Cada burbuja lleva la fecha y la hora. Una respuesta lleva arriba el mensaje citado. Un adjunto se abre haciendo clic en él; las imágenes se ven en miniatura. Un **mensaje de voz** (🎤) se escucha con un clic (apartado «Mensajes de voz»). Los **enlaces** salen subrayados en azul y se abren con un clic (apartado «Enlaces y vídeos»)."],
   [6, "Escribe aquí y pulsa **Intro** o **Enviar**."], [7, "😊 **Emoticonos** y respuestas rápidas (siguiente imagen)."],
   [8, "📎 **Adjuntar** una imagen o un documento."], [9, "**Enviar**."],
-  [10, "🖼 **Fotos**: cambiar o quitar tu foto de perfil y, en un grupo, la foto del grupo (siguiente apartado)."]]));
+  [10, "🖼 **Fotos**: cambiar o quitar tu foto de perfil y, en un grupo, la foto del grupo (siguiente apartado)."],
+  [11, "**Tarjeta de un enlace de vídeo** (TikTok, YouTube o Instagram): la imagen del vídeo, el sitio, el título y el autor. Un clic la abre en el navegador."]]));
 s.push(h2("Copiar, responder, reenviar y eliminar"));
 s.push(...tabla(["Quiero…", "Cómo"], [
   ["Copiar un mensaje", "**Doble clic** sobre él (sale «✓ Copiado»), o clic derecho → «Copiar mensaje»."],
@@ -168,6 +169,13 @@ s.push(...tabla(["Quiero…", "Cómo"], [
   ["Pararlo", "**Otro clic** sobre el mismo mensaje. Si pulsas otro mensaje de voz, el primero se para y suena el nuevo."],
   ["Guardarlo, reenviarlo o eliminarlo (si es tuyo)", "**Clic derecho**, como cualquier otro mensaje."]], [2600, 7038]));
 s.push(p("Funciona igual en la ventana grande y en la burbuja flotante. Si el reproductor de Windows no puede reproducirlo, el mensaje se abre con el programa de audio del equipo."));
+s.push(h2("Enlaces y vídeos"));
+s.push(...tabla(["Quiero…", "Cómo"], [
+  ["Abrir un enlace", "**Un clic** sobre el enlace (sale subrayado en azul): se abre en el navegador."],
+  ["Ver un vídeo de TikTok, YouTube o Instagram", "Bajo el enlace sale una **tarjeta** con la imagen del vídeo, el título y el autor (marca 11 de la ventana del chat). **Un clic** en ella lo abre en el navegador. Si el sitio no da sus datos, la tarjeta sale solo con su nombre."],
+  ["Ver un vídeo enviado como archivo", "Sale con **🎬** y «▶ clic para ver»: **un clic** lo abre con el reproductor de vídeo de Windows."],
+  ["Enviar un enlace", "Pégalo en la caja de escribir (Ctrl+V) y envíalo como cualquier mensaje."]], [2600, 7038]));
+s.push(p("Los vídeos enviados como archivo tienen el mismo límite que cualquier adjunto: **10 MB**. En el móvil se ven dentro de la propia app (capítulo 8)."));
 s.push(h2("Avisos de Control Pedidos"));
 s.push(...imagen("u_chat_avisos", 14, "Conversación «Control Pedidos» (avisos de ejemplo)."));
 s.push(...leyenda([[1, "**Control Pedidos** aparece en tu lista de conversaciones. Ahí te llegan **tus** avisos (pedidos sin entregar, cambios de estado, techo de gastos…), que suenan y avisan como cualquier mensaje."],
@@ -212,6 +220,7 @@ s.push(...tabla(["", "Organizador (Windows)", "Chat Dpto. Compras Princess (Andr
   ["Conversaciones, privados y grupos", "Sí", "Sí"], ["Emoticonos y respuestas rápidas", "Sí", "Sí"],
   ["Enviar fotos y documentos", "📎, arrastrar o Ctrl+V", "Cámara, galería o documento"],
   ["Mensajes de voz", "Escucharlos (un clic)", "Grabarlos (mantener pulsado 🎤) y escucharlos"],
+  ["Enlaces y vídeos", "Enlaces pulsables y tarjeta de los vídeos web; los vídeos enviados se abren con el reproductor de Windows", "Enlaces pulsables y tarjeta de los vídeos web; los vídeos enviados se ven dentro de la app"],
   ["Foto de perfil (tuya y de los grupos)", "🖼 Fotos, en la ventana del chat", "Ajustes → Mi foto (galería o cámara); la del grupo, en su cabecera"],
   ["Avisos de mensajes nuevos", "Burbuja flotante con sonido", "Notificación del móvil, también con la app cerrada"],
   ["Agenda, calendario, accesos y avisos de pedidos", "Sí", "No: solo el chat"],
@@ -239,6 +248,9 @@ s.push(...pasos(["**Mantén pulsado el 🎤** y habla. Mientras grabas, en lugar
   "Si no quieres enviarlo, **desliza el dedo a la izquierda** antes de soltar: cuando aparece **«Suelta para cancelar»**, suelta y no se envía nada.",
   "Para **escucharlo**, pulsa **▶** en la burbuja del mensaje (⏸ lo para); la barra muestra lo que lleva."]));
 s.push(p("La primera vez, Android pregunta si la app puede **usar el micrófono**: pulsa **Permitir**. Un mensaje de voz dura como mucho **3 minutos**: al llegar, se envía solo. Si lo pulsas sin mantenerlo, la app te recuerda que hay que mantenerlo pulsado. Como cualquier mensaje, manteniéndolo pulsado se puede **responder, reenviar, guardar, compartir** o **eliminar** (si es tuyo)."));
+s.push(h2("Enlaces y vídeos"));
+s.push(p("Los **enlaces** de los mensajes salen subrayados: tócalos y se abren en su app (TikTok, YouTube…) o en el navegador. Bajo un enlace de **TikTok, YouTube o Instagram** sale una **tarjeta** con la imagen del vídeo, el título y el autor; tócala para verlo."));
+s.push(p("Un **vídeo enviado como archivo** (📎 → «Documento», hasta 10 MB) sale con **▶**: tócalo y se ve **dentro de la app**, a pantalla completa (✕ lo cierra). Nunca empieza solo."));
 s.push(h2("Cómo se actualiza"));
 s.push(...pasos(["Al abrir la app, si hay una versión nueva, aparece el aviso **«Nueva versión…»** con sus novedades.",
   "Pulsa **Descargar e instalar**: la app la descarga y comprueba que es la publicada (SHA-256).",

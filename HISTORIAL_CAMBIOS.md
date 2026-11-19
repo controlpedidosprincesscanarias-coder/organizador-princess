@@ -51,6 +51,23 @@
 
 ---
 
+## 2026-11-19 11:00 — [Consola Registro Info] Fuera las ventanas de resumen que repetían lo que enseña el envío a la web (v10.2.78)
+
+> La idea y el desarrollo de la aplicación Consola Registro Info, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.
+
+**Petición de Víctor** (19 nov 2026): «eliminar los avisos obsoletos ya que en las nuevas actualizaciones ya tenemos las ventanas con la info a publicar en web… revisar todos los puntos parecidos en la Consola».
+
+**Cambios:**
+- **Quitadas**, porque lo que dicen ya sale en «Cambios para Catálogo Asignaciones» y en el log:
+  - «Actualización completada» de la Acción 1;
+  - «Caso irregular — Proveedor Asignado cambió» al regenerar el catálogo;
+  - los resúmenes de la Acción 3, de los códigos SAP faltantes (Acción 4) y de la Acción 8 cuando todo ha ido bien.
+- **Se quedan** las ventanas que avisan de algo que revisar y no sale en el envío (códigos sin coincidencia, categoría ambigua, DALI no encontrados, códigos fuera de `Productos.xlsx`, avisos de la tarifa) y los errores.
+
+**Probado:** 292 pruebas en verde. **No probado:** en Windows con la app abierta. Sale en la próxima compilación (v10.2.78).
+
+---
+
 ## 2026-11-19 09:30 — [Consola Registro Info] Números de versión corregidos en la documentación
 
 > La idea y el desarrollo de la aplicación Consola Registro Info, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.

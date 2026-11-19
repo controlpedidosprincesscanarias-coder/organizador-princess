@@ -51,6 +51,20 @@
 
 ---
 
+## 2026-11-19 12:00 — [Consola Registro Info] Sin «Reinscripción completada» si todo va bien y log de la Acción 1 con ARTICULOS.htm (v10.2.80)
+
+> La idea y el desarrollo de la aplicación Consola Registro Info, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.
+
+**Petición de Víctor** (19 nov 2026): «la ventana blanca informativa pienso sobra».
+
+**Cambios:**
+- **Acción 4, al completar una tarifa:** «Reinscripción completada» y «Tarifa completada» ya no salen encima de la ventana de envío a la web. El resumen y el nombre del archivo van al log. Si hay duplicados, pendientes o un error al renombrar, el aviso sigue saliendo.
+- **Acción 1 con `ARTICULOS.htm`:** el log ya no habla de ARTICULOS1 ni de ARTICULOS2.
+
+**Probado:** 301 pruebas en verde. **No probado:** en Windows. Sale en la próxima compilación (v10.2.80).
+
+---
+
 ## 2026-11-19 13:30 — [Consola Registro Info + Catálogo Asignaciones] Cambio de nombre del proveedor en DALI: mismo proveedor (Consola v10.2.78, Catálogo v1.20.72)
 
 > La idea y el desarrollo de las aplicaciones Consola Registro Info y Catálogo Asignaciones, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.

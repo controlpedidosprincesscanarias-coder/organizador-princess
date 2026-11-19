@@ -51,6 +51,20 @@
 
 ---
 
+## 2026-11-19 13:30 — [Consola Registro Info] Crear Registro Info más rápido y con menos avisos amarillos (v10.2.82)
+
+> La idea y el desarrollo de la aplicación Consola Registro Info, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.
+
+**Petición de Víctor** (19 nov 2026, log del RINFO de PRO A PRO): «¿por qué tarda este proceso RINFO tanto? Mucho log amarillo».
+
+**Cambios:**
+- **Velocidad:** al generar un RINFO desde un Purchasing existente, las filas absorbidas de la Hoja 3 se borran de una sola pasada. Con PRO A PRO, 690 filas salteadas tardaban 94 s; ahora 0,2 s, con el mismo resultado celda por celda.
+- **Log:** «actualización J omitida (mismo precio)» y «absorción total» no piden hacer nada. Ahora salen en una sola línea informativa con la lista de materiales, en vez de una línea amarilla por material. Lo que hay que revisar sigue en amarillo.
+
+**Probado:** 308 pruebas en verde y el borrado comparado con el Purchasing real, en local. **No probado:** el RINFO completo en Windows. Sale en la próxima compilación (v10.2.82).
+
+---
+
 ## 2026-11-19 12:00 — [Consola Registro Info] Sin «Reinscripción completada» si todo va bien y log de la Acción 1 con ARTICULOS.htm (v10.2.80)
 
 > La idea y el desarrollo de la aplicación Consola Registro Info, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.

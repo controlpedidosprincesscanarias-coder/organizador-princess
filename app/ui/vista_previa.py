@@ -79,8 +79,10 @@ def abrir(url):
         webbrowser.open(url)
 
 
-def pintar_tarjeta(padre, url, bg, color_texto, color_meta, color_sitio, fuente, fuente_meta, cargar_tarjeta):
-    """Crea la tarjeta (Frame) bajo la burbuja y la rellena cuando llegan los datos."""
+def pintar_tarjeta(padre, url, bg, color_texto, color_meta, color_sitio, fuente, fuente_meta, cargar_tarjeta,
+                   seguir_abajo=None):
+    """Crea la tarjeta (Frame) bajo la burbuja y la rellena cuando llegan los datos. `seguir_abajo()` devuelve una
+    función que, llamada tras crecer la tarjeta, vuelve al final de la conversación si se estaba al final."""
     tarjeta = tk.Frame(padre, bg=bg, bd=0, cursor="hand2")
     lbl_img = tk.Label(tarjeta, text="▶", bg="#000000", fg="#ffffff", font=(fuente.actual("family"), 18, "bold"),
                        width=0, padx=14, pady=6, cursor="hand2")
@@ -99,6 +101,8 @@ def pintar_tarjeta(padre, url, bg, color_texto, color_meta, color_sitio, fuente,
     def _listo(datos, foto):
         if not tarjeta.winfo_exists():
             return
+        # (v4.18.74) La tarjeta crece al llegar la miniatura: si se estaba al final, se sigue al final
+        volver = seguir_abajo() if seguir_abajo else None
         if foto is not None:
             lbl_img.configure(image=foto, text="", padx=0, pady=0, bg=bg)
             lbl_img.image = foto
@@ -113,6 +117,8 @@ def pintar_tarjeta(padre, url, bg, color_texto, color_meta, color_sitio, fuente,
                 lbl_autor.configure(text=autor[:60])
                 lbl_autor.pack(anchor="w", fill="x", padx=8)
         tk.Frame(tarjeta, bg=bg, height=4).pack()
+        if volver:
+            volver()
 
     if cargar_tarjeta is not None:
         cargar_tarjeta(url, _listo)

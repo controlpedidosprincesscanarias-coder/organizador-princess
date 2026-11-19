@@ -151,6 +151,24 @@ if TK_REAL:
         lista.agregar_burbuja("Sin vídeo: https://ejemplo.es", "10:01", True)
         raiz.update()
         ok("6. un enlace que no es de vídeo no lleva tarjeta", pedidas == [], pedidas)
+        # (v4.18.74) La tarjeta llega después: si se estaba al final de la conversación, se sigue al final
+        pendientes = []
+        lista2 = BubbleList(raiz, cargar_tarjeta=lambda url, listo: pendientes.append(listo))
+        lista2.pack(fill="both", expand=True)
+        raiz.geometry("400x300")
+        raiz.update()
+        for i in range(12):
+            lista2.agregar_burbuja(f"Mensaje {i}", "10:00", i % 2 == 0)
+        lista2.agregar_burbuja("Vídeo: https://youtu.be/demo", "10:05", False)
+        raiz.update()
+        foto_grande = None
+        if MINI is not None:
+            from PIL import ImageTk
+            foto_grande = ImageTk.PhotoImage(vista_previa.imagen_de({"miniatura": MINI}), master=raiz)
+        pendientes[0]({"sitio": "YouTube", "titulo": "Demo", "autor": "Canal demo"}, foto_grande)
+        raiz.update()
+        ok("6. al llegar la tarjeta, la conversación sigue al final", lista2.canvas.yview()[1] > 0.98,
+           lista2.canvas.yview())
         raiz.destroy()
 
 print(f"\n{'Todas las comprobaciones OK.' if not fallos else str(len(fallos)) + ' fallo(s): ' + '; '.join(fallos)}")

@@ -51,6 +51,21 @@
 
 ---
 
+## 2026-11-19 07:58 — [Consola Registro Info] Acción 3 guiada: la Consola sabe sola si hay que descargar los listados de SAP (v10.2.74)
+
+> La idea y el desarrollo de la aplicación Consola Registro Info, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.
+
+**Petición de Víctor** (13 nov 2026): al pulsar la Acción 3, que salga la guía de descarga de `Productos.xlsx` y `Listas de productos.xlsx` con Sí / No, y el botón para actualizar Catálogo Asignaciones oculto hasta contestar, como al final de la Acción 1. Y su idea: «¿la aplicación podría saber si necesitas actualizar los dos Excel del paso 3?». Umbral de antigüedad de los listados decidido el 19 nov: **7 días**.
+
+**Cambios:**
+- **Comprobación antes de la Acción 3** (`app/comun/listados_sap.py`): artículos del catálogo con código SAP y sin descripción, unidad, grupo o categoría de valoración; si esos códigos ya están en los listados de RECURSOS; y si algún listado no está o tiene más de 7 días.
+- **Ventana «Acción 3 — Listados de SAP»**: fecha de cada listado y resultado. Si falta algo o un listado es antiguo, sale la guía con imágenes y «¿Necesita descargar de nuevo…?» Sí / No. «Sí» abre RECURSOS, y una línea marca ✔ cuando el listado nuevo ya trae los códigos que faltaban (no basta con que cambie su fecha). El botón «Actualizar Catálogo Asignaciones» está oculto hasta contestar; si no hace falta preguntar, sale directamente. Al pulsarlo se hace la Acción 3 de siempre, que conserva la protección de «Listas de productos» que no casa, y el envío a la web.
+- **Error corregido en su commit:** «descargado de nuevo» se comprueba con la fecha del propio archivo, no con la hora del PC (en la unidad G: la pone el servidor).
+- Con los datos reales de RECURSOS (solo lectura), los 7.219 artículos con código SAP tienen ya sus datos: hoy la ventana diría «no falta nada» y mostraría el botón directamente.
+- 15 pruebas nuevas (284 en verde). README, CLAUDE.md e historial de la Consola al día. **Pendiente:** probar en Windows con la app y datos reales, y regenerar el capítulo 5 del manual. Para que llegue a los compañeros: lanzar «Compilar Consola Registro Info» y publicar el borrador.
+
+---
+
 ## 2026-11-18 21:35 — [Organizador] Aspecto nuevo de Agenda, Calendario, Vacaciones y Festivos (v4.18.72)
 
 > La idea y el desarrollo de la aplicación Organizador Princess, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.

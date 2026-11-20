@@ -51,6 +51,16 @@
 
 ---
 
+## 2026-11-20 19:15 — [Consola Registro Info] Aviso de reactivar en SAP con solo centros borrados y búsqueda doble (v10.2.90)
+
+Al revisar el log de la tarifa OASISFISH que mandó Víctor (20 nov 2026) salieron dos errores:
+
+- Cuando el Purchasing trae borrados en SAP solo los centros de un material (Hoja 2) y no su cabecera, la Consola quitaba la marca pero no avisaba de que hay que reactivarlo a mano en SAP. El log decía «ver aviso siguiente» y no salía nada. Ahora salen el aviso en la consola y la ventana «Materiales a reactivar manualmente en SAP».
+- Al elegir un `.xls` para usarlo como TARIFA, la búsqueda se lanzaba dos veces (log duplicado). Ahora se lanza una vez.
+- PR: https://github.com/controlpedidosprincesscanarias-coder/consola-registro-info/pull/46
+
+---
+
 ## 2026-11-20 18:30 — [Catálogo Asignaciones] Correo automático con el catálogo completo (v1.20.73)
 
 Petición de Víctor: un correo automático los miércoles y viernes a las 14:00 a dos cuentas configurables, con texto configurable y un botón para descargar el catálogo completo (como «Exportar catálogo») que pueda usar cualquiera que lo reciba; días y hora también configurables.

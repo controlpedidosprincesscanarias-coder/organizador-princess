@@ -51,6 +51,28 @@
 
 ---
 
+## 2026-11-20 10:30 — [Consola Registro Info] Fuera las ventanas que solo informan (v10.2.88)
+
+> La idea y el desarrollo de la aplicación Consola Registro Info, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.
+
+**Petición de Víctor** (20 nov 2026, con captura de «Categoría valoración ambigua»): «revisar todos los mensajes ya obsoletos y eliminarlos».
+
+**Cambios:**
+- **Revisadas las ~55 ventanas de aviso de la Consola.** Se quitan las que solo repetían lo que dice la consola; ese resumen sigue en la consola, en naranja si conviene revisarlo. Entre ellas:
+  - «Categoría valoración ambigua»;
+  - «Actualización SAP completada con advertencias»;
+  - «Procesado correctamente» y «Tarifa completada»;
+  - «Caso irregular»;
+  - «Códigos proveedor completados»;
+  - incidencias de la descarga de DALI;
+  - «Web parcialmente actualizada»;
+  - «Catálogo Asignaciones sin actualizar».
+- **Se quedan** las que piden decidir algo o avisan de algo que impide seguir: archivo abierto en Excel, duplicados que resolver, tarifa que queda [INCOMPLETO], errores al guardar.
+
+**Probado:** 316 pruebas en verde y manual regenerado. **No probado:** en Windows. Sale en la próxima compilación (v10.2.88).
+
+---
+
 ## 2026-11-20 09:00 — [Consola Registro Info] Acciones numeradas del 1 al 6; la 4 solo con tarifas [INCOMPLETO] (v10.2.86)
 
 > La idea y el desarrollo de la aplicación Consola Registro Info, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.

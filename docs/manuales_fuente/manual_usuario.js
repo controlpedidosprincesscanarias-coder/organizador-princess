@@ -240,6 +240,8 @@ s.push(...tabla(["", "Organizador (Windows)", "Chat Dpto. Compras Princess (Andr
   ["Enlaces y vídeos", "Enlaces pulsables y tarjeta de los vídeos web; los vídeos enviados se abren con el reproductor de Windows", "Enlaces pulsables y tarjeta de los vídeos web; los vídeos enviados se ven dentro de la app"],
   ["Foto de perfil (tuya y de los grupos)", "🖼 Fotos, en la ventana del chat", "Ajustes → Mi foto (galería o cámara); la del grupo, en su cabecera"],
   ["Avisos de mensajes nuevos", "Burbuja flotante con sonido", "Notificación del móvil, también con la app cerrada"],
+  ["Sonido de los mensajes (general y de cada chat o grupo)", "8 tonos, un .wav del PC o silencio (⋮ del chat, 🔔 de la burbuja o Admin)", "Tonos del móvil o silencio (Ajustes y ⋮ del chat)"],
+  ["Orden de las conversaciones", "General arriba y después por el último mensaje", "General y «Control Pedidos» fijos arriba; debajo, la última utilizada primero"],
   ["Agenda, calendario, accesos y avisos de pedidos", "Sí", "No: solo el chat"],
   ["Actualizaciones", "Aviso «Actualizar ahora»", "Aviso al abrir la app"]], [3300, 3169, 3169]));
 s.push(h2("Instalarla la primera vez"));
@@ -258,6 +260,11 @@ s.push(...recuadro("importante", "¿Por qué avisa Android de que puede ser peli
   "Es la app del departamento, publicada en su repositorio oficial, y cada versión va firmada siempre con la misma clave. Descárgala **solo** desde el código QR del Organizador o desde su enlace; si alguien te la pasa por otro medio (WhatsApp, correo…), no la instales."]));
 s.push(...recuadro("nota", "El aviso fijo «Chat conectado»", ["Mientras la app mantiene la conexión verás un aviso fijo «Chat conectado» en la barra de notificaciones. Es lo que permite que te avise de los mensajes con la app cerrada; al encender el móvil se vuelve a conectar solo."]));
 s.push(...recuadro("consejo", "El manual, también en la app", ["En el móvil, **Ajustes → 📖 Manual de uso** explica todo esto sin necesidad de conexión, con un buscador (por ejemplo, «voz» o «batería»). Al final tiene el enlace a este manual completo en PDF."]));
+s.push(h2("Orden de las conversaciones y sonidos"));
+for (const t of ["**Arriba, siempre fijos**, el chat **General** y **«Control Pedidos»**. Debajo, las demás conversaciones: la **última que has usado** (con un mensaje enviado o recibido, o al abrirla en el móvil) va la primera.",
+  "**Sonido general**: Ajustes → Sonidos de los mensajes → **Cambiar** (selector de tonos del móvil).",
+  "**Sonido de un chat o grupo**: menú **⋮** de la conversación (o mantenerla pulsada en la lista) → **🔔 Sonido de este chat**: «Elegir tono…», «🔕 Silencio» o «Como el general». En Ajustes se ven los que tienen sonido propio.",
+  "Los sonidos se guardan **solo en el móvil**: los del Organizador se eligen aparte (capítulo 7)."]) s.push(vineta(t));
 s.push(h2("Mensajes de voz"));
 s.push(p("Con la caja de escribir **vacía**, a su derecha aparece el **🎤** (cuando escribes algo, cambia por el botón de enviar)."));
 s.push(...pasos(["**Mantén pulsado el 🎤** y habla. Mientras grabas, en lugar de la caja de escribir se ve **🔴** y el tiempo que llevas.",

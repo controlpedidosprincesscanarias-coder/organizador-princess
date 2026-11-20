@@ -114,6 +114,8 @@ APARTADOS = [
         "Chat → 📱 Chat en el móvil: código QR para instalar Chat Dpto. Compras Princess en Android.",
         "Entra con tu usuario y contraseña de Control de Pedidos, acepta las notificaciones y quita el ahorro de batería.",
         "Si Play Protect avisa: Más detalles → Instalar de todas formas. Descárgala solo desde el QR o su enlace.",
+        "En el móvil, el General y «Control Pedidos» van fijos arriba y debajo la última conversación usada.",
+        "Sus sonidos se eligen en el propio móvil: Ajustes (el general) y ⋮ del chat → 🔔 Sonido de este chat.",
     ]),
     ("⬆️", "Actualizaciones y novedades", [
         "Al arrancar y cada 2 horas se busca una versión nueva. «Actualizar ahora» lo hace todo y se vuelve a abrir solo.",

@@ -51,6 +51,29 @@
 
 ---
 
+## 2026-11-20 09:00 — [Consola Registro Info] Acciones numeradas del 1 al 6; la 4 solo con tarifas [INCOMPLETO] (v10.2.86)
+
+> La idea y el desarrollo de la aplicación Consola Registro Info, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.
+
+**Petición de Víctor** (20 nov 2026): «Opción 3 pasa a la 2, 4 a 3, 5 desaparece (no se usa), 6 a 4 (sombreado y solo se puede utilizar si existen tarifas [INCOMPLETO] en la carpeta TARIFAS), 8 a 5, 7 a 6».
+
+**Cambios:**
+- **Botones del 1 al 6:**
+  1. Organizar artículos DALI;
+  2. Actualizar listado materiales SAP;
+  3. Generar TARIFA final;
+  4. Actualizar manualmente archivos [INCOMPLETOS];
+  5. Asignar SAP pendientes;
+  6. Tarifa de proveedor vacía (en preparación).
+- Se quita «Abrir archivo última TARIFA procesada».
+- **La Acción 4 sale sombreada** mientras no haya tarifas [INCOMPLETO] en TARIFAS, y se activa sola en cuanto aparece una (se comprueba cada 10 s).
+- Los mensajes de la consola, las ventanas y el manual usan ya los números nuevos.
+- **Corregido** (commit propio): dos avisos remitían a la «Acción 8» y a la «Acción 2» para generar el catálogo, cuando es la Acción 1.
+
+**Probado:** 318 pruebas en verde; manual regenerado con todas las capturas y revisado. **No probado:** en Windows. Sale en la próxima compilación (v10.2.86).
+
+---
+
 ## 2026-11-19 15:20 — [Consola Registro Info] RINFO: con varios Purchasing del mismo proveedor se usa el más reciente (v10.2.84)
 
 > La idea y el desarrollo de la aplicación Consola Registro Info, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.

@@ -51,6 +51,20 @@
 
 ---
 
+## 2026-11-20 23:45 — [Infra] Cada sesión de Claude trabaja sola en los 7 proyectos
+
+Petición de Víctor: que cualquier sesión de Claude, al pedirle algo de cualquiera de los 7 proyectos, trabaje directamente en el que corresponda, abra sola las PR necesarias y solo pida fusionar, como la sesión de hoy.
+
+- Bloque nuevo, igual en los 7 `CLAUDE.md` (sección común «Forma de trabajar con Víctor»). Cada sesión:
+  - elige ella sola el repositorio;
+  - añade el que le falte, sin esperar a que se lo pidan;
+  - abre siempre las PR, también las del historial compartido;
+  - nunca fusiona hasta oír «fusionar»;
+  - pregunta solo las decisiones de negocio.
+- Las sesiones se abren en claude.ai/code (un chat normal de Claude no puede tocar los repositorios), con los 7 repositorios, el entorno «Default» y los permisos en modo automático.
+
+---
+
 ## 2026-11-20 23:15 — [Catálogo Asignaciones] Zona «Manual»: consultar y descargar el manual desde la web (v1.20.78)
 
 Petición de Víctor: una zona para consultar y descargar el manual, como en las otras aplicaciones.

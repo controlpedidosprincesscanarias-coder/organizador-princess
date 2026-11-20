@@ -51,6 +51,17 @@
 
 ---
 
+## 2026-11-20 23:15 — [Catálogo Asignaciones] Zona «Manual»: consultar y descargar el manual desde la web (v1.20.78)
+
+Petición de Víctor: una zona para consultar y descargar el manual, como en las otras aplicaciones.
+
+- Botón **📘 Manual** en el pie del menú. Escribes la duda y salen los apartados del manual que la explican, con su página; al pulsar uno, se abre el PDF en esa página. También se puede abrir o descargar el manual entero.
+- Un usuario de hotel ve su manual; un administrador, el de hotel y el de administración. Solo con la sesión iniciada.
+- Usa la misma búsqueda que «Consultar el manual» de la Consola Registro Info. Los dos manuales explican ya la zona nueva.
+- PR: https://github.com/controlpedidosprincesscanarias-coder/dali-sap-articulos-app/pull/23
+
+---
+
 ## 2026-11-20 22:45 — [Catálogo Asignaciones / Consola Registro Info] Manuales al día con lo de hoy (v1.20.77 / v10.2.90)
 
 Petición de Víctor: actualizar los manuales de la Consola y de Catálogo Asignaciones con todo lo de hoy.

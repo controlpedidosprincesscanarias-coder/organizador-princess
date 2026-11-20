@@ -51,6 +51,16 @@
 
 ---
 
+## 2026-11-20 20:45 — [Consola Registro Info] Conserva la columna «Conversión DALI - SAP» al regenerar el catálogo
+
+Petición de Víctor: que la Consola también trabaje con la columna de equivalencias que Catálogo Asignaciones (v1.20.74) añadió al final del catálogo.
+
+- Antes, al regenerar `catalogo-dali-completo.xlsx` (final de la Acción 1 y Acción 2), la Consola lo escribía con 22 columnas y la columna se perdía en ese Excel.
+- Ahora la conserva del catálogo anterior por código DALI, también cuando cambia el proveedor. No la envía a la web: las equivalencias solo se cargan en Catálogo Asignaciones con «Importar Excel».
+- PR: https://github.com/controlpedidosprincesscanarias-coder/consola-registro-info/pull/47
+
+---
+
 ## 2026-11-20 20:00 — [Catálogo Asignaciones] Columna «Conversión DALI - SAP» (equivalencias) (v1.20.74)
 
 Petición de Víctor: una columna nueva al final del catálogo, guardada en Supabase, que por ahora solo se actualiza desde «Importar Excel», preguntando si se importa el catálogo completo o solo las EQUIVALENCIAS, y que salga en el Excel exportado y en el del correo automático.

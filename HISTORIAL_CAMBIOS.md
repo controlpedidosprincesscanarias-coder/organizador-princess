@@ -51,6 +51,15 @@
 
 ---
 
+## 2026-11-20 22:00 — [Catálogo Asignaciones] Contador y pasos en la página de descarga del correo (v1.20.76)
+
+Petición de Víctor: que quien recibe el correo vea que la descarga no se ha bloqueado.
+
+- Al pulsar «Descargar catálogo completo», la página enseña los segundos que lleva generando el Excel, el % de la descarga y, al final, «✓ Catálogo descargado», o un mensaje claro si algo falla.
+- PR: https://github.com/controlpedidosprincesscanarias-coder/dali-sap-articulos-app/pull/21
+
+---
+
 ## 2026-11-20 21:30 — [Catálogo Asignaciones] El enlace del correo abre una página con el botón de descarga (v1.20.75)
 
 Aviso de Víctor: al pulsar el botón del correo automático, la pestaña se quedaba en blanco en `linkprotect.cudasvc.com`.

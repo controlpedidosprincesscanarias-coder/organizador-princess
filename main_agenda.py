@@ -265,16 +265,15 @@ def abrir_admin():
 
 MANUAL_NOMBRE = "Manual_Usuario_OrganizadorPrincess.pdf"
 
-def abrir_manual():
-    """Abre el Manual de Usuario en PDF.
+def _ruta_manual():
+    """Ruta del Manual de Usuario en PDF, o None.
 
     Busca el archivo en este orden:
       1. Carpeta de instalación (junto al .exe — ruta habitual tras instalar).
       2. Carpeta del script / ejecutable empaquetado (desarrollo).
       3. Directorio de trabajo actual.
-    Si no lo encuentra en ninguna, muestra un mensaje orientativo.
+      4. Dentro del propio .exe (copia portátil).
     """
-
     candidatos = [
         # 1) Junto al ejecutable (PyInstaller pone sys.executable en la carpeta de instalación)
         os.path.join(os.path.dirname(sys.executable), MANUAL_NOMBRE),
@@ -287,31 +286,14 @@ def abrir_manual():
     _incluido = _portatil.documento_incluido(MANUAL_NOMBRE)
     if _incluido:
         candidatos.append(_incluido)
+    return next((p for p in candidatos if os.path.isfile(p)), None)
 
-    ruta_manual = next((p for p in candidatos if os.path.isfile(p)), None)
 
-    if ruta_manual:
-        try:
-            os.startfile(os.path.normpath(ruta_manual))
-        except Exception as e:
-            messagebox.showerror(
-                "Error al abrir el manual",
-                f"⚠️  No se pudo abrir el manual:\n\n"
-                f"    {ruta_manual}\n\n"
-                f"Detalle: {e}\n\n"
-                "Comprueba que tienes un lector de PDF instalado (por ejemplo Adobe Reader o Edge).",
-                parent=app,
-            )
-    else:
-        messagebox.showwarning(
-            "Manual no encontrado",
-            f"⚠️  No se ha encontrado el archivo:\n\n"
-            f"    {MANUAL_NOMBRE}\n\n"
-            "El manual se instala junto con la aplicación.\n"
-            "Si acabas de actualizar, vuelve a ejecutar el instalador\n"
-            "o contacta con el Dpto. Central de Compras para obtenerlo.",
-            parent=app,
-        )
+def abrir_manual():
+    """(v4.18.76, petición de Víctor) Manual consultable como el del chat del móvil: buscador, apartados que se
+    abren y se cierran y, abajo, abrir o guardar el manual completo en PDF (ui/manual.py)."""
+    from ui import manual as _manual
+    _manual.abrir(ctx, _ruta_manual)
 
 
 # Vista del menú principal — extendida o reducida (v4.18.00). Constantes y

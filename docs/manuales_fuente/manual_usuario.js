@@ -16,7 +16,7 @@ s.push(indice([["1. El Organizador de un vistazo", "Qué puedes hacer y qué no"
 // 1
 s.push(h1("1. El Organizador de un vistazo"));
 s.push(p("**Organizador Princess** es el escritorio de trabajo de la Central de Compras: un menú de botones para abrir con un clic las carpetas, webs y programas que usas cada día, una **agenda de avisos**, un **calendario** con vacaciones y festivos y un **chat interno** con tus compañeros. Se instala en tu PC con Windows y te reconoce por tu usuario de Windows."));
-s.push(p("La agenda y los botones son **de cada PC**: lo que apuntas en tu Organizador lo ves tú, no los demás. El **chat** y los **avisos de pedidos** vienen de Control de Pedidos, por eso necesitan tu cuenta (capítulos 6 y 7)."));
+s.push(p("Los botones son **de cada PC**. La **agenda**, las vacaciones y los festivos van con tu **usuario de Control de Pedidos**: los ves tú, en cualquier PC donde entres con él, y no los ven los demás. El **chat** y los **avisos de pedidos** vienen de Control de Pedidos, por eso necesitan tu cuenta (capítulos 6 y 7)."));
 s.push(h2("Qué puedes hacer"));
 for (const t of ["Abrir con un clic **carpetas de red, páginas web, programas y documentos**.",
   "Apuntar **avisos** únicos o repetidos (cada 30 minutos, cada hora, a diario, cada semana, cada mes o cada año), con aviso previo si quieres.",
@@ -27,7 +27,7 @@ for (const t of ["Abrir con un clic **carpetas de red, páginas web, programas y
   "Recibir en el chat, en la conversación **«Control Pedidos»**, los avisos internos de Control de Pedidos (capítulo 7)."]) s.push(vineta(t));
 s.push(h2("Qué no se hace aquí"));
 for (const t of ["Cambiar los botones, su orden o la vista del menú: se hace en el panel **Admin** (Manual de administrador).",
-  "Ver la agenda de otro compañero: cada agenda es local de su PC.",
+  "Ver la agenda de otro compañero: cada agenda es de su usuario.",
   "Borrar mensajes del chat para los demás: «Vaciar chat» y «Eliminar chat» solo los quitan para ti (en el PC y en el móvil).",
   "Usarlo en el móvil o en un Mac: el Organizador es una aplicación de Windows. En un PC donde no se pueden instalar programas, usa la **versión portátil** (capítulo 10)."]) s.push(vineta(t));
 s.push(...recuadro("nota", "Si algo no cuadra", ["Si un botón no abre lo que debería, la ruta puede estar mal o no tienes acceso a esa carpeta: avisa a quien administra el Organizador de tu equipo (capítulo 9)."]));

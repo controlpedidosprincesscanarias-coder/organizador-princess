@@ -11,13 +11,14 @@ Aplicación de escritorio desarrollada en **Python + ttkbootstrap**, que combina
 
 - 📅 Agenda con eventos, avisos recurrentes y calendario con colores, imprimible por día/semana/mes.
 - 🏖 Gestión de Vacaciones y Festivos.
+- 🔔 (v4.18.76) Sonidos del chat a gusto de cada persona: uno general y otro para cada chat o grupo (8 tonos incluidos, un `.wav` propio o «🔕 Silencio»), desde el menú ⋮ de la conversación, el 🔔 de la burbuja o Administración → «🔔 Sonidos del chat». Se guarda en `config.json` de ese equipo (`app/services/sonidos_chat.py`, `app/ui/sonidos_chat.py`).
 - 🎨 (v4.18.72) Agenda, Calendario, Vacaciones y Festivos con aspecto nuevo: tarjetas con la franja del color de cada tipo, hora o fecha en grande, resumen y próximo aviso en la cabecera y, en el calendario, una línea por aviso con su hora y su título (`ui/estilo_calendario.py`, textos en `utils/textos_calendario.py`).
 - 🗓️ (v4.18.66) Agenda, vacaciones y festivos sincronizados con el usuario de Control de Pedidos: la misma agenda en todos los PC donde entres con ese usuario (necesita Control de Pedidos v12.34.38).
 - 🔔 Sistema de notificaciones en segundo plano (bridge) conectado a Control de Pedidos: recibe los mismos avisos que Telegram (techo de gastos, familias repetidas, solicitudes de usuario, cambios de estado de pedidos…) como popup en pantalla, filtrados automáticamente según el usuario y su rol.
 - 🔄 Actualizaciones automáticas desde GitHub Releases, con ventana de "novedades" al terminar de instalar.
 - 💼 Versión portátil (v4.18.54): `OrganizadorPrincess_Portatil_v….zip` en cada Release, para los PC que no permiten instalar. Se descomprime en una carpeta del usuario, se abre `OrganizadorPrincess.exe` y se actualiza sola sin administrador (`app/services/portatil.py`).
 - 🖼️ Interfaz basada en **ttkbootstrap**, con logo corporativo embebido e icono multirresolución para Windows.
-- 📖 Manual de Usuario accesible desde la propia aplicación, y Manual de Administrador (menú Inicio y carpeta `docs/`).
+- 📖 Manual de Usuario accesible desde la propia aplicación: desde la v4.18.76 el botón «Manual» abre un manual para consultar, con buscador y apartados, y el PDF completo para abrir o guardar (`app/ui/manual.py`, contenido en `app/utils/manual_consulta.py`). Manual de Administrador en el menú Inicio y en `docs/`.
 - 🗂️ Compatible con Windows 10/11, distribuido como instalador `.exe` (Inno Setup) — no requiere tener Python instalado en el equipo destino.
 
 ---
@@ -36,10 +37,12 @@ Aplicación de escritorio desarrollada en **Python + ttkbootstrap**, que combina
 │   │   └── correo.py
 │   ├── services/update_service.py  (comprobación de versión y novedades vía GitHub Releases)
 │   ├── services/sincro_agenda.py   (v4.18.66: agenda sincronizada con el usuario de Control de Pedidos, sin red ni Tk)
+│   ├── services/sonidos_chat.py    (v4.18.76: sonido de los mensajes del chat, general y por chat o grupo, sin Tk)
 │   ├── ui/
 │   │   ├── agenda.py, calendario.py, admin.py   (ventanas Agenda, Calendario y Administración — v4.18.08)
 │   │   ├── disposicion.py, colores.py           (constantes del menú y vista; colores comunes)
 │   │   ├── estilo_calendario.py                 (v4.18.72: aspecto común de Agenda, Calendario, Vacaciones y Festivos)
+│   │   ├── sonidos_chat.py                      (v4.18.76: ventanas «🔔 Sonidos del chat» y «Sonido de este chat»)
 │   │   ├── agenda_helpers.py, festivos.py, vacaciones.py, ventana_config.py, ventana_chat.py, saludo.py, assets.py, importexport.py
 │   │   └── __init__.py
 │   └── utils/

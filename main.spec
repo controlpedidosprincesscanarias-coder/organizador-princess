@@ -65,6 +65,7 @@ hiddenimports += [
     'services.vinculo_navegador',  # v4.18.60: navegador de este PC vinculado con Control Pedidos
     'services.reinicio_limpio',    # v4.18.62: borrado completo y reinicio limpio (Administración)
     'services.sincro_agenda',      # v4.18.66: agenda sincronizada con el usuario de Control Pedidos
+    'services.sonidos_chat',       # v4.18.76: sonido de los mensajes del chat, uno por chat o grupo
     'ui.primer_arranque_portatil',  # v4.18.54: carpeta, arranque con Windows y escritorio de la portátil
     'services.admin_auth',   # ANTI-REGRESION: nuevo — sistema de login Admin sin hardcode
     'ui.assets',
@@ -79,6 +80,9 @@ hiddenimports += [
     'ui.emoticonos',     # v4.18.18: panel 😊 del chat
     'ui.chat_movil',     # v4.18.24: ventana «Chat en el móvil» (QR de la app Android)
     'ui.avatares',       # v4.18.28: fotos de perfil del chat
+    'ui.sonidos_chat',   # v4.18.76: ventanas «🔔 Sonidos del chat» y «Sonido de este chat»
+    'ui.manual',         # v4.18.76: manual consultable del botón «Manual» (buscador y PDF completo)
+    'utils.manual_consulta',  # v4.18.76: contenido y búsqueda de ese manual
     'ui.miniaturas',     # v4.18.44: miniaturas de las imágenes del chat
     'ui.vista_previa',   # v4.18.74: tarjeta de los enlaces de vídeo en el chat
     'ui.notas_version',  # v4.18.44: notas de la versión al pulsar el número de versión

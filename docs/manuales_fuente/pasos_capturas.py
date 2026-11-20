@@ -531,6 +531,44 @@ def grupo_info_ver(c):
     c.cerrar(ESTADO.get("chat"))
 
 
+# ── 6d. Sonido de un chat (v4.18.76) ─────────────────────────────────────────
+def sonido_chat(c):
+    cerrar_todo(c)
+    guardar_ventanas()
+    from services import sonidos_chat as sc
+    ctx = c.g["ctx"]
+    sc.fijar_canal(ctx.config, "grp:demo", "campanita")
+    sc.fijar_canal(ctx.config, "dm:compras.demo:control-pedidos", sc.SILENCIO)
+    import ui.sonidos_chat as us
+    us.elegir_sonido_canal(ctx, c.app, "grp:demo", "Compras Canarias")
+
+
+def sonido_chat_ver(c):
+    v = c.ventana("Sonido de este chat")
+    foto(c, v, "u_sonido_chat", [(de_clase(c, v, "TCombobox"), 1, "t"), (buscar(c, v, "▶"), 2, "r"),
+                                 (buscar(c, v, "Todos los sonidos"), 3, "r")] if v else [])
+    c.cerrar(v)
+
+
+# ── 6e. Manual consultable (v4.18.76) ────────────────────────────────────────
+def manual_consulta(c):
+    cerrar_todo(c)
+    guardar_ventanas()
+    c.pulsar(c.app, "Manual")
+
+
+def manual_consulta_ver(c):
+    v = c.ventana("Manual de uso")
+    if v:
+        e = c.entradas(v)
+        if e:
+            c.escribir(e[0], "silencio")
+        c.app.update()
+    foto(c, v, "u_manual", [(c.entradas(v)[0] if v else None, 1, "b"), (buscar(c, v, "Sonido de los mensajes"), 2, "r"),
+                            (buscar(c, v, "Abrir el manual completo"), 3, "ir"), (buscar(c, v, "Guardar una copia"), 4, "ir")] if v else [])
+    c.cerrar(v)
+
+
 # ── 6c. Notas de la versión (v4.18.44) y copia portátil (v4.18.54) ──────────
 def notas_version(c):
     cerrar_todo(c)
@@ -631,7 +669,24 @@ def admin_panel(c):
                            (buscar(c, v, "Limpiar todo"), 3, "b"), (buscar(c, v, "Accesos Rápidos"), 4, "r"),
                            (buscar(c, v, "Editar", "TButton"), 5, "l"), (buscar(c, v, "Opciones del Menú"), 6, "r"),
                            (buscar(c, v, "07 ·"), 7, "l"), (buscar(c, v, "Exportar", "TButton"), 8, "t"),
-                           (buscar(c, v, "Exportar", "TButton", 1), 9, "t"), (buscar(c, v, "Borrado completo"), 10, "t")])
+                           (buscar(c, v, "Exportar", "TButton", 1), 9, "t"), (buscar(c, v, "Borrado completo"), 10, "t"),
+                           (buscar(c, v, "Sonidos del chat", "TButton"), 11, "b")])
+
+
+def admin_sonidos(c):
+    p = c.ventana("Accesos y Opciones")
+    guardar_ventanas()
+    b = buscar(c, p, "Sonidos del chat", "TButton")
+    if b:
+        b.invoke()
+
+
+def admin_sonidos_ver(c):
+    v = c.ventana("Sonidos del chat")
+    foto(c, v, "a_sonidos_chat", [(de_clase(c, v, "TCombobox"), 1, "l"), (buscar(c, v, "Compras Canarias"), 2, "l"),
+                                  (de_clase(c, v, "TCombobox", 4), 3, "ir"), (buscar(c, v, "▶"), 4, "r"),
+                                  (buscar(c, v, "Todos con el general"), 5, "t")] if v else [])
+    c.cerrar(v)
 
 
 def admin_editar(c):
@@ -733,10 +788,13 @@ PASOS = [
     ("chat", chat, 2500), ("chat privado", chat_privado, 2500), ("chat ver", chat_ver, 1500), ("chat emoticonos", chat_emoticonos, 2000), ("chat móvil", chat_movil_ver, 2000), ("chat nueva", chat_nueva_ver, 1500),
     ("chat avisos", chat_avisos, 2500), ("chat avisos elegir", chat_avisos_elegir, 2500), ("chat avisos ver", chat_avisos_ver, 2000),
     ("grupo", grupo_info, 2500), ("grupo ver", grupo_info_ver, 1000),
+    ("sonido chat", sonido_chat, 1500), ("sonido chat ver", sonido_chat_ver, 800),
+    ("manual", manual_consulta, 1500), ("manual ver", manual_consulta_ver, 1200),
     ("notas", notas_version, 1500), ("notas ver", notas_version_ver, 800), ("portátil", portatil, 1500), ("portátil ver", portatil_ver, 800),
     ("burbuja", burbuja, 2500), ("burbuja ver", burbuja_ver, 1000),
     ("actualización", actualizacion, 5000), ("actualización ver", actualizacion_ver, 1000),
     ("admin", admin, 2500), ("admin login", admin_login, 3000), ("panel", admin_panel, 500),
+    ("sonidos", admin_sonidos, 2500), ("sonidos ver", admin_sonidos_ver, 800),
     ("editar", admin_editar, 2000), ("editar ver", admin_editar_ver, 2000), ("subopciones", admin_subopciones_ver, 1000),
     ("admin otra vez", admin, 2500), ("admin login", admin_login_sin_foto, 3000), ("vista", admin_vista, 2000), ("vista ver", admin_vista_ver, 1000),
     ("admin otra vez", admin, 2500), ("admin login", admin_login_sin_foto, 3000), ("mi usuario", admin_usuario, 2000), ("mi usuario ver", admin_usuario_ver, 1000),

@@ -23,7 +23,7 @@ from tkinter import messagebox, filedialog
 from services.chat_client import get_chat_client, cuenta_chat_configurada, nombre_adjunto_seguro, es_canal_avisos, EVT_CONECTADO, EVT_DESCONECTADO, \
     EVT_NUEVO_MENSAJE, EVT_ERROR, EVT_AVATAR, EVT_ELIMINADO, EVT_GRUPO, EVT_OCULTA, DESTINO_DESACTIVADO, DESTINO_NO_EXISTE
 from services import voz
-from ui import avatares, miniaturas, acciones_chat, grupo_info, vista_previa
+from ui import avatares, miniaturas, acciones_chat, grupo_info, vista_previa, sonidos_chat
 from utils import enlaces
 from ui.chat_bubbles import BubbleList, fecha_hora_local
 from ui.emoticonos import abrir_panel, imagen as imagen_emoticono
@@ -260,6 +260,10 @@ def _ventana_chat(ctx):
 
     def _preparar_menu_chat():
         menu_chat.delete(0, "end")
+        # (v4.18.76, petición de Víctor) Sonido propio de esta conversación (services/sonidos_chat.py)
+        menu_chat.add_command(label="🔔 Sonido de este chat…", command=lambda: sonidos_chat.elegir_sonido_canal(
+            ctx, win, canal_actual["id"], lbl_titulo_chat.cget("text")))
+        menu_chat.add_separator()
         menu_chat.add_command(label="🧹 Vaciar chat", command=lambda: _vaciar_chat())
         if str(canal_actual["id"]).startswith("dm:"):
             menu_chat.add_command(label="🗑 Eliminar chat", command=lambda: _eliminar_chat())

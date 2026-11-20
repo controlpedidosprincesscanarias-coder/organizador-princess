@@ -780,6 +780,18 @@ def abrir_admin(ctx):
             command=_ventana_modificar_usuario,
         ).pack(side="right", padx=(0, 8), ipadx=4)
 
+        # (v4.18.76, petición de Víctor) Sonidos de los mensajes del chat: el general y uno por chat o grupo
+        def _sonidos_chat():
+            from ui import sonidos_chat
+            sonidos_chat.ventana_sonidos(ctx, parent=win)
+
+        ttk.Button(
+            hdr,
+            text="🔔  Sonidos del chat",
+            bootstyle="info-outline",
+            command=_sonidos_chat,
+        ).pack(side="right", padx=(0, 8), ipadx=4)
+
         ttk.Button(
             hdr,
             text="\U0001F5A5  Vista",

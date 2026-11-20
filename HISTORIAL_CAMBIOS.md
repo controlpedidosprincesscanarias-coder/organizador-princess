@@ -51,6 +51,17 @@
 
 ---
 
+## 2026-11-20 22:45 — [Catálogo Asignaciones / Consola Registro Info] Manuales al día con lo de hoy (v1.20.77 / v10.2.90)
+
+Petición de Víctor: actualizar los manuales de la Consola y de Catálogo Asignaciones con todo lo de hoy.
+
+- **Catálogo Asignaciones:** manual nuevo de **administración** (Gestión), de 24 páginas. Incluye importar el catálogo completo o solo las equivalencias, la columna «Conversión DALI - SAP», el correo automático y su página de descarga con contador, usuarios y permisos, y el resto de pantallas de Gestión. Hasta ahora solo había manual de hotel.
+- **Consola:** manual con la v10.2.90. Explica la columna de equivalencias, que la Consola conserva, y el aviso de reactivar a mano en SAP también cuando solo están borrados algunos centros.
+- Capturas con datos inventados.
+- PR: https://github.com/controlpedidosprincesscanarias-coder/dali-sap-articulos-app/pull/22 y https://github.com/controlpedidosprincesscanarias-coder/consola-registro-info/pull/49
+
+---
+
 ## 2026-11-20 22:00 — [Catálogo Asignaciones] Contador y pasos en la página de descarga del correo (v1.20.76)
 
 Petición de Víctor: que quien recibe el correo vea que la descarga no se ha bloqueado.

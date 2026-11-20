@@ -51,6 +51,18 @@
 
 ---
 
+## 2026-11-20 18:30 — [Catálogo Asignaciones] Correo automático con el catálogo completo (v1.20.73)
+
+Petición de Víctor: un correo automático los miércoles y viernes a las 14:00 a dos cuentas configurables, con texto configurable y un botón para descargar el catálogo completo (como «Exportar catálogo») que pueda usar cualquiera que lo reciba; días y hora también configurables.
+
+- Gestión → Sistema → «Correo del catálogo» (solo el administrador principal): activar, dos destinatarios, asunto, texto, días y hora de Canarias; «Enviar ahora» y «Anular el enlace vigente».
+- El servidor de Catálogo Asignaciones mira cada minuto si toca y envía cada turno una sola vez, con su EmailJS.
+- El botón del correo descarga el mismo Excel que «Exportar catálogo completo», sin iniciar sesión. Cada correo trae un enlace nuevo y el anterior deja de valer (decisión de Víctor: «hasta el siguiente envío»).
+- ⚠️ Hay que aplicar a mano la migración `database/migraciones/2026-11-20_correo_catalogo.sql` de Catálogo Asignaciones. Sin ella no se envía nada.
+- PR: https://github.com/controlpedidosprincesscanarias-coder/dali-sap-articulos-app/pull/18
+
+---
+
 ## 2026-11-20 10:30 — [Consola Registro Info] Fuera las ventanas que solo informan (v10.2.88)
 
 > La idea y el desarrollo de la aplicación Consola Registro Info, incluidas sus pruebas, son de Víctor Alejandro Martín Andrade, para el Departamento de Central de Compras de Princess Hotels en Canarias.

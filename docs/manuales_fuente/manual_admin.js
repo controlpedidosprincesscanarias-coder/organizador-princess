@@ -1,7 +1,7 @@
 // Manual de administrador del Organizador Princess. Idea y desarrollo de la aplicación: Víctor Alejandro Martín Andrade.
 const L = require("./lib");
 const { p, vineta, pasos, h1, h2, imagen, leyenda, recuadro, tabla, portada, indice } = L;
-const V = process.env.VERSION || "v4.18.70";
+const V = process.env.VERSION || "v4.18.76";
 
 const s = [];
 s.push(portada({ rol: "Administración", subtitulo: "Configura los botones y la vista del menú, el usuario y las copias, e instala y publica versiones",
@@ -49,9 +49,17 @@ s.push(...leyenda([[1, "**Vista**: menú extendido o reducido (capítulo 5)."], 
   [4, "**Accesos rápidos del header**: los 6 botones dorados."], [5, "**Editar**: abre la configuración de ese botón."],
   [6, "**Opciones del menú principal**: los 30 botones azules, numerados 01–30."], [7, "El triángulo **▶** junto al nombre indica que el botón tiene submenú."],
   [8, "**Configuración**: Exportar / Importar (capítulo 7)."], [9, "**Agenda**: Exportar / Importar (capítulo 7)."],
-  [10, "**♻ Borrado completo y reinicio limpio**: deja el Organizador de este equipo como recién instalado (capítulo 7)."]]));
+  [10, "**♻ Borrado completo y reinicio limpio**: deja el Organizador de este equipo como recién instalado (capítulo 7)."],
+  [11, "**🔔 Sonidos del chat** (arriba): cómo suenan los mensajes nuevos del chat en este equipo (apartado siguiente)."]]));
 s.push(p("Al pulsar el **número de versión** (abajo a la derecha) se ven las novedades de esa versión."));
 s.push(...recuadro("consejo", "Los cambios se ven al momento", ["Al guardar un botón, su nombre cambia enseguida en el menú principal."]));
+s.push(h2("Sonidos del chat"));
+s.push(...imagen("a_sonidos_chat", 15, "Sonidos del chat (datos de ejemplo)."));
+s.push(...leyenda([[1, "**Sonido general**: el de todos los chats que no tengan uno propio. Al empezar es «Clásico», el doble pitido de siempre."],
+  [2, "**Cada conversación**: General, los chats privados, Control Pedidos y los grupos."],
+  [3, "Su sonido: **Como el general**, uno de los 8 tonos, **🔕 Silencio** o un **archivo .wav** del PC."], [4, "**▶** lo hace sonar."],
+  [5, "**↺ Todos con el general**: quita los sonidos propios de todas las conversaciones."]]));
+s.push(p("Cada persona elige los suyos y se guardan **solo en este equipo** (en config.json, por eso viajan con «Exportar / Importar» de la configuración). No se sincronizan con el móvil, que tiene sus propios sonidos en Ajustes. Cada conversación también se puede cambiar desde su menú ⋮ («🔔 Sonido de este chat») o desde el 🔔 de la burbuja."));
 
 // 4
 s.push(h1("4. Configurar botones y accesos rápidos"));

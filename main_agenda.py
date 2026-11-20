@@ -17,6 +17,7 @@ from db.sqlite import (
     get_nombre_usuario, tiene_nombre_configurado,
 )
 from utils.sonido import _reproducir_sonido_aviso
+from services import sonidos_chat as _sonidos_chat
 import negocio.alertas as _alertas_mod
 from negocio.alertas import (
     monitor_avisos, mostrar_alerta,
@@ -102,7 +103,7 @@ NOMBRE_USUARIO_ACTUAL = get_nombre_usuario()
 
 GOLD  = "#C9A84C"
 LIGHT = "#D8E8F0"
-APP_VERSION  = "v4.18.74"   # ← actualizar en cada release (debe coincidir con el tag del release en GitHub)
+APP_VERSION  = "v4.18.76"   # ← actualizar en cada release (debe coincidir con el tag del release en GitHub)
 GITHUB_REPO  = "controlpedidosprincesscanarias-coder/organizador-princess"  # repo de releases
 _update_mod.APP_VERSION = APP_VERSION  # propagar a services/update_service.py
 _update_mod.GITHUB_REPO = GITHUB_REPO
@@ -264,16 +265,15 @@ def abrir_admin():
 
 MANUAL_NOMBRE = "Manual_Usuario_OrganizadorPrincess.pdf"
 
-def abrir_manual():
-    """Abre el Manual de Usuario en PDF.
+def _ruta_manual():
+    """Ruta del Manual de Usuario en PDF, o None.
 
     Busca el archivo en este orden:
       1. Carpeta de instalación (junto al .exe — ruta habitual tras instalar).
       2. Carpeta del script / ejecutable empaquetado (desarrollo).
       3. Directorio de trabajo actual.
-    Si no lo encuentra en ninguna, muestra un mensaje orientativo.
+      4. Dentro del propio .exe (copia portátil).
     """
-
     candidatos = [
         # 1) Junto al ejecutable (PyInstaller pone sys.executable en la carpeta de instalación)
         os.path.join(os.path.dirname(sys.executable), MANUAL_NOMBRE),
@@ -286,31 +286,14 @@ def abrir_manual():
     _incluido = _portatil.documento_incluido(MANUAL_NOMBRE)
     if _incluido:
         candidatos.append(_incluido)
+    return next((p for p in candidatos if os.path.isfile(p)), None)
 
-    ruta_manual = next((p for p in candidatos if os.path.isfile(p)), None)
 
-    if ruta_manual:
-        try:
-            os.startfile(os.path.normpath(ruta_manual))
-        except Exception as e:
-            messagebox.showerror(
-                "Error al abrir el manual",
-                f"⚠️  No se pudo abrir el manual:\n\n"
-                f"    {ruta_manual}\n\n"
-                f"Detalle: {e}\n\n"
-                "Comprueba que tienes un lector de PDF instalado (por ejemplo Adobe Reader o Edge).",
-                parent=app,
-            )
-    else:
-        messagebox.showwarning(
-            "Manual no encontrado",
-            f"⚠️  No se ha encontrado el archivo:\n\n"
-            f"    {MANUAL_NOMBRE}\n\n"
-            "El manual se instala junto con la aplicación.\n"
-            "Si acabas de actualizar, vuelve a ejecutar el instalador\n"
-            "o contacta con el Dpto. Central de Compras para obtenerlo.",
-            parent=app,
-        )
+def abrir_manual():
+    """(v4.18.76, petición de Víctor) Manual consultable como el del chat del móvil: buscador, apartados que se
+    abren y se cierran y, abajo, abrir o guardar el manual completo en PDF (ui/manual.py)."""
+    from ui import manual as _manual
+    _manual.abrir(ctx, _ruta_manual)
 
 
 # Vista del menú principal — extendida o reducida (v4.18.00). Constantes y
@@ -1166,7 +1149,9 @@ def poll_chat():
                 remitente = m.get("remitente", "")
                 if remitente and remitente != _chat_cliente.username:
                     canal_id = m.get("canal_id", "")
-                    _reproducir_sonido_aviso("aviso")
+                    # (v4.18.76, petición de Víctor) El sonido es el elegido para ese chat o grupo, o el
+                    # general («🔔 Sonidos del chat»); antes era siempre el doble pitido de los avisos.
+                    _sonidos_chat.sonar_mensaje(config, canal_id)
                     # Si ya se está viendo ese canal (ventana principal abierta
                     # en ese canal, o ya hay una burbuja abierta para él), el
                     # mensaje ya es visible ahí mismo — no hace falta nada más

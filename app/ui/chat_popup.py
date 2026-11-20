@@ -35,7 +35,7 @@ from datetime import datetime
 from services.chat_client import get_chat_client, nombre_adjunto_seguro, es_canal_avisos, EVT_NUEVO_MENSAJE, EVT_AVATAR, EVT_ELIMINADO, EVT_GRUPO, \
     EVT_OCULTA, EVT_ERROR, DESTINO_DESACTIVADO, DESTINO_NO_EXISTE
 from services import voz
-from ui import avatares, miniaturas, acciones_chat, vista_previa
+from ui import avatares, miniaturas, acciones_chat, vista_previa, sonidos_chat
 from utils import enlaces
 from ui.chat_bubbles import BubbleList, fecha_hora_local
 from ui.emoticonos import abrir_panel, imagen as imagen_emoticono
@@ -201,6 +201,12 @@ def mostrar_popup_chat(ctx, canal_id, titulo, mensaje_inicial=None, borrador="")
               activebackground=_COLOR_HEADER, activeforeground="white",
               relief="flat", cursor="hand2", command=_cerrar,
               font=("Segoe UI", 10)).pack(side="right", padx=(0, 6))
+    # (v4.18.76, petición de Víctor) 🔔 Sonido de esta conversación (services/sonidos_chat.py)
+    tk.Button(header, text="🔔", bg=_COLOR_HEADER, fg="white", bd=0,
+              activebackground=_COLOR_HEADER, activeforeground="white",
+              relief="flat", cursor="hand2",
+              command=lambda: sonidos_chat.elegir_sonido_canal(ctx, win, canal_id, titulo.replace("  (grupo)", "")),
+              font=("Segoe UI", 9)).pack(side="right", padx=(0, 2))
 
     _drag = {"x": 0, "y": 0}
     def _drag_start(e):

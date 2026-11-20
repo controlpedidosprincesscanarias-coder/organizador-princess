@@ -1,14 +1,26 @@
-✨ Organizador Princess v4.18.74
+✨ Organizador Princess v4.18.76
 ================================================================
 
-🎬 ENLACES Y VÍDEOS EN EL CHAT
+🔔 SONIDOS DEL CHAT A TU GUSTO
 
-• Los enlaces de los mensajes salen subrayados: con un clic se
-  abren en el navegador.
-• Bajo un enlace de TikTok, YouTube o Instagram sale una tarjeta
-  con la imagen del vídeo, el título y el autor. Un clic la abre.
-• Los vídeos enviados como archivo salen con 🎬: un clic los abre
-  con el reproductor de Windows.
+• Ya puedes elegir cómo suenan los mensajes nuevos del chat:
+  un sonido general y, si quieres, otro distinto para cada
+  chat o grupo.
+• Hay 8 tonos para elegir, puedes usar un sonido .wav de tu PC
+  o dejar un chat en «🔕 Silencio».
+• Desde el menú ⋮ de cada conversación («🔔 Sonido de este
+  chat»), desde el botón 🔔 de la burbuja y desde
+  Administración → «🔔 Sonidos del chat».
+• Se guarda solo en este equipo. El móvil tiene sus propios
+  sonidos en Ajustes.
+
+📖 MANUAL PARA CONSULTAR
+
+• El botón «Manual» abre ahora un manual con buscador, como
+  el de la app del móvil: escribe una palabra («vacaciones»,
+  «sonido»…) y salen los apartados que hablan de ello.
+• Abajo, «Abrir el manual completo» (PDF) y «Guardar una
+  copia…» para descargarlo donde quieras.
 
 ================================================================
 La idea y el desarrollo de la aplicación Organizador Princess son de

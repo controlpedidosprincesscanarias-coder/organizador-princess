@@ -51,6 +51,31 @@
 
 ---
 
+## 2026-11-20 23:55 — [Chat móvil] Sonidos por chat o grupo; General y Control Pedidos fijos arriba (v1.0.22)
+
+Peticiones de Víctor (20 nov 2026): «que se pueda cambiar el sonido de los mensajes, pudiendo elegir diferentes según el chat o grupo» y «que el grupo general y el de control pedidos queden fijos arriba; justo debajo, los últimos utilizados, el último el primero».
+
+- **Sonidos:** en Ajustes, el sonido general (selector de tonos del móvil). En el menú ⋮ de cada conversación, «🔔 Sonido de este chat»: un tono, «🔕 Silencio» o «Como el general». Cada persona elige los suyos y se guardan solo en ese móvil.
+- Android no deja cambiar el sonido de un canal de avisos: cada cambio crea un canal nuevo y borra el anterior.
+- **Orden de la lista:** General y «Control Pedidos» fijos arriba. Debajo, la última conversación utilizada primero (un mensaje enviado o recibido, o abrirla en el móvil).
+- No cambia el servidor del chat.
+- PR: https://github.com/controlpedidosprincesscanarias-coder/chat-movil-princess/pull/17
+
+---
+
+## 2026-11-20 23:50 — [Organizador] Sonidos del chat por conversación y botón Manual consultable (v4.18.76)
+
+Peticiones de Víctor (20 nov 2026): «que desde Herramientas o Administrador se pueda cambiar el sonido de los mensajes, pudiendo elegir diferentes según el chat o grupo» y «que el botón manual del organizador funcione como el del chat móvil, que al pulsar se pueda realizar consultas y también descargar el manual completo».
+
+- **Sonidos del chat:** uno general y otro para cada chat o grupo: 8 tonos, un `.wav` propio o «🔕 Silencio». Se eligen en el ⋮ de la conversación, en el 🔔 de la burbuja y en Administración → «🔔 Sonidos del chat». Sin cambiar nada suena como siempre.
+- Decisiones de Víctor: cada persona elige los suyos; se guardan solo en ese equipo; no se sincronizan con el móvil ni tocan el servidor del chat.
+- **Botón «Manual»:** abre un manual para consultar, con buscador y apartados, como el del móvil. Abajo, «Abrir el manual completo» y «Guardar una copia…» del PDF.
+- Corregido: la compilación automática no se paraba si fallaba la prueba de la sincronización de la agenda. El manual decía que la agenda es «de cada PC».
+- Manuales de usuario y de administrador regenerados.
+- PR: https://github.com/controlpedidosprincesscanarias-coder/organizador-princess/pull/92
+
+---
+
 ## 2026-11-20 23:45 — [Infra] Cada sesión de Claude trabaja sola en los 7 proyectos
 
 Petición de Víctor: que cualquier sesión de Claude, al pedirle algo de cualquiera de los 7 proyectos, trabaje directamente en el que corresponda, abra sola las PR necesarias y solo pida fusionar, como la sesión de hoy.

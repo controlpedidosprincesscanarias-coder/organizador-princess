@@ -113,7 +113,12 @@ jobs:
           python test_reinicio_limpio.py
           if ($LASTEXITCODE -ne 0) { exit 1 }
           python test_sincro_agenda.py
+          if ($LASTEXITCODE -ne 0) { exit 1 }
           python test_textos_calendario.py
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          python test_sonidos_chat.py
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          python test_manual_consulta.py
           if ($LASTEXITCODE -ne 0) { exit 1 }
 
       - name: Compilar con PyInstaller

@@ -1,3 +1,29 @@
+# ✨ Organizador Princess v4.18.76
+
+## 🔔 Sonidos del chat a tu gusto
+
+Petición de Víctor (20 nov 2026): «quiero que desde Herramientas o Administrador se pueda cambiar el sonido de los mensajes, pudiendo elegir diferentes según el chat o grupo».
+
+- **Un sonido general y otro para cada chat o grupo.** Hasta ahora todos los mensajes sonaban con el mismo doble pitido de los avisos. Sin cambiar nada, sigue sonando igual («Clásico»).
+- **Qué se puede elegir:** 8 tonos incluidos (Clásico, Campanita, Burbuja, Ascendente, Suave, Triple toque, Gota y Timbre), un sonido **.wav** de tu PC o **«🔕 Silencio»**. Con ▶ se escucha antes de elegirlo.
+- **Dónde:** en el menú **⋮** de cada conversación («🔔 Sonido de este chat»), en el botón **🔔** de la burbuja y en **Administración → «🔔 Sonidos del chat»**, con el sonido general y la lista de todas tus conversaciones.
+- Cada persona elige los suyos y se guardan **solo en este equipo**. El móvil tiene sus propios sonidos en Ajustes.
+
+## 📖 Manual para consultar
+
+Petición de Víctor (20 nov 2026): «que el botón manual del organizador funcione como el del chat móvil, que al pulsar se pueda realizar consultas y también descargar el manual completo».
+
+- El botón **Manual** abre la ventana **«📖 Manual de uso»**: un **buscador** (no importan tildes ni mayúsculas) y los apartados del manual, que se abren y se cierran con un clic. Con una búsqueda escrita salen solo los apartados que hablan de ello, ya abiertos.
+- Abajo, **«📄 Abrir el manual completo»** (el PDF de siempre) y **«💾 Guardar una copia…»** para descargarlo donde quieras.
+- Funciona sin conexión. Manuales de usuario y de administrador actualizados.
+
+## Correcciones
+
+- La compilación automática no se paraba si fallaba la prueba de la sincronización de la agenda.
+- El manual de usuario decía que la agenda es «de cada PC»: desde la v4.18.66 va con el usuario de Control de Pedidos.
+
+---
+
 # ✨ Organizador Princess v4.18.74
 
 ## 🎬 Enlaces y vídeos en el chat

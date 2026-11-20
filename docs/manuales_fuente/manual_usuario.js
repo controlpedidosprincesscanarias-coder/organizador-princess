@@ -1,7 +1,7 @@
 // Manual de usuario del Organizador Princess. Idea y desarrollo de la aplicación: Víctor Alejandro Martín Andrade.
 const L = require("./lib");
 const { p, vineta, pasos, h1, h2, imagen, leyenda, recuadro, tabla, portada, indice } = L;
-const V = process.env.VERSION || "v4.18.74";
+const V = process.env.VERSION || "v4.18.76";
 
 const s = [];
 s.push(portada({ rol: "Uso diario", subtitulo: "Abre tus accesos, apunta avisos, consulta el calendario y chatea con tus compañeros",
@@ -16,7 +16,7 @@ s.push(indice([["1. El Organizador de un vistazo", "Qué puedes hacer y qué no"
 // 1
 s.push(h1("1. El Organizador de un vistazo"));
 s.push(p("**Organizador Princess** es el escritorio de trabajo de la Central de Compras: un menú de botones para abrir con un clic las carpetas, webs y programas que usas cada día, una **agenda de avisos**, un **calendario** con vacaciones y festivos y un **chat interno** con tus compañeros. Se instala en tu PC con Windows y te reconoce por tu usuario de Windows."));
-s.push(p("La agenda y los botones son **de cada PC**: lo que apuntas en tu Organizador lo ves tú, no los demás. El **chat** y los **avisos de pedidos** vienen de Control de Pedidos, por eso necesitan tu cuenta (capítulos 6 y 7)."));
+s.push(p("Los botones son **de cada PC**. La **agenda**, las vacaciones y los festivos van con tu **usuario de Control de Pedidos**: los ves tú, en cualquier PC donde entres con él, y no los ven los demás. El **chat** y los **avisos de pedidos** vienen de Control de Pedidos, por eso necesitan tu cuenta (capítulos 6 y 7)."));
 s.push(h2("Qué puedes hacer"));
 for (const t of ["Abrir con un clic **carpetas de red, páginas web, programas y documentos**.",
   "Apuntar **avisos** únicos o repetidos (cada 30 minutos, cada hora, a diario, cada semana, cada mes o cada año), con aviso previo si quieres.",
@@ -27,7 +27,7 @@ for (const t of ["Abrir con un clic **carpetas de red, páginas web, programas y
   "Recibir en el chat, en la conversación **«Control Pedidos»**, los avisos internos de Control de Pedidos (capítulo 7)."]) s.push(vineta(t));
 s.push(h2("Qué no se hace aquí"));
 for (const t of ["Cambiar los botones, su orden o la vista del menú: se hace en el panel **Admin** (Manual de administrador).",
-  "Ver la agenda de otro compañero: cada agenda es local de su PC.",
+  "Ver la agenda de otro compañero: cada agenda es de su usuario.",
   "Borrar mensajes del chat para los demás: «Vaciar chat» y «Eliminar chat» solo los quitan para ti (en el PC y en el móvil).",
   "Usarlo en el móvil o en un Mac: el Organizador es una aplicación de Windows. En un PC donde no se pueden instalar programas, usa la **versión portátil** (capítulo 10)."]) s.push(vineta(t));
 s.push(...recuadro("nota", "Si algo no cuadra", ["Si un botón no abre lo que debería, la ruta puede estar mal o no tienes acceso a esa carpeta: avisa a quien administra el Organizador de tu equipo (capítulo 9)."]));
@@ -38,11 +38,18 @@ s.push(p("Al abrir el Organizador ves el **Menú Principal**. Así es la vista c
 s.push(...imagen("u_menu", 17, "Menú Principal, vista extendida (datos de ejemplo)."));
 s.push(...leyenda([[1, "**Cabecera**: «Menú Principal», el nombre del centro y un saludo con tu nombre. Si no lo has puesto, el Organizador usa el de tu **cuenta de Control de Pedidos** en cuanto entra con ella; puedes cambiarlo cuando quieras en Admin → Mi Usuario."],
   [2, "**Admin**: panel de administración del menú (botones, vista, tu usuario y copias). Pide tu contraseña de Control de Pedidos; lo explica el Manual de administrador."],
-  [3, "**Manual**: abre este manual en PDF."],
+  [3, "**Manual**: el manual para consultar, con buscador, y el manual completo en PDF (apartado «El botón Manual»)."],
   [4, "**Accesos rápidos** (dorados): seis botones para lo que más usas. Los nombres largos se cortan, así que conviene ponerles nombres cortos."],
   [5, "**Agenda**, **Calendario** y **Chat**: los tres botones de trabajo diario (capítulos 4, 5 y 7)."],
   [6, "**Botones del menú** (azules): hasta 30 accesos en 6 columnas. Al pasar el ratón por encima cambian de color."],
   [7, "**Versión** instalada. Al pulsarla se ven sus **novedades** (capítulo 9)."]]));
+s.push(h2("El botón Manual"));
+s.push(...imagen("u_manual", 12, "Manual de uso con una búsqueda («silencio»)."));
+s.push(...leyenda([[1, "**Buscador**: escribe una o varias palabras (no importan tildes ni mayúsculas). Salen solo los apartados que las contienen, ya abiertos. ✕ borra la búsqueda."],
+  [2, "**Apartados**: un clic los abre o los cierra."],
+  [3, "**Abrir el manual completo**: este manual en PDF, con todas las pantallas, en el lector de PDF del equipo."],
+  [4, "**Guardar una copia…** del PDF donde elijas (por ejemplo, para enviarlo o imprimirlo)."]]));
+s.push(p("Funciona sin conexión, igual que **Ajustes → 📖 Manual de uso** de la app del móvil."));
 s.push(h2("Abrir un acceso"));
 s.push(p("Pulsa el botón. Según cómo esté configurado, se abre una **carpeta de red** en el Explorador, una **página web** en tu navegador, o un **programa o documento** (un Excel, un PDF, un .exe…)."));
 s.push(...imagen("u_submenu", 13, "Un botón con submenú abre una ventana con sus subopciones."));
@@ -139,7 +146,7 @@ s.push(p("El **Chat** te conecta con los compañeros que tienen cuenta en Contro
 s.push(...imagen("u_chat", 16, "Ventana del chat (datos de ejemplo)."));
 s.push(...leyenda([[1, "**Estado** de la conexión: «Conectado» en verde cuando todo va bien."],
   [2, "**Conversaciones**: el canal General, los chats privados y los grupos, cada uno con su foto (o sus iniciales sobre un círculo de color si no tiene). El número entre paréntesis son los mensajes sin leer."],
-  [3, "**Nueva conversación**."], [4, "**⋮** Menú de la conversación: **🧹 Vaciar chat** y, en los chats privados, **🗑 Eliminar chat** (siguiente apartado)."],
+  [3, "**Nueva conversación**."], [4, "**⋮** Menú de la conversación: **🔔 Sonido de este chat** (apartado «Sonido de los mensajes»), **🧹 Vaciar chat** y, en los chats privados, **🗑 Eliminar chat**."],
   [5, "**Mensajes**: los tuyos, a la derecha en verde; los de los demás, a la izquierda. Cada burbuja lleva la fecha y la hora. Una respuesta lleva arriba el mensaje citado. Un adjunto se abre haciendo clic en él; las imágenes se ven en miniatura. Un **mensaje de voz** (🎤) se escucha con un clic (apartado «Mensajes de voz»). Los **enlaces** salen subrayados en azul y se abren con un clic (apartado «Enlaces y vídeos»)."],
   [6, "Escribe aquí y pulsa **Intro** o **Enviar**."], [7, "😊 **Emoticonos** y respuestas rápidas (siguiente imagen)."],
   [8, "📎 **Adjuntar** una imagen o un documento."], [9, "**Enviar**."],
@@ -159,6 +166,16 @@ s.push(...tabla(["Quiero…", "Cómo"], [
   ["Vaciar una conversación", "**⋮ → 🧹 Vaciar chat**. Desaparecen los mensajes que hay ahora, **solo para ti**, en el PC y en la app del móvil. Los demás siguen viendo los suyos."],
   ["Eliminar un chat privado", "**⋮ → Eliminar chat**. La conversación sale de tu lista (en el PC y en el móvil) con sus mensajes. Solo vuelve a aparecer si esa persona te escribe de nuevo."]], [2600, 7038]));
 s.push(p("Ambas opciones piden confirmación. En un grupo no se puede eliminar el chat: para dejarlo, sal del grupo (apartado «Integrantes de un grupo»)."));
+s.push(h2("Sonido de los mensajes"));
+s.push(p("Cada mensaje nuevo suena. Puedes elegir **un sonido general** y, si quieres, **otro distinto para cada chat o grupo**, o dejar alguno en silencio. Se guarda **solo en este PC**: el móvil tiene sus propios sonidos (capítulo 8)."));
+s.push(...imagen("u_sonido_chat", 10, "Sonido de una conversación (datos de ejemplo)."));
+s.push(...leyenda([[1, "Elige el sonido: **Como el general**, uno de los **8 tonos** (Clásico, Campanita, Burbuja, Ascendente, Suave, Triple toque, Gota, Timbre), **🔕 Silencio** o **📁 Archivo propio (.wav)…** para usar un sonido de tu PC. Se guarda al momento y suena para que lo oigas."],
+  [2, "**▶** vuelve a hacerlo sonar."], [3, "**🔔 Todos los sonidos…** abre la lista completa (Administración → «🔔 Sonidos del chat»), con el sonido general."]]));
+s.push(...tabla(["Quiero…", "Cómo"], [
+  ["Cambiar el sonido de un chat o grupo", "En la ventana del chat, **⋮ → 🔔 Sonido de este chat…**; en la burbuja, el botón **🔔** de arriba."],
+  ["Cambiar el sonido de todos", "**Admin → 🔔 Sonidos del chat** → «Sonido general». Los chats con «Como el general» lo siguen."],
+  ["Silenciar un chat", "Elige **🔕 Silencio**: el mensaje llega y se ve, pero sin sonido."]], [2600, 7038]));
+s.push(p("Si no cambias nada, todo sigue sonando como siempre (tono «Clásico»). Si el archivo .wav propio se borra o se mueve, suena «Clásico»."));
 s.push(h2("Compañeros desactivados o que ya no existen"));
 s.push(p("Si un compañero está **desactivado** en Control de Pedidos, junto a su nombre se ve **⏸ Temporalmente desactivado**. Si le escribes, el mensaje no se envía: te avisa y el texto vuelve a la caja de escribir."));
 s.push(p("Si se ha **eliminado** su usuario, se ve **⛔ Ya no existe**. Al escribirle te lo dice y te ofrece **eliminar el chat** directamente."));
@@ -210,7 +227,7 @@ s.push(...recuadro("nota", "Límites de los archivos", ["Las imágenes se reduce
   "Por seguridad, el chat rechaza programas, scripts y archivos con macros (por ejemplo .exe, .bat, .ps1, .lnk, .html, .xlsm o .docm)."]));
 s.push(h2("La burbuja flotante"));
 s.push(...imagen("u_chat_burbuja", 6, "Burbuja flotante con un mensaje nuevo."));
-s.push(p("Cuando te escriben aparece una **burbuja** pequeña abajo a la derecha de la pantalla, con un aviso sonoro. Muestra toda la conversación (sube para ver los mensajes anteriores). Desde ella puedes leer y responder, poner emoticonos con 😊, adjuntar con 📎, **arrastrar archivos** encima o pegarlos con **Ctrl+V**, y enviar con ➤. **✕** la cierra y **⤢** abre la ventana completa del chat. Si te escriben varias personas, se apilan varias burbujas."));
+s.push(p("Cuando te escriben aparece una **burbuja** pequeña abajo a la derecha de la pantalla, con un aviso sonoro. Muestra toda la conversación (sube para ver los mensajes anteriores). Desde ella puedes leer y responder, poner emoticonos con 😊, adjuntar con 📎, **arrastrar archivos** encima o pegarlos con **Ctrl+V**, y enviar con ➤. **🔔** cambia el sonido de esa conversación, **✕** la cierra y **⤢** abre la ventana completa del chat. Si te escriben varias personas, se apilan varias burbujas."));
 s.push(...recuadro("consejo", "La conversación sigue en la burbuja", ["Si tienes abierta la ventana grande del chat en una conversación y la otra persona contesta, la ventana grande se cierra y la conversación sigue en la burbuja. Lo que estuvieras escribiendo pasa a la burbuja, no se pierde. Para volver a la ventana grande, pulsa ⤢."]));
 
 // 8
@@ -223,6 +240,8 @@ s.push(...tabla(["", "Organizador (Windows)", "Chat Dpto. Compras Princess (Andr
   ["Enlaces y vídeos", "Enlaces pulsables y tarjeta de los vídeos web; los vídeos enviados se abren con el reproductor de Windows", "Enlaces pulsables y tarjeta de los vídeos web; los vídeos enviados se ven dentro de la app"],
   ["Foto de perfil (tuya y de los grupos)", "🖼 Fotos, en la ventana del chat", "Ajustes → Mi foto (galería o cámara); la del grupo, en su cabecera"],
   ["Avisos de mensajes nuevos", "Burbuja flotante con sonido", "Notificación del móvil, también con la app cerrada"],
+  ["Sonido de los mensajes (general y de cada chat o grupo)", "8 tonos, un .wav del PC o silencio (⋮ del chat, 🔔 de la burbuja o Admin)", "Tonos del móvil o silencio (Ajustes y ⋮ del chat)"],
+  ["Orden de las conversaciones", "General arriba y después por el último mensaje", "General y «Control Pedidos» fijos arriba; debajo, la última utilizada primero"],
   ["Agenda, calendario, accesos y avisos de pedidos", "Sí", "No: solo el chat"],
   ["Actualizaciones", "Aviso «Actualizar ahora»", "Aviso al abrir la app"]], [3300, 3169, 3169]));
 s.push(h2("Instalarla la primera vez"));
@@ -241,6 +260,11 @@ s.push(...recuadro("importante", "¿Por qué avisa Android de que puede ser peli
   "Es la app del departamento, publicada en su repositorio oficial, y cada versión va firmada siempre con la misma clave. Descárgala **solo** desde el código QR del Organizador o desde su enlace; si alguien te la pasa por otro medio (WhatsApp, correo…), no la instales."]));
 s.push(...recuadro("nota", "El aviso fijo «Chat conectado»", ["Mientras la app mantiene la conexión verás un aviso fijo «Chat conectado» en la barra de notificaciones. Es lo que permite que te avise de los mensajes con la app cerrada; al encender el móvil se vuelve a conectar solo."]));
 s.push(...recuadro("consejo", "El manual, también en la app", ["En el móvil, **Ajustes → 📖 Manual de uso** explica todo esto sin necesidad de conexión, con un buscador (por ejemplo, «voz» o «batería»). Al final tiene el enlace a este manual completo en PDF."]));
+s.push(h2("Orden de las conversaciones y sonidos"));
+for (const t of ["**Arriba, siempre fijos**, el chat **General** y **«Control Pedidos»**. Debajo, las demás conversaciones: la **última que has usado** (con un mensaje enviado o recibido, o al abrirla en el móvil) va la primera.",
+  "**Sonido general**: Ajustes → Sonidos de los mensajes → **Cambiar** (selector de tonos del móvil).",
+  "**Sonido de un chat o grupo**: menú **⋮** de la conversación (o mantenerla pulsada en la lista) → **🔔 Sonido de este chat**: «Elegir tono…», «🔕 Silencio» o «Como el general». En Ajustes se ven los que tienen sonido propio.",
+  "Los sonidos se guardan **solo en el móvil**: los del Organizador se eligen aparte (capítulo 7)."]) s.push(vineta(t));
 s.push(h2("Mensajes de voz"));
 s.push(p("Con la caja de escribir **vacía**, a su derecha aparece el **🎤** (cuando escribes algo, cambia por el botón de enviar)."));
 s.push(...pasos(["**Mantén pulsado el 🎤** y habla. Mientras grabas, en lugar de la caja de escribir se ve **🔴** y el tiempo que llevas.",
@@ -317,6 +341,6 @@ s.push(...tabla(["Quiero…", "Cómo"], [["Abrir una carpeta, web o programa", "
   ["Enviar un archivo por el chat", "📎, arrastrarlo a la ventana o Ctrl+V"], ["Cambiar mi nombre o mis credenciales", "Admin → Mi Usuario"],
   ["Tener el chat en el móvil", "Chat → 📱 Chat en el móvil (código QR)"],
   ["Responder, reenviar o eliminar un mensaje", "Clic derecho sobre el mensaje"], ["Ver las novedades de la versión", "Pulsar el número de versión"],
-  ["Abrir este manual", "Botón Manual del menú, o «Manual de Usuario» en el menú Inicio de Windows"]], [4000, 5638]));
+  ["Consultar el manual o abrir este PDF", "Botón Manual del menú (buscador y «Abrir el manual completo»), o «Manual de Usuario» en el menú Inicio de Windows"]], [4000, 5638]));
 
 L.generar(process.argv[2] || "salida/Manual_Usuario_OrganizadorPrincess.docx", "Manual de usuario — Organizador Princess", "de usuario", s);

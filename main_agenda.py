@@ -17,6 +17,7 @@ from db.sqlite import (
     get_nombre_usuario, tiene_nombre_configurado,
 )
 from utils.sonido import _reproducir_sonido_aviso
+from services import sonidos_chat as _sonidos_chat
 import negocio.alertas as _alertas_mod
 from negocio.alertas import (
     monitor_avisos, mostrar_alerta,
@@ -102,7 +103,7 @@ NOMBRE_USUARIO_ACTUAL = get_nombre_usuario()
 
 GOLD  = "#C9A84C"
 LIGHT = "#D8E8F0"
-APP_VERSION  = "v4.18.74"   # ← actualizar en cada release (debe coincidir con el tag del release en GitHub)
+APP_VERSION  = "v4.18.76"   # ← actualizar en cada release (debe coincidir con el tag del release en GitHub)
 GITHUB_REPO  = "controlpedidosprincesscanarias-coder/organizador-princess"  # repo de releases
 _update_mod.APP_VERSION = APP_VERSION  # propagar a services/update_service.py
 _update_mod.GITHUB_REPO = GITHUB_REPO
@@ -1166,7 +1167,9 @@ def poll_chat():
                 remitente = m.get("remitente", "")
                 if remitente and remitente != _chat_cliente.username:
                     canal_id = m.get("canal_id", "")
-                    _reproducir_sonido_aviso("aviso")
+                    # (v4.18.76, petición de Víctor) El sonido es el elegido para ese chat o grupo, o el
+                    # general («🔔 Sonidos del chat»); antes era siempre el doble pitido de los avisos.
+                    _sonidos_chat.sonar_mensaje(config, canal_id)
                     # Si ya se está viendo ese canal (ventana principal abierta
                     # en ese canal, o ya hay una burbuja abierta para él), el
                     # mensaje ya es visible ahí mismo — no hace falta nada más

@@ -51,6 +51,16 @@
 
 ---
 
+## 2026-11-20 21:30 — [Catálogo Asignaciones] El enlace del correo abre una página con el botón de descarga (v1.20.75)
+
+Aviso de Víctor: al pulsar el botón del correo automático, la pestaña se quedaba en blanco en `linkprotect.cudasvc.com`.
+
+- Causa: el correo de la empresa pasa los enlaces por Barracuda, que analiza el destino antes de dejar pasar. El enlace generaba directamente el Excel completo, que tarda en crearse.
+- Ahora el enlace abre una página ligera con el botón «Descargar catálogo completo», y el Excel se genera al pulsarlo. Los correos ya enviados siguen valiendo.
+- PR: https://github.com/controlpedidosprincesscanarias-coder/dali-sap-articulos-app/pull/20
+
+---
+
 ## 2026-11-20 20:45 — [Consola Registro Info] Conserva la columna «Conversión DALI - SAP» al regenerar el catálogo
 
 Petición de Víctor: que la Consola también trabaje con la columna de equivalencias que Catálogo Asignaciones (v1.20.74) añadió al final del catálogo.

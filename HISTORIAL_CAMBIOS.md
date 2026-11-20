@@ -51,6 +51,17 @@
 
 ---
 
+## 2026-11-20 20:00 — [Catálogo Asignaciones] Columna «Conversión DALI - SAP» (equivalencias) (v1.20.74)
+
+Petición de Víctor: una columna nueva al final del catálogo, guardada en Supabase, que por ahora solo se actualiza desde «Importar Excel», preguntando si se importa el catálogo completo o solo las EQUIVALENCIAS, y que salga en el Excel exportado y en el del correo automático.
+
+- Importar Excel pregunta «Catálogo completo» o «Solo EQUIVALENCIAS». La segunda opción solo cambia esa columna en los artículos que existen.
+- La exportación completa (Gestión, correo automático, agente local y Consola) lleva al final «Conversión DALI - SAP».
+- ⚠️ Hay que aplicar a mano la migración `database/migraciones/2026-11-20_conversion_dali_sap.sql` de Catálogo Asignaciones.
+- PR: https://github.com/controlpedidosprincesscanarias-coder/dali-sap-articulos-app/pull/19
+
+---
+
 ## 2026-11-20 19:15 — [Consola Registro Info] Aviso de reactivar en SAP con solo centros borrados y búsqueda doble (v10.2.90)
 
 Al revisar el log de la tarifa OASISFISH que mandó Víctor (20 nov 2026) salieron dos errores:

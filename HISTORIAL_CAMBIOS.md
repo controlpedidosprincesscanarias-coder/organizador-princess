@@ -51,6 +51,19 @@
 
 ---
 
+## 2026-11-21 12:30 — [Catálogo Asignaciones] Menú igual para todos y ventana «⚙ Administración» (v1.20.79)
+
+Petición de Víctor: un menú de la izquierda más entendible, igual para todos, con un botón de administración atenuado para quien no es administrador, que abra una ventana con todas las opciones: activas las que cada uno puede usar y el resto visible pero en gris.
+
+- El menú solo lleva las categorías del catálogo. La antigua sección «Gestión», que obligaba a desplazarse, pasa a una ventana.
+- Botón **⚙ Administración** en el pie del menú, siempre a la vista: en color para los administradores (con las solicitudes de acceso pendientes) y atenuado para los demás.
+- La ventana tiene los 4 grupos de siempre (Catálogo, Proveedores y documentación, Accesos, Sistema). Las opciones que no se pueden usar salen en gris con el motivo: «Solo administradores», «Solo el administrador principal» o «No tienes este permiso».
+- Decisiones de Víctor: solo categorías en el menú, el nombre «Administración», un hotel también puede abrir la ventana (todo en gris) y los mismos 4 grupos.
+- El servidor sigue comprobando cada permiso. Sin migraciones. Manuales de hotel y de administración regenerados.
+- PR: https://github.com/controlpedidosprincesscanarias-coder/dali-sap-articulos-app/pull/25
+
+---
+
 ## 2026-11-20 23:55 — [Chat móvil] Sonidos por chat o grupo; General y Control Pedidos fijos arriba (v1.0.22)
 
 Peticiones de Víctor (20 nov 2026): «que se pueda cambiar el sonido de los mensajes, pudiendo elegir diferentes según el chat o grupo» y «que el grupo general y el de control pedidos queden fijos arriba; justo debajo, los últimos utilizados, el último el primero».

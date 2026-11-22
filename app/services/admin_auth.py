@@ -226,6 +226,39 @@ def resetear_intentos(username_win: str) -> None:
 
 
 # ══════════════════════════════════════════════════════════════════════════
+#  (v4.18.78) Contraseña de Administración una vez al día
+# ══════════════════════════════════════════════════════════════════════════
+# Decisión de Víctor (22 nov 2026): si «Mi Usuario» tiene guardados el usuario y la contraseña de Control de
+# Pedidos, Administración pide esa misma contraseña solo la primera vez de cada día; el resto del día se abre
+# directamente. Sin credenciales guardadas se pide como siempre. El día se guarda en el almacén cifrado.
+
+def _hoy() -> str:
+    return time.strftime("%Y-%m-%d")
+
+
+def anotar_acceso_admin(username_win: str, hoy: str = None) -> None:
+    """Apunta que hoy ya se ha entrado en Administración con la contraseña."""
+    almacen = _cargar_almacen()
+    entrada = almacen.get(username_win, {"nombre": "", "salt": "", "hash": "",
+                                         "intentos_fallidos": 0, "bloqueado_hasta": 0})
+    entrada["acceso_admin_dia"] = hoy or _hoy()
+    almacen[username_win] = entrada
+    _guardar_almacen(almacen)
+
+
+def acceso_admin_de_hoy(username_win: str, hoy: str = None) -> bool:
+    """True si hoy ya se entró en Administración y «Mi Usuario» tiene las credenciales completas: entonces no
+    se vuelve a pedir la contraseña hasta mañana."""
+    usuario, clave = get_bridge_credentials(username_win)
+    if not (usuario and clave):
+        return False
+    if esta_bloqueado(username_win)[0]:
+        return False
+    reg = obtener_registro_local(username_win) or {}
+    return reg.get("acceso_admin_dia") == (hoy or _hoy())
+
+
+# ══════════════════════════════════════════════════════════════════════════
 #  Comunicación con Control de Pedidos
 # ══════════════════════════════════════════════════════════════════════════
 
@@ -402,11 +435,20 @@ def verificar_acceso(username_win: str, password: str) -> dict:
     #    usuario que nunca ha guardado nada local y aún no sabemos si la
     #    contraseña es correcta de verdad.
     reg = obtener_registro_local(username_win)
+    bridge_user, bridge_password = get_bridge_credentials(username_win)
     if reg and reg.get("hash") and _verificar_password(password, reg["salt"], reg["hash"]):
         resetear_intentos(username_win)
+        # (v4.18.78) Si «Mi Usuario» aún no tiene las credenciales de Control de Pedidos, se aprovecha para
+        # comprobar esta contraseña en la plataforma y, si vale, rellenarlas solas. Sin red (o si no vale:
+        # el registro local también guarda contraseñas provisionales) se entra igual que antes.
+        if not (bridge_user and bridge_password):
+            online = validar_en_plataforma(username_win, password)
+            if online and online.get("ok"):
+                guardar_nombre_si_falta(username_win, online["nombre"])
+                return {"ok": True, "nombre": online["nombre"], "modo": "online",
+                        "credenciales_completadas": completar_credenciales(username_win, password)}
         return {"ok": True, "nombre": reg.get("nombre", username_win), "modo": "offline"}
 
-    bridge_user, bridge_password = get_bridge_credentials(username_win)
     # (v4.16.9) compare_digest sobre bytes: con str lanza TypeError si la contraseña
     # lleva ñ, tildes u otros caracteres no ASCII.
     if bridge_password and _secrets.compare_digest(password.encode('utf-8'), bridge_password.encode('utf-8')):
@@ -452,7 +494,8 @@ def verificar_acceso(username_win: str, password: str) -> dict:
             resetear_intentos(username_win)
             guardar_nombre_si_falta(username_win, resultado_online["nombre"])   # (v4.18.58)
             guardar_registro_local(username_win, resultado_online["nombre"], password)
-            return {"ok": True, "nombre": resultado_online["nombre"], "modo": "online"}
+            return {"ok": True, "nombre": resultado_online["nombre"], "modo": "online",
+                    "credenciales_completadas": completar_credenciales(username_win, password)}   # (v4.18.78)
         else:
             restantes, bloqueado_ahora = registrar_intento_fallido(username_win)
             if bloqueado_ahora:
@@ -477,6 +520,28 @@ def verificar_acceso(username_win: str, password: str) -> dict:
     return {"ok": False,
              "error": "Sin conexión con Control de Pedidos y no hay datos guardados en este equipo.",
              "bloqueado": False, "segundos": 0, "intentos_restantes": MAX_INTENTOS}
+
+
+def completar_credenciales(username_win: str, password: str) -> bool:
+    """(v4.18.78, petición de Víctor) Tras validar en Control de Pedidos el usuario de Windows y su contraseña,
+    rellena con ellos «Mi Usuario» (usuario y contraseña del bridge, los mismos que usan el chat y los avisos)
+    si todavía no estaban completos, para que nadie tenga que escribirlos a mano. Si es el mismo usuario y la
+    contraseña guardada ya no es la buena (se cambió en Control de Pedidos), la actualiza. Un usuario distinto
+    puesto a mano no se toca nunca. Siempre se puede cambiar en Admin → Mi Usuario.
+    Devuelve True si ha guardado algo."""
+    if not username_win or not password:
+        return False
+    usuario, clave = get_bridge_credentials(username_win)
+    if usuario and usuario.lower() != username_win.lower():
+        return False                      # otro usuario puesto a mano: no se toca
+    if usuario and clave == password:
+        return False                      # ya estaba bien
+    try:
+        update_bridge_credentials(username_win, usuario or username_win, password)
+        return True
+    except Exception:  # noqa: BLE001
+        _log_warning()
+        return False
 
 
 def registrar_usuario_nuevo(username_win: str, nombre: str, password: str) -> dict:

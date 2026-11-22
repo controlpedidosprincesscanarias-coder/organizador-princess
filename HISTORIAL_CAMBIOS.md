@@ -61,6 +61,7 @@ Petición de Víctor: «Necesito reconfigurar el apartado ADMINISTRADOR tal y co
 - Decisiones de Víctor: el botón se llama «⚙ Administración» y va abajo; compras y hotel también lo ven, atenuado, y la ventana les sale en gris («🔒 Solo administradores»); es una ventana superpuesta; «Cargar listados DALI / SAP» y «Confirmar albaranes sueltos» están en la ventana y siguen también en Pedidos.
 - Solo cambia la navegación: las pantallas, los endpoints y los permisos que comprueba el servidor son los mismos.
 - Pruebas en local: e2e en navegador con los tres roles (64 pasos, con las pantallas abiertas desde la ventana) y huellas de rutas y de respuestas por rol sin cambios. Manuales de Administrador, Comprador y Hotel regenerados con datos inventados. Queda por comprobar en Render tras desplegar.
+- PR: https://github.com/controlpedidosprincesscanarias-coder/control-pedidos-princess/pull/105 (historial en https://github.com/controlpedidosprincesscanarias-coder/organizador-princess/pull/97)
 
 ---
 

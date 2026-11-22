@@ -51,6 +51,19 @@
 
 ---
 
+## 2026-11-22 20:50 — [Control Pedidos] Botón fijo «⚙ Administración» con todos los apartados en una ventana (v12.34.40)
+
+Petición de Víctor: «Necesito reconfigurar el apartado ADMINISTRADOR tal y como hicimos con CATÁLOGO ASIGNACIONES, es decir, un único botón fijo que abre una nueva ventana con todos los apartados».
+
+- Las 10 pantallas de administración salen del menú lateral (antes, 4 bloques «· Admin»). El menú se queda con «Principal» y «Gestión».
+- Botón nuevo **«⚙ Administración»**, fijo al pie del menú, encima de la versión. Lleva el aviso rojo de Integridad.
+- Al pulsarlo se abre una ventana por encima de la pantalla, con tarjetas agrupadas por temas: Datos maestros, Usuarios y accesos, Alertas y avisos, Listados SAP y Sistema. Cada tarjeta explica en una línea para qué sirve.
+- Decisiones de Víctor: el botón se llama «⚙ Administración» y va abajo; compras y hotel también lo ven, atenuado, y la ventana les sale en gris («🔒 Solo administradores»); es una ventana superpuesta; «Cargar listados DALI / SAP» y «Confirmar albaranes sueltos» están en la ventana y siguen también en Pedidos.
+- Solo cambia la navegación: las pantallas, los endpoints y los permisos que comprueba el servidor son los mismos.
+- Pruebas en local: e2e en navegador con los tres roles (64 pasos, con las pantallas abiertas desde la ventana) y huellas de rutas y de respuestas por rol sin cambios. Manuales de Administrador, Comprador y Hotel regenerados con datos inventados. Queda por comprobar en Render tras desplegar.
+
+---
+
 ## 2026-11-22 15:00 — [Consola Registro Info] Columna REGISTRO INFO y recuadro de HOTELES encima de la tabla (v10.2.94)
 
 Petición de Víctor: añadir a la tarifa una columna con el Registro Info de SAP de cada material, tanto en la que se crea desde cero como en la que se crea desde un RINFO.

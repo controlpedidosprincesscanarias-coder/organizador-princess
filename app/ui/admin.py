@@ -595,7 +595,7 @@ def abrir_admin(ctx):
             ttk.Label(mu_hdr, text="\U0001f464  Mi Usuario",
                       font=("Segoe UI", 12, "bold")).pack(anchor="w")
             ttk.Label(mu_hdr,
-                      text="Nombre de sesion y credenciales de Control de Pedidos.",
+                      text="Nombre de sesión y credenciales de Control de Pedidos.",
                       font=("Segoe UI", 9), foreground=LIGHT,
                       wraplength=420).pack(anchor="w", pady=(3, 0))
             ttk.Separator(mu_win).pack(fill="x")
@@ -626,13 +626,12 @@ def abrir_admin(ctx):
 
             # ── Separador seccion bridge ──────────────────────────────────────
             ttk.Separator(body).pack(fill="x", pady=(14, 10))
-            ttk.Label(body, text="\U0001f4e1  Control de Pedidos — credenciales bridge",
+            ttk.Label(body, text="\U0001f4e1  Tu cuenta de Control de Pedidos",
                       font=("Segoe UI", 9, "bold")).pack(anchor="w", pady=(0, 2))
             ttk.Label(body,
                       text=(
-                          "Introduce tu usuario y contrasena de Control de Pedidos.\n"
-                          "Los avisos emergentes mostraran SOLO tus pedidos asignados,\n"
-                          "igual que los mensajes de Telegram."
+                          "Tu usuario y tu contraseña de Control de Pedidos. Con ellos el Organizador\n"
+                          "te muestra los avisos de tus pedidos, sincroniza tu agenda y abre el chat."
                       ),
                       font=("Segoe UI", 8), foreground=LIGHT,
                       wraplength=420).pack(anchor="w", pady=(0, 8))
@@ -652,7 +651,7 @@ def abrir_admin(ctx):
             # Fila: contrasena bridge
             row_bp = ttk.Frame(body)
             row_bp.pack(fill="x", pady=(0, 4))
-            ttk.Label(row_bp, text="Contrasena:",
+            ttk.Label(row_bp, text="Contraseña:",
                       font=("Segoe UI", 9), width=20, anchor="w").pack(side="left")
             var_bridge_pass = _SV2(value=_bp_actual)
             entry_pass = ttk.Entry(row_bp, textvariable=var_bridge_pass,
@@ -677,11 +676,11 @@ def abrir_admin(ctx):
                 _estado_txt = (
                     f"\u2705  Conectado como '{_bu_activo}' (rol: {_rol_activo})"
                     if _bridge_ok
-                    else "\u26a0\ufe0f  Sin sesion activa  \u2014  guardado activo al reiniciar"
+                    else "\u26a0\ufe0f  Sin sesión activa con Control de Pedidos todavía"
                 )
                 _estado_col = "#2ecc71" if _bridge_ok else "#e67e22"
             except Exception:
-                _estado_txt = "\u2014  Bridge no iniciado en esta sesion"
+                _estado_txt = "\u2014  Conexión con Control de Pedidos no iniciada en esta sesión"
                 _estado_col = LIGHT
             ttk.Label(body, text=_estado_txt,
                       font=("Segoe UI", 8), foreground=_estado_col,
@@ -697,7 +696,7 @@ def abrir_admin(ctx):
             def _guardar_cambio():
                 nuevo_nombre = var_nombre_edit.get().strip()
                 if not nuevo_nombre:
-                    var_mu_err.set("\u26a0  El nombre no puede estar vacio.")
+                    var_mu_err.set("\u26a0  El nombre no puede estar vacío.")
                     return
 
                 nuevo_bu = var_bridge_user.get().strip()
@@ -733,7 +732,7 @@ def abrir_admin(ctx):
                     "Mi Usuario",
                     f"Guardado correctamente.\n\n"
                     f"  Nombre: {uwin_actual}  \u2192  {nuevo_nombre}\n"
-                    f"  Bridge: {nuevo_bu or '(vacio)'}",
+                    f"  Control de Pedidos: {nuevo_bu or '(vacío)'}",
                     parent=mu_win,
                 )
                 mu_win.destroy()

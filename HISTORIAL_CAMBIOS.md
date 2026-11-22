@@ -51,6 +51,19 @@
 
 ---
 
+## 2026-11-22 21:30 — [Control Pedidos] Botón «📘 Manual»: consultar y descargar el manual sin salir de la aplicación (v12.34.42)
+
+Petición de Víctor: «colocamos también el botón de manual en el menú de la izquierda como hicimos en el de catálogo de asignaciones? Botón, se abre nueva ventana con consultas y posibilidad de descarga».
+
+- Botón nuevo **«📘 Manual»** en el pie fijo del menú, en la misma fila que «⚙ Administración» (decisión de Víctor).
+- Abre una ventana con un buscador, «Consultar el manual»: se escribe la duda y salen los apartados del manual que la explican, con su página y una frase del texto. Al pulsar uno se abre el PDF en esa página. Debajo, «Abrir» y «Descargar PDF» de cada manual. Es la misma búsqueda que en Catálogo Asignaciones y en la Consola Registro Info, sin Internet.
+- Qué ve cada uno (decisión de Víctor): hotel, el manual de Hotel; compras, el de Comprador y el de Hotel; admin, los tres. Lo comprueba también el servidor.
+- El generador de manuales crea ahora, junto a cada PDF, el índice para buscar, con la página de cada apartado.
+- Manuales de Hotel, Comprador y Administrador regenerados con datos inventados, con un apartado sobre el botón.
+- Pruebas en local: prueba nueva de los manuales (qué ve cada rol, índices completos y la búsqueda), e2e en navegador con los tres roles (67 pasos) y huellas regeneradas por las 3 rutas nuevas. Queda por comprobar en Render tras desplegar.
+
+---
+
 ## 2026-11-22 20:50 — [Control Pedidos] Botón fijo «⚙ Administración» con todos los apartados en una ventana (v12.34.40)
 
 Petición de Víctor: «Necesito reconfigurar el apartado ADMINISTRADOR tal y como hicimos con CATÁLOGO ASIGNACIONES, es decir, un único botón fijo que abre una nueva ventana con todos los apartados».

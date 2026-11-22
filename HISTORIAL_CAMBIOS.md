@@ -51,6 +51,18 @@
 
 ---
 
+## 2026-11-22 22:10 — [Organizador] «Mi Usuario» se rellena solo y Admin pide la contraseña una vez al día (v4.18.78)
+
+Petición de Víctor (22 nov 2026): «si el usuario está registrado en Control Pedidos, que directamente quede cumplimentado este apartado sin necesidad de que se tenga que rellenar, siempre editable», y que para Administración sirva la misma contraseña.
+
+- Al entrar en Admin con la contraseña de Control de Pedidos, «Mi Usuario» guarda sola la cuenta si faltaba, o si cambió la contraseña del mismo usuario. El chat y los avisos se ponen en marcha sin reiniciar.
+- Siempre editable: un usuario distinto puesto a mano no se sustituye nunca.
+- Decisión de Víctor: con la cuenta guardada, Admin pide la contraseña solo la primera vez de cada día.
+- Corregido: los textos de Mi Usuario hablaban todavía de Telegram. Manuales de usuario y de administrador regenerados.
+- PR: https://github.com/controlpedidosprincesscanarias-coder/organizador-princess/pull/99
+
+---
+
 ## 2026-11-22 21:30 — [Control Pedidos] Botón «📘 Manual»: consultar y descargar el manual sin salir de la aplicación (v12.34.42)
 
 Petición de Víctor: «colocamos también el botón de manual en el menú de la izquierda como hicimos en el de catálogo de asignaciones? Botón, se abre nueva ventana con consultas y posibilidad de descarga».

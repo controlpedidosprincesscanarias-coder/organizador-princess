@@ -28,7 +28,9 @@ APARTADOS = [
         "Arriba, el saludo con tu nombre. Si no lo has puesto, se usa el de tu cuenta de Control de Pedidos; se "
         "cambia en Admin → Mi Usuario.",
         "Admin: panel de administración (botones, vista, tu usuario, sonidos del chat y copias). Pide tu contraseña "
-        "de Control de Pedidos.",
+        "de Control de Pedidos; con tu cuenta ya guardada, solo la primera vez de cada día.",
+        "Al entrar en Admin con esa contraseña, tu cuenta queda guardada sola en Admin → Mi Usuario (no hace falta "
+        "escribirla allí). Se puede cambiar cuando quieras.",
         "Manual: esta ventana. Accesos rápidos (dorados): seis botones para lo que más usas.",
         "Agenda, Calendario y Chat: los tres botones de trabajo diario. Botones azules: hasta 30 accesos.",
         "Abajo a la derecha, la versión: al pulsarla se ven sus novedades.",
@@ -130,7 +132,8 @@ APARTADOS = [
     ("🛠", "Problemas frecuentes", [
         "Un botón no abre nada: comprueba la red o Internet; si sigue, la ruta puede estar mal.",
         "No salta un aviso: mira que no esté DESACTIVADO, la fecha y la hora, y que el Organizador estuviera abierto.",
-        "No llegan avisos de pedidos o el chat no entra: revisa Admin → Mi Usuario.",
+        "No llegan avisos de pedidos o el chat no entra: entra en Admin con tu contraseña de Control de Pedidos "
+        "(se guarda sola) o revisa Admin → Mi Usuario.",
         "Admin pide contraseña: es la de Control de Pedidos; tras 3 fallos se bloquea 5 minutos.",
         "No me deja instalar: usa la versión portátil.",
     ]),

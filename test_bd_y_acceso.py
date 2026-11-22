@@ -11,6 +11,8 @@ Uso: python test_bd_y_acceso.py   (usa una carpeta de datos temporal; no toca la
 4. (v4.18.42) El chat solo se abre si hay cuenta de Control de Pedidos guardada (Mi Usuario).
 5. (v4.18.58) Sin lista fija de nombres: el saludo usa el nombre de Control de Pedidos si el equipo no
    tiene uno propio, y cambiar el nombre ya no borra la cuenta guardada.
+6. (v4.18.78) Al entrar en Administración con la cuenta de Control de Pedidos, «Mi Usuario» se rellena solo
+   (sin pisar lo puesto a mano), y con la cuenta guardada la contraseña se pide una vez al día.
 """
 import contextlib
 import io
@@ -164,6 +166,53 @@ for _f in ("chat_client.py", "admin_auth.py"):
     ok(f"{_f} guarda el nombre de Control de Pedidos al entrar",
        "guardar_nombre_si_falta(" in open(os.path.join(RAIZ, "app", "services", _f), encoding="utf-8").read())
 ok("pedidos_agenda_bridge.py también", "guardar_nombre_si_falta(" in open(os.path.join(RAIZ, "pedidos_agenda_bridge.py"), encoding="utf-8").read())
+
+# ── 6. «Mi Usuario» se rellena solo y Admin pide la contraseña una vez al día (v4.18.78) ──
+if admin_auth:
+    respuestas = {}
+    admin_auth.validar_en_plataforma = lambda u, p: respuestas.get((u, p), {"ok": False, "nombre": "", "rol": ""})
+    respuestas[("compras20", "clave-cp")] = {"ok": True, "nombre": "Marta Ejemplo", "rol": "compras"}
+    r = admin_auth.verificar_acceso("compras20", "clave-cp")
+    ok("entrar con la cuenta de Control de Pedidos rellena «Mi Usuario» solo",
+       r.get("ok") and r.get("credenciales_completadas") is True
+       and bd.get_bridge_credentials("compras20") == ("compras20", "clave-cp"), (r, bd.get_bridge_credentials("compras20")))
+    r = admin_auth.verificar_acceso("compras20", "clave-cp")
+    ok("si ya estaba bien, no se vuelve a guardar", r.get("ok") and not r.get("credenciales_completadas"))
+    bd.update_bridge_credentials("compras20", "compras20", "clave-antigua")
+    respuestas[("compras20", "clave-cp-nueva")] = {"ok": True, "nombre": "Marta Ejemplo", "rol": "compras"}
+    r = admin_auth.verificar_acceso("compras20", "clave-cp-nueva")
+    ok("si cambió la contraseña en Control de Pedidos, «Mi Usuario» se actualiza (mismo usuario)",
+       r.get("credenciales_completadas") and bd.get_bridge_credentials("compras20") == ("compras20", "clave-cp-nueva"),
+       bd.get_bridge_credentials("compras20"))
+    bd.update_bridge_credentials("compras21", "otro.usuario", "")   # sin contraseña: no entra por la vía local
+    respuestas[("compras21", "c21")] = {"ok": True, "nombre": "Luis Ejemplo", "rol": "compras"}
+    admin_auth.verificar_acceso("compras21", "c21")
+    ok("si hay otro usuario puesto a mano (sin contraseña), no se cambia por el de Windows",
+       bd.get_bridge_credentials("compras21") == ("otro.usuario", ""), bd.get_bridge_credentials("compras21"))
+    r = admin_auth.verificar_acceso("compras22", "mala")
+    ok("una contraseña que Control de Pedidos no acepta no guarda nada",
+       not r.get("ok") and bd.get_bridge_credentials("compras22") == ("", ""), bd.get_bridge_credentials("compras22"))
+    # Equipo que ya había entrado antes (registro local) pero sin «Mi Usuario»: se completa al entrar
+    admin_auth.guardar_registro_local("compras23", "Ana Ejemplo", "c23")
+    respuestas[("compras23", "c23")] = {"ok": True, "nombre": "Ana Ejemplo", "rol": "compras"}
+    r = admin_auth.verificar_acceso("compras23", "c23")
+    ok("con registro local de antes y «Mi Usuario» vacío, también se rellena",
+       r.get("credenciales_completadas") and bd.get_bridge_credentials("compras23") == ("compras23", "c23"))
+    admin_auth.guardar_registro_local("compras24", "Sin Red", "c24")
+    admin_auth.validar_en_plataforma = lambda u, p: None           # sin conexión
+    r = admin_auth.verificar_acceso("compras24", "c24")
+    ok("sin red, con registro local, se entra igual que antes", r.get("ok") and r.get("modo") == "offline")
+    # Una vez al día
+    ok("sin haber entrado hoy, se pide la contraseña", admin_auth.acceso_admin_de_hoy("compras20", "2026-11-22") is False)
+    admin_auth.anotar_acceso_admin("compras20", "2026-11-22")
+    ok("tras entrar hoy, el resto del día no se pide", admin_auth.acceso_admin_de_hoy("compras20", "2026-11-22") is True)
+    ok("al día siguiente se vuelve a pedir", admin_auth.acceso_admin_de_hoy("compras20", "2026-11-23") is False)
+    admin_auth.anotar_acceso_admin("compras22", "2026-11-22")
+    ok("sin «Mi Usuario» completo se pide siempre, aunque haya entrado hoy",
+       admin_auth.acceso_admin_de_hoy("compras22", "2026-11-22") is False)
+    adm = open(os.path.join(RAIZ, "app", "ui", "admin.py"), encoding="utf-8").read()
+    ok("Administración usa la contraseña de una vez al día y pone en marcha lo rellenado",
+       "acceso_admin_de_hoy(" in adm and "anotar_acceso_admin(" in adm and "_aplicar_credenciales_en_marcha(uwin, clave)" in adm)
 
 print(f"\n{'Todas las comprobaciones OK.' if not fallos else str(len(fallos)) + ' fallo(s)'}")
 sys.exit(1 if fallos else 0)

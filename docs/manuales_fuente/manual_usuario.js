@@ -1,7 +1,7 @@
 // Manual de usuario del Organizador Princess. Idea y desarrollo de la aplicación: Víctor Alejandro Martín Andrade.
 const L = require("./lib");
 const { p, vineta, pasos, h1, h2, imagen, leyenda, recuadro, tabla, portada, indice } = L;
-const V = process.env.VERSION || "v4.18.76";
+const V = process.env.VERSION || "v4.18.78";
 
 const s = [];
 s.push(portada({ rol: "Uso diario", subtitulo: "Abre tus accesos, apunta avisos, consulta el calendario y chatea con tus compañeros",
@@ -37,7 +37,7 @@ s.push(h1("2. Conoce la pantalla"));
 s.push(p("Al abrir el Organizador ves el **Menú Principal**. Así es la vista completa (la extendida, capítulo 3). Los nombres de los botones son un ejemplo: en tu PC pueden ser otros."));
 s.push(...imagen("u_menu", 17, "Menú Principal, vista extendida (datos de ejemplo)."));
 s.push(...leyenda([[1, "**Cabecera**: «Menú Principal», el nombre del centro y un saludo con tu nombre. Si no lo has puesto, el Organizador usa el de tu **cuenta de Control de Pedidos** en cuanto entra con ella; puedes cambiarlo cuando quieras en Admin → Mi Usuario."],
-  [2, "**Admin**: panel de administración del menú (botones, vista, tu usuario y copias). Pide tu contraseña de Control de Pedidos; lo explica el Manual de administrador."],
+  [2, "**Admin**: panel de administración del menú (botones, vista, tu usuario y copias). Pide tu contraseña de Control de Pedidos (con tu cuenta ya guardada, solo la primera vez de cada día) y, al entrar, deja guardada tu cuenta en Mi Usuario si faltaba; lo explica el Manual de administrador."],
   [3, "**Manual**: el manual para consultar, con buscador, y el manual completo en PDF (apartado «El botón Manual»)."],
   [4, "**Accesos rápidos** (dorados): seis botones para lo que más usas. Los nombres largos se cortan, así que conviene ponerles nombres cortos."],
   [5, "**Agenda**, **Calendario** y **Chat**: los tres botones de trabajo diario (capítulos 4, 5 y 7)."],
@@ -327,7 +327,7 @@ s.push(...tabla(["Problema", "Qué hacer"], [
   ["No me salta un aviso", "Revisa en la Agenda que no esté DESACTIVADO, que la fecha y la hora son correctas y que el Organizador estaba abierto a esa hora. Puede haberse callado con «Silenciar hoy»."],
   ["No me sale el saludo", "Solo aparece la primera vez que abres el Organizador cada día."],
   ["No me llegan avisos de pedidos", "Revisa Admin → Mi Usuario: tu usuario y contraseña de Control de Pedidos deben estar guardados y ser los que usas allí."],
-  ["El chat dice que no hay credenciales", "Guarda tus credenciales en Admin → Mi Usuario y reinicia el Organizador."],
+  ["El chat dice que no hay credenciales", "Entra en Admin con tu contraseña de Control de Pedidos: tu cuenta se guarda sola en Mi Usuario y el chat se conecta. También puedes escribirla en Admin → Mi Usuario."],
   ["El móvil no avisa de los mensajes", "Comprueba que la app tiene permiso de notificaciones, que se ve el aviso «Chat conectado» y quita el ahorro de batería (Ajustes de la app)."],
   ["«Admin» me pide una contraseña", "Es la de tu cuenta de Control de Pedidos. Tras 3 fallos se bloquea 5 minutos. Si no tienes cuenta, pulsa «Crear acceso» (Manual de administrador)."],
   ["Error al comprobar actualizaciones", "Pulsa «Copiar texto» en la ventana de error y envíaselo a informática. No impide trabajar."],

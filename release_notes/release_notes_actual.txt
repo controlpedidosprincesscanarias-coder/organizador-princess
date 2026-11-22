@@ -1,26 +1,20 @@
-✨ Organizador Princess v4.18.76
+✨ Organizador Princess v4.18.78
 ================================================================
 
-🔔 SONIDOS DEL CHAT A TU GUSTO
+👤 MI USUARIO SE RELLENA SOLO
 
-• Ya puedes elegir cómo suenan los mensajes nuevos del chat:
-  un sonido general y, si quieres, otro distinto para cada
-  chat o grupo.
-• Hay 8 tonos para elegir, puedes usar un sonido .wav de tu PC
-  o dejar un chat en «🔕 Silencio».
-• Desde el menú ⋮ de cada conversación («🔔 Sonido de este
-  chat»), desde el botón 🔔 de la burbuja y desde
-  Administración → «🔔 Sonidos del chat».
-• Se guarda solo en este equipo. El móvil tiene sus propios
-  sonidos en Ajustes.
+• Si tu usuario de Windows tiene cuenta en Control de Pedidos,
+  al entrar en Admin con tu contraseña queda guardada sola en
+  «Mi Usuario». No hace falta escribirla otra vez: el chat y
+  los avisos de tus pedidos se ponen en marcha al momento.
+• Si cambias la contraseña en Control de Pedidos, se actualiza
+  sola la próxima vez que entres en Admin.
+• Siempre se puede cambiar a mano en Admin → Mi Usuario.
 
-📖 MANUAL PARA CONSULTAR
+🔑 ADMIN, UNA VEZ AL DÍA
 
-• El botón «Manual» abre ahora un manual con buscador, como
-  el de la app del móvil: escribe una palabra («vacaciones»,
-  «sonido»…) y salen los apartados que hablan de ello.
-• Abajo, «Abrir el manual completo» (PDF) y «Guardar una
-  copia…» para descargarlo donde quieras.
+• Con tu cuenta ya guardada, Admin pide la contraseña solo la
+  primera vez de cada día. El resto del día se abre directo.
 
 ================================================================
 La idea y el desarrollo de la aplicación Organizador Princess son de

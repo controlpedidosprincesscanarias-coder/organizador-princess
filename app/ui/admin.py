@@ -32,6 +32,32 @@ from ui.ventana_config import _ventana_config
 # ANTI-REGRESION: antes había credenciales ADMIN_USER / ADMIN_PASSWORD hardcodeadas en
 # main_agenda.py. Sustituidas por el sistema sin hardcode de services/admin_auth.py.
 _admin_autenticado = False   # sesión activa mientras la app esté abierta
+_rellenado_auto = False      # (v4.18.78) «Mi Usuario» se ha rellenado solo al entrar en esta sesión
+
+
+def _aplicar_credenciales_en_marcha(usuario, clave):
+    """Pone en marcha, sin reiniciar, las credenciales de Control de Pedidos recién guardadas: el bridge
+    (avisos de pedidos y agenda) vuelve a entrar en su siguiente vuelta y el chat se conecta si no lo estaba."""
+    try:
+        import pedidos_agenda_bridge as _pab
+        if usuario != _pab.BRIDGE_USER or clave != _pab.BRIDGE_PASSWORD:
+            _pab.BRIDGE_USER     = usuario
+            _pab.BRIDGE_PASSWORD = clave
+            # Forzar re-login en el siguiente ciclo del hilo
+            _pab._session._logged_in = False
+            _pab._session.username   = ""
+            _pab._session.rol        = ""
+    except Exception:  # noqa: BLE001
+        import sys as _sys, traceback as _tb
+        print(f"[WARNING] {_tb.format_exc().splitlines()[-1]}", file=_sys.stderr)
+    try:
+        from services.chat_client import get_chat_client
+        cli = get_chat_client()
+        if not cli.conectado:
+            cli.iniciar_conexion_en_segundo_plano()
+    except Exception:  # noqa: BLE001
+        import sys as _sys, traceback as _tb
+        print(f"[WARNING] {_tb.format_exc().splitlines()[-1]}", file=_sys.stderr)
 
 
 def _ventana_login_admin(ctx, on_success):
@@ -138,8 +164,17 @@ def _ventana_login_admin(ctx, on_success):
             resultado = admin_auth.verificar_acceso(uwin, clave)
             dlg.configure(cursor="")
             if resultado["ok"]:
-                global _admin_autenticado
+                global _admin_autenticado, _rellenado_auto
                 _admin_autenticado = True
+                try:
+                    admin_auth.anotar_acceso_admin(uwin)       # (v4.18.78) no se vuelve a pedir hasta mañana
+                except Exception:  # noqa: BLE001
+                    pass
+                if resultado.get("credenciales_completadas"):
+                    # (v4.18.78, petición de Víctor) «Mi Usuario» se ha rellenado solo con la cuenta de
+                    # Control de Pedidos que se acaba de comprobar: se pone en marcha sin reiniciar.
+                    _rellenado_auto = True
+                    _aplicar_credenciales_en_marcha(uwin, clave)
                 print(f"[LOG] Acceso Admin — usuario Windows: {uwin} "
                       f"({resultado.get('nombre','')}, modo={resultado.get('modo')}) — "
                       f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
@@ -595,7 +630,7 @@ def abrir_admin(ctx):
             ttk.Label(mu_hdr, text="\U0001f464  Mi Usuario",
                       font=("Segoe UI", 12, "bold")).pack(anchor="w")
             ttk.Label(mu_hdr,
-                      text="Nombre de sesion y credenciales de Control de Pedidos.",
+                      text="Nombre de sesión y credenciales de Control de Pedidos.",
                       font=("Segoe UI", 9), foreground=LIGHT,
                       wraplength=420).pack(anchor="w", pady=(3, 0))
             ttk.Separator(mu_win).pack(fill="x")
@@ -626,13 +661,12 @@ def abrir_admin(ctx):
 
             # ── Separador seccion bridge ──────────────────────────────────────
             ttk.Separator(body).pack(fill="x", pady=(14, 10))
-            ttk.Label(body, text="\U0001f4e1  Control de Pedidos — credenciales bridge",
+            ttk.Label(body, text="\U0001f4e1  Tu cuenta de Control de Pedidos",
                       font=("Segoe UI", 9, "bold")).pack(anchor="w", pady=(0, 2))
             ttk.Label(body,
                       text=(
-                          "Introduce tu usuario y contrasena de Control de Pedidos.\n"
-                          "Los avisos emergentes mostraran SOLO tus pedidos asignados,\n"
-                          "igual que los mensajes de Telegram."
+                          "Tu usuario y tu contraseña de Control de Pedidos. Con ellos el Organizador\n"
+                          "te muestra los avisos de tus pedidos, sincroniza tu agenda y abre el chat."
                       ),
                       font=("Segoe UI", 8), foreground=LIGHT,
                       wraplength=420).pack(anchor="w", pady=(0, 8))
@@ -645,14 +679,16 @@ def abrir_admin(ctx):
             row_bu.pack(fill="x", pady=(0, 4))
             ttk.Label(row_bu, text="Usuario (login):",
                       font=("Segoe UI", 9), width=20, anchor="w").pack(side="left")
-            var_bridge_user = _SV2(value=_bu_actual)
+            # (v4.18.78) Si está vacío, se propone el usuario de Windows (el mismo con el que se entra en
+            # Control de Pedidos desde el Organizador); se puede cambiar.
+            var_bridge_user = _SV2(value=_bu_actual or uwin_actual)
             ttk.Entry(row_bu, textvariable=var_bridge_user,
                       font=("Segoe UI", 10), width=26).pack(side="left", fill="x", expand=True)
 
             # Fila: contrasena bridge
             row_bp = ttk.Frame(body)
             row_bp.pack(fill="x", pady=(0, 4))
-            ttk.Label(row_bp, text="Contrasena:",
+            ttk.Label(row_bp, text="Contraseña:",
                       font=("Segoe UI", 9), width=20, anchor="w").pack(side="left")
             var_bridge_pass = _SV2(value=_bp_actual)
             entry_pass = ttk.Entry(row_bp, textvariable=var_bridge_pass,
@@ -668,6 +704,12 @@ def abrir_admin(ctx):
                 bootstyle="secondary", command=_toggle_pass
             ).pack(side="left", padx=(6, 0))
 
+            if _rellenado_auto:
+                ttk.Label(body, text="\u2714  Rellenado autom\u00e1ticamente con tu cuenta de Control de Pedidos "
+                                     "al entrar en Administraci\u00f3n. Puedes cambiarlo si quieres usar otro usuario.",
+                          font=("Segoe UI", 8), foreground="#2ecc71",
+                          wraplength=420).pack(anchor="w", pady=(4, 0))
+
             # Indicador de estado del bridge (lectura)
             try:
                 import pedidos_agenda_bridge as _pab
@@ -677,11 +719,11 @@ def abrir_admin(ctx):
                 _estado_txt = (
                     f"\u2705  Conectado como '{_bu_activo}' (rol: {_rol_activo})"
                     if _bridge_ok
-                    else "\u26a0\ufe0f  Sin sesion activa  \u2014  guardado activo al reiniciar"
+                    else "\u26a0\ufe0f  Sin sesión activa con Control de Pedidos todavía"
                 )
                 _estado_col = "#2ecc71" if _bridge_ok else "#e67e22"
             except Exception:
-                _estado_txt = "\u2014  Bridge no iniciado en esta sesion"
+                _estado_txt = "\u2014  Conexión con Control de Pedidos no iniciada en esta sesión"
                 _estado_col = LIGHT
             ttk.Label(body, text=_estado_txt,
                       font=("Segoe UI", 8), foreground=_estado_col,
@@ -697,7 +739,7 @@ def abrir_admin(ctx):
             def _guardar_cambio():
                 nuevo_nombre = var_nombre_edit.get().strip()
                 if not nuevo_nombre:
-                    var_mu_err.set("\u26a0  El nombre no puede estar vacio.")
+                    var_mu_err.set("\u26a0  El nombre no puede estar vacío.")
                     return
 
                 nuevo_bu = var_bridge_user.get().strip()
@@ -715,25 +757,14 @@ def abrir_admin(ctx):
                 # 2) Guardar credenciales bridge
                 update_bridge_credentials(uwin_actual, nuevo_bu, nuevo_bp)
 
-                # 3) Aplicar credenciales al bridge en memoria (sin reiniciar)
-                try:
-                    import pedidos_agenda_bridge as _pab
-                    if nuevo_bu != _pab.BRIDGE_USER or nuevo_bp != _pab.BRIDGE_PASSWORD:
-                        _pab.BRIDGE_USER     = nuevo_bu
-                        _pab.BRIDGE_PASSWORD = nuevo_bp
-                        # Forzar re-login en el siguiente ciclo del hilo
-                        _pab._session._logged_in = False
-                        _pab._session.username   = ""
-                        _pab._session.rol        = ""
-                except Exception:  # noqa: BLE001
-                    import sys as _sys, traceback as _tb
-                    print(f"[WARNING] {_tb.format_exc().splitlines()[-1]}", file=_sys.stderr)
+                # 3) Aplicar credenciales al bridge (y al chat) en memoria (sin reiniciar)
+                _aplicar_credenciales_en_marcha(nuevo_bu, nuevo_bp)
 
                 messagebox.showinfo(
                     "Mi Usuario",
                     f"Guardado correctamente.\n\n"
                     f"  Nombre: {uwin_actual}  \u2192  {nuevo_nombre}\n"
-                    f"  Bridge: {nuevo_bu or '(vacio)'}",
+                    f"  Control de Pedidos: {nuevo_bu or '(vacío)'}",
                     parent=mu_win,
                 )
                 mu_win.destroy()
@@ -996,7 +1027,12 @@ def abrir_admin(ctx):
             )
 
     # Primero solicitar credenciales; si son correctas se abre el panel
+    global _admin_autenticado
     if _admin_autenticado:
+        _abrir_panel()
+    elif admin_auth.acceso_admin_de_hoy(admin_auth.get_windows_user()):
+        # (v4.18.78, decisión de Víctor) Con «Mi Usuario» completo, la contraseña se pide una vez al día
+        _admin_autenticado = True
         _abrir_panel()
     else:
         _ventana_login_admin(ctx, on_success=_abrir_panel)

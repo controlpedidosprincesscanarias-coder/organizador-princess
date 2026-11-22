@@ -51,7 +51,7 @@
 
 ---
 
-## 2026-11-22 15:00 — [Consola Registro Info] Columna REGISTRO INFO en la TARIFA y en la plantilla desde RINFO (v10.2.94)
+## 2026-11-22 15:00 — [Consola Registro Info] Columna REGISTRO INFO y recuadro de HOTELES encima de la tabla (v10.2.94)
 
 Petición de Víctor: añadir a la tarifa una columna con el Registro Info de SAP de cada material, tanto en la que se crea desde cero como en la que se crea desde un RINFO.
 
@@ -59,6 +59,7 @@ Petición de Víctor: añadir a la tarifa una columna con el Registro Info de SA
 - En la plantilla para el proveedor (Acción 6), el número sale del propio RINFO o Purchasing.
 - En la TARIFA final (Acción 3), se copia del Purchasing de ese proveedor que haya en TARIFAS, el mismo que se usa para crear el RINFO. Si no hay ninguno, queda vacía. Al reprocesar una tarifa [INCOMPLETO] se completan los de los códigos SAP nuevos.
 - Decisión de Víctor: rellenarla con el Purchasing aunque sea antiguo, porque los Registros Info no cambian.
+- El recuadro de HOTELES pasa encima de la tabla (columnas FORMATO a REGISTRO INFO), para que la tarifa no se ensanche tres columnas más. La frase «DESCUENTOS YA APLICADOS EN PRECIO FINAL» pasa debajo de «Dto.(%)». Lo pidió Víctor al ver la captura del manual.
 - 4 pruebas nuevas (359 en total) y manual regenerado. Queda por probar en Windows con un Purchasing real.
 - PR: https://github.com/controlpedidosprincesscanarias-coder/consola-registro-info/pull/53
 

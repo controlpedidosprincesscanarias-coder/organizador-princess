@@ -61,6 +61,7 @@ Petición de Víctor: «colocamos también el botón de manual en el menú de la
 - El generador de manuales crea ahora, junto a cada PDF, el índice para buscar, con la página de cada apartado.
 - Manuales de Hotel, Comprador y Administrador regenerados con datos inventados, con un apartado sobre el botón.
 - Pruebas en local: prueba nueva de los manuales (qué ve cada rol, índices completos y la búsqueda), e2e en navegador con los tres roles (67 pasos) y huellas regeneradas por las 3 rutas nuevas. Queda por comprobar en Render tras desplegar.
+- PR: https://github.com/controlpedidosprincesscanarias-coder/control-pedidos-princess/pull/106 (historial en https://github.com/controlpedidosprincesscanarias-coder/organizador-princess/pull/98)
 
 ---
 

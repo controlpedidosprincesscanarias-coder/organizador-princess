@@ -51,6 +51,20 @@
 
 ---
 
+## 2026-11-22 13:00 — [Consola Registro Info] Acción 6: Generar plantilla Tarifa desde RINFO (v10.2.94 / v10.2.96)
+
+Petición de Víctor: un paso nuevo, «Generar plantilla Tarifa desde RINFO», para arrastrar un RINFO o un Purchasing y sacar una tarifa; es el paso «Crear / Actualizar Registro Info SAP» al revés.
+
+- El botón 6, antes en construcción, abre una ventana donde se arrastran uno o varios RINFO o Purchasing (o se eligen con «Examinar…»). Las plantillas salen en TARIFAS sin más preguntas, con el resumen en la consola.
+- Sale una tarifa por proveedor, con sus artículos, el precio vigente, el código de proveedor, el teléfono y los hoteles. Si los precios cambian según el hotel, sale una por cada grupo de hoteles con los mismos precios.
+- El proveedor rellena en amarillo el periodo, PRECIO NUEVO y FECHA INICIO. Cuando la devuelve, se usa tal cual para crear el RINFO: manda el precio nuevo donde esté y se propone su fecha de inicio.
+- No salen los registros marcados para borrar ni los precios caducados. Los escalados llevan el precio base y se avisan en la consola. Nunca se pisa un archivo.
+- Decisiones de Víctor: la plantilla es para enviar al proveedor; una por proveedor; los hoteles con los mismos precios juntos; va en el botón 6; lo devuelto entra directo en el RINFO.
+- 18 pruebas nuevas (355 en total) y manual regenerado. Queda por probar en Windows: arrastrar desde el Explorador y la ida y vuelta con un Purchasing real.
+- PR: https://github.com/controlpedidosprincesscanarias-coder/consola-registro-info/pull/52
+
+---
+
 ## 2026-11-22 10:00 — [Consola Registro Info] Teléfono del proveedor y hoteles en la TARIFA: el RINFO no los pregunta (v10.2.94)
 
 Petición de Víctor: añadir a la TARIFA un hueco para el teléfono del proveedor y otro con las siglas de los 10 hoteles, marcando con ✔ a los que se aplica, para que la creación del RINFO sea directa, sin paradas, y para que el futuro paso «Generar plantilla Tarifa desde RINFO» pueda rellenarlos; si la tarifa no trae un dato, se sigue preguntando.

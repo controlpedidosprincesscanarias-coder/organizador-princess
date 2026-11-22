@@ -737,6 +737,8 @@ def admin_vista_ver(c):
 
 def admin_usuario(c):
     p = c.ventana("Accesos y Opciones")
+    import ui.admin as _adm
+    _adm._rellenado_auto = True        # (v4.18.78) como si la cuenta se hubiera guardado sola al entrar
 
     b = buscar(c, p, "Mi Usuario", "TButton")
     if b:

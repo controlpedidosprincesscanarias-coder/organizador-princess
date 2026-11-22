@@ -1,3 +1,23 @@
+# ✨ Organizador Princess v4.18.78
+
+## 👤 «Mi Usuario» se rellena solo
+
+Petición de Víctor (22 nov 2026): «si el usuario está registrado en Control Pedidos, que directamente quede cumplimentado este apartado sin necesidad de que se tenga que rellenar, siempre editable por si se quiere modificar el usuario».
+
+- Al entrar en **Admin** con tu contraseña de Control de Pedidos, si **Mi Usuario** todavía no tenía tu cuenta, se guarda sola (tu usuario de Windows y esa contraseña, cifrada como siempre). El chat y los avisos de tus pedidos se ponen en marcha al momento, sin reiniciar.
+- Si tu contraseña de Control de Pedidos cambió, se actualiza sola la próxima vez que entres en Admin.
+- **Siempre editable**: en Mi Usuario se puede cambiar. Un usuario distinto puesto allí a mano no se sustituye nunca. Si el campo «Usuario» está vacío, se propone tu usuario de Windows.
+
+## 🔑 La contraseña de Admin, una vez al día
+
+Decisión de Víctor (22 nov 2026): con la cuenta ya guardada en Mi Usuario, Admin pide la contraseña (la misma de Control de Pedidos) solo la **primera vez de cada día**. El resto del día se abre directamente. Sin cuenta guardada se pide como siempre.
+
+## Correcciones
+
+- Los textos de Mi Usuario hablaban todavía de Telegram y no llevaban tildes.
+
+---
+
 # ✨ Organizador Princess v4.18.76
 
 ## 🔔 Sonidos del chat a tu gusto

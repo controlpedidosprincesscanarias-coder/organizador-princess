@@ -1,7 +1,7 @@
 // Manual de administrador del Organizador Princess. Idea y desarrollo de la aplicación: Víctor Alejandro Martín Andrade.
 const L = require("./lib");
 const { p, vineta, pasos, h1, h2, imagen, leyenda, recuadro, tabla, portada, indice } = L;
-const V = process.env.VERSION || "v4.18.76";
+const V = process.env.VERSION || "v4.18.78";
 
 const s = [];
 s.push(portada({ rol: "Administración", subtitulo: "Configura los botones y la vista del menú, el usuario y las copias, e instala y publica versiones",
@@ -33,7 +33,8 @@ s.push(p("Pulsa **Admin** en el menú principal. El acceso no usa un usuario y u
 s.push(...imagen("a_login", 10, "Acceso a Administración."));
 s.push(...leyenda([[1, "**Usuario Windows**: se toma solo; no se escribe."], [2, "**Contraseña**: la de tu cuenta de Control de Pedidos."],
   [3, "**¿Todavía no tienes cuenta en Control de Pedidos? Crear acceso**: cambia a la solicitud de alta (más abajo)."], [4, "**Entrar** (también vale la tecla Intro)."]]));
-s.push(p("La contraseña se comprueba contra Control de Pedidos, así que hace falta conexión; si ya entraste antes en este equipo con esa contraseña, se acepta aunque Control de Pedidos no responda. Una vez dentro, el panel no vuelve a pedirla mientras el Organizador siga abierto."));
+s.push(p("La contraseña se comprueba contra Control de Pedidos, así que hace falta conexión; si ya entraste antes en este equipo con esa contraseña, se acepta aunque Control de Pedidos no responda. Una vez dentro, el panel no vuelve a pedirla mientras el Organizador siga abierto. Desde la versión 4.18.78, si **Mi Usuario** ya tiene guardada tu cuenta de Control de Pedidos, la contraseña solo se pide **la primera vez de cada día**: el resto del día Admin se abre directamente."));
+s.push(...recuadro("consejo", "Mi Usuario se rellena solo", ["Al entrar en Admin con tu contraseña de Control de Pedidos, si **Mi Usuario** todavía no tenía tu cuenta (o tenía una contraseña antigua de tu mismo usuario), el Organizador la guarda sola y pone en marcha el chat y los avisos sin reiniciar. No tienes que escribirla otra vez. Siempre puedes cambiarla en Mi Usuario (capítulo 6)."]));
 s.push(...recuadro("importante", "Tres intentos y 5 minutos", ["Tras 3 contraseñas incorrectas el acceso se bloquea unos 5 minutos («Demasiados intentos fallidos»). Espera y vuelve a probar."]));
 s.push(h2("Si tu usuario aún no tiene cuenta"));
 s.push(...pasos(["En el acceso pulsa **Crear acceso**.", "Rellena nombre, apellidos, correo, teléfono móvil de empresa y marca tu hotel o hoteles (puedes marcar varios).",
@@ -100,10 +101,11 @@ s.push(h1("6. Mi Usuario: nombre y credenciales"));
 s.push(p("**Mi Usuario** guarda dos cosas de este equipo: cómo quieres que te llamen y con qué cuenta de Control de Pedidos trabaja el Organizador."));
 s.push(...imagen("a_mi_usuario", 11, "Mi Usuario (datos de ejemplo)."));
 s.push(...leyenda([[1, "**Usuario Windows** de este equipo."], [2, "**Nombre a mostrar**: sale en el saludo y en el chat. No puede quedar vacío."],
-  [3, "**Usuario (login)** de Control de Pedidos."], [4, "**Contraseña** de Control de Pedidos (se guarda cifrada). Debajo, el estado: verde si hay sesión; naranja si todavía no (se activa al guardar o al reiniciar)."],
+  [3, "**Usuario (login)** de Control de Pedidos. Si está vacío, se propone tu usuario de Windows."], [4, "**Contraseña** de Control de Pedidos (se guarda cifrada). Debajo, el estado: verde si hay sesión; naranja si todavía no."],
   [5, "**Guardar**."]]));
 s.push(p("Si en este equipo no hay **nombre** puesto, el Organizador usa el de la cuenta de Control de Pedidos en cuanto entra con ella. Un nombre escrito aquí no se cambia nunca solo."));
 s.push(p("Estas credenciales son las que usan el **chat**, los **avisos de pedidos** y el aviso «Abrir el Organizador» de Control de Pedidos: deben coincidir exactamente con las de Control de Pedidos. Al guardar, el Organizador las aplica sin reiniciar."));
+s.push(p("**No hace falta rellenarlas a mano** si tu usuario de Windows tiene cuenta en Control de Pedidos: al entrar en Admin con tu contraseña se guardan solas, y Mi Usuario lo indica en verde («Rellenado automáticamente…»). Se pueden cambiar cuando quieras, por ejemplo para usar otro usuario: un usuario distinto puesto aquí a mano no se sustituye nunca."));
 s.push(...recuadro("nota", "Cómo se protege la contraseña", ["Se guarda cifrada con Windows (DPAPI): solo el mismo usuario de Windows en el mismo equipo puede descifrarla. Si copias la carpeta de datos a otro PC u otro usuario, habrá que volver a escribirla en Mi Usuario."]));
 
 // 7
@@ -174,6 +176,6 @@ s.push(...tabla(["Síntoma", "Causa probable y qué hacer"], [
   ["Tras importar la configuración no cambia nada", "La importación cierra el Organizador: ábrelo de nuevo."],
   ["Hay que dejar un equipo como nuevo", "Panel Admin → ♻ Borrado completo y reinicio limpio (capítulo 7)."],
   ["Control de Pedidos avisa de que el Organizador no está abierto en ese PC", "Pulsar una vez «🖥️ Abrir el Organizador» en el aviso de la web para vincular ese navegador. Requiere Mi Usuario guardado."]], [3500, 6138]));
-s.push(...recuadro("consejo", "Lista de comprobación tras instalar un PC nuevo", ["1. Entrar en Admin (o solicitar el acceso).  2. Importar la configuración de referencia o configurar los botones.  3. Elegir la vista.  4. Guardar Mi Usuario con nombre y credenciales de Control de Pedidos.  5. Probar un botón de cada tipo, crear un aviso de prueba y abrir el chat."]));
+s.push(...recuadro("consejo", "Lista de comprobación tras instalar un PC nuevo", ["1. Entrar en Admin (o solicitar el acceso).  2. Importar la configuración de referencia o configurar los botones.  3. Elegir la vista.  4. Revisar Mi Usuario (las credenciales se guardan solas al entrar en Admin con la cuenta de Control de Pedidos; el nombre, si se quiere otro).  5. Probar un botón de cada tipo, crear un aviso de prueba y abrir el chat."]));
 
 L.generar(process.argv[2] || "salida/Manual_Administrador_OrganizadorPrincess.docx", "Manual de administrador — Organizador Princess", "de administrador", s);

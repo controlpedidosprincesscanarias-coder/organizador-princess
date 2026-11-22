@@ -51,6 +51,18 @@
 
 ---
 
+## 2026-11-22 10:00 — [Consola Registro Info] Teléfono del proveedor y hoteles en la TARIFA: el RINFO no los pregunta (v10.2.94)
+
+Petición de Víctor: añadir a la TARIFA un hueco para el teléfono del proveedor y otro con las siglas de los 10 hoteles, marcando con ✔ a los que se aplica, para que la creación del RINFO sea directa, sin paradas, y para que el futuro paso «Generar plantilla Tarifa desde RINFO» pueda rellenarlos; si la tarifa no trae un dato, se sigue preguntando.
+
+- La TARIFA final (Acción 3) lleva **«Teléfono:»** en la fila 4 (antes una fila vacía) y, a la derecha de la cabecera, el recuadro **HOTELES** con GY IT LP TA ST MG GC MT JN FV y una casilla con lista desplegable «✔» (también vale una X). Salen en blanco. La tabla no se mueve.
+- **Crear / Actualizar Registro Info SAP:** con un teléfono válido (8 a 10 cifras) y algún hotel marcado, no abre esas dos ventanas y lo dice en la consola; si falta alguno, su ventana de siempre. Las tarifas antiguas funcionan igual que antes.
+- Decisiones de Víctor: el recuadro en la cabecera (no en otra hoja), esas siglas, las fechas se siguen preguntando y las casillas salen sin marcar.
+- 17 pruebas nuevas (337 en total). Manual regenerado con la cabecera nueva. Queda por probar en Windows con una tarifa real y Excel (la lista desplegable y que se lea lo marcado).
+- PR: https://github.com/controlpedidosprincesscanarias-coder/consola-registro-info/pull/51
+
+---
+
 ## 2026-11-21 12:30 — [Catálogo Asignaciones] Menú igual para todos y ventana «⚙ Administración» (v1.20.79)
 
 Petición de Víctor: un menú de la izquierda más entendible, igual para todos, con un botón de administración atenuado para quien no es administrador, que abra una ventana con todas las opciones: activas las que cada uno puede usar y el resto visible pero en gris.

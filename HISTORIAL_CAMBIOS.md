@@ -51,6 +51,17 @@
 
 ---
 
+## 2026-11-23 14:00 — [Consola Registro Info] Salto a la v 10.4.00 (v10.4.00)
+
+- Petición de Víctor: «la siguiente versión sumamos dos al del centro y 0 al final, v 10.4.00».
+- La próxima compilación de la Consola será la **v10.4.00** (aunque la v10.2.100 siga en borrador), y las siguientes 10.4.02, 10.4.04… El último número va siempre con dos cifras, como en el Organizador. Para otro salto basta con poner la versión nueva en el código.
+- Corregido: al pulsar el número de versión, las novedades se pedían con la etiqueta «v10.4.0» y no habrían salido.
+- La v10.4.00 incluye lo que iba a salir en la v10.2.102: teléfono del proveedor desde el Purchasing (comprobado con los archivos de AHUMADOS CANARIOS SA: 606717855) y plantilla de la Acción 6 completa.
+- 383 pruebas; manual regenerado con «v 10.4.00».
+- PR: https://github.com/controlpedidosprincesscanarias-coder/consola-registro-info/pull/59
+
+---
+
 ## 2026-11-23 13:30 — [Consola Registro Info] Teléfono del proveedor desde el Purchasing y plantilla completa (v10.2.102)
 
 - Petición de Víctor: «si existe un Purchasing del proveedor, asignar el teléfono que tenga asociado al Excel de la tarifa que se crea e indicar al usuario que lo revise; cuando se crea a la inversa, también rellenar todos los campos correctamente».

@@ -51,6 +51,18 @@
 
 ---
 
+## 2026-11-23 12:00 — [Consola Registro Info] La web espera a la guía de los listados de SAP: un solo envío completo (v10.2.98)
+
+Petición de Víctor, con el log de AHUMADOS CANARIOS SA: al guardar códigos SAP nuevos, la web recibía primero solo los códigos y después, con la Acción 2, sus datos. Quería un único envío con todo completo y quitar la pregunta «Confirmar actualización SAP», que ya sobraba.
+
+- Si los códigos aún no están en Productos.xlsx, no se envía nada hasta contestar a «Faltan los listados de SAP actualizados». Con «Ya están en RECURSOS», la Acción 2 lo completa y lo envía todo de una vez, sin volver a preguntar. Con «Más tarde» se envían ya los códigos, como antes.
+- Se mantiene el aviso de duplicados, porque hay que corregirlos antes de crear el RINFO.
+- 371 pruebas y manual regenerado. Queda por probar en Windows.
+- Junto con el aviso de Purchasing desactualizado, saldrá en la v10.2.98, porque la v10.2.96 ya está publicada.
+- PR: https://github.com/controlpedidosprincesscanarias-coder/consola-registro-info/pull/56
+
+---
+
 ## 2026-11-23 11:00 — [Consola Registro Info] Aviso de Purchasing desactualizado al crear el RINFO (v10.2.98)
 
 Pregunta de Víctor: si la tarifa ya trae todos los Registros Info, ¿hace falta el Purchasing? Sí: de él salen los periodos de precio que ya tiene SAP, los datos de cada hotel, las bajas y el formato que SAP acepta, y tiene que estar descargado después de la última importación. Víctor aceptó que la Consola avise cuando no lo parece.

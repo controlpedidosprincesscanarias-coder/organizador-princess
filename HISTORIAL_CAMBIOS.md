@@ -51,6 +51,17 @@
 
 ---
 
+## 2026-11-23 13:00 — [Consola Registro Info] Bajas solo en los hoteles de la tarifa y sigla SU (v10.2.100)
+
+Víctor mandó el log del RINFO de AHUMADOS CANARIOS SA LP: una tarifa de un solo hotel (La Palma) con un Purchasing de todos los hoteles.
+
+- ⚠️ Error grave corregido: los 34 materiales que no venían en la tarifa de LP (son de las tarifas de Gran Canaria-Tenerife y de Fuerteventura) se marcaban para borrar en el Registro Info entero, lo que en SAP los borra en todos los hoteles. Ahora solo se dan de baja en los hoteles de esa tarifa, y los que solo están en otros hoteles no se tocan. No hay que importar el RINFO de AHUMADOS LP generado a las 10:02; si ya se importó, revisar esos materiales en SAP.
+- La sigla de Suite Princess pasa a ser SU (antes ST, que se sigue leyendo), y la columna REGISTRO INFO es más ancha.
+- 376 pruebas y manual regenerado. Queda por regenerar y probar en Windows el RINFO de AHUMADOS LP.
+- PR: https://github.com/controlpedidosprincesscanarias-coder/consola-registro-info/pull/57
+
+---
+
 ## 2026-11-23 12:00 — [Consola Registro Info] La web espera a la guía de los listados de SAP: un solo envío completo (v10.2.98)
 
 Petición de Víctor, con el log de AHUMADOS CANARIOS SA: al guardar códigos SAP nuevos, la web recibía primero solo los códigos y después, con la Acción 2, sus datos. Quería un único envío con todo completo y quitar la pregunta «Confirmar actualización SAP», que ya sobraba.

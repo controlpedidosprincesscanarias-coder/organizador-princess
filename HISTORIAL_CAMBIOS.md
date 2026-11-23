@@ -51,6 +51,15 @@
 
 ---
 
+## 2026-11-23 16:00 — [Consola Registro Info] Acción 3: la barra de progreso se pone en marcha al pulsar (v10.4.04)
+
+- Petición de Víctor: «cuando pulso la Acción 3 tarda mucho en cambiar la barra de progreso y parece que se ha quedado bloqueado».
+- La Acción 3 (y la reinscripción de un [INCOMPLETO]) trae primero lo cambiado en Catálogo Asignaciones y lee el catálogo, y mientras tanto la barra seguía en verde. Ahora pasa a amarilla en movimiento en cuanto se pulsa («Trayendo lo cambiado en Catálogo Asignaciones…», «Preparando la TARIFA…» y los pasos de siempre).
+- 395 pruebas. Sale en la v10.4.04.
+- PR: https://github.com/controlpedidosprincesscanarias-coder/consola-registro-info/pull/61
+
+---
+
 ## 2026-11-23 15:00 — [Consola Registro Info] La sesión caduca cada día y Categoría valoración distinta solo de los códigos en uso (v10.4.00)
 
 - Petición de Víctor: «la verificación de usuario que realiza la consola al inicio queda grabada en mi PC, ¿no sería conveniente que caduque diariamente?». Ahora la contraseña guardada vale solo ese día: al día siguiente se pide de nuevo (con el email puesto) y, si la Consola sigue abierta al cambiar el día, se pide antes de la siguiente acción («Cancelar» no la cierra; la acción no se hace).

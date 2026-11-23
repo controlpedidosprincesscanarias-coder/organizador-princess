@@ -51,6 +51,18 @@
 
 ---
 
+## 2026-11-23 11:00 — [Consola Registro Info] Aviso de Purchasing desactualizado al crear el RINFO (v10.2.98)
+
+Pregunta de Víctor: si la tarifa ya trae todos los Registros Info, ¿hace falta el Purchasing? Sí: de él salen los periodos de precio que ya tiene SAP, los datos de cada hotel, las bajas y el formato que SAP acepta, y tiene que estar descargado después de la última importación. Víctor aceptó que la Consola avise cuando no lo parece.
+
+- Al crear el RINFO, la ventana «Purchasing encontrado» avisa en naranja, y la consola también, en dos casos: si la tarifa lleva Registros Info que el Purchasing no tiene, o si hay un RINFO de ese proveedor guardado después del Purchasing.
+- Lleva un botón con los pasos para descargarlo de SAP. No impide seguir: si ese RINFO no se llegó a importar, se continúa.
+- Con los archivos reales de COMERCIAL YU FONG SL no sale ningún aviso, como debe.
+- 9 pruebas nuevas (369 en total) y manual regenerado. Queda por probar en Windows, en la unidad G:.
+- PR: https://github.com/controlpedidosprincesscanarias-coder/consola-registro-info/pull/55
+
+---
+
 ## 2026-11-23 09:30 — [Consola Registro Info] Revisión con datos reales y corrección en la Acción 6 (v10.2.94)
 
 Víctor mandó el log de la mañana con la tarifa, el Purchasing y el RINFO reales de COMERCIAL YU FONG SL.

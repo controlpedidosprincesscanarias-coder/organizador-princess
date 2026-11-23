@@ -51,6 +51,13 @@
 
 ---
 
+## 2026-11-23 13:30 — [Consola Registro Info] Teléfono del proveedor desde el Purchasing y plantilla completa (v10.2.102)
+
+- Petición de Víctor: «si existe un Purchasing del proveedor, asignar el teléfono que tenga asociado al Excel de la tarifa que se crea e indicar al usuario que lo revise; cuando se crea a la inversa, también rellenar todos los campos correctamente».
+- **TARIFA final (Acción 3):** si en TARIFAS hay un Purchasing del proveedor (el mismo que rellena REGISTRO INFO), su teléfono se pone en «Teléfono:» y la consola avisa en amarillo para revisarlo. No pisa un teléfono ya escrito. También al reprocesar un [INCOMPLETO]. Los hoteles no se toman del Purchasing (una tarifa puede ser de solo algunos).
+- **Plantilla de la Acción 6:** «Código:» con el código DALI del proveedor (de su última TARIFA final; si no hay, el de SAP) y «Dto.(%)» con «0 línea» / «0 general», como la TARIFA final.
+- 379 pruebas; manual regenerado. Saldrá en la v10.2.102 (la v10.2.100 sigue en borrador).
+
 ## 2026-11-23 13:00 — [Consola Registro Info] Bajas solo en los hoteles de la tarifa y sigla SU (v10.2.100)
 
 Víctor mandó el log del RINFO de AHUMADOS CANARIOS SA LP: una tarifa de un solo hotel (La Palma) con un Purchasing de todos los hoteles.

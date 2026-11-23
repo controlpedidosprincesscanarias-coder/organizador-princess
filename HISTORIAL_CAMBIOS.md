@@ -51,6 +51,15 @@
 
 ---
 
+## 2026-11-23 15:00 — [Consola Registro Info] La sesión caduca cada día y Categoría valoración distinta solo de los códigos en uso (v10.4.00)
+
+- Petición de Víctor: «la verificación de usuario que realiza la consola al inicio queda grabada en mi PC, ¿no sería conveniente que caduque diariamente?». Ahora la contraseña guardada vale solo ese día: al día siguiente se pide de nuevo (con el email puesto) y, si la Consola sigue abierta al cambiar el día, se pide antes de la siguiente acción («Cancelar» no la cierra; la acción no se hace).
+- Petición de Víctor: la «Categoría valoración distinta según el centro» de la Acción 2 solo se avisa para los códigos SAP en uso en el catálogo y la web; los demás no se tienen en cuenta.
+- 393 pruebas; manual regenerado. Sale en la v10.4.00.
+- PR: https://github.com/controlpedidosprincesscanarias-coder/consola-registro-info/pull/60
+
+---
+
 ## 2026-11-23 14:00 — [Consola Registro Info] Salto a la v 10.4.00 (v10.4.00)
 
 - Petición de Víctor: «la siguiente versión sumamos dos al del centro y 0 al final, v 10.4.00».

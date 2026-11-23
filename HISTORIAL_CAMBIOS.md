@@ -57,6 +57,9 @@
 - **TARIFA final (Acción 3):** si en TARIFAS hay un Purchasing del proveedor (el mismo que rellena REGISTRO INFO), su teléfono se pone en «Teléfono:» y la consola avisa en amarillo para revisarlo. No pisa un teléfono ya escrito. También al reprocesar un [INCOMPLETO]. Los hoteles no se toman del Purchasing (una tarifa puede ser de solo algunos).
 - **Plantilla de la Acción 6:** «Código:» con el código DALI del proveedor (de su última TARIFA final; si no hay, el de SAP) y «Dto.(%)» con «0 línea» / «0 general», como la TARIFA final.
 - 379 pruebas; manual regenerado. Saldrá en la v10.2.102 (la v10.2.100 sigue en borrador).
+- PR: https://github.com/controlpedidosprincesscanarias-coder/consola-registro-info/pull/58
+
+---
 
 ## 2026-11-23 13:00 — [Consola Registro Info] Bajas solo en los hoteles de la tarifa y sigla SU (v10.2.100)
 

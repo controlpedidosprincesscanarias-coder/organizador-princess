@@ -51,6 +51,17 @@
 
 ---
 
+## 2026-11-23 09:30 — [Consola Registro Info] Revisión con datos reales y corrección en la Acción 6 (v10.2.94)
+
+Víctor mandó el log de la mañana con la tarifa, el Purchasing y el RINFO reales de COMERCIAL YU FONG SL.
+
+- Todo lo nuevo funcionó bien: el recuadro de HOTELES encima de la tabla, la columna REGISTRO INFO (completa salvo en los 2 materiales nuevos, que aún no tienen número en SAP) y el RINFO sin preguntar los centros, «Sin incidencias detectadas».
+- Error corregido en la Acción 6: si la plantilla se genera desde un RINFO de la Consola, los materiales nuevos habrían salido con Registro Info «1» y «2», que son números provisionales. Ahora salen vacíos.
+- 360 pruebas. Queda por probar en Windows la Acción 6 arrastrando el archivo.
+- PR: https://github.com/controlpedidosprincesscanarias-coder/consola-registro-info/pull/54
+
+---
+
 ## 2026-11-22 22:10 — [Organizador] «Mi Usuario» se rellena solo y Admin pide la contraseña una vez al día (v4.18.78)
 
 Petición de Víctor (22 nov 2026): «si el usuario está registrado en Control Pedidos, que directamente quede cumplimentado este apartado sin necesidad de que se tenga que rellenar, siempre editable», y que para Administración sirva la misma contraseña.

@@ -51,7 +51,7 @@
 
 ---
 
-## 2026-11-23 11:00 — [Consola Registro Info] Aviso de Purchasing desactualizado al crear el RINFO (v10.2.96)
+## 2026-11-23 11:00 — [Consola Registro Info] Aviso de Purchasing desactualizado al crear el RINFO (v10.2.98)
 
 Pregunta de Víctor: si la tarifa ya trae todos los Registros Info, ¿hace falta el Purchasing? Sí: de él salen los periodos de precio que ya tiene SAP, los datos de cada hotel, las bajas y el formato que SAP acepta, y tiene que estar descargado después de la última importación. Víctor aceptó que la Consola avise cuando no lo parece.
 

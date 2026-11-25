@@ -51,6 +51,18 @@
 
 ---
 
+## 2026-11-25 23:50 — [Control Pedidos / Infra] Revisión de seguridad de las cuatro web: pypdf al día (v12.34.44)
+
+Petición de Víctor (25 nov 2026): «¿Puedes revisar la seguridad de mis aplicaciones? Son todas web y recientemente se descubrió un agujero serio de seguridad en el código habitual de las web».
+
+- Se revisaron Control Pedidos, el servidor del chat, Catálogo Asignaciones y Activo Operacional. Las librerías se pasaron por los comprobadores oficiales de fallos conocidos (`pip-audit` y `npm audit`) y se repasaron los agujeros típicos: consultas a la base de datos, cabeceras, cookies, CORS y modo depuración.
+- No apareció ningún aviso nuevo de Flask, Express o React que les afecte. Los fallos graves publicados este mes son de PHP, Drupal, WordPress, NGINX y Tomcat, que no se usan.
+- Único hallazgo, en Control Pedidos: la librería que lee los PDF (pypdf 6.21.2) tenía 7 fallos publicados. Un PDF manipulado podía dejar el servidor bloqueado o sin memoria. Pasa a la 6.21.4.
+- El chat, Catálogo Asignaciones y Activo Operacional: sin ninguna librería con fallos conocidos y sin agujeros típicos.
+- PR: https://github.com/controlpedidosprincesscanarias-coder/control-pedidos-princess/pull/120
+
+---
+
 ## 2026-11-25 23:20 — [Organizador] Chat más seguro: marca de Internet en los adjuntos, y vídeos con el reproductor (v4.18.80)
 
 Petición de Víctor (25 nov 2026): «Con el chat del organizador de escritorio, ¿hay que realizar algún arreglo de seguridad?».

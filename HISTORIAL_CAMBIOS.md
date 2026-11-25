@@ -51,6 +51,17 @@
 
 ---
 
+## 2026-11-25 22:40 — [Chat] Sin error de gunicorn al apagar el servidor (v1.9.2)
+
+Petición de Víctor (25 nov 2026): «Arregla el error de gunicorn del servidor del chat».
+
+- Desde gunicorn 25, cada vez que el servidor del chat se apagaba (en cada despliegue de Render) salía en el registro un error `eventlet.timeout.Timeout: 2.0 seconds`. Lo provocaba el «control socket» de gunicorn 25, una interfaz de administración que el chat no usa y que no se lleva bien con eventlet.
+- Nuevo `gunicorn.conf.py`, que gunicorn lee solo al arrancar y que lo desactiva. El comando de arranque de Render no cambia.
+- No afecta a los mensajes, al Organizador ni a la app móvil. Las pruebas del chat pasan ya enteras.
+- PR: https://github.com/controlpedidosprincesscanarias-coder/control-pedidos-chat/pull/17
+
+---
+
 ## 2026-11-25 22:00 — [Chat móvil / Chat] Auditoría de seguridad de la app móvil (v1.0.26 / v1.9.1)
 
 Petición de Víctor (25 nov 2026): «¿puedes auditar la seguridad de la apk? Que no exista ningún tipo de puerta por donde alguien o algo pudiera entrar en el móvil».

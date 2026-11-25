@@ -140,7 +140,12 @@ def url_adjunto_permitida(url) -> bool:
     except Exception:
         pass
     host = u.hostname.lower()
-    return any(host.endswith(h) for h in _HOSTS_ADJUNTOS + extra)
+    # (v4.18.80) Un host extra escrito sin el punto inicial («supabase.co») ya no acepta «evilsupabase.co»
+    for h in _HOSTS_ADJUNTOS + extra:
+        base = h.strip().lstrip(".")
+        if base and (host == base or host.endswith("." + base)):
+            return True
+    return False
 
 
 # Tipos de evento que se encolan para la UI (ver ChatClient.eventos)

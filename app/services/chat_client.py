@@ -105,6 +105,9 @@ _RE_NOMBRE_MALO = re.compile(r'[\x00-\x1f\x7f<>:"/\\|?*\u202a-\u202e\u2066-\u206
 EXT_ABRIR_DIRECTO = {
     ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp", ".pdf", ".txt", ".csv",
     ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".odt", ".ods", ".odp", ".rtf",
+    # (v4.18.80) Vídeos: la v4.18.74 decía «un clic los abre con el reproductor de Windows», pero al no estar aquí
+    # solo se enseñaban en el Explorador. Mismas extensiones que utils/enlaces.EXT_VIDEO.
+    ".mp4", ".m4v", ".mov", ".3gp", ".webm", ".mkv", ".avi", ".wmv",
 }
 
 

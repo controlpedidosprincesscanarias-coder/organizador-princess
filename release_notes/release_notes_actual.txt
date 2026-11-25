@@ -1,20 +1,19 @@
-✨ Organizador Princess v4.18.78
+✨ Organizador Princess v4.18.80
 ================================================================
 
-👤 MI USUARIO SE RELLENA SOLO
+🔒 CHAT MÁS SEGURO
 
-• Si tu usuario de Windows tiene cuenta en Control de Pedidos,
-  al entrar en Admin con tu contraseña queda guardada sola en
-  «Mi Usuario». No hace falta escribirla otra vez: el chat y
-  los avisos de tus pedidos se ponen en marcha al momento.
-• Si cambias la contraseña en Control de Pedidos, se actualiza
-  sola la próxima vez que entres en Admin.
-• Siempre se puede cambiar a mano en Admin → Mi Usuario.
+• Los archivos que llegan por el chat se guardan con la marca
+  «descargado de Internet», como hacen los navegadores.
+  Word, Excel y PowerPoint los abren en «Vista protegida» y no
+  ejecutan macros sin preguntar. Si confías en quien lo envió,
+  pulsa «Habilitar edición».
 
-🔑 ADMIN, UNA VEZ AL DÍA
+🎬 VÍDEOS
 
-• Con tu cuenta ya guardada, Admin pide la contraseña solo la
-  primera vez de cada día. El resto del día se abre directo.
+• Los vídeos enviados como archivo se abren ya con el
+  reproductor de Windows al pulsarlos (antes solo se enseñaban
+  en la carpeta Descargas).
 
 ================================================================
 La idea y el desarrollo de la aplicación Organizador Princess son de

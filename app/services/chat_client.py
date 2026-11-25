@@ -71,6 +71,7 @@ import socketio
 from PIL import Image
 
 from db.sqlite import get_bridge_credentials, guardar_nombre_si_falta, load_config
+from utils import marca_internet
 
 log = logging.getLogger(__name__)
 
@@ -105,6 +106,9 @@ _RE_NOMBRE_MALO = re.compile(r'[\x00-\x1f\x7f<>:"/\\|?*\u202a-\u202e\u2066-\u206
 EXT_ABRIR_DIRECTO = {
     ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp", ".pdf", ".txt", ".csv",
     ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".odt", ".ods", ".odp", ".rtf",
+    # (v4.18.80) Vídeos: la v4.18.74 decía «un clic los abre con el reproductor de Windows», pero al no estar aquí
+    # solo se enseñaban en el Explorador. Mismas extensiones que utils/enlaces.EXT_VIDEO.
+    ".mp4", ".m4v", ".mov", ".3gp", ".webm", ".mkv", ".avi", ".wmv",
 }
 
 
@@ -136,7 +140,12 @@ def url_adjunto_permitida(url) -> bool:
     except Exception:
         pass
     host = u.hostname.lower()
-    return any(host.endswith(h) for h in _HOSTS_ADJUNTOS + extra)
+    # (v4.18.80) Un host extra escrito sin el punto inicial («supabase.co») ya no acepta «evilsupabase.co»
+    for h in _HOSTS_ADJUNTOS + extra:
+        base = h.strip().lstrip(".")
+        if base and (host == base or host.endswith("." + base)):
+            return True
+    return False
 
 
 # Tipos de evento que se encolan para la UI (ver ChatClient.eventos)
@@ -485,6 +494,7 @@ class ChatClient:
         datos = self.descargar_bytes(url)
         with open(destino, "wb") as f:
             f.write(datos)
+        marca_internet.marcar(destino, url)          # (v4.18.80) Vista protegida / avisos de Windows
         return destino
 
     def descargar_adjunto(self, url: str, nombre_archivo: str) -> str:
@@ -509,6 +519,9 @@ class ChatClient:
             try:
                 with open(ruta, "xb") as f:      # "x": nunca pisa un archivo existente
                     f.write(datos)
+                # (v4.18.80, auditoría) Marca de Internet, como los navegadores: Office lo abre en Vista protegida
+                # (sin macros) y Windows avisa antes de ejecutar cualquier cosa.
+                marca_internet.marcar(ruta, url)
                 return ruta
             except FileExistsError:
                 n += 1

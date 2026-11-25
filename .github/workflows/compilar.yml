@@ -120,6 +120,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit 1 }
           python test_manual_consulta.py
           if ($LASTEXITCODE -ne 0) { exit 1 }
+          python test_chat_fase7.py
+          if ($LASTEXITCODE -ne 0) { exit 1 }
 
       - name: Compilar con PyInstaller
         shell: pwsh

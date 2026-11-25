@@ -51,6 +51,17 @@
 
 ---
 
+## 2026-11-25 23:20 — [Organizador] Chat más seguro: marca de Internet en los adjuntos, y vídeos con el reproductor (v4.18.80)
+
+Petición de Víctor (25 nov 2026): «Con el chat del organizador de escritorio, ¿hay que realizar algún arreglo de seguridad?».
+
+- Se revisó todo lo que hace el chat de escritorio con lo que llega de otros. Lo importante ya estaba bien: solo se abren directamente fotos, PDF, Office, texto, audio y vídeo (un programa solo se enseña en el Explorador, sin ejecutarse), las descargas solo vienen del almacén del chat, los nombres se limpian, los enlaces solo se abren si son páginas web y la contraseña va cifrada con Windows.
+- Lo que faltaba: los archivos del chat se guardan ahora con la **marca de Internet**, como los navegadores. Word, Excel y PowerPoint los abren en «Vista protegida» y no ejecutan macros, y Windows avisa antes de ejecutar nada. Antes, un `.doc` o `.xls` con macros recibido por el chat se abría como un archivo de confianza del PC.
+- Corregido: los vídeos enviados como archivo se abren con el reproductor de Windows (solo se enseñaban en Descargas). Manual de usuario regenerado.
+- PR: https://github.com/controlpedidosprincesscanarias-coder/organizador-princess/pull/111
+
+---
+
 ## 2026-11-25 22:40 — [Chat] Sin error de gunicorn al apagar el servidor (v1.9.2)
 
 Petición de Víctor (25 nov 2026): «Arregla el error de gunicorn del servidor del chat».

@@ -71,6 +71,7 @@ import socketio
 from PIL import Image
 
 from db.sqlite import get_bridge_credentials, guardar_nombre_si_falta, load_config
+from utils import marca_internet
 
 log = logging.getLogger(__name__)
 
@@ -488,6 +489,7 @@ class ChatClient:
         datos = self.descargar_bytes(url)
         with open(destino, "wb") as f:
             f.write(datos)
+        marca_internet.marcar(destino, url)          # (v4.18.80) Vista protegida / avisos de Windows
         return destino
 
     def descargar_adjunto(self, url: str, nombre_archivo: str) -> str:
@@ -512,6 +514,9 @@ class ChatClient:
             try:
                 with open(ruta, "xb") as f:      # "x": nunca pisa un archivo existente
                     f.write(datos)
+                # (v4.18.80, auditoría) Marca de Internet, como los navegadores: Office lo abre en Vista protegida
+                # (sin macros) y Windows avisa antes de ejecutar cualquier cosa.
+                marca_internet.marcar(ruta, url)
                 return ruta
             except FileExistsError:
                 n += 1

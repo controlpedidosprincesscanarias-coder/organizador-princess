@@ -173,6 +173,8 @@ def pulsar(url: str, nombre: str, descargar_bytes, despues, al_error=None, rep=N
                 with open(ruta + ".part", "wb") as f:
                     f.write(datos)
                 os.replace(ruta + ".part", ruta)
+                from utils import marca_internet          # (v4.18.80) por si se abre con el programa de audio
+                marca_internet.marcar(ruta, url)
         except Exception as e:  # noqa: BLE001
             log.warning("Mensaje de voz: no se pudo descargar: %s", e)
             if al_error:

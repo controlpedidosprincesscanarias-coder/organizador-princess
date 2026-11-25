@@ -82,6 +82,7 @@ hiddenimports += [
     'ui.avatares',       # v4.18.28: fotos de perfil del chat
     'ui.sonidos_chat',   # v4.18.76: ventanas «🔔 Sonidos del chat» y «Sonido de este chat»
     'ui.manual',         # v4.18.76: manual consultable del botón «Manual» (buscador y PDF completo)
+    'utils.marca_internet',  # v4.18.80: marca de Internet en los adjuntos del chat (Vista protegida)
     'utils.manual_consulta',  # v4.18.76: contenido y búsqueda de ese manual
     'ui.miniaturas',     # v4.18.44: miniaturas de las imágenes del chat
     'ui.vista_previa',   # v4.18.74: tarjeta de los enlaces de vídeo en el chat

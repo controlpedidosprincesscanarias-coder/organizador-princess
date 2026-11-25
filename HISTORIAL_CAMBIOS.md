@@ -51,6 +51,17 @@
 
 ---
 
+## 2026-11-25 17:55 — [Chat móvil] Mensaje claro sin conexión y «Sin conexión a internet» en la cabecera (v1.0.24)
+
+Petición de Víctor (25 nov 2026), con una captura en modo avión: «Revisar el mensaje cuando no existe conexión en el chat móvil». Salía el error técnico de Android en inglés («Unable to resolve host…») y la cabecera se quedaba en «Conectando…».
+
+- Ahora el aviso dice: «Sin conexión a internet. Comprueba los datos móviles o el wifi: el chat se conectará solo en cuanto vuelva». Hay textos claros también cuando el chat tarda en responder o la wifi no deja abrir una conexión segura.
+- La cabecera dice «🔴 Sin conexión a internet» y, al volver la conexión, el chat se reconecta solo.
+- No cambia el servidor del chat ni el Organizador.
+- PR: https://github.com/controlpedidosprincesscanarias-coder/chat-movil-princess/pull/18
+
+---
+
 ## 2026-11-23 16:00 — [Consola Registro Info] Acción 3: la barra de progreso se pone en marcha al pulsar (v10.4.04)
 
 - Petición de Víctor: «cuando pulso la Acción 3 tarda mucho en cambiar la barra de progreso y parece que se ha quedado bloqueado».

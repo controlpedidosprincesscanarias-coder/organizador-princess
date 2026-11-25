@@ -51,6 +51,20 @@
 
 ---
 
+## 2026-11-25 22:00 — [Chat móvil / Chat] Auditoría de seguridad de la app móvil (v1.0.26 / v1.9.1)
+
+Petición de Víctor (25 nov 2026): «¿puedes auditar la seguridad de la apk? Que no exista ningún tipo de puerta por donde alguien o algo pudiera entrar en el móvil».
+
+- **La puerta importante:** una app de Android (`.apk`) enviada por el chat se abría en el móvil con el instalador, y la app del chat tiene permiso para instalar (lo usa para actualizarse). Ahora el servidor del chat (v1.9.1) no deja enviar apps (`.apk`, `.xapk`, `.aab`…, también con doble extensión) y la app móvil (v1.0.26) no las abre, guarda ni comparte aunque lleguen.
+- **Actualizaciones del móvil:** solo con su comprobación SHA-256 y descargadas de GitHub por https. Antes, una Release sin `.sha256` se instalaba sin comprobar. Se usa la `.apk` que corresponde a su `.sha256` (la Release trae dos).
+- **Avisos:** otra app del móvil ya no puede abrir el chat en una conversación con un título inventado; solo lo hacen los avisos de la propia app, con una clave privada.
+- **Cambio de móvil:** ningún dato de la app (sesión, contraseña, ajustes) pasa a otro móvil ni a la copia de Google.
+- Revisado y correcto: conexiones solo cifradas, contraseña cifrada en el móvil, ninguna clave en el código, adjuntos solo del almacén del chat, enlaces solo http/https, nada de la app accesible para otras apps.
+- Pendiente anotado en el chat: un traceback de gunicorn 25 al apagar el servidor (ya pasaba antes; no afecta a los mensajes).
+- PR: https://github.com/controlpedidosprincesscanarias-coder/chat-movil-princess/pull/19 y https://github.com/controlpedidosprincesscanarias-coder/control-pedidos-chat/pull/16
+
+---
+
 ## 2026-11-25 17:55 — [Chat móvil] Mensaje claro sin conexión y «Sin conexión a internet» en la cabecera (v1.0.24)
 
 Petición de Víctor (25 nov 2026), con una captura en modo avión: «Revisar el mensaje cuando no existe conexión en el chat móvil». Salía el error técnico de Android en inglés («Unable to resolve host…») y la cabecera se quedaba en «Conectando…».

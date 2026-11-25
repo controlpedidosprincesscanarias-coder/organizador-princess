@@ -99,6 +99,9 @@ APARTADOS = [
         "Los mensajes de voz se graban en el móvil; aquí se escuchan con un clic (otro clic los para).",
         "Los enlaces salen subrayados y se abren en el navegador. Los de TikTok, YouTube o Instagram llevan una tarjeta.",
         "Un vídeo enviado como archivo (🎬) se abre con el reproductor de Windows.",
+        "Los documentos recibidos se abren en Vista protegida: si confías en quien los envió, pulsa «Habilitar "
+        "edición». Por seguridad, solo se abren directamente fotos, PDF, Office, texto, audio y vídeo; cualquier "
+        "otro archivo se guarda en Descargas y se enseña en el Explorador.",
     ]),
     ("🫧", "La burbuja flotante", [
         "Cuando te escriben aparece una burbuja abajo a la derecha, con sonido, para leer y responder sin abrir el chat.",

@@ -1,3 +1,19 @@
+# ✨ Organizador Princess v4.18.80
+
+## 🔒 Chat más seguro
+
+Petición de Víctor (25 nov 2026): «Con el chat del organizador de escritorio, ¿hay que realizar algún arreglo de seguridad?».
+
+- Se revisó todo lo que hace el chat con lo que llega de otros: archivos, imágenes, voz, vídeos y enlaces, además de la conexión y la sesión. Lo importante ya estaba bien: solo se abren directamente tipos inofensivos (fotos, PDF, Office, texto, audio y vídeo); cualquier otro, por ejemplo un programa, solo se enseña en el Explorador. Las descargas solo vienen del almacén del chat, los nombres de archivo se limpian, los enlaces solo se abren si son páginas web normales y la contraseña va cifrada con Windows.
+- **Lo que faltaba:** los archivos del chat se guardan ahora con la **marca de Internet**, como los navegadores. Así Word, Excel y PowerPoint los abren en **Vista protegida** y no ejecutan macros, el lector de PDF los abre en modo protegido y Windows avisa antes de ejecutar cualquier cosa. Antes, un `.doc` o `.xls` con macros recibido por el chat se abría como un archivo de confianza del PC. Si confías en quien lo envió, pulsa «Habilitar edición».
+- Un ajuste avanzado (`chat_hosts_adjuntos` de `config.json`) escrito sin el punto inicial ya no acepta otros dominios que solo terminan igual.
+
+## 🎬 Vídeos adjuntos
+
+- Corregido: los vídeos enviados como archivo se abren con el reproductor de Windows al pulsarlos, como anunciaba la v4.18.74. Hasta ahora solo se enseñaban en la carpeta Descargas.
+
+---
+
 # ✨ Organizador Princess v4.18.78
 
 ## 👤 «Mi Usuario» se rellena solo

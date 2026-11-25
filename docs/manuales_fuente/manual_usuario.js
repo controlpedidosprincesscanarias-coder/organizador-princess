@@ -1,7 +1,7 @@
 // Manual de usuario del Organizador Princess. Idea y desarrollo de la aplicación: Víctor Alejandro Martín Andrade.
 const L = require("./lib");
 const { p, vineta, pasos, h1, h2, imagen, leyenda, recuadro, tabla, portada, indice } = L;
-const V = process.env.VERSION || "v4.18.78";
+const V = process.env.VERSION || "v4.18.80";
 
 const s = [];
 s.push(portada({ rol: "Uso diario", subtitulo: "Abre tus accesos, apunta avisos, consulta el calendario y chatea con tus compañeros",
@@ -159,7 +159,9 @@ s.push(...tabla(["Quiero…", "Cómo"], [
   ["Reenviar", "Clic derecho → **↪ Reenviar…** y eliges la conversación o el compañero. Vale también para fotos y archivos (no se vuelven a subir). La copia lleva «↪ Reenviado»."],
   ["Eliminar un mensaje mío", "Clic derecho → **🗑 Eliminar**. Pide confirmación y queda como «🚫 Mensaje eliminado» para todos, al momento."],
   ["Ver una imagen", "Pulsa su miniatura."],
-  ["Guardar un adjunto", "Clic derecho sobre él → «Abrir», «Guardar como…» o «Copiar nombre del archivo»."]], [2600, 7038]));
+  ["Guardar un adjunto", "Clic derecho sobre él → «Abrir», «Guardar como…» o «Copiar nombre del archivo»."],
+  ["Editar un documento recibido", "Word, Excel y PowerPoint lo abren en **Vista protegida** (barra amarilla), porque viene de fuera. Si confías en quien lo envió, pulsa **Habilitar edición**. Las macros no se ejecutan sin preguntar."]], [2600, 7038]));
+s.push(...recuadro("nota", "Archivos que no se abren solos", ["Por seguridad, el Organizador solo abre directamente fotos, PDF, documentos de Office, texto, audio y vídeo. Cualquier otro archivo (por ejemplo, un programa) se guarda en **Descargas** y se enseña en el Explorador, sin abrirlo."]));
 s.push(p("Todo esto funciona igual en la ventana grande y en la burbuja flotante."));
 s.push(h2("Vaciar o eliminar un chat"));
 s.push(...tabla(["Quiero…", "Cómo"], [

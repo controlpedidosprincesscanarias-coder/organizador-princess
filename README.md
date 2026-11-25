@@ -11,6 +11,7 @@ Aplicación de escritorio desarrollada en **Python + ttkbootstrap**, que combina
 
 - 📅 Agenda con eventos, avisos recurrentes y calendario con colores, imprimible por día/semana/mes.
 - 🏖 Gestión de Vacaciones y Festivos.
+- 🔒 (v4.18.80) Los adjuntos del chat se guardan con la marca de Internet (`app/utils/marca_internet.py`): Office los abre en Vista protegida y Windows avisa antes de ejecutar nada. Los vídeos adjuntos se abren con el reproductor.
 - 👤 (v4.18.78) «Mi Usuario» se rellena solo al entrar en Admin con la cuenta de Control de Pedidos (siempre editable), y con la cuenta guardada Admin pide la contraseña una vez al día (`services/admin_auth.py`: `completar_credenciales`, `acceso_admin_de_hoy`).
 - 🔔 (v4.18.76) Sonidos del chat a gusto de cada persona: uno general y otro para cada chat o grupo (8 tonos incluidos, un `.wav` propio o «🔕 Silencio»), desde el menú ⋮ de la conversación, el 🔔 de la burbuja o Administración → «🔔 Sonidos del chat». Se guarda en `config.json` de ese equipo (`app/services/sonidos_chat.py`, `app/ui/sonidos_chat.py`).
 - 🎨 (v4.18.72) Agenda, Calendario, Vacaciones y Festivos con aspecto nuevo: tarjetas con la franja del color de cada tipo, hora o fecha en grande, resumen y próximo aviso en la cabecera y, en el calendario, una línea por aviso con su hora y su título (`ui/estilo_calendario.py`, textos en `utils/textos_calendario.py`).

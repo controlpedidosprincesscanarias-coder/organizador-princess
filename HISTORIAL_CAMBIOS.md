@@ -51,6 +51,29 @@
 
 ---
 
+## 2026-11-25 23:58 — [Catálogo Asignaciones] Enlace firmado del PDF de documentación faltante (v1.20.80)
+
+**Petición de Víctor (25 nov 2026):** «¿Catálogo Asignaciones y Activo Operacional están bien?», dentro de la revisión de seguridad de las cuatro web.
+
+- **Hallazgo:** el PDF de documentación faltante que se envía a cada proveedor (`GET /export/documentacion-faltante-pdf/:idProveedor`) se abría sin sesión con solo el número del proveedor, que es correlativo: cualquiera podía descargar los de todos.
+- **Arreglo:** el enlace del correo lleva ahora una firma (`?firma=`, HMAC del id con una clave del servidor; `backend/src/utils/enlaceDocumentacion.js`). Sin firma, o con la de otro proveedor, responde 403 con una página que pide que se reenvíe el correo. No caduca: el PDF se recalcula al abrirlo, como antes.
+- **Enlaces ya enviados** (decisión de Víctor): los antiguos sin firma siguen valiendo hasta el **15 de diciembre de 2026** incluido (`ENLACES_ANTIGUOS_HASTA`). No hay que añadir nada en Render ni aplicar migraciones.
+- **Activo Operacional:** revisado sin cambios (`npm audit` sin fallos, rutas públicas limitadas al inicio y cierre de sesión y a los enlaces firmados).
+- **Pruebas:** backend con 93 pruebas OK (7 nuevas en `enlaceDocumentacion.test.mjs`), frontend con 18 pruebas OK y compilación OK. Queda por probar en producción el enlace de un correo nuevo y el de uno antiguo.
+- PR: https://github.com/controlpedidosprincesscanarias-coder/dali-sap-articulos-app/pull/26
+
+## 2026-11-25 23:50 — [Control Pedidos / Infra] Revisión de seguridad de las cuatro web: pypdf al día (v12.34.44)
+
+Petición de Víctor (25 nov 2026): «¿Puedes revisar la seguridad de mis aplicaciones? Son todas web y recientemente se descubrió un agujero serio de seguridad en el código habitual de las web».
+
+- Se revisaron Control Pedidos, el servidor del chat, Catálogo Asignaciones y Activo Operacional. Las librerías se pasaron por los comprobadores oficiales de fallos conocidos (`pip-audit` y `npm audit`) y se repasaron los agujeros típicos: consultas a la base de datos, cabeceras, cookies, CORS y modo depuración.
+- No apareció ningún aviso nuevo de Flask, Express o React que les afecte. Los fallos graves publicados este mes son de PHP, Drupal, WordPress, NGINX y Tomcat, que no se usan.
+- Único hallazgo, en Control Pedidos: la librería que lee los PDF (pypdf 6.21.2) tenía 7 fallos publicados. Un PDF manipulado podía dejar el servidor bloqueado o sin memoria. Pasa a la 6.21.4.
+- El chat, Catálogo Asignaciones y Activo Operacional: sin ninguna librería con fallos conocidos y sin agujeros típicos.
+- PR: https://github.com/controlpedidosprincesscanarias-coder/control-pedidos-princess/pull/120
+
+---
+
 ## 2026-11-25 23:20 — [Organizador] Chat más seguro: marca de Internet en los adjuntos, y vídeos con el reproductor (v4.18.80)
 
 Petición de Víctor (25 nov 2026): «Con el chat del organizador de escritorio, ¿hay que realizar algún arreglo de seguridad?».
